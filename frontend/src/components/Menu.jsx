@@ -16,16 +16,22 @@ export default function Menu() {
         console.log("Khaliya Debug: Menu.jsx is trying to fetch from ->", API_URL);
         axios.get(`${API_URL}/api/menu`)
             .then(res => {
-                setMenuItems(res.data || []);
+                setMenuItems(res.data && res.data.length > 0 ? res.data : getFallbackMenu());
             })
             .catch(err => {
-                console.error('Error fetching menu:', err);
-                setMenuItems([]);
+                console.error('Error fetching menu, using fallback:', err);
+                setMenuItems(getFallbackMenu());
             })
             .finally(() => {
                 setLoading(false);
             });
     }, []);
+
+    const getFallbackMenu = () => [
+        { id: 1, category: "Appetizer", name: { en: "Samosa", hi: "समोसा", ar: "سمبوسك" }, description: { en: "Crispy pastry", hi: "कुरकुरा पेस्ट्री", ar: "معجنات مقرمشة" }, price: "₹80" },
+        { id: 2, category: "Main Course", name: { en: "Butter Chicken", hi: "बटर चिकन", ar: "دجاج بالزبدة" }, description: { en: "Creamy tomato gravy", hi: "क्रीमी टमाटर की ग्रेवी", ar: "مرق طماطم كريمي" }, price: "₹380" },
+        { id: 3, category: "Bread", name: { en: "Garlic Naan", hi: "गार्लिक नान", ar: "خبز النان بالثوم" }, description: { en: "Freshly baked", hi: "ताजा पकाया हुआ", ar: "مخبوز طازجاً" }, price: "₹60" }
+    ];
 
     const getLocalized = (field) => {
         if (field && typeof field === 'object') {

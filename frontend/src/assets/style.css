@@ -5,6 +5,13 @@
     box-sizing: border-box;
 }
 
+#root {
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+}
+
 :root {
     /* Premium Luxury Brand Colors */
     --primary-color: #E63946;
@@ -255,7 +262,7 @@ nav {
     background: var(--bg-glass);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    padding: 1.5rem 2rem;
+    padding: 1rem;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -263,7 +270,9 @@ nav {
     /* more subtle shadow */
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     flex-wrap: wrap;
-    gap: 3rem;
+    gap: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 
