@@ -1,0 +1,282 @@
+/* loyalty-dashboard.css */
+/* Gamified User Profile & Loyalty Points UI */
+
+.loyalty-container {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+}
+
+.loyalty-card {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(45, 20, 20, 0.95));
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.loyalty-header {
+    padding: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: url('https://www.transparenttextures.com/patterns/black-scales.png') repeat;
+}
+
+.loyalty-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-light), var(--accent-color));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    box-shadow: 0 0 20px var(--accent-glow);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+.loyalty-user-info {
+    flex: 1;
+}
+
+.loyalty-user-info h3 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+}
+
+.loyalty-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.5rem;
+}
+
+.tier-bronze {
+    background: linear-gradient(135deg, #cd7f32, #8b5a2b);
+    color: white;
+}
+
+.tier-silver {
+    background: linear-gradient(135deg, #e0e0e0, #9e9e9e);
+    color: #333;
+}
+
+.tier-gold {
+    background: linear-gradient(135deg, var(--accent-light), var(--accent-color));
+    color: #333;
+}
+
+.tier-platinum {
+    background: linear-gradient(135deg, #e5e4e2, #7a7a7a);
+    color: white;
+    border: 1px solid #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.loyalty-points-display {
+    text-align: right;
+}
+
+.loyalty-points-display .pts {
+    font-size: 3rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--accent-light);
+    line-height: 1;
+    text-shadow: 0 0 15px var(--accent-glow);
+}
+
+.loyalty-progress-container {
+    padding: 2.5rem;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d4af37, #f3e5ab);
+    width: 0%;
+    border-radius: 10px;
+    position: relative;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%);
+    animation: shimmerProgress 2s infinite;
+}
+
+@keyframes shimmerProgress {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.loyalty-rewards {
+    padding: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.reward-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.reward-card.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.reward-card.unlocked {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(212, 175, 55, 0.15));
+    border-color: rgba(212, 175, 55, 0.4);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.reward-card.unlocked:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(212, 175, 55, 0.2);
+}
+
+.reward-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.reward-card.unlocked .reward-icon {
+    color: var(--accent-color);
+    animation: bounce 2s infinite;
+}
+
+.reward-title {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.reward-pts {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.claim-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-light);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.reward-card.unlocked .claim-btn {
+    background: var(--accent-color);
+    color: var(--secondary-color);
+}
+
+.reward-card.unlocked .claim-btn:hover {
+    background: var(--accent-light);
+    transform: scale(1.05);
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-10px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Auth Login overlay for Gamification */
+.auth-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+}
+
+@media(max-width: 600px) {
+    .loyalty-header {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .loyalty-points-display {
+        text-align: center;
+    }
+}

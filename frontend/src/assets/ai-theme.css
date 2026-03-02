@@ -1,0 +1,357 @@
+.khali-assistant {
+    position: fixed;
+    bottom: 90px;
+    left: 20px;
+    z-index: 9999;
+    font-family: var(--font-body);
+}
+
+.khali-trigger {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    transition: transform 0.3s;
+    animation: float 3s ease-in-out infinite;
+}
+
+.khali-trigger:hover {
+    transform: scale(1.1);
+}
+
+.khali-trigger::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--accent-light);
+    animation: ripple 2s infinite ease-out;
+}
+
+.khali-window {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    width: 330px;
+    height: 450px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: bottom left;
+    transform: scale(0);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--border-light);
+}
+
+.khali-window.active {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.khali-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.khali-header .title {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+}
+
+.khali-header .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.khali-chat-area {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: var(--bg-light);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+}
+
+.chat-bubble.bot {
+    background: white;
+    color: var(--text-dark);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    box-shadow: var(--shadow-xs);
+    border: 1px solid var(--border-light);
+}
+
+.chat-bubble.user {
+    background: linear-gradient(135deg, var(--primary-color), #5c141b);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    box-shadow: var(--shadow-xs);
+}
+
+.chat-bubble a {
+    color: var(--accent-color);
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.chat-bubble.user a {
+    color: #fff;
+}
+
+.khali-input-area {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 10px;
+}
+
+.khali-input-area input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 0.9rem;
+    background: #f9f9f9;
+}
+
+.khali-input-area input:focus {
+    border-color: var(--primary-color);
+    background: white;
+}
+
+.khali-input-area button {
+    background: var(--accent-color);
+    color: var(--secondary-color);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s;
+}
+
+.khali-input-area button:hover {
+    transform: scale(1.1);
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dynamic Smart UI Themes */
+body.theme-evening {
+    background-color: #fdf5f6;
+    /* Very light pink/warm tone */
+}
+
+body.theme-evening .hero-overlay {
+    background: linear-gradient(135deg, rgba(60, 20, 30, 0.6), rgba(0, 0, 0, 0.8));
+}
+
+body.theme-night {
+    background-color: var(--bg-dark);
+    color: #e0e0e0;
+}
+
+body.theme-night section {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+body.theme-night .menu-item {
+    background: #1e1e1e;
+    border-color: #333;
+    color: #dcdcdc;
+}
+
+body.theme-night .menu-item h3 {
+    color: var(--accent-light);
+}
+
+body.theme-night .hero-overlay {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(15, 8, 8, 0.95));
+}
+
+body.theme-night h1,
+body.theme-night h2 {
+    color: var(--accent-light);
+}
+
+body.theme-night header {
+    background: linear-gradient(135deg, #111 0%, #000 100%);
+}
+
+body.theme-night nav {
+    background: rgba(20, 20, 20, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.theme-night nav a {
+    color: #ccc;
+}
+
+body.theme-night nav a:hover {
+    color: var(--accent-light);
+}
+
+body.theme-night .accent-section {
+    background: linear-gradient(135deg, #2a1111 0%, #150808 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.theme-night .testimonial-card {
+    background: #1c1c1c;
+    border-color: #333;
+}
+
+body.theme-night #reviews form input,
+body.theme-night #reviews form textarea,
+body.theme-night #reviews form select {
+    background: #222;
+    border-color: #444;
+    color: white;
+}
+
+body.theme-night #tables>div {
+    background: #1e1e1e !important;
+    border-left-color: var(--primary-color) !important;
+}
+
+body.theme-night .table-type-card {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+body.theme-night .table-type-card strong {
+    color: #fff;
+}
+
+body.theme-night .hours-table th {
+    background: var(--primary-color);
+}
+
+body.theme-night .hours-table td {
+    background: #1e1e1e;
+    color: #ccc;
+    border-bottom: 1px solid #333;
+}
+
+body.theme-night .hours-table tr:hover td {
+    background: #2a2a2a;
+}
+
+body.theme-night #reservations form {
+    background: #1e1e1e !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.theme-night #reservations form input,
+body.theme-night #reservations form select {
+    background: #222;
+    border-color: #444;
+    color: white;
+}
+
+body.theme-night #reservations form * {
+    color: #ccc;
+}
+
+body.theme-night .khali-window {
+    background: #1c1c1c;
+    border-color: #444;
+}
+
+body.theme-night .khali-chat-area {
+    background: #111;
+}
+
+body.theme-night .chat-bubble.bot {
+    background: #2c2c2c;
+    color: #eee;
+    border-color: #444;
+}
+
+body.theme-night .khali-input-area {
+    background: #1c1c1c;
+    border-top-color: #444;
+}
+
+body.theme-night .khali-input-area input {
+    background: #111;
+    color: white;
+    border-color: #444;
+}
