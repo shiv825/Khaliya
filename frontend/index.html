@@ -20,6 +20,17 @@
   <!-- GSAP for Animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <style>
+    /* Absolute reset to prevent mobile horizontal scroll drag under any circumstance */
+    html,
+    body {
+      max-width: 100vw;
+      width: 100%;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 
 <body>
