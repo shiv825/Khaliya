@@ -12,6 +12,24 @@
     width: 100%;
 }
 
+/* Native App Feel - Hide Scrollbars */
+::-webkit-scrollbar {
+    display: none;
+}
+
+* {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+/* Prevent image dragging and long-press save menus on mobile */
+img {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+}
+
 :root {
     /* Premium Luxury Brand Colors */
     --primary-color: #E63946;
