@@ -6,7 +6,7 @@ export const i18nData = {
         nav: {
             home: 'Home', menu: 'Menu', hours: 'Hours', track: 'Find Us',
             tables: '🪑 Tables', bookings: '📊 Bookings', menuManager: '📝 Menu Manager',
-            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reservations'
+            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reservations', loyalty: 'Spice Club'
         },
         header: { sub: 'Authentic Indian Cuisine • Est. 2020' },
         hero: {
@@ -174,7 +174,7 @@ export const i18nData = {
         nav: {
             home: 'होम', menu: 'मेनू', hours: 'घंटे', track: 'हम कहाँ हैं',
             tables: '🪑 टेबल', bookings: '📊 बुकिंग्स', menuManager: '📝 मेनू प्रबंधक',
-            settings: '⚙️ सेटिंग्स', logout: '🚪 लॉगआउट', contact: 'संपर्क', reservations: 'आरक्षण'
+            settings: '⚙️ सेटिंग्स', logout: '🚪 लॉगआउट', contact: 'संपर्क', reservations: 'आरक्षण', loyalty: 'रिवार्ड्स'
         },
         header: { sub: 'प्रामाणिक भारतीय व्यंजन • स्था. 2020' },
         hero: {
@@ -342,7 +342,7 @@ export const i18nData = {
         nav: {
             home: 'الصفحة الرئيسية', menu: 'القائمة', hours: 'ساعات العمل', track: 'اعثر علينا',
             tables: '🪑 الطاولات', bookings: '📊 الحجوزات', menuManager: '📝 مدير القائمة',
-            settings: '⚙️ الإعدادات', logout: '🚪 تسجيل الخروج', contact: 'اتصل بنا', reservations: 'الحجوزات'
+            settings: '⚙️ الإعدادات', logout: '🚪 تسجيل الخروج', contact: 'اتصل بنا', reservations: 'الحجوزات', loyalty: 'مكافآت'
         },
         header: { sub: 'المأكولات الهندية الأصيلة • تأسس عام 2020' },
         hero: {
