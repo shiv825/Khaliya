@@ -34,6 +34,33 @@ app.get('/api/menu', (req, res) => {
     res.json(menu);
 });
 
+app.post('/api/menu', (req, res) => {
+    const menu = readData('menu.json');
+    const newItem = { id: Date.now().toString(), ...req.body };
+    menu.push(newItem);
+    writeData('menu.json', menu);
+    res.status(201).json(newItem);
+});
+
+app.put('/api/menu/:id', (req, res) => {
+    const menu = readData('menu.json');
+    const index = menu.findIndex(item => item.id == req.params.id || item.name === req.params.id);
+    if (index !== -1) {
+        menu[index] = { ...menu[index], ...req.body };
+        writeData('menu.json', menu);
+        res.json(menu[index]);
+    } else {
+        res.status(404).json({ message: 'Menu item not found' });
+    }
+});
+
+app.delete('/api/menu/:id', (req, res) => {
+    let menu = readData('menu.json');
+    menu = menu.filter(item => item.id != req.params.id && item.name !== req.params.id);
+    writeData('menu.json', menu);
+    res.json({ message: 'Menu item deleted' });
+});
+
 // API: Bookings
 app.get('/api/bookings', (req, res) => {
     const bookings = readData('bookings.json');
@@ -58,6 +85,19 @@ app.put('/api/bookings/:id', (req, res) => {
     } else {
         res.status(404).json({ message: 'Booking not found' });
     }
+});
+
+app.delete('/api/bookings/:id', (req, res) => {
+    let bookings = readData('bookings.json');
+    bookings = bookings.filter(b => b.id != req.params.id);
+    writeData('bookings.json', bookings);
+    res.json({ message: 'Booking deleted' });
+});
+
+// API: Clear Bookings
+app.delete('/api/bookings', (req, res) => {
+    writeData('bookings.json', []);
+    res.json({ message: 'All bookings cleared' });
 });
 
 // API: Reviews
