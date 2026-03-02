@@ -239,12 +239,14 @@ header::before {
 header h1 {
     color: white;
     margin-bottom: 0.3rem;
-    font-size: 3.8rem;
+    font-size: min(3.8rem, 12vw);
     text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.4);
     position: relative;
     z-index: 1;
     letter-spacing: 2px;
     font-weight: 700;
+    word-wrap: break-word;
+    padding: 0 1rem;
 }
 
 header p {
@@ -262,7 +264,7 @@ nav {
     background: var(--bg-glass);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    padding: 1rem;
+    padding: 0.8rem;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -270,7 +272,7 @@ nav {
     /* more subtle shadow */
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1rem;
     width: 100%;
     box-sizing: border-box;
 }
