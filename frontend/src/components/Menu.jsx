@@ -16,10 +16,12 @@ export default function Menu() {
         axios.get(`${API_URL}/api/menu`)
             .then(res => {
                 setMenuItems(res.data || []);
-                setLoading(false);
             })
             .catch(err => {
                 console.error('Error fetching menu:', err);
+                setMenuItems([]);
+            })
+            .finally(() => {
                 setLoading(false);
             });
     }, []);
