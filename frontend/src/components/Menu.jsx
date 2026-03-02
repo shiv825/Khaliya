@@ -13,6 +13,7 @@ export default function Menu() {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     useEffect(() => {
+        console.log("Khaliya Debug: Menu.jsx is trying to fetch from ->", API_URL);
         axios.get(`${API_URL}/api/menu`)
             .then(res => {
                 setMenuItems(res.data || []);
