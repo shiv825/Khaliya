@@ -9,11 +9,13 @@ export default function Navbar() {
             <header data-aos="fade-down" data-aos-duration="800">
                 <h1>{t('common.name')}</h1>
                 <p>{t('header.sub')}</p>
-                <div style={{ position: 'absolute', top: '1.6rem', left: '2rem', display: 'flex', gap: '0.5rem', alignItems: 'center', zIndex: 9999 }}>
+            </header>
+            <nav data-aos="fade-right" data-aos-duration="600" data-aos-delay="200">
+                <div style={{ display: 'inline-block', marginRight: '1rem' }}>
                     <select
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
-                        style={{ padding: '0.3rem', borderRadius: '6px' }}
+                        style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #ddd', background: 'white', fontWeight: 'bold' }}
                         title="Select language"
                     >
                         <option value="en">EN</option>
@@ -21,8 +23,6 @@ export default function Navbar() {
                         <option value="ar">عربي</option>
                     </select>
                 </div>
-            </header>
-            <nav data-aos="fade-right" data-aos-duration="600" data-aos-delay="200">
                 <a href="#home">{t('nav.home')}</a>
                 <a href="#menu">{t('nav.menu')}</a>
                 <a href="#loyalty"><i className="fas fa-gem" style={{ color: 'var(--accent-color)', marginRight: '5px' }}></i> {t('nav.loyalty')}</a>
