@@ -10,8 +10,10 @@ export default function Menu() {
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState('default');
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     useEffect(() => {
-        axios.get('http://localhost:5000/api/menu')
+        axios.get(`${API_URL}/api/menu`)
             .then(res => {
                 setMenuItems(res.data || []);
                 setLoading(false);
