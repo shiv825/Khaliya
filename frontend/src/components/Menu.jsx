@@ -23,8 +23,10 @@ export default function Menu() {
         console.log("Khaliya Debug: Menu.jsx is trying to fetch from ->", API_URL);
         axios.get(`${API_URL}/api/menu`)
             .then(res => {
-                if (res.data && res.data.length > 0) {
+                if (Array.isArray(res.data) && res.data.length > 0) {
                     setMenuItems(res.data);
+                } else {
+                    console.warn("API returned invalid data format, forcing fallback menu:", res.data);
                 }
             })
             .catch(err => {

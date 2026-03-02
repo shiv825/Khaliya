@@ -1,6 +1,7 @@
 export const i18nData = {
     en: {
         common: { name: 'Khaliya Restaurant' },
+        loyalty: { title: 'Spice Club Rewards', sub: 'Join our exclusive loyalty program. Earn points, tier up, and unlock secret menu items!' },
         seasonal: { text: 'Flash Deal: 20% OFF on all Starters!' },
         nav: {
             home: 'Home', menu: 'Menu', hours: 'Hours', track: 'Find Us',
@@ -168,6 +169,7 @@ export const i18nData = {
     },
     hi: {
         common: { name: 'खालिया रेस्टोरेंट' },
+        loyalty: { title: 'स्पाइस क्लब रिवार्ड्स', sub: 'हमारे विशेष लॉयल्टी कार्यक्रम में शामिल हों। अंक अर्जित करें, टियर अप करें और गुप्त मेनू आइटम अनलॉक करें!' },
         seasonal: { text: 'फ्लैश डील: सभी स्टार्टर्स पर 20% की छूट!' },
         nav: {
             home: 'होम', menu: 'मेनू', hours: 'घंटे', track: 'हम कहाँ हैं',
@@ -335,6 +337,7 @@ export const i18nData = {
     },
     ar: {
         common: { name: 'مطعم خاليا' },
+        loyalty: { title: 'مكافآت نادي سبايس', sub: 'انضم إلى برنامج الولاء الحصري الخاص بنا. اكسب النقاط، وارتقِ في المستويات، وافتح عناصر القائمة السرية!' },
         seasonal: { text: 'عرض فلاش: خصم 20% على جميع المقبلات!' },
         nav: {
             home: 'الصفحة الرئيسية', menu: 'القائمة', hours: 'ساعات العمل', track: 'اعثر علينا',

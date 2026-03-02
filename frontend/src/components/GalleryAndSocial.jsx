@@ -22,12 +22,12 @@ export default function GalleryAndSocial() {
                     <p>{t('social.sub')}</p>
                 </div>
                 <div className="instagram-grid">
-                    <div className="insta-item"><img src="/moments-interior.png" alt="Restaurant Interior" onError={e => e.target.src = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80'} /></div>
-                    <div className="insta-item"><img src="/moments-biryani.png" alt="Signature Biryani" onError={e => e.target.src = 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400&q=80'} /></div>
-                    <div className="insta-item"><img src="/moments-chef.png" alt="Chef at Work" onError={e => e.target.src = 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&q=80'} /></div>
-                    <div className="insta-item"><img src="/moments-kebabs.png" alt="Sizzling Kebabs" onError={e => e.target.src = 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=80'} /></div>
-                    <div className="insta-item"><img src="/moments-ambiance.png" alt="Happy Ambiance" onError={e => e.target.src = 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80'} /></div>
-                    <div className="insta-item"><img src="/moments-spices.png" alt="Vibrant Spices" onError={e => e.target.src = 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80'} /></div>
+                    <div className="insta-item"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80" alt="Restaurant Interior" /></div>
+                    <div className="insta-item"><img src="https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400&q=80" alt="Signature Biryani" /></div>
+                    <div className="insta-item"><img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&q=80" alt="Chef at Work" /></div>
+                    <div className="insta-item"><img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=80" alt="Sizzling Kebabs" /></div>
+                    <div className="insta-item"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80" alt="Happy Ambiance" /></div>
+                    <div className="insta-item"><img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80" alt="Vibrant Spices" /></div>
                 </div>
             </section>
 
