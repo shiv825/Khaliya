@@ -6,7 +6,7 @@
 }
 
 #root {
-    max-width: 100vw;
+    max-width: 100%;
     overflow-x: hidden;
     position: relative;
     width: 100%;
@@ -667,10 +667,10 @@ nav a:hover::after {
 .pwa-install-banner::before {
     content: '';
     position: fixed;
-    top: -50vh;
-    left: -50vw;
-    width: 200vw;
-    height: 200vh;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     z-index: -1;
