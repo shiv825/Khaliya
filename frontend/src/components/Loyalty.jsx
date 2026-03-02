@@ -25,6 +25,47 @@ export default function Loyalty() {
     const tier = getTierInfo(points);
     const progressPercent = tier.next ? (points / tier.next) * 100 : 100;
 
+    const handleRedeem = (cost, itemName) => {
+        if (points >= cost) {
+            import('sweetalert2').then(({ default: Swal }) => {
+                Swal.fire({
+                    title: 'Redeem Reward?',
+                    text: `Use ${cost} points for ${itemName}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: 'var(--accent-color)',
+                    cancelButtonColor: '#444',
+                    confirmButtonText: 'Yes, redeem it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const newPoints = points - cost;
+                        setPoints(newPoints);
+
+                        // Keep tier logic updated manually for now since it doesn't auto-recalc tier on save
+                        const currentTier = getTierInfo(newPoints).name;
+                        localStorage.setItem('khaliya_loyalty_status', JSON.stringify({ points: newPoints, tier: currentTier }));
+
+                        Swal.fire({
+                            title: 'Redeemed!',
+                            text: `You have successfully claimed: ${itemName}. Show this to your waiter.`,
+                            icon: 'success',
+                            confirmButtonColor: 'var(--accent-color)'
+                        });
+                    }
+                });
+            }).catch(() => {
+                // Fallback in case sweetalert2 fails to load dynamically
+                if (window.confirm(`Use ${cost} points for ${itemName}?`)) {
+                    const newPoints = points - cost;
+                    setPoints(newPoints);
+                    const currentTier = getTierInfo(newPoints).name;
+                    localStorage.setItem('khaliya_loyalty_status', JSON.stringify({ points: newPoints, tier: currentTier }));
+                    alert(`Redeemed! You claimed: ${itemName}. Show this to your waiter.`);
+                }
+            });
+        }
+    };
+
     return (
         <section id="loyalty" style={{ background: '#111', padding: '5rem 0' }} data-aos="fade-up">
             <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
@@ -77,7 +118,7 @@ export default function Loyalty() {
                                 <div style={{ fontSize: '1.2rem', marginBottom: '5px' }}>☕ Free Masala Chai</div>
                                 <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Redeem for a hot beverage</div>
                             </div>
-                            <button className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 100 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 100 ? 'auto' : 'none' }}>
+                            <button onClick={() => handleRedeem(100, 'Free Masala Chai')} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 100 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 100 ? 'auto' : 'none', cursor: points >= 100 ? 'pointer' : 'not-allowed' }}>
                                 100 pts
                             </button>
                         </div>
@@ -87,7 +128,7 @@ export default function Loyalty() {
                                 <div style={{ fontSize: '1.2rem', marginBottom: '5px' }}>🥟 Free Samosa Plate</div>
                                 <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Classic Indian Starter</div>
                             </div>
-                            <button className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 300 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 300 ? 'auto' : 'none' }}>
+                            <button onClick={() => handleRedeem(300, 'Free Samosa Plate')} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 300 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 300 ? 'auto' : 'none', cursor: points >= 300 ? 'pointer' : 'not-allowed' }}>
                                 300 pts
                             </button>
                         </div>
@@ -97,7 +138,7 @@ export default function Loyalty() {
                                 <div style={{ fontSize: '1.2rem', marginBottom: '5px' }}>🍛 20% Off Bill</div>
                                 <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Discount on grand total</div>
                             </div>
-                            <button className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 800 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 800 ? 'auto' : 'none' }}>
+                            <button onClick={() => handleRedeem(800, '20% Off Bill')} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 800 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 800 ? 'auto' : 'none', cursor: points >= 800 ? 'pointer' : 'not-allowed' }}>
                                 800 pts
                             </button>
                         </div>
