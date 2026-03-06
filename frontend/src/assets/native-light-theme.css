@@ -1,0 +1,117 @@
+/* Light Theme Overrides for Khaliya Native App */
+:root {
+    --card-bg: #FFFFFF;
+    --text-color: #222222;
+    --text-muted: #666666;
+    --border-color: rgba(0, 0, 0, 0.05);
+}
+
+.native-app-shell {
+    background-color: #F8F9FA !important;
+    color: #222 !important;
+}
+
+.native-content-area {
+    background: #F0F2F5 !important;
+}
+
+.native-bottom-nav {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.03);
+}
+
+.nav-tab {
+    color: #888 !important;
+}
+
+.nav-tab.active {
+    color: var(--primary-color, #E63946) !important;
+}
+
+.native-header .greeting h2,
+.section-header h3,
+.food-info h4,
+.native-menu-header h2,
+.native-menu-card h3,
+.profile-hero h2,
+.points-number,
+.settings-text,
+.summary-row strong,
+.table-card,
+.stepper span,
+.wizard-step h3 {
+    color: #222 !important;
+}
+
+.native-header .subtitle,
+.native-menu-card p,
+.loyalty-card-native h3,
+.form-group-native label {
+    color: #666 !important;
+}
+
+.food-card-mini,
+.native-menu-card,
+.search-bar,
+.category-tab,
+.native-input,
+.stepper,
+.table-card,
+.booking-summary,
+.loyalty-card-native,
+.settings-item {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+.category-tab.active {
+    background: var(--primary-color, #E63946) !important;
+    color: white !important;
+}
+
+.search-bar input,
+.native-input {
+    color: #222 !important;
+    color-scheme: light !important;
+}
+
+.card-price {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #222 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.add-to-cart-btn {
+    background: rgba(230, 57, 70, 0.1) !important;
+    color: var(--primary-color, #E63946) !important;
+}
+
+.add-to-cart-btn:active {
+    background: var(--primary-color, #E63946) !important;
+    color: white !important;
+}
+
+.stepper-btn {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #222 !important;
+}
+
+.native-btn-secondary {
+    background: #E0E0E0 !important;
+    color: #333 !important;
+}
+
+.summary-row {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.profile-tier {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #d4af37 !important;
+}
+
+.progress-bar-container {
+    background: rgba(0, 0, 0, 0.1) !important;
+}

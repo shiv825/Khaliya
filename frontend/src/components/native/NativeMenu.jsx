@@ -1,69 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function NativeMenu() {
+    const { t, language } = useLanguage();
     const [activeCategory, setActiveCategory] = useState('All');
+    const [menuItems, setMenuItems] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const categories = ['All', 'Starters', 'Mains', 'Breads', 'Desserts', 'Drinks'];
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-    const menuItems = [
-        { id: 1, name: "Paneer Tikka", category: "Starters", price: "₹320", desc: "Charcoal grilled cottage cheese", image: "https://images.unsplash.com/photo-1599487405702-3e28faced4e3?w=500&fit=crop" },
-        { id: 2, name: "Butter Chicken", category: "Mains", price: "₹450", desc: "Rich tomato gravy & tender chicken", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&fit=crop" },
-        { id: 3, name: "Garlic Naan", category: "Breads", price: "₹80", desc: "Fresh baked flatbread with garlic", image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&fit=crop" },
-        { id: 4, name: "Dal Makhani", category: "Mains", price: "₹350", desc: "Slow cooked black lentils", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop" },
-        { id: 5, name: "Gulab Jamun", category: "Desserts", price: "₹150", desc: "Sweet dumplings in rose syrup", image: "https://images.unsplash.com/photo-1588673756288-4cb22c0199e1?w=500&fit=crop" },
-    ];
+    useEffect(() => {
+        axios.get(`${API_URL}/api/menu`)
+            .then(res => {
+                if (Array.isArray(res.data)) {
+                    setMenuItems(res.data);
+                }
+            })
+            .catch(err => console.error('Error fetching native menu:', err))
+            .finally(() => setLoading(false));
+    }, [API_URL]);
+
+    const getLocalized = (field) => {
+        if (field && typeof field === 'object') {
+            return field[language] || field.en || '';
+        }
+        return field || '';
+    };
+
+    // Dynamically generate categories from the available items
+    const backendCategories = [...new Set(menuItems.map(item => getLocalized(item.category)).filter(Boolean))];
+    const categories = ['All', ...backendCategories];
 
     const filteredItems = activeCategory === 'All'
         ? menuItems
-        : menuItems.filter(item => item.category === activeCategory);
+        : menuItems.filter(item => {
+            const cat = getLocalized(item.category);
+            return cat === activeCategory;
+        });
+
+    if (loading) {
+        return (
+            <div className="native-loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--accent-color)' }}>
+                <i className="fas fa-spinner fa-spin fa-2x"></i>
+            </div>
+        );
+    }
 
     return (
-        <div className="native-menu-view">
+        <div className="native-menu-view" id="native-menu">
             {/* Header */}
             <div className="native-menu-header">
-                <h2>Our Menu</h2>
+                <h2>{t('menu.title')}</h2>
                 <div className="search-bar">
                     <i className="fas fa-search"></i>
-                    <input type="text" placeholder="Search dishes..." />
+                    <input type="text" placeholder={t('menu.searchPlaceholder')} />
                 </div>
             </div>
 
             {/* Swipeable Category Tabs */}
             <div className="native-categories">
-                {categories.map(cat => (
-                    <button
-                        key={cat}
-                        className={`category-tab ${activeCategory === cat ? 'active' : ''}`}
-                        onClick={() => setActiveCategory(cat)}
-                    >
-                        {cat}
-                    </button>
-                ))}
+                {categories.map(cat => {
+                    let localizedCat = cat;
+                    if (cat === 'All') localizedCat = t('menu.catAll') || 'All';
+                    else if (cat === 'Appetizer') localizedCat = t('menu.catAppetizer') || 'Appetizer';
+                    else if (cat === 'Main Course') localizedCat = t('menu.catMain') || 'Main Course';
+                    else if (cat === 'Bread') localizedCat = t('menu.catBread') || 'Bread';
+                    else if (cat === 'Dessert') localizedCat = t('menu.catDessert') || 'Dessert';
+                    else if (cat.includes('Beverage')) localizedCat = t('menu.catBeverage') || 'Beverage';
+
+                    return (
+                        <button
+                            key={cat}
+                            className={`category-tab ${activeCategory === cat ? 'active' : ''}`}
+                            onClick={() => setActiveCategory(cat)}
+                        >
+                            {localizedCat}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Menu Items Grid */}
             <motion.div layout className="native-menu-grid">
                 <AnimatePresence>
-                    {filteredItems.map(item => (
+                    {filteredItems.map((item, index) => (
                         <motion.div
                             layout
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.2 }}
-                            key={item.id}
+                            key={item.id || index}
                             className="native-menu-card"
                         >
                             <div className="card-image">
-                                <img src={item.image} alt={item.name} />
-                                <div className="card-price">{item.price}</div>
+                                <img
+                                    src={
+                                        item.image
+                                            ? (item.image.startsWith('http') ? item.image : `${API_URL}${item.image}`)
+                                            : "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop"
+                                    }
+                                    alt={getLocalized(item.name)}
+                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop"; }}
+                                />
+                                <div className="card-price">₹{item.price}</div>
                             </div>
                             <div className="card-content">
-                                <h3>{item.name}</h3>
-                                <p>{item.desc}</p>
+                                <h3>{getLocalized(item.name)}</h3>
+                                <p>{getLocalized(item.description)}</p>
                                 <button className="add-to-cart-btn">
-                                    <i className="fas fa-plus"></i> Add
+                                    <i className="fas fa-plus"></i> {t('menu.addBtn', 'Add')}
                                 </button>
                             </div>
                         </motion.div>

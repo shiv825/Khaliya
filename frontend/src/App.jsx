@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
@@ -20,10 +20,11 @@ function App() {
   );
   useEffect(() => {
     AOS.init({
-      duration: 900,
+      duration: 800,
       once: true,
-      offset: 120,
-      easing: 'ease-in-out'
+      offset: 50,
+      easing: 'ease-out',
+      disable: 'mobile' // Completely disable AOS on small devices for maximum speed
     });
   }, []);
 

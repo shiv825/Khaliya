@@ -1,4 +1,4 @@
-const CACHE_NAME = 'khaliya-restaurant-v10';
+const CACHE_NAME = 'khaliya-restaurant-v11';
 const STATIC_ASSETS = [
     '/',
     '/index.html',

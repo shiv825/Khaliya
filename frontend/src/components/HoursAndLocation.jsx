@@ -102,25 +102,61 @@ export default function HoursAndLocation() {
                 {locationState.error && <div style={{ textAlign: 'center', color: '#ff9800', marginBottom: '1rem' }}>{locationState.error}</div>}
 
                 {locationState.lat && (
-                    <div id="userLocation" className="location-info" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justification: 'center', background: 'var(--bg-surface)', padding: '20px', borderRadius: '8px', boxShadow: 'var(--shadow-md)' }}>
-                        <div style={{ flex: '1 1 300px' }}>
-                            <h3>{t('track.currentLocation')}</h3>
-                            <p><strong>{t('track.coordinates')}</strong></p>
-                            <p><span>{t('track.lat')}</span> {locationState.lat}</p>
-                            <p><span>{t('track.lng')}</span> {locationState.lng}</p>
+                    <div id="userLocation" className="location-card" data-aos="fade-up">
+                        <div className="location-details">
+                            <h3 style={{ marginBottom: '1rem', color: 'var(--accent-light)' }}>{t('track.currentLocation') || "Your Location Found"}</h3>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '1rem' }}>
+                                <span style={{ fontSize: '3rem', fontWeight: '800', lineHeight: '1', color: 'var(--text-dark)' }}>{locationState.distance}</span>
+                                <span style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>{t('track.kmAway') || "km away"}</span>
+                            </div>
+                            <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+                                <i className="fas fa-clock" style={{ color: 'var(--accent-color)', marginRight: '8px' }}></i>
+                                {t('track.travelTimeLabel') || "Est. Time:"} {locationState.travelTime}
+                            </p>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                <i className="fas fa-map-marker-alt" style={{ marginRight: '5px' }}></i>
+                                {locationState.lat}, {locationState.lng}
+                            </p>
                         </div>
-                        <div style={{ flex: '1 1 300px', background: '#fff3e0', padding: '15px', borderRadius: '8px', borderLeft: '5px solid #ff9800' }}>
-                            <p><strong>{t('track.distanceTo')}</strong></p>
-                            <p><span style={{ fontSize: '2rem', fontWeight: 'bold', color: '#e65100' }}>{locationState.distance}</span> <span>{t('track.kmAway')}</span></p>
-                            <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}><span>{t('track.travelTimeLabel')}</span> {locationState.travelTime}</p>
+
+                        <div className="location-actions">
+                            <h4 style={{ marginBottom: '1rem', color: 'var(--text-dark)' }}>Get Directions</h4>
+
+                            <a href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=driving`} target="_blank" rel="noreferrer" className="route-btn">
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <i className="fas fa-car"></i>
+                                    Drive
+                                </span>
+                                <i className="fas fa-chevron-right" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}></i>
+                            </a>
+
+                            <a href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=two-wheeler`} target="_blank" rel="noreferrer" className="route-btn">
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <i className="fas fa-motorcycle"></i>
+                                    Two-Wheeler
+                                </span>
+                                <i className="fas fa-chevron-right" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}></i>
+                            </a>
+
+                            <a href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=walking`} target="_blank" rel="noreferrer" className="route-btn">
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <i className="fas fa-walking"></i>
+                                    Walk
+                                </span>
+                                <i className="fas fa-chevron-right" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}></i>
+                            </a>
                         </div>
                     </div>
                 )}
 
                 <h3 style={{ marginTop: '2rem', textAlign: 'center' }}>{t('track.mapTitle')}</h3>
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.003975762078!2d88.3347072!3d22.6108169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a02798f090d80c9%3A0xe104332b4b47ea87!2sKhaliya%20Restaurant!5e0!3m2!1sen!2sin!4v1714902123955!5m2!1sen!2sin"
-                    width="100%" height="400" style={{ border: 0, borderRadius: '8px' }} allowFullScreen="" loading="lazy"></iframe>
+                <div className="map-container" data-aos="fade-up" data-aos-delay="200" style={{ marginTop: '3rem', borderRadius: 'var(--radius-xl)', overflow: 'hidden', boxShadow: '0 15px 40px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <iframe
+                        title="Khaliya Restaurant Location"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.003975762078!2d88.3347072!3d22.6108169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a02798f090d80c9%3A0xe104332b4b47ea87!2sKhaliya%20Restaurant!5e0!3m2!1sen!2sin!4v1714902123955!5m2!1sen!2sin"
+                        width="100%" height="450" style={{ border: 0, display: 'block' }} allowFullScreen="" loading="lazy">
+                    </iframe>
+                </div>
             </section>
         </>
     );

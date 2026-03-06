@@ -5,15 +5,27 @@ import { useLanguage } from '../../context/LanguageContext';
 export default function NativeHome({ setActiveTab }) {
     const { t } = useLanguage();
 
-    // Quick mock data for popular items
+    // High-quality mock data for popular items
     const popularItems = [
-        { id: 1, name: "Butter Chicken", price: "₹450", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&fit=crop" },
-        { id: 2, name: "Garlic Naan", price: "₹80", image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&fit=crop" },
-        { id: 3, name: "Mutton Biryani", price: "₹550", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&fit=crop" },
+        { id: 1, name: "Butter Chicken", price: "₹450", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=500&fit=crop", tag: "Bestseller" },
+        { id: 2, name: "Garlic Naan", price: "₹80", image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&fit=crop", tag: "Must Try" },
+        { id: 3, name: "Mutton Biryani", price: "₹550", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&fit=crop", tag: "Chef's Special" },
+        { id: 4, name: "Crispy Samosa", price: "₹60", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&fit=crop", tag: "Snack" },
+    ];
+
+    const offers = [
+        { id: 1, title: "20% OFF", desc: "On your first order", code: "WELCOME20", bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)", color: "#d32f2f" },
+        { id: 2, title: "Free Dessert", desc: "On orders above ₹1000", code: "SWEET", bg: "linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)", color: "#4a148c" }
+    ];
+
+    const reviews = [
+        { id: 1, name: "Rahul S.", rating: 5, text: "Best Butter Chicken in town! Totally recommend it to everyone." },
+        { id: 2, name: "Priya M.", rating: 5, text: "The booking process was so smooth. Loved the ambiance!" },
+        { id: 3, name: "Amit K.", rating: 4, text: "Authentic taste, reminds me of classic Indian street food." }
     ];
 
     return (
-        <div className="native-home">
+        <div className="native-home" id="native-home">
             {/* Header Section */}
             <motion.div
                 className="native-header"
@@ -32,18 +44,24 @@ export default function NativeHome({ setActiveTab }) {
                 </div>
             </motion.div>
 
-            {/* Hero Card */}
+            {/* Active Offers Section */}
             <motion.div
-                className="native-hero-card"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                onClick={() => setActiveTab('book')}
+                className="native-offers"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
             >
-                <div className="hero-content">
-                    <h3>Reserve Your Table</h3>
-                    <p>Skip the wait. Book your dining experience now.</p>
-                    <button className="native-btn-primary">Book Now</button>
+                <div className="horizontal-scroll" style={{ paddingBottom: '20px', margin: '0 -20px', padding: '0 20px', scrollPadding: '20px' }}>
+                    {offers.map(offer => (
+                        <div key={offer.id} className="offer-card" style={{ background: offer.bg, minWidth: '260px', padding: '20px', borderRadius: '16px', color: offer.color, position: 'relative', overflow: 'hidden', scrollSnapAlign: 'start' }}>
+                            <h3 style={{ margin: '0 0 5px 0', fontSize: '1.4rem', fontWeight: '800' }}>{offer.title}</h3>
+                            <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>{offer.desc}</p>
+                            <div style={{ marginTop: '15px', background: 'rgba(255,255,255,0.4)', display: 'inline-block', padding: '5px 10px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                Code: {offer.code}
+                            </div>
+                            <i className="fas fa-gift" style={{ position: 'absolute', right: '-10px', bottom: '-10px', fontSize: '5rem', opacity: 0.15 }}></i>
+                        </div>
+                    ))}
                 </div>
             </motion.div>
 
@@ -53,6 +71,7 @@ export default function NativeHome({ setActiveTab }) {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
+                style={{ marginTop: '10px', marginBottom: '35px' }}
             >
                 <div className="action-circle" onClick={() => setActiveTab('menu')}>
                     <div className="icon-wrapper menu-icon"><i className="fas fa-book-open"></i></div>
@@ -72,7 +91,7 @@ export default function NativeHome({ setActiveTab }) {
                 </div>
             </motion.div>
 
-            {/* Horizontal Carousel: Popular Items */}
+            {/* Horizontal Carousel: Chef's Recommendations */}
             <motion.div
                 className="native-section"
                 initial={{ opacity: 0 }}
@@ -80,19 +99,20 @@ export default function NativeHome({ setActiveTab }) {
                 transition={{ duration: 0.5, delay: 0.4 }}
             >
                 <div className="section-header">
-                    <h3>Popular Right Now</h3>
+                    <h3 style={{ color: 'var(--text-color, #fff)' }}>Chef's Picks</h3>
                     <span className="see-all" onClick={() => setActiveTab('menu')}>See All</span>
                 </div>
 
-                <div className="horizontal-scroll">
-                    {popularItems.map((item, index) => (
-                        <div className="food-card-mini" key={item.id}>
+                <div className="horizontal-scroll" style={{ margin: '0 -20px', padding: '0 20px', scrollPadding: '20px' }}>
+                    {popularItems.map((item) => (
+                        <div className="food-card-mini" key={item.id} onClick={() => setActiveTab('menu')}>
                             <div className="food-img">
                                 <img src={item.image} alt={item.name} />
+                                <div className="food-tag" style={{ position: 'absolute', top: '10px', left: '10px', background: 'var(--primary-color, #E63946)', color: 'white', fontSize: '0.7rem', padding: '3px 8px', borderRadius: '10px', fontWeight: 'bold' }}>{item.tag}</div>
                                 <div className="add-btn"><i className="fas fa-plus"></i></div>
                             </div>
                             <div className="food-info">
-                                <h4>{item.name}</h4>
+                                <h4 style={{ color: 'var(--text-color, #fff)' }}>{item.name}</h4>
                                 <span className="price">{item.price}</span>
                             </div>
                         </div>
@@ -100,8 +120,49 @@ export default function NativeHome({ setActiveTab }) {
                 </div>
             </motion.div>
 
+            {/* Hero Card (Moved lower for flow) */}
+            <motion.div
+                className="native-hero-card"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                onClick={() => setActiveTab('book')}
+                style={{ marginBottom: '35px' }}
+            >
+                <div className="hero-content">
+                    <h3>Reserve Your Table</h3>
+                    <p>Skip the wait by booking in advance.</p>
+                    <button className="native-btn-primary">Book Now</button>
+                </div>
+            </motion.div>
+
+            {/* Customer Reviews */}
+            <motion.div
+                className="native-section"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+            >
+                <div className="section-header">
+                    <h3 style={{ color: 'var(--text-color, #fff)' }}>What People Say</h3>
+                </div>
+                <div className="horizontal-scroll" style={{ margin: '0 -20px', padding: '0 20px', scrollPadding: '20px' }}>
+                    {reviews.map(review => (
+                        <div key={review.id} className="review-card" style={{ background: 'var(--card-bg, #1e1e1e)', minWidth: '220px', padding: '15px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', scrollSnapAlign: 'start' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                <strong style={{ color: 'var(--text-color, #fff)', fontSize: '0.9rem' }}>{review.name}</strong>
+                                <div style={{ color: '#FFD700', fontSize: '0.8rem' }}>
+                                    {[...Array(review.rating)].map((_, i) => <i key={i} className="fas fa-star"></i>)}
+                                </div>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted, #aaa)', fontStyle: 'italic', lineHeight: '1.4' }}>"{review.text}"</p>
+                        </div>
+                    ))}
+                </div>
+            </motion.div>
+
             {/* Spacer for bottom nav */}
-            <div style={{ height: '30px' }}></div>
+            <div style={{ height: '50px' }}></div>
         </div>
     );
 }

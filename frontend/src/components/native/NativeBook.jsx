@@ -106,7 +106,7 @@ export default function NativeBook() {
     };
 
     return (
-        <div className="native-book-view">
+        <div className="native-book-view" id="native-book">
             <div className="native-book-header">
                 <h2>Reserve Table</h2>
                 <div className="progress-bar-container">
