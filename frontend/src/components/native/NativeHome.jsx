@@ -3,6 +3,10 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function NativeHome({ setActiveTab }) {
+    // Standard mock user in case localStorage is empty, though Auth intercepts this
+    const storedUserStr = localStorage.getItem('khaliya_native_user');
+    const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'Guest' };
+    const firstName = user.name ? user.name.split(' ')[0] : 'Guest';
     const { t } = useLanguage();
 
     // High-quality mock data for popular items
@@ -32,15 +36,59 @@ export default function NativeHome({ setActiveTab }) {
                 initial={{ y: -50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
+                style={{ marginBottom: '25px' }}
             >
                 <div className="header-top">
                     <div className="greeting">
-                        <h2>{t('hero.title') || 'Welcome to Khaliya'}</h2>
-                        <p className="subtitle">{t('header.sub') || 'Authentic Indian Cuisine'}</p>
+                        <h2>Hi, {firstName} 👋</h2>
+                        <p className="subtitle">Ready for your next meal?</p>
                     </div>
                     <div className="user-avatar" onClick={() => setActiveTab('profile')}>
-                        <img src="https://ui-avatars.com/api/?name=Guest+User&background=E63946&color=fff" alt="User" />
+                        <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Guest User')}&background=E63946&color=fff`} alt="User" />
                     </div>
+                </div>
+            </motion.div>
+
+            {/* Live Order Tracking Mock */}
+            <motion.div
+                className="native-section"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+            >
+                <div className="section-header">
+                    <h3>Current Order</h3>
+                    <span className="see-all">Track <i className="fas fa-chevron-right"></i></span>
+                </div>
+                <div className="table-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px 20px', background: 'var(--bg-card, #fff)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'rgba(230, 57, 70, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E63946', fontSize: '1.2rem' }}>
+                            <i className="fas fa-motorcycle"></i>
+                        </div>
+                        <div style={{ textAlign: 'left' }}>
+                            <strong style={{ display: 'block', fontSize: '1.05rem', color: 'var(--text-main, #222)' }}>On the way!</strong>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted, #666)' }}>Arriving in 15 mins</span>
+                        </div>
+                    </div>
+                    <div style={{ fontWeight: 'bold', color: '#E63946', fontSize: '0.9rem' }}>
+                        Preparing
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Hero Card (Moved up) */}
+            <motion.div
+                className="native-hero-card"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                onClick={() => setActiveTab('book')}
+                style={{ marginBottom: '35px' }}
+            >
+                <div className="hero-content">
+                    <h3>Reserve Your Table</h3>
+                    <p>Skip the wait by booking in advance.</p>
+                    <button className="native-btn-primary">Book Now</button>
                 </div>
             </motion.div>
 

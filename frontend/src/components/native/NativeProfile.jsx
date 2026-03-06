@@ -5,8 +5,16 @@ export default function NativeProfile() {
     const [adminPhone, setAdminPhone] = useState('');
     const [adminError, setAdminError] = useState('');
 
-    // Read from local storage exactly like the main app
     const loyaltyData = JSON.parse(localStorage.getItem('khaliya_loyalty_status')) || { points: 1500, tier: 'Silver' };
+    const storedUserStr = localStorage.getItem('khaliya_native_user');
+    const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'Guest User', phone: '' };
+
+    const handleAppLogout = () => {
+        if (window.confirm('Are you sure you want to log out?')) {
+            localStorage.removeItem('khaliya_native_user');
+            window.location.reload();
+        }
+    };
 
     const activeReservations = [
         { id: 1, date: "Oct 25, 2026", time: "19:30", guests: 2, status: "Confirmed" }
@@ -24,9 +32,10 @@ export default function NativeProfile() {
                 animate={{ opacity: 1, y: 0 }}
             >
                 <div className="profile-hero">
-                    <img src="https://ui-avatars.com/api/?name=Guest+User&background=E63946&color=fff&size=120" alt="Avatar" className="profile-avatar" />
-                    <h2>Guest User</h2>
-                    <span className="profile-tier"><i className="fas fa-crown"></i> {loyaltyData.tier} Member</span>
+                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=E63946&color=fff&size=120`} alt="Avatar" className="profile-avatar" />
+                    <h2>{user.name}</h2>
+                    <span className="profile-tier" style={{ marginTop: '5px', display: 'inline-block' }}>{user.phone ? `+91 ${user.phone}` : ''}</span>
+                    <span className="profile-tier" style={{ display: 'block', marginTop: '10px' }}><i className="fas fa-crown"></i> {loyaltyData.tier} Member</span>
                 </div>
             </motion.div>
 
@@ -113,6 +122,10 @@ export default function NativeProfile() {
                     <div className="settings-icon"><i className="fas fa-cog"></i></div>
                     <div className="settings-text">App Settings</div>
                     <i className="fas fa-chevron-right arrow"></i>
+                </div>
+                <div className="settings-item" onClick={handleAppLogout} style={{ border: '2px dashed rgba(230, 57, 70, 0.4)', background: 'transparent' }}>
+                    <div className="settings-icon" style={{ color: '#E63946' }}><i className="fas fa-sign-out-alt"></i></div>
+                    <div className="settings-text" style={{ color: '#E63946', fontWeight: 'bold' }}>Log Out</div>
                 </div>
             </motion.div>
 
