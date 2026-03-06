@@ -1,10 +1,10 @@
-const CACHE_NAME = 'khaliya-restaurant-v11';
+const CACHE_NAME = 'khaliya-restaurant-v12';
 const STATIC_ASSETS = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/pwa-icon-192.png',
-    '/pwa-icon-512.png'
+    './',
+    './index.html',
+    './manifest.json',
+    './pwa-icon-192.png',
+    './pwa-icon-512.png'
 ];
 
 // Install Event

@@ -9,8 +9,8 @@ const PWAManager = {
     registerServiceWorker: () => {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Use absolute path for React Router compatibility
-                navigator.serviceWorker.register('/service-worker.js')
+                // Use relative path for universal hosting compatibility
+                navigator.serviceWorker.register('./service-worker.js')
                     .then(reg => {
                         console.log('✅ Service Worker registered:', reg.scope);
                     })
