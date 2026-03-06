@@ -61,7 +61,7 @@ export default function AdminDashboard({ onLogout }) {
     const handleLogout = () => {
         sessionStorage.removeItem('adminLoggedIn');
         onLogout(false);
-        navigate('/admin');
+        navigate('/');
     };
 
     // -- BOOKINGS LOGIC --

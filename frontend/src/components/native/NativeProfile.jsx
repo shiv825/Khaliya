@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function NativeProfile() {
+    const [adminPhone, setAdminPhone] = useState('');
+    const [adminError, setAdminError] = useState('');
+
     // Read from local storage exactly like the main app
     const loyaltyData = JSON.parse(localStorage.getItem('khaliya_loyalty_status')) || { points: 1500, tier: 'Silver' };
 
@@ -112,6 +115,53 @@ export default function NativeProfile() {
                     <i className="fas fa-chevron-right arrow"></i>
                 </div>
             </motion.div>
+
+            {/* Admin Access by Phone Number */}
+            <motion.div
+                className="profile-section"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                style={{ marginTop: '35px', marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(230, 57, 70, 0.05), rgba(0,0,0,0.2))', border: '1px solid rgba(230, 57, 70, 0.15)', borderRadius: '16px' }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(230, 57, 70, 0.1)', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                        <i className="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#fff' }}>Admin Panel Access</h3>
+                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Authorized personnel only</span>
+                    </div>
+                </div>
+
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (adminPhone === '8252731784') {
+                        sessionStorage.setItem('adminLoggedIn', 'true');
+                        // Use window.location to force full reload to admin router due to HashRouter context
+                        window.location.hash = '#/admin/dashboard';
+                    } else {
+                        setAdminError('Invalid authorization number.');
+                        setTimeout(() => setAdminError(''), 3000);
+                    }
+                }}>
+                    <div style={{ position: 'relative' }}>
+                        <i className="fas fa-mobile-alt" style={{ position: 'absolute', top: '50%', left: '15px', transform: 'translateY(-50%)', color: '#888' }}></i>
+                        <input
+                            type="tel"
+                            placeholder="Enter Authorized Phone"
+                            value={adminPhone}
+                            onChange={(e) => setAdminPhone(e.target.value)}
+                            style={{ width: '100%', padding: '12px 15px 12px 40px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white', boxSizing: 'border-box' }}
+                        />
+                    </div>
+                    {adminError && <div style={{ color: '#E63946', fontSize: '0.8rem', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}><i className="fas fa-exclamation-circle"></i> {adminError}</div>}
+                    <button type="submit" style={{ width: '100%', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 'bold', marginTop: '15px' }}>
+                        Access Admin Dashboard
+                    </button>
+                </form>
+            </motion.div>
+
         </div>
     );
 }
