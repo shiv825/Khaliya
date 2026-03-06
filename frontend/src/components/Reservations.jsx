@@ -17,9 +17,11 @@ export default function Reservations({ predefinedTable }) {
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:5000/api/bookings', formData)
+        axios.post(`${API_URL}/api/bookings`, formData)
             .then(res => {
                 setMessage(t('msg.bookingConfirmed') || 'Booking saved!');
                 setFormData({ name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: '' });

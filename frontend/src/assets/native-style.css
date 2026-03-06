@@ -1,0 +1,860 @@
+/* Native App Architecture Stylesheet */
+
+.native-app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport height for mobile browsers */
+    width: 100vw;
+    background-color: var(--bg-dark, #121212);
+    color: white;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.native-content-area {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #0f0f0f;
+    padding-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbars */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.native-content-area::-webkit-scrollbar {
+    display: none;
+}
+
+/* Bottom Navigation Bar */
+.native-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(22, 22, 22, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    z-index: 9999;
+}
+
+.nav-tab {
+    background: none;
+    border: none;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 100%;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.nav-tab span {
+    font-size: 0.7rem;
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.nav-tab.active {
+    color: var(--primary-color, #E63946);
+}
+
+.nav-tab.active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 3px;
+    background: var(--primary-color, #E63946);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 10px rgba(230, 57, 70, 0.4);
+}
+
+/* Floating Action Button Style for "Book" */
+.nav-tab.book-btn {
+    position: relative;
+    top: -15px;
+}
+
+.nav-tab.book-btn span {
+    margin-top: 25px;
+}
+
+.book-fab {
+    position: absolute;
+    top: -10px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color, #E63946), #ff6b6b);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.3rem;
+    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
+    border: 4px solid var(--bg-dark, #121212);
+    transition: transform 0.2s ease;
+}
+
+.nav-tab.book-btn:active .book-fab {
+    transform: scale(0.92);
+}
+
+.nav-tab.book-btn.active span {
+    color: var(--primary-color, #E63946);
+}
+
+.nav-tab.book-btn.active::after {
+    display: none;
+}
+
+/* -------------------------------------- */
+/* Native Home View Styles                */
+/* -------------------------------------- */
+.native-home {
+    padding: 20px;
+    padding-top: 50px;
+    min-height: 80vh;
+}
+
+.native-header .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.native-header .greeting h2 {
+    font-size: 1.8rem;
+    margin: 0 0 5px 0;
+    color: #fff;
+    font-weight: 700;
+}
+
+.native-header .subtitle {
+    color: #aaa;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.user-avatar img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color, #E63946);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.native-hero-card {
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&fit=crop') center/cover;
+    border-radius: 20px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: flex-end;
+    min-height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.hero-content p {
+    color: #ddd;
+    margin: 0 0 15px 0;
+    font-size: 0.9rem;
+    max-width: 80%;
+}
+
+.native-btn-primary {
+    background: var(--primary-color, #E63946);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+}
+
+/* Quick Actions */
+.native-quick-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 35px;
+}
+
+.action-circle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.menu-icon {
+    background: linear-gradient(135deg, #FF9A9E, #FECFEF);
+    color: #D32F2F;
+}
+
+.book-icon {
+    background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+    color: #4A148C;
+}
+
+.loyalty-icon {
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    color: #E65100;
+}
+
+.map-icon {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #006064;
+}
+
+.action-circle span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ccc;
+}
+
+/* Horizontal Scrolling Section */
+.native-section {
+    margin-bottom: 30px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 15px;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #fff;
+}
+
+.see-all {
+    color: var(--primary-color, #E63946);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.horizontal-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.food-card-mini {
+    min-width: 160px;
+    background: #1e1e1e;
+    border-radius: 16px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.food-img {
+    height: 120px;
+    width: 100%;
+    position: relative;
+}
+
+.food-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.add-btn {
+    position: absolute;
+    bottom: -15px;
+    right: 15px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.food-info {
+    padding: 20px 12px 12px;
+}
+
+.food-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.food-info .price {
+    color: var(--primary-color, #E63946);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* -------------------------------------- */
+/* Native Menu View Styles                */
+/* -------------------------------------- */
+.native-menu-view {
+    padding: 20px;
+    padding-top: 40px;
+    min-height: 100vh;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.native-menu-header {
+    margin-bottom: 20px;
+}
+
+.native-menu-header h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.search-bar i {
+    color: #888;
+    margin-right: 10px;
+}
+
+.search-bar input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    width: 100%;
+    font-size: 1rem;
+    outline: none;
+}
+
+.native-categories {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+    scrollbar-width: none;
+}
+
+.native-categories::-webkit-scrollbar {
+    display: none;
+}
+
+.category-tab {
+    background: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: #aaa;
+    padding: 8px 20px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.category-tab.active {
+    background: var(--primary-color, #E63946);
+    color: white;
+    border-color: var(--primary-color, #E63946);
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.4);
+}
+
+.native-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+.native-menu-card {
+    background: #1e1e1e;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.native-menu-card .card-image {
+    position: relative;
+    height: 160px;
+    /* Increased height for better food visibility */
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.native-menu-card .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-price {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.native-menu-card .card-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.native-menu-card h3 {
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+}
+
+.native-menu-card p {
+    color: #aaa;
+    margin: 0 0 15px 0;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    flex: 1;
+}
+
+.add-to-cart-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+.add-to-cart-btn:active {
+    background: var(--primary-color, #E63946);
+}
+
+/* -------------------------------------- */
+/* Native Book Wizard Styles              */
+/* -------------------------------------- */
+.native-book-view {
+    padding: 20px;
+    padding-top: 40px;
+    min-height: 80vh;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.native-book-header {
+    margin-bottom: 25px;
+}
+
+.native-book-header h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    color: #fff;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color, #E63946);
+    transition: width 0.4s ease;
+}
+
+.steps-indicator {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 600;
+}
+
+.steps-indicator span.active {
+    color: #fff;
+}
+
+.wizard-container {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+    padding-bottom: 30px;
+}
+
+.wizard-step {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.wizard-step h3 {
+    margin: 0 0 20px 0;
+    color: var(--primary-color, #E63946);
+    font-size: 1.3rem;
+}
+
+.form-group-native {
+    margin-bottom: 25px;
+}
+
+.form-group-native label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+.native-input {
+    width: 100%;
+    padding: 15px;
+    background: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    color-scheme: dark;
+    /* For native calendar/clock pickers */
+    box-sizing: border-box;
+}
+
+.native-input:focus {
+    outline: none;
+    border-color: var(--primary-color, #E63946);
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stepper-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.stepper-btn:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.stepper span {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.table-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.table-card {
+    background: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 10px;
+    text-align: center;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.table-card.selected {
+    background: rgba(230, 57, 70, 0.15);
+    border-color: var(--primary-color, #E63946);
+    color: var(--primary-color, #E63946);
+}
+
+.wizard-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.native-btn-secondary {
+    flex: 1;
+    background: #333;
+    color: white;
+    border: none;
+    padding: 15px 0;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.native-btn-primary.full-width {
+    width: 100%;
+    padding: 15px 0;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+.wizard-actions .native-btn-primary,
+.wizard-actions .native-btn-success {
+    flex: 2;
+    padding: 15px 0;
+    border-radius: 12px;
+    font-size: 1rem;
+}
+
+.native-btn-success {
+    background: #4caf50;
+    color: white;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.booking-summary {
+    background: #1e1e1e;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.summary-row span {
+    color: #888;
+}
+
+.summary-row strong {
+    color: white;
+    font-weight: 600;
+}
+
+/* -------------------------------------- */
+/* Native Profile View Styles             */
+/* -------------------------------------- */
+.native-profile-view {
+    padding: 20px;
+    padding-top: 40px;
+    min-height: 80vh;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.profile-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--primary-color, #E63946);
+    margin-bottom: 15px;
+    box-shadow: 0 5px 20px rgba(230, 57, 70, 0.3);
+}
+
+.profile-hero h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.profile-tier {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.loyalty-card-native {
+    background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.loyalty-card-native h3 {
+    margin: 0 0 15px 0;
+    color: #aaa;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.points-display {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.points-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.points-label {
+    color: #888;
+    font-weight: 600;
+}
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.points-subtitle {
+    margin: 10px 0 0 0;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.settings-list {
+    background: #1e1e1e;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s ease;
+}
+
+.settings-item:active {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.settings-item:last-child {
+    border-bottom: none;
+}
+
+.settings-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(230, 57, 70, 0.1);
+    color: var(--primary-color, #E63946);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin-right: 15px;
+}
+
+.settings-text {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+}
+
+.settings-item .arrow {
+    color: #666;
+    font-size: 0.9rem;
+}
