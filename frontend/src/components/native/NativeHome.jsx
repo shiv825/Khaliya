@@ -36,10 +36,36 @@ export default function NativeHome({ setActiveTab }) {
         { id: 3, name: "Amit K.", rating: 4, text: "Authentic taste, reminds me of classic Indian street food." }
     ];
 
+    // Animation Variants for Stagger
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.15
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        show: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } }
+    };
+
     return (
-        <div className="native-home" id="native-home" style={{ overflowX: 'hidden' }}>
+        <motion.div
+            className="native-home"
+            id="native-home"
+            style={{ overflowX: 'hidden' }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+        >
             {/* Parallax Hero Image Background */}
-            <div style={{ position: 'relative', height: '350px', overflow: 'hidden', margin: '0 -20px 20px -20px' }}>
+            <motion.div
+                variants={itemVariants}
+                style={{ position: 'relative', height: '350px', overflow: 'hidden', margin: '0 -20px 20px -20px' }}
+            >
                 <motion.img
                     src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1000&fit=crop"
                     style={{
@@ -63,39 +89,42 @@ export default function NativeHome({ setActiveTab }) {
                     <motion.h1
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        style={{ color: 'white', fontSize: '2.2rem', fontWeight: 800, margin: 0 }}
+                        style={{ color: 'white', fontSize: '2.5rem', fontWeight: 800, margin: 0, textShadow: '0 4px 10px rgba(0,0,0,0.5)' }}
                     >
                         Authentic Taste
                     </motion.h1>
-                    <p style={{ color: 'rgba(255,255,255,0.8)', margin: '5px 0 15px 0' }}>Discover the true flavors of India</p>
+                    <p style={{ color: 'rgba(255,255,255,0.9)', margin: '5px 0 15px 0', fontSize: '1.1rem' }}>Discover the true flavors of India</p>
                     <motion.button
                         whileTap={{ scale: 0.95 }}
-                        className="native-btn-primary"
-                        style={{ width: 'fit-content', padding: '10px 25px' }}
+                        className="native-btn-primary btn-premium-scale"
+                        style={{ width: 'fit-content', padding: '12px 30px' }}
                         onClick={() => setActiveTab('menu')}
                     >
                         Explore Menu
                     </motion.button>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Header Section */}
             <motion.div
                 className="native-header"
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}
+                variants={itemVariants}
                 style={{ marginBottom: '25px' }}
             >
                 <div className="header-top">
                     <div className="greeting">
-                        <h2>Hi, {firstName} 👋</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                            <span className="live-pulse-indicator"></span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '1px' }}>Open Now</span>
+                        </div>
+                        <h2 style={{ fontSize: '1.8rem' }}>Hi, {firstName} 👋</h2>
                         <p className="subtitle">Ready for your next meal?</p>
                     </div>
                     <motion.div
                         className="user-avatar"
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setActiveTab('profile')}
+                        style={{ cursor: 'pointer' }}
                     >
                         <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Guest User')}&background=E63946&color=fff`} alt="User" />
                     </motion.div>
@@ -106,10 +135,9 @@ export default function NativeHome({ setActiveTab }) {
 
             {/* Active Offers Section */}
             <motion.div
+                variants={itemVariants}
                 className="native-offers"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.15 }}
+                style={{ marginBottom: '10px' }}
             >
                 <div className="horizontal-scroll" style={{ paddingBottom: '20px', margin: '0 -20px', padding: '0 20px', scrollPadding: '20px' }}>
                     {offers.map(offer => (
@@ -133,9 +161,7 @@ export default function NativeHome({ setActiveTab }) {
             {/* Quick Actions */}
             <motion.div
                 className="native-quick-actions"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+                variants={itemVariants}
                 style={{ marginTop: '10px', marginBottom: '35px' }}
             >
                 <motion.div className="action-circle" whileTap={{ scale: 0.9 }} onClick={() => setActiveTab('menu')}>
@@ -159,9 +185,7 @@ export default function NativeHome({ setActiveTab }) {
             {/* Horizontal Carousel: Chef's Recommendations */}
             <motion.div
                 className="native-section"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
+                variants={itemVariants}
             >
                 <div className="section-header">
                     <h3 style={{ color: 'var(--text-color, #fff)' }}>Chef's Picks</h3>
@@ -194,9 +218,7 @@ export default function NativeHome({ setActiveTab }) {
             {/* Customer Reviews */}
             <motion.div
                 className="native-section"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
+                variants={itemVariants}
             >
                 <div className="section-header">
                     <h3 style={{ color: 'var(--text-color, #fff)' }}>What People Say</h3>
@@ -223,6 +245,6 @@ export default function NativeHome({ setActiveTab }) {
 
             {/* Spacer for bottom nav */}
             <div style={{ height: '50px' }}></div>
-        </div>
+        </motion.div>
     );
 }

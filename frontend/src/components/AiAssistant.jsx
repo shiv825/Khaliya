@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AiAssistant() {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,12 +34,10 @@ export default function AiAssistant() {
     const handleSend = () => {
         if (!inputVal.trim()) return;
 
-        // Add User message
         const userMsg = inputVal.trim();
         setMessages(prev => [...prev, { type: 'user', text: userMsg }]);
         setInputVal('');
 
-        // Simulate typing delay
         setTimeout(() => {
             setMessages(prev => [...prev, { type: 'bot', text: getAIResponse(userMsg) }]);
         }, 600);
@@ -52,38 +51,96 @@ export default function AiAssistant() {
 
     return (
         <div className="khali-assistant">
-            <div className={`khali-window ${isOpen ? 'active' : ''}`} style={{ display: isOpen ? 'flex' : 'none' }}>
-                <div className="khali-header">
-                    <div className="title"><i className="fas fa-robot"></i> Khali AI</div>
-                    <button onClick={() => setIsOpen(false)} className="close-btn" title="Close"><i className="fas fa-times"></i></button>
-                </div>
-
-                <div className="khali-chat-area">
-                    {messages.map((m, i) => (
-                        <div key={i} className={`khali-msg ${m.type}`}>
-                            {m.text}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        className="khali-window futuristic-glass"
+                        initial={{ scale: 0, opacity: 0, y: 100, x: -50 }}
+                        animate={{ scale: 1, opacity: 1, y: 0, x: 0 }}
+                        exit={{ scale: 0, opacity: 0, y: 100, x: -50 }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                    >
+                        <div className="khali-header" style={{ background: 'linear-gradient(135deg, #E23744, #1c1c1c)', borderRadius: '20px 20px 0 0' }}>
+                            <div className="title" style={{ fontWeight: 800 }}>
+                                <i className="fas fa-robot" style={{ marginRight: '10px' }}></i>
+                                KHALI AI
+                            </div>
+                            <button onClick={() => setIsOpen(false)} className="close-btn" title="Close">
+                                <i className="fas fa-times"></i>
+                            </button>
                         </div>
-                    ))}
-                    <div ref={chatEndRef} />
-                </div>
 
-                <div className="khali-input-area">
-                    <input
-                        type="text"
-                        value={inputVal}
-                        onChange={e => setInputVal(e.target.value)}
-                        onKeyPress={e => e.key === 'Enter' && handleSend()}
-                        placeholder="Ask Khali a question..."
-                    />
-                    <button onClick={handleSend} title="Send"><i className="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
+                        <div className="khali-chat-area" style={{ background: 'rgba(10, 10, 10, 0.4)' }}>
+                            <AnimatePresence initial={false}>
+                                {messages.map((m, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, x: m.type === 'bot' ? -20 : 20, y: 10 }}
+                                        animate={{ opacity: 1, x: 0, y: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className={`khali-msg ${m.type}`}
+                                        style={m.type === 'bot' ?
+                                            { background: 'rgba(255,255,255,0.08)', borderRadius: '15px 15px 15px 2px', border: '1px solid rgba(255,255,255,0.1)' } :
+                                            { background: 'linear-gradient(135deg, #E23744, #8b1d26)', borderRadius: '15px 15px 2px 15px' }
+                                        }
+                                    >
+                                        {m.text}
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                            <div ref={chatEndRef} />
+                        </div>
 
-            {!isOpen && (
-                <button onClick={() => setIsOpen(true)} className="khali-trigger" title="Ask Khali!">
-                    ✨
-                </button>
-            )}
+                        <div className="khali-input-area glass-panel" style={{ border: 'none', padding: '15px' }}>
+                            <input
+                                type="text"
+                                value={inputVal}
+                                onChange={e => setInputVal(e.target.value)}
+                                onKeyPress={e => e.key === 'Enter' && handleSend()}
+                                placeholder="Ask Khali anything..."
+                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+                            />
+                            <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={handleSend}
+                                className="btn-premium-scale"
+                                style={{ background: '#E23744', color: '#fff' }}
+                            >
+                                <i className="fas fa-paper-plane"></i>
+                            </motion.button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {!isOpen && (
+                    <motion.button
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setIsOpen(true)}
+                        className="khali-trigger btn-premium-scale"
+                        title="Ask Khali!"
+                        style={{
+                            background: 'linear-gradient(135deg, #E23744, #1c1c1c)',
+                            boxShadow: '0 8px 32px rgba(226, 55, 68, 0.4)',
+                            border: '1px solid rgba(255,255,255,0.1)'
+                        }}
+                    >
+                        <div style={{
+                            position: 'absolute',
+                            inset: '-8px',
+                            border: '2px solid rgba(226, 55, 68, 0.2)',
+                            borderRadius: '50%',
+                            animation: 'ripple 2s infinite ease-out'
+                        }}></div>
+                        ✨
+                    </motion.button>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -13,6 +13,8 @@ import {
     Legend
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 ChartJS.register(
     CategoryScale,
@@ -162,8 +164,9 @@ export default function AdminDashboard({ onLogout }) {
                 datasets: [{
                     label: 'Estimated Revenue (₹)',
                     data: last7Days.map(d => revenue[d]),
-                    backgroundColor: '#FFB703',
-                    borderRadius: 4
+                    backgroundColor: '#E63946',
+                    hoverBackgroundColor: '#8b1d26',
+                    borderRadius: 8
                 }]
             }
         };
@@ -195,12 +198,22 @@ export default function AdminDashboard({ onLogout }) {
     return (
         <div style={{ background: '#f0f2f5', minHeight: '100vh', padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', background: 'white', padding: '1rem 2rem', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                <h1 style={{ margin: 0, color: '#E63946', fontSize: '1.5rem' }}>Khaliya Admin Portal</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', background: 'white', padding: '1.2rem 2.5rem', borderRadius: '16px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <h1 style={{ margin: 0, color: '#E63946', fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' }}>Khaliya Admin</h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+                        <motion.div
+                            animate={{ scale: [1, 1.2, 1], opacity: [1, 0.6, 1] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            style={{ width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%' }}
+                        />
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase' }}>Live Sync</span>
+                    </div>
+                </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button style={{ padding: '0.5rem 1rem', background: activeTab === 'bookings' ? '#E63946' : '#eee', color: activeTab === 'bookings' ? 'white' : '#333', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setActiveTab('bookings')}>Bookings</button>
-                    <button style={{ padding: '0.5rem 1rem', background: activeTab === 'menu' ? '#E63946' : '#eee', color: activeTab === 'menu' ? 'white' : '#333', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setActiveTab('menu')}>Menu Manager</button>
-                    <button style={{ padding: '0.5rem 1rem', background: '#333', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }} onClick={handleLogout}>Logout</button>
+                    <button style={{ padding: '0.6rem 1.2rem', background: activeTab === 'bookings' ? '#E63946' : 'transparent', color: activeTab === 'bookings' ? 'white' : '#666', border: activeTab === 'bookings' ? 'none' : '1px solid #eee', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, transition: 'all 0.2s' }} onClick={() => setActiveTab('bookings')}>Bookings</button>
+                    <button style={{ padding: '0.6rem 1.2rem', background: activeTab === 'menu' ? '#E63946' : 'transparent', color: activeTab === 'menu' ? 'white' : '#666', border: activeTab === 'menu' ? 'none' : '1px solid #eee', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, transition: 'all 0.2s' }} onClick={() => setActiveTab('menu')}>Menu Manager</button>
+                    <button style={{ padding: '0.6rem 1.2rem', background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }} onClick={handleLogout}>Logout</button>
                 </div>
             </div>
 

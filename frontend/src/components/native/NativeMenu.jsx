@@ -277,45 +277,52 @@ export default function NativeMenu() {
 
                         <motion.div layout className="native-menu-grid">
                                 <AnimatePresence mode="popLayout">
-                                        {filteredItems.map((item, index) => (
-                                                <motion.div
-                                                        layout
-                                                        initial={{ opacity: 0, scale: 0.9 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.9 }}
-                                                        transition={{ duration: 0.2 }}
-                                                        key={item.id || index}
-                                                        className="native-menu-card futuristic-glass"
-                                                >
-                                                        <div className="card-image">
-                                                                <img
-                                                                        loading="lazy"
-                                                                        src={item.image}
-                                                                        alt={getLocalized(item.name)}
-                                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                                        onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop"; }}
-                                                                />
-                                                                <div className="card-price">₹{item.price}</div>
-                                                        </div>
-                                                        <div className="card-content">
-                                                                <h3>{getLocalized(item.name)}</h3>
-                                                                <div className="menu-item-tags" style={{ display: 'flex', gap: '5px', marginTop: '5px' }}>
-                                                                        {item.tags && item.tags.map(tag => {
-                                                                                if (tag === 'veg') return <span key={tag} className="tag tag-veg" title="Vegetarian" style={{ fontSize: '0.8rem' }}>🌱</span>;
-                                                                                if (tag === 'non-veg') return <span key={tag} className="tag tag-nonveg" title="Non-Vegetarian" style={{ fontSize: '0.8rem' }}>🍖</span>;
-                                                                                if (tag === 'spicy-1') return <span key={tag} className="tag tag-spicy" title="Mild Spicy" style={{ fontSize: '0.8rem' }}>🌶️</span>;
-                                                                                if (tag === 'spicy-2') return <span key={tag} className="tag tag-spicy" title="Medium Spicy" style={{ fontSize: '0.8rem' }}>🌶️🌶️</span>;
-                                                                                if (tag === 'spicy-3') return <span key={tag} className="tag tag-spicy" title="Extra Spicy" style={{ fontSize: '0.8rem' }}>🌶️🌶️🌶️</span>;
-                                                                                return null;
-                                                                        })}
+                                        {filteredItems.map((item, index) => {
+                                                const [loaded, setLoaded] = useState(false);
+                                                return (
+                                                        <motion.div
+                                                                layout
+                                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                                animate={{ opacity: 1, scale: 1 }}
+                                                                exit={{ opacity: 0, scale: 0.9 }}
+                                                                transition={{ duration: 0.2 }}
+                                                                key={item.id || index}
+                                                                className="native-menu-card futuristic-glass"
+                                                        >
+                                                                <div className="card-image" style={{ position: 'relative', overflow: 'hidden' }}>
+                                                                        {!loaded && (
+                                                                                <div className="shimmer-effect" style={{ position: 'absolute', inset: 0, zIndex: 1 }}></div>
+                                                                        )}
+                                                                        <img
+                                                                                loading="lazy"
+                                                                                src={item.image}
+                                                                                alt={getLocalized(item.name)}
+                                                                                onLoad={() => setLoaded(true)}
+                                                                                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s' }}
+                                                                                onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop"; setLoaded(true); }}
+                                                                        />
+                                                                        <div className="card-price">₹{item.price}</div>
                                                                 </div>
-                                                                <p>{getLocalized(item.description)}</p>
-                                                                <button className="add-to-cart-btn">
-                                                                        <i className="fas fa-plus"></i> {t('menu.addBtn', 'Add')}
-                                                                </button>
-                                                        </div>
-                                                </motion.div>
-                                        ))}
+                                                                <div className="card-content">
+                                                                        <h3>{getLocalized(item.name)}</h3>
+                                                                        <div className="menu-item-tags" style={{ display: 'flex', gap: '5px', marginTop: '5px' }}>
+                                                                                {item.tags && item.tags.map(tag => {
+                                                                                        if (tag === 'veg') return <span key={tag} className="tag tag-veg" title="Vegetarian" style={{ fontSize: '0.8rem' }}>🌱</span>;
+                                                                                        if (tag === 'non-veg') return <span key={tag} className="tag tag-nonveg" title="Non-Vegetarian" style={{ fontSize: '0.8rem' }}>🍖</span>;
+                                                                                        if (tag === 'spicy-1') return <span key={tag} className="tag tag-spicy" title="Mild Spicy" style={{ fontSize: '0.8rem' }}>🌶️</span>;
+                                                                                        if (tag === 'spicy-2') return <span key={tag} className="tag tag-spicy" title="Medium Spicy" style={{ fontSize: '0.8rem' }}>🌶️🌶️</span>;
+                                                                                        if (tag === 'spicy-3') return <span key={tag} className="tag tag-spicy" title="Extra Spicy" style={{ fontSize: '0.8rem' }}>🌶️🌶️🌶️</span>;
+                                                                                        return null;
+                                                                                })}
+                                                                        </div>
+                                                                        <p>{getLocalized(item.description)}</p>
+                                                                        <button className="add-to-cart-btn btn-premium-scale">
+                                                                                <i className="fas fa-plus"></i> {t('menu.addBtn', 'Add')}
+                                                                        </button>
+                                                                </div>
+                                                        </motion.div>
+                                                );
+                                        })}
                                 </AnimatePresence>
                         </motion.div>
 
