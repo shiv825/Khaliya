@@ -49,7 +49,7 @@ export default function NativeProfile() {
                     <div style={{ background: 'linear-gradient(135deg, #ffd700, #ffc107)', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <i className="fas fa-crown" style={{ color: '#1c1c1c', fontSize: '0.9rem' }}></i>
                     </div>
-                    <span style={{ fontSize: '1rem', fontWeight: 700 }}>Join Zomato Gold</span>
+                    <span style={{ fontSize: '1rem', fontWeight: 700 }}>Join Khaliya Gold</span>
                 </div>
                 <i className="fas fa-chevron-right" style={{ fontSize: '0.9rem' }}></i>
             </motion.div>
