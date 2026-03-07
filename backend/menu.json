@@ -7,16 +7,16 @@
             "ar": "سمبوسة (4 قطع)"
         },
         "description": {
-            "en": "Crispy fried pastry with spiced potato and pea filling. A classic Indian starter.",
-            "hi": "मसालेदार आलू और मटर भराव के साथ कुरकुरा तला हुआ पेस्ट्री। एक क्लासिक भारतीय स्टार्टर।",
-            "ar": "فطيرة مقرمشة محشوة بالبطاطس المتبلة والبازلاء. مقبلات هندية كلاسيكية."
+            "en": "Crispy fried pastry with spiced potato and pea filling.",
+            "hi": "मसालेदार आलू और मटर भराव के साथ कुरकुरा तला हुआ पेस्ट्री।",
+            "ar": "فطيرة مقرمشة محشوة بالبطاطس المتبلة والبازلاء."
         },
         "price": "₹150",
         "tags": [
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1601050633647-8f8f2f3ee079?w=500&h=400&fit=crop"
+        "image": "/menu-images/samosa.jpg"
     },
     {
         "category": "Appetizer",
@@ -35,7 +35,7 @@
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1599487405702-3e28faced4e3?w=500&h=400&fit=crop"
+        "image": "/menu-images/paneer-tikka.jpg"
     },
     {
         "category": "Appetizer",
@@ -54,7 +54,7 @@
             "non-veg",
             "spicy-2"
         ],
-        "image": "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&h=400&fit=crop"
+        "image": "/menu-images/tandoori-chicken.jpg"
     },
     {
         "category": "Appetizer",
@@ -73,7 +73,7 @@
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1626508064436-cc0845350be4?w=500&h=400&fit=crop"
+        "image": "/menu-images/hara-bhara.jpg"
     },
     {
         "category": "Appetizer",
@@ -92,7 +92,7 @@
             "non-veg",
             "spicy-2"
         ],
-        "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&h=400&fit=crop"
+        "image": "/menu-images/fish-amritsari.jpg"
     },
     {
         "category": "Appetizer",
@@ -111,7 +111,7 @@
             "veg",
             "spicy-2"
         ],
-        "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&h=400&fit=crop"
+        "image": "/menu-images/chili-paneer.jpg"
     },
     {
         "category": "Appetizer",
@@ -130,7 +130,26 @@
             "non-veg",
             "spicy-3"
         ],
-        "image": "https://images.unsplash.com/photo-1624374052601-2092cc60bfb7?w=500&h=400&fit=crop"
+        "image": "/menu-images/chicken-65.jpg"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Chicken Biryani",
+            "hi": "चिकन बिरयानी",
+            "ar": "دجاج برياني"
+        },
+        "description": {
+            "en": "Fragrant basmati rice cooked with marinated chicken and aromatic spices.",
+            "hi": "सुगंधित बासमती चावल मैरीनेट किए हुए चिकन और सुगंधित मसालों के साथ पकाया जाता है।",
+            "ar": "أرز بسمتي عطري مطبوخ مع دجاج متبل وبهارات عطرية."
+        },
+        "price": "₹450",
+        "tags": [
+            "non-veg",
+            "spicy-2"
+        ],
+        "image": "/menu-images/chicken-biryani.jpg"
     },
     {
         "category": "Main Course",
@@ -142,14 +161,14 @@
         "description": {
             "en": "Succulent chicken in rich, buttery tomato cream sauce. House specialty.",
             "hi": "समृद्ध, मलाईदार टमाटर क्रीम सॉस में रसीला चिकन। हाउस स्पेशलिटी।",
-            "ar": "دجاج طري في صلصة طماطم بالزبدة والقشطة الغنية. تخصص البيت."
+            "ar": "دجاج طري في صلصة طماطم بالزبدة والقشطة الغنية."
         },
         "price": "₹400",
         "tags": [
             "non-veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&h=400&fit=crop"
+        "image": "/menu-images/butter-chicken.jpg"
     },
     {
         "category": "Main Course",
@@ -159,16 +178,16 @@
             "ar": "دجاج تيكا ماسالا"
         },
         "description": {
-            "en": "Tender chicken in creamy tomato sauce with aromatic spices. Served with rice.",
-            "hi": "सुगंधित मसालों के साथ मलाईदार टमाटर सॉस में नरम चिकन। चावल के साथ परोसा जाता है।",
-            "ar": "دجاج طري في صلصة طماطم كريمية مع بهارات عطرية. يقدم مع الأرز."
+            "en": "Tender chicken in creamy tomato sauce with aromatic spices.",
+            "hi": "सुगंधित मसालों के साथ मलाईदार टमाटर सॉस में नरम चिकन।",
+            "ar": "دجاج طري في صلصة طماطم كريمية مع بهارات عطرية."
         },
         "price": "₹380",
         "tags": [
             "non-veg",
             "spicy-2"
         ],
-        "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&h=400&fit=crop"
+        "image": "/menu-images/tikka-masala.jpg"
     },
     {
         "category": "Main Course",
@@ -180,14 +199,14 @@
         "description": {
             "en": "Soft cottage cheese in rich tomato butter gravy. Vegetarian favorite.",
             "hi": "समृद्ध टमाटर बटर ग्रेवी में नरम पनीर। शाकाहारी पसंदीदा।",
-            "ar": "جبنة قريش ناعمة في مرق الزبدة الغني بالطماطم. مفضل للنباتيين."
+            "ar": "جبنة قريش ناعمة في مرق الزبدة الغني بالطماطم."
         },
         "price": "₹320",
         "tags": [
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&h=400&fit=crop"
+        "image": "/menu-images/paneer-butter.jpg"
     },
     {
         "category": "Main Course",
@@ -206,7 +225,7 @@
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&h=400&fit=crop"
+        "image": "/menu-images/dal-makhani.jpg"
     },
     {
         "category": "Main Course",
@@ -225,7 +244,7 @@
             "non-veg",
             "spicy-3"
         ],
-        "image": "https://images.unsplash.com/photo-1514327605112-b887c0e61c0a?w=500&h=400&fit=crop"
+        "image": "/menu-images/lamb-rogan.jpg"
     },
     {
         "category": "Main Course",
@@ -244,7 +263,7 @@
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1645177623570-ad442650cd23?w=500&h=400&fit=crop"
+        "image": "/menu-images/malai-kofta.jpg"
     },
     {
         "category": "Main Course",
@@ -263,7 +282,7 @@
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1601050633647-8f8f2f3ee079?w=500&h=400&fit=crop"
+        "image": "/menu-images/palak-paneer.jpg"
     },
     {
         "category": "Main Course",
@@ -282,7 +301,7 @@
             "non-veg",
             "spicy-3"
         ],
-        "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&h=400&fit=crop"
+        "image": "/menu-images/kadai-chicken.jpg"
     },
     {
         "category": "Main Course",
@@ -301,7 +320,7 @@
             "non-veg",
             "spicy-2"
         ],
-        "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&h=400&fit=crop"
+        "image": "/menu-images/goan-fish.jpg"
     },
     {
         "category": "Main Course",
@@ -320,7 +339,7 @@
             "veg",
             "spicy-2"
         ],
-        "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&h=400&fit=crop"
+        "image": "/menu-images/chana-masala.jpg"
     },
     {
         "category": "Bread",
@@ -338,261 +357,42 @@
         "tags": [
             "veg"
         ],
-        "image": "https://images.unsplash.com/photo-1626082896492-766af4eb6501?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Bread",
-        "name": {
-            "en": "Butter Naan",
-            "hi": "बटर नान",
-            "ar": "باني نان"
-        },
-        "description": {
-            "en": "Soft traditional Indian bread brushed with melted butter, baked fresh.",
-            "hi": "पिघले हुए मक्खन के साथ ब्रश की हुई नरम पारंपरिक भारतीय रोटी, ताजी पकी हुई।",
-            "ar": "خبز هندي تقليدي ناعم مدهون بالزبدة المذابة ومخبوز طازجاً."
-        },
-        "price": "₹60",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1601050633647-8f8f2f3ee079?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Bread",
-        "name": {
-            "en": "Laccha Paratha",
-            "hi": "लच्छा पराठा",
-            "ar": "لاتشا باراثا"
-        },
-        "description": {
-            "en": "Multi-layered flaky whole wheat flatbread brushed with butter.",
-            "hi": "मक्खन के साथ बहु-स्तरित परतदार साबुत गेहूं की रोटी।",
-            "ar": "خبز القمح الكامل المقرمش متعدد الطبقات مدهون بالزبدة."
-        },
-        "price": "₹70",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Bread",
-        "name": {
-            "en": "Tandoori Roti",
-            "hi": "तंदूरी रोटी",
-            "ar": "تندوري روتي"
-        },
-        "description": {
-            "en": "Whole wheat bread baked in the intense heat of a traditional tandoor.",
-            "hi": "पारंपरिक तंदूर की तीव्र गर्मी में पकी हुई साबुत गेहूं की रोटी।",
-            "ar": "خبز القمح الكامل مخبوز في الحرارة الشديدة للتنور التقليدي."
-        },
-        "price": "₹40",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Rice",
-        "name": {
-            "en": "Chicken Biryani",
-            "hi": "चिकन बिरयानी",
-            "ar": "براني دجاج"
-        },
-        "description": {
-            "en": "Fragrant basmati rice cooked with marinated chicken and whole spices.",
-            "hi": "मैरीनेट किए हुए चिकन और साबुत मसालों के साथ पकाए गए सुगंधित बासमती चावल।",
-            "ar": "أرز بسمتي عطري مطبوخ مع دجاج متبل وبهارات كاملة."
-        },
-        "price": "₹280",
-        "tags": [
-            "non-veg",
-            "spicy-2"
-        ],
-        "image": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Rice",
-        "name": {
-            "en": "Vegetable Biryani",
-            "hi": "वेज बिरयानी",
-            "ar": "براني خضار"
-        },
-        "description": {
-            "en": "Fragrant basmati rice with mixed seasonal vegetables and aromatic spices.",
-            "hi": "मिश्रित मौसमी सब्जियों और सुगंधित मसालों के साथ सुगंधित बासमती चावल।",
-            "ar": "أرز بسمتي عطري مع خضروات موسمية مشكلة وبهارات عطرية."
-        },
-        "price": "₹220",
-        "tags": [
-            "veg",
-            "spicy-2"
-        ],
-        "image": "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Rice",
-        "name": {
-            "en": "Jeera Rice",
-            "hi": "जीरा चावल",
-            "ar": "أرز بالكمون"
-        },
-        "description": {
-            "en": "Fragrant basmati rice tempered with cumin seeds and whole spices.",
-            "hi": "जीरा और साबुत मसालों के साथ सुगंधित बासमती चावल।",
-            "ar": "أرز بسمتي عطري مقلي ببذور الكمون والبهارات الكاملة."
-        },
-        "price": "₹160",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1596797038530-2c39fa08ef86?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Rice",
-        "name": {
-            "en": "Mutton Biryani",
-            "hi": "मटन बिरयानी",
-            "ar": "برياني لحم ضأن"
-        },
-        "description": {
-            "en": "Slow-cooked basmati rice layered with aromatic spices and tender mutton.",
-            "hi": "धीमी आंच पर पकाया हुआ बासमती चावल, सुगंधित मसालों और नरम मटन के साथ।",
-            "ar": "أرز بسمتي مطبوخ ببطء مع طبقات من البهارات العطرية ولحم الضأن الطري."
-        },
-        "price": "₹350",
-        "tags": [
-            "non-veg",
-            "spicy-3"
-        ],
-        "image": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=500&h=400&fit=crop"
+        "image": "/menu-images/garlic-naan.jpg"
     },
     {
         "category": "Dessert",
         "name": {
-            "en": "Gulab Jamun (2 pcs)",
-            "hi": "गुलाब जामुन (2 पीसी)",
-            "ar": "جولاب جامون (قطعتان)"
+            "en": "Gulab Jamun",
+            "hi": "गुलाब जामुन",
+            "ar": "جولاب جامون"
         },
         "description": {
-            "en": "Soft milk solids in warm sugar syrup. The perfect ending.",
-            "hi": "गर्म चीनी की चाशनी में मैदे और खोये के नरम गोले। उत्तम अंत।",
-            "ar": "كرات الحليب الناعمة في شراب السكر الدافئ. النهاية المثالية."
+            "en": "Soft milk-based dumplings soaked in rose and cardamom syrup.",
+            "hi": "गुलाब और इलायची की चाशनी में भिगोए हुए नरम दूध के पेड़े।",
+            "ar": "زلابية ناعمة مبنية على الحليب منقوعة في شراب الورد والهيل."
         },
         "price": "₹120",
         "tags": [
             "veg"
         ],
-        "image": "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Dessert",
-        "name": {
-            "en": "Ras Malai",
-            "hi": "रसमलाई",
-            "ar": "رسملاي"
-        },
-        "description": {
-            "en": "Soft cottage cheese dumplings in rose-flavored condensed milk.",
-            "hi": "गुलाब के स्वाद वाले गाढ़े दूध में नरम पनीर के गोले।",
-            "ar": "زلابية جبنة قريش ناعمة في حليب مكثف بنكهة الورد."
-        },
-        "price": "₹150",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1602498456745-e9503b90473b?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Dessert",
-        "name": {
-            "en": "Gajar ka Halwa",
-            "hi": "गाजर का हलवा",
-            "ar": "حلوى الجزر"
-        },
-        "description": {
-            "en": "Warm carrot pudding with milk, nuts, and traditional khoya.",
-            "hi": "दूध, मेवे और पारंपरिक खोये के साथ गर्म गाजर का हलवा।",
-            "ar": "بودينغ جزر دافئ مع الحليب والمكسرات والخويا التقليدية."
-        },
-        "price": "₹160",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1633337474564-1d9478ca4e2e?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Dessert",
-        "name": {
-            "en": "Kulfi Falooda",
-            "hi": "कुल्फी फालूदा",
-            "ar": "كولفي فالودا"
-        },
-        "description": {
-            "en": "Traditional Indian ice cream served with vermicelli and rose syrup.",
-            "hi": "सेवई और गुलाब के सिरप के साथ परोसा जाने वाला पारंपरिक भारतीय आइसक्रीम।",
-            "ar": "آيس كريم هندي تقليدي يقدم مع الشعيرية وشراب الورد."
-        },
-        "price": "₹180",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500&h=400&fit=crop"
+        "image": "/menu-images/gulab-jamun.jpg"
     },
     {
         "category": "Beverage",
         "name": {
             "en": "Mango Lassi",
             "hi": "मैंगो लस्सी",
-            "ar": "لاسي مانجو"
+            "ar": "مانجو لاسي"
         },
         "description": {
-            "en": "Refreshing yogurt-based drink with fresh mango puree.",
-            "hi": "ताजा आम की प्यूरी के साथ ताज़ा दही आधारित पेय।",
-            "ar": "مشروب منعش يعتمد على الزبادي مع هريس المانجو الطازج."
+            "en": "Sweet and creamy yogurt-based drink made with fresh mangoes.",
+            "hi": "ताजे आम से बना मीठा और मलाईदार दही आधारित पेय।",
+            "ar": "مشروب حلو وكريمي قائم على الزبادي ومصنوع من المانجو الطازج."
         },
-        "price": "₹100",
+        "price": "₹150",
         "tags": [
             "veg"
         ],
-        "image": "https://images.unsplash.com/photo-1549128247-37e905ebdb3f?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Beverage",
-        "name": {
-            "en": "Masala Chai",
-            "hi": "मसाला चाय",
-            "ar": "شاي ماسالا"
-        },
-        "description": {
-            "en": "Aromatic Indian tea brewed with traditional spices and milk.",
-            "hi": "पारंपरिक मसालों और दूध के साथ बनाई गई सुगंधित भारतीय चाय।",
-            "ar": "شاي هندي عطري مخمر مع البهارات التقليدية والحليب."
-        },
-        "price": "₹80",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?w=500&h=400&fit=crop"
-    },
-    {
-        "category": "Beverage",
-        "name": {
-            "en": "Fresh Lime Soda",
-            "hi": "ताजा नींबू सोडा",
-            "ar": "صودا الليمون الطازجة"
-        },
-        "description": {
-            "en": "Refreshing drink made with fresh lemon juice, soda, and mint.",
-            "hi": "ताजा नींबू के रस, सोडा और पुदीने से बना ताज़ा पेय।",
-            "ar": "مشروب منعش مصنوع من عصير الليمون الطازج والصودا والنعناع."
-        },
-        "price": "₹80",
-        "tags": [
-            "veg"
-        ],
-        "image": "https://images.unsplash.com/photo-1621263764496-749ffed7d0d0?w=500&h=400&fit=crop"
+        "image": "/menu-images/mango-lassi.jpg"
     }
 ]

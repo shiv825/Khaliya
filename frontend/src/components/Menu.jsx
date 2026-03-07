@@ -7,262 +7,402 @@ export default function Menu() {
 
     const getFallbackMenu = () => [
         {
-            "category": "Appetizer",
-            "name": { "en": "Samosa (4 pcs)", "hi": "समोसा (4 पीसी)", "ar": "سمبوسة (4 قطع)" },
-            "description": { "en": "Crispy fried pastry with spiced potato and pea filling. A classic Indian starter.", "hi": "मसालेदार आलू और मटर भराव के साथ कुरकुरा तला हुआ पेस्ट्री। एक क्लासिक भारतीय स्टार्टर।", "ar": "فطيرة مقرمشة محشوة بالبطاطس المتبلة والبازلاء. مقبلات هندية كلاسيكية." },
-            "price": "₹150",
-            "tags": ["veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1601050633647-8f8f2f3ee079?w=500&h=400&fit=crop"
+                "category": "Appetizer",
+                "name": {
+                        "en": "Samosa (4 pcs)",
+                        "hi": "समोसा (4 पीसी)",
+                        "ar": "سمبوسة (4 قطع)"
+                },
+                "description": {
+                        "en": "Crispy fried pastry with spiced potato and pea filling.",
+                        "hi": "मसालेदार आलू और मटर भराव के साथ कुरकुरा तला हुआ पेस्ट्री।",
+                        "ar": "فطيرة مقرمشة محشوة بالبطاطس المتبلة والبازلاء."
+                },
+                "price": "₹150",
+                "tags": [
+                        "veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/samosa.jpg"
         },
         {
-            "category": "Appetizer",
-            "name": { "en": "Paneer Tikka", "hi": "पनीर टिक्का", "ar": "بانيير تيكا" },
-            "description": { "en": "Cubed cottage cheese marinated in yogurt and spices, grilled in tandoor.", "hi": "दही और मसालों में मैरीनेट किया हुआ पनीर, तंदूर में ग्रिल किया हुआ।", "ar": "مكعبات جبنة القريش المتبلة بالزبادي والبهارات والمشوية في التنور." },
-            "price": "₹320",
-            "tags": ["veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1599487405702-3e28faced4e3?w=500&h=400&fit=crop"
+                "category": "Appetizer",
+                "name": {
+                        "en": "Paneer Tikka",
+                        "hi": "पनीर टिक्का",
+                        "ar": "بانيير تيكا"
+                },
+                "description": {
+                        "en": "Cubed cottage cheese marinated in yogurt and spices, grilled in tandoor.",
+                        "hi": "दही और मसालों में मैरीनेट किया हुआ पनीर, तंदूर में ग्रिल किया हुआ।",
+                        "ar": "مكعبات جبنة القريش المتبلة بالزبادي والبهارات والمشوية في التنور."
+                },
+                "price": "₹320",
+                "tags": [
+                        "veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/paneer-tikka.jpg"
         },
         {
-            "category": "Appetizer",
-            "name": { "en": "Tandoori Chicken (Half)", "hi": "तंदूरी चिकन (आधा)", "ar": "دجاج تندوري (نصف)" },
-            "description": { "en": "Classic tandoori chicken marinated in secret spices and grilled to perfection.", "hi": "क्लासिक तंदूरी चिकन गुप्त मसालों में मैरीनेट किया हुआ और पूर्णता के साथ ग्रिल किया हुआ।", "ar": "دجاج تندوري كلاسيكي متبل بالبهارات السرية ومشوي بإتقان." },
-            "price": "₹420",
-            "tags": ["non-veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&h=400&fit=crop"
+                "category": "Appetizer",
+                "name": {
+                        "en": "Tandoori Chicken (Half)",
+                        "hi": "तंदूरी चिकन (आधा)",
+                        "ar": "دجاج تندوري (نصف)"
+                },
+                "description": {
+                        "en": "Classic tandoori chicken marinated in secret spices and grilled to perfection.",
+                        "hi": "क्लासिक तंदूरी चिकन गुप्त मसालों में मैरीनेट किया हुआ और पूर्णता के साथ ग्रिल किया हुआ।",
+                        "ar": "دجاج تندوري كلاسيكي متبل بالبهارات السرية ومشوي بإتقان."
+                },
+                "price": "₹420",
+                "tags": [
+                        "non-veg",
+                        "spicy-2"
+                ],
+                "image": "/menu-images/tandoori-chicken.jpg"
         },
         {
-            "category": "Appetizer",
-            "name": { "en": "Hara Bhara Kabab (6 pcs)", "hi": "हरा भरा कबाब (6 पीसी)", "ar": "هارا بهارا كباب (6 قطع)" },
-            "description": { "en": "Healthy spinach and green pea patties with traditional herbs and spices.", "hi": "पारंपरिक जड़ी-बूटियों और मसालों के साथ स्वस्थ पालक और हरी मटर के पैटीज़।", "ar": "فطائر السبانخ والبازلاء الخضراء الصحية مع الأعشاب والبهارات التقليدية." },
-            "price": "₹220",
-            "tags": ["veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1626508064436-cc0845350be4?w=500&h=400&fit=crop"
+                "category": "Appetizer",
+                "name": {
+                        "en": "Hara Bhara Kabab (6 pcs)",
+                        "hi": "हरा भरा कबाब (6 पीसी)",
+                        "ar": "هارا بهارا كباب (6 قطع)"
+                },
+                "description": {
+                        "en": "Healthy spinach and green pea patties with traditional herbs and spices.",
+                        "hi": "पारंपरिक जड़ी-बूटियों और मसालों के साथ स्वस्थ पालक और हरी मटर के पैटीज़।",
+                        "ar": "فطائر السبانخ والبازلاء الخضراء الصحية مع الأعشاب والبهارات التقليدية."
+                },
+                "price": "₹220",
+                "tags": [
+                        "veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/hara-bhara.jpg"
         },
         {
-            "category": "Appetizer",
-            "name": { "en": "Fish Amritsari", "hi": "फिश अमृतसरी", "ar": "سمك أمريتساري" },
-            "description": { "en": "Golden fried fish fillets flavored with carom seeds and authentic spices.", "hi": "अजवाइन और प्रामाणिक मसालों के साथ सुनहरे तले हुए मछली के टुकड़े।", "ar": "شرائح سمك مقلية ذهبية بنكهة بذور الكروم والبهارات الأصلية." },
-            "price": "₹350",
-            "tags": ["non-veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&h=400&fit=crop"
+                "category": "Appetizer",
+                "name": {
+                        "en": "Fish Amritsari",
+                        "hi": "फिश अमृतसरी",
+                        "ar": "سمك أمريتساري"
+                },
+                "description": {
+                        "en": "Golden fried fish fillets flavored with carom seeds and authentic spices.",
+                        "hi": "अजवाइन और प्रामाणिक मसालों के साथ सुनहरे तले हुए मछली के टुकड़े।",
+                        "ar": "شرائح سمك مقلية ذهبية بنكهة بذور الكروم والبهارات الأصلية."
+                },
+                "price": "₹350",
+                "tags": [
+                        "non-veg",
+                        "spicy-2"
+                ],
+                "image": "/menu-images/fish-amritsari.jpg"
         },
         {
-            "category": "Appetizer",
-            "name": { "en": "Chili Paneer", "hi": "चिली पनीर", "ar": "تشيلي بانير" },
-            "description": { "en": "Indo-Chinese style spicy cottage cheese with bell peppers and onions.", "hi": "शिमला मिर्च और प्याज के साथ इंडो-चाइनीज स्टाइल का मसालेदार पनीर।", "ar": "جبنة قريش حارة على الطريقة الهندية الصينية مع فلفل رومي وبصل." },
-            "price": "₹280",
-            "tags": ["veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&h=400&fit=crop"
+                "category": "Appetizer",
+                "name": {
+                        "en": "Chili Paneer",
+                        "hi": "चिली पनीर",
+                        "ar": "تشيلي بانير"
+                },
+                "description": {
+                        "en": "Indo-Chinese style spicy cottage cheese with bell peppers and onions.",
+                        "hi": "शिमला मिर्च और प्याज के साथ इंडो-चाइनीज स्टाइल का मसालेदार पनीर।",
+                        "ar": "جبنة قريش حارة على الطريقة الهندية الصينية مع فلفل رومي وبصل."
+                },
+                "price": "₹280",
+                "tags": [
+                        "veg",
+                        "spicy-2"
+                ],
+                "image": "/menu-images/chili-paneer.jpg"
         },
         {
-            "category": "Appetizer",
-            "name": { "en": "Chicken 65", "hi": "चिकन 65", "ar": "دجاج 65" },
-            "description": { "en": "Spicy, deep-fried chicken dish originating from Chennai, India.", "hi": "चेन्नई, भारत से उत्पन्न मसालेदार, गहरे तले हुए चिकन डिश।", "ar": "طبق دجاج مقلي حار من تشيناي، الهند." },
-            "price": "₹310",
-            "tags": ["non-veg", "spicy-3"],
-            "image": "https://images.unsplash.com/photo-1624374052601-2092cc60bfb7?w=500&h=400&fit=crop"
+                "category": "Appetizer",
+                "name": {
+                        "en": "Chicken 65",
+                        "hi": "चिकन 65",
+                        "ar": "دجاج 65"
+                },
+                "description": {
+                        "en": "Spicy, deep-fried chicken dish originating from Chennai, India.",
+                        "hi": "चेन्नई, भारत से उत्पन्न मसालेदार, गहरे तले हुए चिकन डिश।",
+                        "ar": "طبق دجاج مقلي حار من تشيناي، الهند."
+                },
+                "price": "₹310",
+                "tags": [
+                        "non-veg",
+                        "spicy-3"
+                ],
+                "image": "/menu-images/chicken-65.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Butter Chicken", "hi": "बटर चिकन", "ar": "دجاج بالزبدة" },
-            "description": { "en": "Succulent chicken in rich, buttery tomato cream sauce. House specialty.", "hi": "समृद्ध, मलाईदार टमाटर क्रीम सॉस में रसीला चिकन। हाउस स्पेशलिटी।", "ar": "دجاج طري في صلصة طماطم بالزبدة والقشطة الغنية. تخصص البيت." },
-            "price": "₹400",
-            "tags": ["non-veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Chicken Biryani",
+                        "hi": "चिकन बिरयानी",
+                        "ar": "دجاج برياني"
+                },
+                "description": {
+                        "en": "Fragrant basmati rice cooked with marinated chicken and aromatic spices.",
+                        "hi": "सुगंधित बासमती चावल मैरीनेट किए हुए चिकन और सुगंधित मसालों के साथ पकाया जाता है।",
+                        "ar": "أرز بسمتي عطري مطبوخ مع دجاج متبل وبهارات عطرية."
+                },
+                "price": "₹450",
+                "tags": [
+                        "non-veg",
+                        "spicy-2"
+                ],
+                "image": "/menu-images/chicken-biryani.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Chicken Tikka Masala", "hi": "चिकन टिक्का मसाला", "ar": "دجاج تيكا ماسالا" },
-            "description": { "en": "Tender chicken in creamy tomato sauce with aromatic spices. Served with rice.", "hi": "सुगंधित मसालों के साथ मलाईदार टमाटर सॉस में नरम चिकन। चावल के साथ परोसा जाता है।", "ar": "دجاج طري في صلصة طماطم كريمية مع بهارات عطرية. يقدم مع الأرز." },
-            "price": "₹380",
-            "tags": ["non-veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Butter Chicken",
+                        "hi": "बटर चिकन",
+                        "ar": "دجاج بالزبدة"
+                },
+                "description": {
+                        "en": "Succulent chicken in rich, buttery tomato cream sauce. House specialty.",
+                        "hi": "समृद्ध, मलाईदार टमाटर क्रीम सॉस में रसीला चिकन। हाउस स्पेशलिटी।",
+                        "ar": "دجاج طري في صلصة طماطم بالزبدة والقشطة الغنية."
+                },
+                "price": "₹400",
+                "tags": [
+                        "non-veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/butter-chicken.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Paneer Butter Masala", "hi": "पनीर बटर मसाला", "ar": "بانيयर بوتر ماسالا" },
-            "description": { "en": "Soft cottage cheese in rich tomato butter gravy. Vegetarian favorite.", "hi": "समृद्ध टमाटर बटर ग्रेवी में नरम पनीर। शाकाहारी पसंदीदा।", "ar": "جبنة قريش ناعمة في مرق الزبدة الغني بالطماطم. مفضل للنباتيين." },
-            "price": "₹320",
-            "tags": ["veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Chicken Tikka Masala",
+                        "hi": "चिकन टिक्का मसाला",
+                        "ar": "دجاج تيكا ماسالا"
+                },
+                "description": {
+                        "en": "Tender chicken in creamy tomato sauce with aromatic spices.",
+                        "hi": "सुगंधित मसालों के साथ मलाईदार टमाटर सॉस में नरम चिकन।",
+                        "ar": "دجاج طري في صلصة طماطم كريمية مع بهارات عطرية."
+                },
+                "price": "₹380",
+                "tags": [
+                        "non-veg",
+                        "spicy-2"
+                ],
+                "image": "/menu-images/tikka-masala.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Dal Makhani", "hi": "दाल मखनी", "ar": "دال ماخاني" },
-            "description": { "en": "Creamy black lentils slow-cooked with butter, cream, and aromatic spices.", "hi": "मक्खन, क्रीम और सुगंधित मसालों के साथ धीमी आंच पर पकाए गए मलाईदार काले उड़द।", "ar": "عدس أسود كريمي مطبوخ ببطء مع الزبدة والقشطة والبهارات العطرية." },
-            "price": "₹280",
-            "tags": ["veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Paneer Butter Masala",
+                        "hi": "पनीर बटर मसाला",
+                        "ar": "بانيयर بوتر ماسالا"
+                },
+                "description": {
+                        "en": "Soft cottage cheese in rich tomato butter gravy. Vegetarian favorite.",
+                        "hi": "समृद्ध टमाटर बटर ग्रेवी में नरम पनीर। शाकाहारी पसंदीदा।",
+                        "ar": "جبنة قريش ناعمة في مرق الزبدة الغني بالطماطم."
+                },
+                "price": "₹320",
+                "tags": [
+                        "veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/paneer-butter.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Lamb Rogan Josh", "hi": "लैम्ब रोगन जोश", "ar": "لحم روجان جوش" },
-            "description": { "en": "Tender lamb cooked in aromatic spice blend with tomato and yogurt sauce.", "hi": "टमाटर और दही की सॉस के साथ सुगंधित मसाले के मिश्रण में पका हुआ नरम मेमना।", "ar": "لحم طري مطبوخ بمزيج بهارات عطرية مع صلصة الطماطم والزبادي." },
-            "price": "₹450",
-            "tags": ["non-veg", "spicy-3"],
-            "image": "https://images.unsplash.com/photo-1514327605112-b887c0e61c0a?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Dal Makhani",
+                        "hi": "दाल मखनी",
+                        "ar": "دال ماخاني"
+                },
+                "description": {
+                        "en": "Creamy black lentils slow-cooked with butter, cream, and aromatic spices.",
+                        "hi": "मक्खन, क्रीम और सुगंधित मसालों के साथ धीमी आंच पर पकाए गए मलाईदार काले उड़द।",
+                        "ar": "عدس أسود كريمي مطبوخ ببطء مع الزبدة والقشطة والبهارات العطرية."
+                },
+                "price": "₹280",
+                "tags": [
+                        "veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/dal-makhani.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Malai Kofta", "hi": "मलाई कोफ्ता", "ar": "ملاي كفتة" },
-            "description": { "en": "Soft cottage cheese and potato dumplings in a rich, creamy white gravy.", "hi": "समृद्ध, मलाईदार सफेद ग्रेवी में नरम पनीर और आलू के कोफ्ते।", "ar": "كفتة الجبنة والبطاطس الناعمة في مرق أبيض كريمي غني." },
-            "price": "₹340",
-            "tags": ["veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1645177623570-ad442650cd23?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Lamb Rogan Josh",
+                        "hi": "लैम्ब रोगन जोश",
+                        "ar": "لحم روجان جوش"
+                },
+                "description": {
+                        "en": "Tender lamb cooked in aromatic spice blend with tomato and yogurt sauce.",
+                        "hi": "टमाटर और दही की सॉस के साथ सुगंधित मसाले के मिश्रण में पका हुआ नरम मेमना।",
+                        "ar": "لحم طري مطبوخ بمزيج بهارات عطرية مع صلصة الطماطم والزبادي."
+                },
+                "price": "₹450",
+                "tags": [
+                        "non-veg",
+                        "spicy-3"
+                ],
+                "image": "/menu-images/lamb-rogan.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Palak Paneer", "hi": "पालक पनीर", "ar": "بالاك بانير" },
-            "description": { "en": "Cottage cheese cubes in a thick, spiced spinach puree. Nutritious.", "hi": "गाढ़ा, मसालेदार पालक प्यूरी में पनीर के टुकड़े। पौष्टिक।", "ar": "مكعبات جبنة القريش في هريس السبانخ الكثيف والمتبل. مغذية." },
-            "price": "₹310",
-            "tags": ["veg", "spicy-1"],
-            "image": "https://images.unsplash.com/photo-1601050633647-8f8f2f3ee079?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Malai Kofta",
+                        "hi": "मलाई कोफ्ता",
+                        "ar": "ملاي كفتة"
+                },
+                "description": {
+                        "en": "Soft cottage cheese and potato dumplings in a rich, creamy white gravy.",
+                        "hi": "समृद्ध, मलाईदार सफेद ग्रेवी में नरम पनीर और आलू के कोफ्ते।",
+                        "ar": "كفتة الجبنة والبطاطس الناعمة في مرق أبيض كريمي غني."
+                },
+                "price": "₹340",
+                "tags": [
+                        "veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/malai-kofta.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Kadai Chicken", "hi": "कढ़ाई चिकन", "ar": "كاداي دجاج" },
-            "description": { "en": "Spicy chicken curry cooked with bell peppers, tomatoes, and ground spices.", "hi": "शिमला मिर्च, टमाटर और पिसे हुए मसालों के साथ मसालेदार चिकन करी।", "ar": "كاري الدجاج الحار المطبوخ مع الفلفل الرومي والطماطم والبهارات المطحونة." },
-            "price": "₹390",
-            "tags": ["non-veg", "spicy-3"],
-            "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Palak Paneer",
+                        "hi": "पालक पनीर",
+                        "ar": "بالاك بانير"
+                },
+                "description": {
+                        "en": "Cottage cheese cubes in a thick, spiced spinach puree. Nutritious.",
+                        "hi": "गाढ़ा, मसालेदार पालक प्यूरी में पनीर के टुकड़े। पौष्टिक।",
+                        "ar": "مكعبات جبنة القريش في هريس السبانخ الكثيف والمتبل. مغذية."
+                },
+                "price": "₹310",
+                "tags": [
+                        "veg",
+                        "spicy-1"
+                ],
+                "image": "/menu-images/palak-paneer.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Goan Fish Curry", "hi": "गोअन फिश करी", "ar": "كاري سمك غوان" },
-            "description": { "en": "Coconut-based tangy fish curry prepared with tamarind and fresh catch.", "hi": "इमली और ताजी मछली के साथ तैयार नारियल आधारित तीखी मछली करी।", "ar": "كاري السمك اللاذع بجوز الهند المعد بالتمر الهندي والصيد الطازج." },
-            "price": "₹460",
-            "tags": ["non-veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Kadai Chicken",
+                        "hi": "कढ़ाई चिकन",
+                        "ar": "كاداي دجاج"
+                },
+                "description": {
+                        "en": "Spicy chicken curry cooked with bell peppers, tomatoes, and ground spices.",
+                        "hi": "शिमला मिर्च, टमाटर और पिसे हुए मसालों के साथ मसालेदार चिकन करी।",
+                        "ar": "كاري الدجاج الحار المطبوخ مع الفلفل الرومي والطماطم والبهارات المطحونة."
+                },
+                "price": "₹390",
+                "tags": [
+                        "non-veg",
+                        "spicy-3"
+                ],
+                "image": "/menu-images/kadai-chicken.jpg"
         },
         {
-            "category": "Main Course",
-            "name": { "en": "Chana Masala", "hi": "चना मसाला", "ar": "شانا ماسالا" },
-            "description": { "en": "Classic chickpea curry cooked with tangy tomato and onion gravy.", "hi": "खट्टे टमाटर और प्याज की ग्रेवी के साथ पकाए गए क्लासिक चना करी।", "ar": "كاري الحمص الكلاسيكي المطبوخ مع مرق الطماطم والبصل اللاذع." },
-            "price": "₹260",
-            "tags": ["veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Goan Fish Curry",
+                        "hi": "गोअन फिश करी",
+                        "ar": "كاري سمك غوان"
+                },
+                "description": {
+                        "en": "Coconut-based tangy fish curry prepared with tamarind and fresh catch.",
+                        "hi": "इमली और ताजी मछली के साथ तैयार नारियल आधारित तीखी मछली करी।",
+                        "ar": "كاري السمك اللاذع بجوز الهند المعد بالتمر الهندي والصيد الطازج."
+                },
+                "price": "₹460",
+                "tags": [
+                        "non-veg",
+                        "spicy-2"
+                ],
+                "image": "/menu-images/goan-fish.jpg"
         },
         {
-            "category": "Bread",
-            "name": { "en": "Garlic Naan", "hi": "गार्लिक नान", "ar": "خبز النان بالثوم" },
-            "description": { "en": "Traditional Indian bread baked in clay oven with fresh garlic and butter.", "hi": "ताजा लहसुन और मक्खन के साथ मिट्टी के ओवन में पकी हुई पारंपरिक भारतीय रोटी।", "ar": "خبز هندي تقليدي مخبوز في فرن الطين مع الثوم الطازج والزبدة." },
-            "price": "₹80",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1626082896492-766af4eb6501?w=500&h=400&fit=crop"
+                "category": "Main Course",
+                "name": {
+                        "en": "Chana Masala",
+                        "hi": "चना मसाला",
+                        "ar": "شانا ماسالا"
+                },
+                "description": {
+                        "en": "Classic chickpea curry cooked with tangy tomato and onion gravy.",
+                        "hi": "खट्टे टमाटर और प्याज की ग्रेवी के साथ पकाए गए क्लासिक चना करी।",
+                        "ar": "كاري الحمص الكلاسيكي المطبوخ مع مرق الطماطم والبصل اللاذع."
+                },
+                "price": "₹260",
+                "tags": [
+                        "veg",
+                        "spicy-2"
+                ],
+                "image": "/menu-images/chana-masala.jpg"
         },
         {
-            "category": "Bread",
-            "name": { "en": "Butter Naan", "hi": "बटर नान", "ar": "باني نان" },
-            "description": { "en": "Soft traditional Indian bread brushed with melted butter, baked fresh.", "hi": "पिघले हुए मक्खन के साथ ब्रश की हुई नरम पारंपरिक भारतीय रोटी, ताजी पकी हुई।", "ar": "خبز هندي تقليدي ناعم مدهون بالزبدة المذابة ومخبوز طازجاً." },
-            "price": "₹60",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1601050633647-8f8f2f3ee079?w=500&h=400&fit=crop"
+                "category": "Bread",
+                "name": {
+                        "en": "Garlic Naan",
+                        "hi": "गार्लिक नान",
+                        "ar": "خبز النان بالثوم"
+                },
+                "description": {
+                        "en": "Traditional Indian bread baked in clay oven with fresh garlic and butter.",
+                        "hi": "ताजा लहसुन और मक्खन के साथ मिट्टी के ओवन में पकी हुई पारंपरिक भारतीय रोटी।",
+                        "ar": "خبز هندي تقليدي مخبوز في فرن الطين مع الثوم الطازج والزبدة."
+                },
+                "price": "₹80",
+                "tags": [
+                        "veg"
+                ],
+                "image": "/menu-images/garlic-naan.jpg"
         },
         {
-            "category": "Bread",
-            "name": { "en": "Laccha Paratha", "hi": "लच्छा पराठा", "ar": "لاتشا باراثا" },
-            "description": { "en": "Multi-layered flaky whole wheat flatbread brushed with butter.", "hi": "मक्खन के साथ बहु-स्तरित परतदार साबुत गेहूं की रोटी।", "ar": "خبز القمح الكامل المقرمش متعدد الطبقات مدهون بالزبدة." },
-            "price": "₹70",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&h=400&fit=crop"
+                "category": "Dessert",
+                "name": {
+                        "en": "Gulab Jamun",
+                        "hi": "गुलाब जामुन",
+                        "ar": "جولاب جامون"
+                },
+                "description": {
+                        "en": "Soft milk-based dumplings soaked in rose and cardamom syrup.",
+                        "hi": "गुलाब और इलायची की चाशनी में भिगोए हुए नरम दूध के पेड़े।",
+                        "ar": "زلابية ناعمة مبنية على الحليب منقوعة في شراب الورد والهيل."
+                },
+                "price": "₹120",
+                "tags": [
+                        "veg"
+                ],
+                "image": "/menu-images/gulab-jamun.jpg"
         },
         {
-            "category": "Bread",
-            "name": { "en": "Tandoori Roti", "hi": "तंदूरी रोटी", "ar": "تندوري روتي" },
-            "description": { "en": "Whole wheat bread baked in the intense heat of a traditional tandoor.", "hi": "पारंपरिक तंदूर की तीव्र गर्मी में पकी हुई साबुत गेहूं की रोटी।", "ar": "خبز القمح الكامل مخبوز في الحرارة الشديدة للتنور التقليدي." },
-            "price": "₹40",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Rice",
-            "name": { "en": "Chicken Biryani", "hi": "चिकन बिरयानी", "ar": "براني دجاج" },
-            "description": { "en": "Fragrant basmati rice cooked with marinated chicken and whole spices.", "hi": "मैरीनेट किए हुए चिकन और साबुत मसालों के साथ पकाए गए सुगंधित बासमती चावल।", "ar": "أرز بسمتي عطري مطبوخ مع دجاج متبل وبهارات كاملة." },
-            "price": "₹280",
-            "tags": ["non-veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Rice",
-            "name": { "en": "Vegetable Biryani", "hi": "वेज बिरयानी", "ar": "براني خضار" },
-            "description": { "en": "Fragrant basmati rice with mixed seasonal vegetables and aromatic spices.", "hi": "मिश्रित मौसमी सब्जियों और सुगंधित मसालों के साथ सुगंधित बासमती चावल।", "ar": "أرز بسمتي عطري مع خضروات موسمية مشكلة وبهارات عطرية." },
-            "price": "₹220",
-            "tags": ["veg", "spicy-2"],
-            "image": "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Rice",
-            "name": { "en": "Jeera Rice", "hi": "जीरा चावल", "ar": "أرز بالكمون" },
-            "description": { "en": "Fragrant basmati rice tempered with cumin seeds and whole spices.", "hi": "जीरा और साबुत मसालों के साथ सुगंधित बासमती चावल।", "ar": "أرز بسمتي عطري مقلي ببذور الكمون والبهارات الكاملة." },
-            "price": "₹160",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1596797038530-2c39fa08ef86?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Rice",
-            "name": { "en": "Mutton Biryani", "hi": "मटन बिरयानी", "ar": "برياني لحم ضأن" },
-            "description": { "en": "Slow-cooked basmati rice layered with aromatic spices and tender mutton.", "hi": "धीमी आंच पर पकाया हुआ बासमती चावल, सुगंधित मसालों और नरम मटन के साथ।", "ar": "أرز بسمتي مطبوخ ببطء مع طبقات من البهارات العطرية ولحم الضأن الطري." },
-            "price": "₹350",
-            "tags": ["non-veg", "spicy-3"],
-            "image": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Dessert",
-            "name": { "en": "Gulab Jamun (2 pcs)", "hi": "गुलाब जामुन (2 पीसी)", "ar": "جولاب جامون (قطعتان)" },
-            "description": { "en": "Soft milk solids in warm sugar syrup. The perfect ending.", "hi": "गर्म चीनी की चाशनी में मैदे और खोये के नरम गोले। उत्तम अंत।", "ar": "كرات الحليب الناعمة في شراب السكر الدافئ. النهاية المثالية." },
-            "price": "₹120",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Dessert",
-            "name": { "en": "Ras Malai", "hi": "रसमलाई", "ar": "رسملاي" },
-            "description": { "en": "Soft cottage cheese dumplings in rose-flavored condensed milk.", "hi": "गुलाब के स्वाद वाले गाढ़े दूध में नरम पनीर के गोले।", "ar": "زلابية جبنة قريش ناعمة في حليب مكثف بنكهة الورد." },
-            "price": "₹150",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1602498456745-e9503b90473b?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Dessert",
-            "name": { "en": "Gajar ka Halwa", "hi": "गाजर का हलवा", "ar": "حلوى الجزر" },
-            "description": { "en": "Warm carrot pudding with milk, nuts, and traditional khoya.", "hi": "दूध, मेवे और पारंपरिक खोये के साथ गर्म गाजर का हलवा।", "ar": "بودينغ جزر دافئ مع الحليب والمكسرات والخويا التقليدية." },
-            "price": "₹160",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1633337474564-1d9478ca4e2e?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Dessert",
-            "name": { "en": "Kulfi Falooda", "hi": "कुल्फी फालूदा", "ar": "كولفي فالودا" },
-            "description": { "en": "Traditional Indian ice cream served with vermicelli and rose syrup.", "hi": "सेवई और गुलाब के सिरप के साथ परोसा जाने वाला पारंपरिक भारतीय आइसक्रीम।", "ar": "آيس كريم هندي تقليدي يقدم مع الشعيرية وشراب الورد." },
-            "price": "₹180",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Beverage",
-            "name": { "en": "Mango Lassi", "hi": "मैंगो लस्सी", "ar": "لاسي مانجو" },
-            "description": { "en": "Refreshing yogurt-based drink with fresh mango puree.", "hi": "ताजा आम की प्यूरी के साथ ताज़ा दही आधारित पेय।", "ar": "مشروب منعش يعتمد على الزبادي مع هريس المانجو الطازج." },
-            "price": "₹100",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1549128247-37e905ebdb3f?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Beverage",
-            "name": { "en": "Masala Chai", "hi": "मसाला चाय", "ar": "شاي ماسالا" },
-            "description": { "en": "Aromatic Indian tea brewed with traditional spices and milk.", "hi": "पारंपरिक मसालों और दूध के साथ बनाई गई सुगंधित भारतीय चाय।", "ar": "شاي هندي عطري مخمر مع البهارات التقليدية والحليب." },
-            "price": "₹80",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?w=500&h=400&fit=crop"
-        },
-        {
-            "category": "Beverage",
-            "name": { "en": "Fresh Lime Soda", "hi": "ताजा नींबू सोडा", "ar": "صودا الليمون الطازجة" },
-            "description": { "en": "Refreshing drink made with fresh lemon juice, soda, and mint.", "hi": "ताजा नींबू के रस, सोडा और पुदीने से बना ताज़ा पेय।", "ar": "مشروب منعش مصنوع من عصير الليمون الطازج والصودا والنعناع." },
-            "price": "₹80",
-            "tags": ["veg"],
-            "image": "https://images.unsplash.com/photo-1621263764496-749ffed7d0d0?w=500&h=400&fit=crop"
+                "category": "Beverage",
+                "name": {
+                        "en": "Mango Lassi",
+                        "hi": "मैंगो लस्सी",
+                        "ar": "مانجو لاسي"
+                },
+                "description": {
+                        "en": "Sweet and creamy yogurt-based drink made with fresh mangoes.",
+                        "hi": "ताजे आम से बना मीठा और मलाईदार दही आधारित पेय।",
+                        "ar": "مشروب حلو وكريمي قائم على الزبادي ومصنوع من المانجو الطازج."
+                },
+                "price": "₹150",
+                "tags": [
+                        "veg"
+                ],
+                "image": "/menu-images/mango-lassi.jpg"
         }
-    ];
+];
 
     const [menuItems, setMenuItems] = useState(getFallbackMenu());
     const [loading, setLoading] = useState(true);
@@ -274,7 +414,7 @@ export default function Menu() {
 
     useEffect(() => {
         console.log("Khaliya Debug: Menu.jsx is trying to fetch from ->", API_URL);
-        axios.get(`${API_URL}/api/menu`)
+        axios.get(`${API_URL}/api/menu`, { timeout: 5000 })
             .then(res => {
                 if (Array.isArray(res.data) && res.data.length > 0) {
                     setMenuItems(res.data);
@@ -360,7 +500,7 @@ export default function Menu() {
                         <div key={index} className="menu-item" data-aos="fade-up" data-aos-delay={(index % 5) * 100}>
                             {item.image && (
                                 <div className="menu-item-image" style={{ width: '100%', height: '180px', overflow: 'hidden', borderRadius: '8px', marginBottom: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                                    <img src={item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                                    <img loading="lazy" src={item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
                                 </div>
                             )}
                             <div className="menu-item-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
