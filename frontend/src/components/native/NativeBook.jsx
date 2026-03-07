@@ -5,8 +5,14 @@ export default function NativeBook() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ date: '', time: '', guests: 2, tableType: '' });
 
-    const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
+    const handleNext = () => setStep(prev => Math.min(prev + 1, 4));
     const handlePrev = () => setStep(prev => Math.max(prev - 1, 1));
+
+    const generateReservationID = () => {
+        return 'KH-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+    };
+
+    const [reservationId] = useState(generateReservationID());
 
     const renderStepContent = () => {
         switch (step) {
@@ -98,10 +104,38 @@ export default function NativeBook() {
                         </div>
                         <div className="wizard-actions">
                             <motion.button whileTap={{ scale: 0.95 }} className="native-btn-secondary" onClick={handlePrev}>Edit</motion.button>
-                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-success" onClick={() => alert('Booking Confirmed!')}>
+                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-success" onClick={handleNext}>
                                 Confirm Reservation
                             </motion.button>
                         </div>
+                    </motion.div>
+                );
+            case 4:
+                return (
+                    <motion.div
+                        key="step4"
+                        initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                        style={{ textAlign: 'center', padding: '20px' }}
+                    >
+                        <div style={{ width: '80px', height: '80px', background: '#4CAF50', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', color: 'white', fontSize: '2.5rem' }}>
+                            <i className="fas fa-check"></i>
+                        </div>
+                        <h2 style={{ color: '#1c1c1c', marginBottom: '10px' }}>Reservation Confirmed!</h2>
+                        <p style={{ color: '#696969' }}>We look forward to serving you.</p>
+
+                        <div style={{ background: '#f8f8f8', padding: '15px', borderRadius: '12px', marginTop: '25px', border: '1px dashed #ddd' }}>
+                            <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px' }}>Confirmation ID</p>
+                            <strong style={{ fontSize: '1.2rem', color: '#E23744', letterSpacing: '2px' }}>{reservationId}</strong>
+                        </div>
+
+                        <motion.button
+                            whileTap={{ scale: 0.95 }}
+                            className="native-btn-primary full-width"
+                            style={{ marginTop: '30px' }}
+                            onClick={() => window.location.reload()}
+                        >
+                            Return to Home
+                        </motion.button>
                     </motion.div>
                 );
             default:
@@ -114,13 +148,15 @@ export default function NativeBook() {
             <div className="native-book-header">
                 <h2>Reserve Table</h2>
                 <div className="progress-bar-container">
-                    <div className="progress-fill" style={{ width: `${(step / 3) * 100}%` }}></div>
+                    <div className="progress-fill" style={{ width: `${(Math.min(step, 3) / 3) * 100}%` }}></div>
                 </div>
-                <div className="steps-indicator">
-                    <span className={step >= 1 ? 'active' : ''}>When</span>
-                    <span className={step >= 2 ? 'active' : ''}>Details</span>
-                    <span className={step >= 3 ? 'active' : ''}>Confirm</span>
-                </div>
+                {step < 4 && (
+                    <div className="steps-indicator">
+                        <span className={step >= 1 ? 'active' : ''}>When</span>
+                        <span className={step >= 2 ? 'active' : ''}>Details</span>
+                        <span className={step >= 3 ? 'active' : ''}>Confirm</span>
+                    </div>
+                )}
             </div>
 
             <div className="wizard-container">

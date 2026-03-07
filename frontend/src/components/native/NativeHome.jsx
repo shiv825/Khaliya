@@ -1,8 +1,16 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function NativeHome({ setActiveTab }) {
+    const scrollRef = useRef(null);
+    const { scrollY } = useScroll();
+
+    // Parallax transforms
+    const heroY = useTransform(scrollY, [0, 500], [0, 200]);
+    const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+    const scale = useTransform(scrollY, [0, 300], [1, 1.1]);
+
     // Standard mock user in case localStorage is empty, though Auth intercepts this
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'Guest' };
@@ -29,13 +37,54 @@ export default function NativeHome({ setActiveTab }) {
     ];
 
     return (
-        <div className="native-home" id="native-home">
+        <div className="native-home" id="native-home" style={{ overflowX: 'hidden' }}>
+            {/* Parallax Hero Image Background */}
+            <div style={{ position: 'relative', height: '350px', overflow: 'hidden', margin: '0 -20px 20px -20px' }}>
+                <motion.img
+                    src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1000&fit=crop"
+                    style={{
+                        width: '100%',
+                        height: '140%',
+                        objectFit: 'cover',
+                        y: heroY,
+                        scale: scale,
+                        opacity: heroOpacity
+                    }}
+                />
+                <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.8))',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: '20px'
+                }}>
+                    <motion.h1
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        style={{ color: 'white', fontSize: '2.2rem', fontWeight: 800, margin: 0 }}
+                    >
+                        Authentic Taste
+                    </motion.h1>
+                    <p style={{ color: 'rgba(255,255,255,0.8)', margin: '5px 0 15px 0' }}>Discover the true flavors of India</p>
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        className="native-btn-primary"
+                        style={{ width: 'fit-content', padding: '10px 25px' }}
+                        onClick={() => setActiveTab('menu')}
+                    >
+                        Explore Menu
+                    </motion.button>
+                </div>
+            </div>
+
             {/* Header Section */}
             <motion.div
                 className="native-header"
-                initial={{ y: -50, opacity: 0 }}
+                initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
+                transition={{ duration: 0.5 }}
                 style={{ marginBottom: '25px' }}
             >
                 <div className="header-top">
@@ -54,23 +103,6 @@ export default function NativeHome({ setActiveTab }) {
             </motion.div>
 
 
-
-            {/* Hero Card (Moved up) */}
-            <motion.div
-                className="native-hero-card"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.5, delay: 0.15 }}
-                onClick={() => setActiveTab('book')}
-                style={{ marginBottom: '35px', cursor: 'pointer' }}
-            >
-                <div className="hero-content">
-                    <h3>Reserve Your Table</h3>
-                    <p>Skip the wait by booking in advance.</p>
-                    <motion.button whileTap={{ scale: 0.9 }} className="native-btn-primary">Book Now</motion.button>
-                </div>
-            </motion.div>
 
             {/* Active Offers Section */}
             <motion.div
