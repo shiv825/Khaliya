@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import NativeInitialization from './NativeInitialization';
 import NativeNotification from './NativeNotification';
 
 export default function NativeAuth({ onLoginSuccess }) {
     const [step, setStep] = useState('landing'); // landing, otp, notification
+    const [isInitialized, setIsInitialized] = useState(localStorage.getItem('khaliya_initialized') === 'true');
+    const [showInitialization, setShowInitialization] = useState(!isInitialized);
     const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
@@ -191,11 +194,24 @@ export default function NativeAuth({ onLoginSuccess }) {
         </motion.div>
     );
 
+    if (showInitialization) {
+        return (
+            <NativeInitialization
+                onComplete={() => {
+                    localStorage.setItem('khaliya_initialized', 'true');
+                    setShowInitialization(false);
+                }}
+            />
+        );
+    }
+
     return (
-        <AnimatePresence mode="wait">
-            {step === 'landing' && renderLanding()}
-            {step === 'otp' && renderOTP()}
-            {step === 'notification' && <NativeNotification onComplete={finalizeLogin} />}
-        </AnimatePresence>
+        <div className="native-auth-screen">
+            <AnimatePresence mode="wait">
+                {step === 'landing' && renderLanding()}
+                {step === 'otp' && renderOTP()}
+                {step === 'notification' && <NativeNotification onComplete={finalizeLogin} />}
+            </AnimatePresence>
+        </div>
     );
 }
