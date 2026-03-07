@@ -70,11 +70,11 @@ export default function NativeAuth({ onLoginSuccess }) {
         <div className="zomato-landing">
             <div className="landing-hero">
                 <img
-                    src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&fit=crop"
-                    alt="Food delivery"
+                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&fit=crop"
+                    alt="Authentic Dining"
                 />
                 <div className="landing-overlay">
-                    <h1>India's #1 Food Delivery App</h1>
+                    <h1>India's #1 Authentic Cuisine Restaurant</h1>
                     <div>
                         <span className="zomato-logo-stripe">khaliya</span>
                     </div>
