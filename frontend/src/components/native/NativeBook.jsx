@@ -25,9 +25,9 @@ export default function NativeBook() {
                             <label>Time</label>
                             <input type="time" value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} className="native-input" />
                         </div>
-                        <button className="native-btn-primary full-width" onClick={handleNext} disabled={!formData.date || !formData.time}>
+                        <motion.button whileTap={{ scale: 0.95 }} className="native-btn-primary full-width" onClick={handleNext} disabled={!formData.date || !formData.time}>
                             Next Step <i className="fas fa-arrow-right"></i>
-                        </button>
+                        </motion.button>
                     </motion.div>
                 );
             case 2:
@@ -40,30 +40,31 @@ export default function NativeBook() {
                         <div className="form-group-native">
                             <label>Number of Guests</label>
                             <div className="stepper">
-                                <button className="stepper-btn" onClick={() => setFormData({ ...formData, guests: Math.max(1, formData.guests - 1) })}>-</button>
+                                <motion.button whileTap={{ scale: 0.9 }} className="stepper-btn" onClick={() => setFormData({ ...formData, guests: Math.max(1, formData.guests - 1) })}>-</motion.button>
                                 <span>{formData.guests}</span>
-                                <button className="stepper-btn" onClick={() => setFormData({ ...formData, guests: Math.min(20, formData.guests + 1) })}>+</button>
+                                <motion.button whileTap={{ scale: 0.9 }} className="stepper-btn" onClick={() => setFormData({ ...formData, guests: Math.min(20, formData.guests + 1) })}>+</motion.button>
                             </div>
                         </div>
                         <div className="form-group-native table-types">
                             <label>Seating Preference</label>
                             <div className="table-grid">
                                 {['Indoor', 'Patio', 'Window', 'Private Booth'].map(type => (
-                                    <div
+                                    <motion.div
+                                        whileTap={{ scale: 0.95 }}
                                         key={type}
                                         className={`table-card ${formData.tableType === type ? 'selected' : ''}`}
                                         onClick={() => setFormData({ ...formData, tableType: type })}
                                     >
                                         {type}
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         </div>
                         <div className="wizard-actions">
-                            <button className="native-btn-secondary" onClick={handlePrev}>Back</button>
-                            <button className="native-btn-primary" onClick={handleNext} disabled={!formData.tableType}>
+                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-secondary" onClick={handlePrev}>Back</motion.button>
+                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-primary" onClick={handleNext} disabled={!formData.tableType}>
                                 Review <i className="fas fa-arrow-right"></i>
-                            </button>
+                            </motion.button>
                         </div>
                     </motion.div>
                 );
@@ -93,10 +94,10 @@ export default function NativeBook() {
                             </div>
                         </div>
                         <div className="wizard-actions">
-                            <button className="native-btn-secondary" onClick={handlePrev}>Edit</button>
-                            <button className="native-btn-success" onClick={() => alert('Booking Confirmed!')}>
+                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-secondary" onClick={handlePrev}>Edit</motion.button>
+                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-success" onClick={() => alert('Booking Confirmed!')}>
                                 Confirm Reservation
-                            </button>
+                            </motion.button>
                         </div>
                     </motion.div>
                 );

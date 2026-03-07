@@ -66,7 +66,7 @@ export default function NativeProfile() {
             >
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '10px', color: 'var(--text-color, #fff)' }}>Active Reservation</h3>
                 {activeReservations.map(res => (
-                    <div key={res.id} style={{ background: 'var(--card-bg, #1e1e1e)', borderRadius: '16px', padding: '15px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <motion.div whileTap={{ scale: 0.98 }} key={res.id} style={{ background: 'var(--card-bg, #1e1e1e)', borderRadius: '16px', padding: '15px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                             <strong style={{ display: 'block', fontSize: '1rem', color: 'var(--text-color, #fff)', marginBottom: '5px' }}><i className="far fa-calendar-alt" style={{ color: 'var(--primary-color)' }}></i> {res.date} at {res.time}</strong>
                             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted, #aaa)' }}>{res.guests} Guests • Table Booking</span>
@@ -74,7 +74,7 @@ export default function NativeProfile() {
                         <div style={{ background: 'rgba(76, 175, 80, 0.15)', color: '#4caf50', padding: '5px 10px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
                             {res.status}
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
             </motion.div>
 
@@ -88,7 +88,7 @@ export default function NativeProfile() {
             >
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '10px', color: 'var(--text-color, #fff)' }}>Recent Order</h3>
                 {recentOrders.map(order => (
-                    <div key={order.id} style={{ background: 'var(--card-bg, #1e1e1e)', borderRadius: '16px', padding: '15px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                    <motion.div whileTap={{ scale: 0.98 }} key={order.id} style={{ background: 'var(--card-bg, #1e1e1e)', borderRadius: '16px', padding: '15px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                             <strong style={{ color: 'var(--text-color, #fff)' }}>Order #{order.id}</strong>
                             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted, #aaa)' }}>{order.date}</span>
@@ -98,7 +98,7 @@ export default function NativeProfile() {
                             <strong style={{ color: 'var(--primary-color)' }}>{order.total}</strong>
                             <span style={{ fontSize: '0.8rem', color: '#4caf50', fontWeight: 'bold' }}><i className="fas fa-check-circle"></i> {order.status}</span>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
             </motion.div>
 
@@ -108,25 +108,25 @@ export default function NativeProfile() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
             >
-                <div className="settings-item">
+                <motion.div whileTap={{ scale: 0.95 }} className="settings-item">
                     <div className="settings-icon"><i className="fas fa-history"></i></div>
                     <div className="settings-text">Order History</div>
                     <i className="fas fa-chevron-right arrow"></i>
-                </div>
-                <div className="settings-item">
+                </motion.div>
+                <motion.div whileTap={{ scale: 0.95 }} className="settings-item">
                     <div className="settings-icon"><i className="fas fa-heart"></i></div>
                     <div className="settings-text">Saved Items</div>
                     <i className="fas fa-chevron-right arrow"></i>
-                </div>
-                <div className="settings-item">
+                </motion.div>
+                <motion.div whileTap={{ scale: 0.95 }} className="settings-item">
                     <div className="settings-icon"><i className="fas fa-cog"></i></div>
                     <div className="settings-text">App Settings</div>
                     <i className="fas fa-chevron-right arrow"></i>
-                </div>
-                <div className="settings-item" onClick={handleAppLogout} style={{ border: '2px dashed rgba(230, 57, 70, 0.4)', background: 'transparent' }}>
+                </motion.div>
+                <motion.div whileTap={{ scale: 0.95 }} className="settings-item" onClick={handleAppLogout} style={{ border: '2px dashed rgba(230, 57, 70, 0.4)', background: 'transparent' }}>
                     <div className="settings-icon" style={{ color: '#E63946' }}><i className="fas fa-sign-out-alt"></i></div>
                     <div className="settings-text" style={{ color: '#E63946', fontWeight: 'bold' }}>Log Out</div>
-                </div>
+                </motion.div>
             </motion.div>
 
             {/* Admin Access by Phone Number */}
@@ -169,9 +169,9 @@ export default function NativeProfile() {
                         />
                     </div>
                     {adminError && <div style={{ color: '#E63946', fontSize: '0.8rem', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}><i className="fas fa-exclamation-circle"></i> {adminError}</div>}
-                    <button type="submit" style={{ width: '100%', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 'bold', marginTop: '15px' }}>
+                    <motion.button whileTap={{ scale: 0.95 }} type="submit" style={{ width: '100%', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 'bold', marginTop: '15px' }}>
                         Access Admin Dashboard
-                    </button>
+                    </motion.button>
                 </form>
             </motion.div>
 

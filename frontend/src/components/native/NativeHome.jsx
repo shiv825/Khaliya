@@ -43,9 +43,13 @@ export default function NativeHome({ setActiveTab }) {
                         <h2>Hi, {firstName} 👋</h2>
                         <p className="subtitle">Ready for your next meal?</p>
                     </div>
-                    <div className="user-avatar" onClick={() => setActiveTab('profile')}>
+                    <motion.div
+                        className="user-avatar"
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setActiveTab('profile')}
+                    >
                         <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Guest User')}&background=E63946&color=fff`} alt="User" />
-                    </div>
+                    </motion.div>
                 </div>
             </motion.div>
 
@@ -58,9 +62,13 @@ export default function NativeHome({ setActiveTab }) {
             >
                 <div className="section-header">
                     <h3>Current Order</h3>
-                    <span className="see-all">Track <i className="fas fa-chevron-right"></i></span>
+                    <motion.span whileTap={{ scale: 0.95 }} className="see-all">Track <i className="fas fa-chevron-right"></i></motion.span>
                 </div>
-                <div className="table-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px 20px', background: 'var(--bg-card, #fff)' }}>
+                <motion.div
+                    className="table-card"
+                    whileTap={{ scale: 0.98 }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px 20px', background: 'var(--bg-card, #fff)' }}
+                >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'rgba(230, 57, 70, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E63946', fontSize: '1.2rem' }}>
                             <i className="fas fa-motorcycle"></i>
@@ -73,7 +81,7 @@ export default function NativeHome({ setActiveTab }) {
                     <div style={{ fontWeight: 'bold', color: '#E63946', fontSize: '0.9rem' }}>
                         Preparing
                     </div>
-                </div>
+                </motion.div>
             </motion.div>
 
             {/* Hero Card (Moved up) */}
@@ -81,14 +89,15 @@ export default function NativeHome({ setActiveTab }) {
                 className="native-hero-card"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
+                whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.5, delay: 0.15 }}
                 onClick={() => setActiveTab('book')}
-                style={{ marginBottom: '35px' }}
+                style={{ marginBottom: '35px', cursor: 'pointer' }}
             >
                 <div className="hero-content">
                     <h3>Reserve Your Table</h3>
                     <p>Skip the wait by booking in advance.</p>
-                    <button className="native-btn-primary">Book Now</button>
+                    <motion.button whileTap={{ scale: 0.9 }} className="native-btn-primary">Book Now</motion.button>
                 </div>
             </motion.div>
 
@@ -101,14 +110,19 @@ export default function NativeHome({ setActiveTab }) {
             >
                 <div className="horizontal-scroll" style={{ paddingBottom: '20px', margin: '0 -20px', padding: '0 20px', scrollPadding: '20px' }}>
                     {offers.map(offer => (
-                        <div key={offer.id} className="offer-card" style={{ background: offer.bg, minWidth: '260px', padding: '20px', borderRadius: '16px', color: offer.color, position: 'relative', overflow: 'hidden', scrollSnapAlign: 'start' }}>
+                        <motion.div
+                            key={offer.id}
+                            className="offer-card"
+                            whileTap={{ scale: 0.96 }}
+                            style={{ background: offer.bg, minWidth: '260px', padding: '20px', borderRadius: '16px', color: offer.color, position: 'relative', overflow: 'hidden', scrollSnapAlign: 'start', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}
+                        >
                             <h3 style={{ margin: '0 0 5px 0', fontSize: '1.4rem', fontWeight: '800' }}>{offer.title}</h3>
                             <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>{offer.desc}</p>
                             <div style={{ marginTop: '15px', background: 'rgba(255,255,255,0.4)', display: 'inline-block', padding: '5px 10px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
                                 Code: {offer.code}
                             </div>
                             <i className="fas fa-gift" style={{ position: 'absolute', right: '-10px', bottom: '-10px', fontSize: '5rem', opacity: 0.15 }}></i>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </motion.div>
@@ -121,22 +135,22 @@ export default function NativeHome({ setActiveTab }) {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 style={{ marginTop: '10px', marginBottom: '35px' }}
             >
-                <div className="action-circle" onClick={() => setActiveTab('menu')}>
+                <motion.div className="action-circle" whileTap={{ scale: 0.9 }} onClick={() => setActiveTab('menu')}>
                     <div className="icon-wrapper menu-icon"><i className="fas fa-book-open"></i></div>
                     <span>Menu</span>
-                </div>
-                <div className="action-circle" onClick={() => setActiveTab('book')}>
+                </motion.div>
+                <motion.div className="action-circle" whileTap={{ scale: 0.9 }} onClick={() => setActiveTab('book')}>
                     <div className="icon-wrapper book-icon"><i className="fas fa-chair"></i></div>
                     <span>Tables</span>
-                </div>
-                <div className="action-circle" onClick={() => setActiveTab('profile')}>
+                </motion.div>
+                <motion.div className="action-circle" whileTap={{ scale: 0.9 }} onClick={() => setActiveTab('profile')}>
                     <div className="icon-wrapper loyalty-icon"><i className="fas fa-gift"></i></div>
                     <span>Rewards</span>
-                </div>
-                <div className="action-circle">
+                </motion.div>
+                <motion.div className="action-circle" whileTap={{ scale: 0.9 }}>
                     <div className="icon-wrapper map-icon"><i className="fas fa-map-marker-alt"></i></div>
                     <span>Location</span>
-                </div>
+                </motion.div>
             </motion.div>
 
             {/* Horizontal Carousel: Chef's Recommendations */}
@@ -148,39 +162,29 @@ export default function NativeHome({ setActiveTab }) {
             >
                 <div className="section-header">
                     <h3 style={{ color: 'var(--text-color, #fff)' }}>Chef's Picks</h3>
-                    <span className="see-all" onClick={() => setActiveTab('menu')}>See All</span>
+                    <motion.span whileTap={{ scale: 0.95 }} className="see-all" onClick={() => setActiveTab('menu')}>See All</motion.span>
                 </div>
 
                 <div className="horizontal-scroll" style={{ margin: '0 -20px', padding: '0 20px', scrollPadding: '20px' }}>
                     {popularItems.map((item) => (
-                        <div className="food-card-mini" key={item.id} onClick={() => setActiveTab('menu')}>
+                        <motion.div
+                            className="food-card-mini"
+                            key={item.id}
+                            onClick={() => setActiveTab('menu')}
+                            whileTap={{ scale: 0.95 }}
+                            style={{ cursor: 'pointer', border: '1px solid var(--border-soft, rgba(0,0,0,0.05))', boxShadow: 'var(--shadow-soft, 0 4px 10px rgba(0,0,0,0.05))' }}
+                        >
                             <div className="food-img">
                                 <img src={item.image} alt={item.name} />
                                 <div className="food-tag" style={{ position: 'absolute', top: '10px', left: '10px', background: 'var(--primary-color, #E63946)', color: 'white', fontSize: '0.7rem', padding: '3px 8px', borderRadius: '10px', fontWeight: 'bold' }}>{item.tag}</div>
-                                <div className="add-btn"><i className="fas fa-plus"></i></div>
+                                <motion.div whileTap={{ scale: 0.8 }} className="add-btn"><i className="fas fa-plus"></i></motion.div>
                             </div>
                             <div className="food-info">
                                 <h4 style={{ color: 'var(--text-color, #fff)' }}>{item.name}</h4>
                                 <span className="price">{item.price}</span>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
-            </motion.div>
-
-            {/* Hero Card (Moved lower for flow) */}
-            <motion.div
-                className="native-hero-card"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                onClick={() => setActiveTab('book')}
-                style={{ marginBottom: '35px' }}
-            >
-                <div className="hero-content">
-                    <h3>Reserve Your Table</h3>
-                    <p>Skip the wait by booking in advance.</p>
-                    <button className="native-btn-primary">Book Now</button>
                 </div>
             </motion.div>
 
@@ -196,7 +200,12 @@ export default function NativeHome({ setActiveTab }) {
                 </div>
                 <div className="horizontal-scroll" style={{ margin: '0 -20px', padding: '0 20px', scrollPadding: '20px' }}>
                     {reviews.map(review => (
-                        <div key={review.id} className="review-card" style={{ background: 'var(--card-bg, #1e1e1e)', minWidth: '220px', padding: '15px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', scrollSnapAlign: 'start' }}>
+                        <motion.div
+                            key={review.id}
+                            className="review-card"
+                            whileTap={{ scale: 0.98 }}
+                            style={{ background: 'var(--card-bg, #1e1e1e)', minWidth: '220px', padding: '15px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', scrollSnapAlign: 'start', boxShadow: 'var(--shadow-soft)' }}
+                        >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                                 <strong style={{ color: 'var(--text-color, #fff)', fontSize: '0.9rem' }}>{review.name}</strong>
                                 <div style={{ color: '#FFD700', fontSize: '0.8rem' }}>
@@ -204,7 +213,7 @@ export default function NativeHome({ setActiveTab }) {
                                 </div>
                             </div>
                             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted, #aaa)', fontStyle: 'italic', lineHeight: '1.4' }}>"{review.text}"</p>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </motion.div>
