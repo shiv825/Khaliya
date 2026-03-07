@@ -7,10 +7,16 @@ export default function NativeAuth({ onLoginSuccess }) {
     const [step, setStep] = useState('landing'); // landing, otp, notification
     const [isInitialized, setIsInitialized] = useState(localStorage.getItem('khaliya_initialized') === 'true');
     const [showInitialization, setShowInitialization] = useState(!isInitialized);
+
+    // Auth State
     const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Demo OTP State
+    const [generatedOtp, setGeneratedOtp] = useState('');
+    const [showSystemNotification, setShowSystemNotification] = useState(false);
 
     // Timer for OTP resend
     useEffect(() => {
@@ -25,9 +31,18 @@ export default function NativeAuth({ onLoginSuccess }) {
         e.preventDefault();
         if (phone.length === 10) {
             setIsLoading(true);
+
+            // Generate a random 6-digit OTP for demo
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            setGeneratedOtp(code);
+
             setTimeout(() => {
                 setIsLoading(false);
                 setStep('otp');
+                // Show simulated push notification after a small delay
+                setTimeout(() => {
+                    setShowSystemNotification(true);
+                }, 800);
             }, 1000);
         }
     };
@@ -51,11 +66,28 @@ export default function NativeAuth({ onLoginSuccess }) {
     };
 
     const verifyOTP = (code) => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            setStep('notification');
-        }, 1200);
+        if (code === generatedOtp) {
+            setIsLoading(true);
+            setShowSystemNotification(false);
+            setTimeout(() => {
+                setIsLoading(false);
+                setStep('notification');
+            }, 1200);
+        } else {
+            // Incorrect code feedback
+            const inputs = document.querySelectorAll('.otp-box');
+            inputs.forEach(input => {
+                input.style.borderColor = '#ff0000';
+                input.animate([
+                    { transform: 'translateX(-5px)' },
+                    { transform: 'translateX(5px)' },
+                    { transform: 'translateX(0)' }
+                ], { duration: 200, iterations: 2 });
+            });
+            setTimeout(() => {
+                inputs.forEach(input => input.style.borderColor = '#ddd');
+            }, 1000);
+        }
     };
 
     const finalizeLogin = () => {
@@ -194,6 +226,47 @@ export default function NativeAuth({ onLoginSuccess }) {
         </motion.div>
     );
 
+    const renderSystemNotification = () => (
+        <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 20, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '90%',
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                padding: '15px',
+                borderRadius: '16px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                zIndex: 1000,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px',
+                border: '1px solid rgba(0,0,0,0.05)'
+            }}
+        >
+            <div style={{ background: '#4CAF50', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                <i className="fas fa-comment-dots"></i>
+            </div>
+            <div style={{ flex: 1 }}>
+                <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#1c1c1c' }}>MESSAGES</h4>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+                    Khaliya: Your OTP is <strong style={{ color: '#E23744' }}>{generatedOtp}</strong>
+                </p>
+            </div>
+            <button
+                onClick={() => setShowSystemNotification(false)}
+                style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '1.2rem' }}
+            >
+                <i className="fas fa-times"></i>
+            </button>
+        </motion.div>
+    );
+
     if (showInitialization) {
         return (
             <NativeInitialization
@@ -207,6 +280,10 @@ export default function NativeAuth({ onLoginSuccess }) {
 
     return (
         <div className="native-auth-screen">
+            <AnimatePresence>
+                {showSystemNotification && renderSystemNotification()}
+            </AnimatePresence>
+
             <AnimatePresence mode="wait">
                 {step === 'landing' && renderLanding()}
                 {step === 'otp' && renderOTP()}
