@@ -206,8 +206,13 @@ export default function AdminDashboard({ onLogout }) {
 
             {activeTab === 'bookings' && (
                 <div className="admin-bookings">
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+                    {/* Stats Grid */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '1rem',
+                        marginBottom: '2rem'
+                    }}>
                         {[{ label: 'Total Bookings', value: bookings.length }, { label: 'Total Guests', value: totalGuests }, { label: 'Today Bookings', value: todayBookingsCount }, { label: 'Today Guests', value: todayGuestsCount }].map((stat, i) => (
                             <div key={i} style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', textAlign: 'center' }}>
                                 <div style={{ fontSize: '0.9rem', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{stat.label}</div>
@@ -216,23 +221,47 @@ export default function AdminDashboard({ onLogout }) {
                         ))}
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
-                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                    {/* Charts Grid */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                        gap: '2rem',
+                        marginBottom: '2rem'
+                    }}>
+                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                             <h3 style={{ marginTop: 0 }}>Booking Trends (7 Days)</h3>
-                            <Line data={charts.trends} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+                            <div style={{ height: '250px' }}>
+                                <Line data={charts.trends} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+                            </div>
                         </div>
-                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                             <h3 style={{ marginTop: 0 }}>Estimated Revenue</h3>
-                            <Bar data={charts.revenue} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+                            <div style={{ height: '250px' }}>
+                                <Bar data={charts.revenue} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+                            </div>
                         </div>
                     </div>
 
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                    {/* Bookings List */}
+                    <div style={{ background: 'white', padding: 'clamp(1rem, 5vw, 2rem)', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: '1rem',
+                            marginBottom: '1.5rem'
+                        }}>
                             <h3 style={{ margin: 0 }}>All Bookings</h3>
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ddd' }} />
-                                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ddd' }}>
+                            <div style={{
+                                display: 'flex',
+                                gap: '0.5rem',
+                                flexWrap: 'wrap',
+                                width: '100%',
+                                maxWidth: '500px'
+                            }}>
+                                <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: '150px', padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{ flex: 1, minWidth: '130px', padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ddd' }}>
                                     <option value="all">All Status</option>
                                     <option value="pending">Pending</option>
                                     <option value="confirmed">Confirmed</option>
@@ -243,19 +272,40 @@ export default function AdminDashboard({ onLogout }) {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             {filteredBookings.length === 0 ? <p style={{ textAlign: 'center', color: '#666' }}>No reservations found.</p> : filteredBookings.map((b) => (
-                                <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.2rem', border: '1px solid #eee', borderRadius: '8px', background: b.status === 'confirmed' ? '#f0fdf4' : b.status === 'pending' ? '#fffbeb' : '#fef2f2' }}>
+                                <div key={b.id} style={{
+                                    display: 'flex',
+                                    flexDirection: window.innerWidth < 768 ? 'column' : 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: window.innerWidth < 768 ? 'flex-start' : 'center',
+                                    padding: '1.2rem',
+                                    border: '1px solid #eee',
+                                    borderRadius: '8px',
+                                    background: b.status === 'confirmed' ? '#f0fdf4' : b.status === 'pending' ? '#fffbeb' : '#fef2f2',
+                                    gap: '1rem'
+                                }}>
                                     <div>
                                         <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '4px' }}>👤 {b.name || 'Guest'} <span style={{ fontSize: '0.8rem', color: '#666', fontWeight: 'normal' }}>#{b.id}</span></div>
-                                        <div style={{ color: '#555', fontSize: '0.9rem', display: 'flex', gap: '1rem' }}>
+                                        <div style={{
+                                            color: '#555',
+                                            fontSize: '0.9rem',
+                                            display: 'flex',
+                                            flexWrap: 'wrap',
+                                            gap: '0.8rem'
+                                        }}>
                                             <span>📅 {b.date}</span> <span>🕐 {b.time}</span> <span>👥 {b.guests}</span>
                                             <span>📞 {b.phone}</span>
                                             <span style={{ fontWeight: 'bold' }}>📍 Status: {b.status}</span>
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        {b.status === 'pending' && <button onClick={() => confirmBooking(b.id)} style={{ background: '#22c55e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Confirm</button>}
-                                        <button onClick={() => deleteBooking(b.id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Delete</button>
-                                        <button onClick={() => sendWhatsApp(b)} style={{ background: '#25D366', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}><i className="fab fa-whatsapp"></i> WhatsApp</button>
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '0.5rem',
+                                        width: window.innerWidth < 768 ? '100%' : 'auto',
+                                        flexWrap: 'wrap'
+                                    }}>
+                                        {b.status === 'pending' && <button onClick={() => confirmBooking(b.id)} style={{ flex: 1, background: '#22c55e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Confirm</button>}
+                                        <button onClick={() => deleteBooking(b.id)} style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Delete</button>
+                                        <button onClick={() => sendWhatsApp(b)} style={{ flex: 1, background: '#25D366', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}><i className="fab fa-whatsapp"></i> WhatsApp</button>
                                     </div>
                                 </div>
                             ))}

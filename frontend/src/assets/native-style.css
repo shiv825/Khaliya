@@ -5,11 +5,9 @@
     flex-direction: column;
     height: 100vh;
     height: 100dvh;
-    /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     --bg-dark: #121212;
     --primary-color: #E23744;
-    /* Zomato Crimson */
     --text-white: #FFFFFF;
     --text-gray: #696969;
     --border-light: rgba(0, 0, 0, 0.08);
@@ -19,6 +17,29 @@
     position: fixed;
     top: 0;
     left: 0;
+}
+
+/* Desktop Containerization: Maintain mobile feel on large screens */
+@media (min-width: 600px) {
+    .native-app-shell {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .native-bottom-nav {
+        max-width: 480px;
+        left: 50% !important;
+        transform: translateX(-50%);
+    }
+
+    body {
+        background-color: #000;
+        /* Outer background for desktop */
+    }
 }
 
 .native-content-area {
@@ -726,7 +747,7 @@
 
 .native-menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 15px;
 }
 

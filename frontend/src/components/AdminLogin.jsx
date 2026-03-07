@@ -28,7 +28,15 @@ export default function AdminLogin({ onLogin }) {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', maxWidth: '450px', width: '100%', border: '1px solid rgba(0,0,0,0.05)' }}
+                style={{
+                    background: 'white',
+                    padding: 'clamp(1.5rem, 5vw, 2.5rem)',
+                    borderRadius: '24px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                    maxWidth: '450px',
+                    width: '95%',
+                    border: '1px solid rgba(0,0,0,0.05)'
+                }}
             >
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <div style={{ width: '80px', height: '80px', background: 'var(--primary-color, #E63946)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'white', fontSize: '2rem', boxShadow: '0 8px 16px rgba(230, 57, 70, 0.2)' }}>
