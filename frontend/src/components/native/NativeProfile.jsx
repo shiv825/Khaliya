@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 export default function NativeProfile() {
+    const navigate = useNavigate();
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
 
@@ -25,7 +27,7 @@ export default function NativeProfile() {
 
     const handleFeatureClick = (label) => {
         if (label === 'Admin Portal') {
-            window.location.href = '/admin'; // Navigate to the web admin route
+            navigate('/admin'); // Navigate to the web admin route using React Router
             return;
         }
 
