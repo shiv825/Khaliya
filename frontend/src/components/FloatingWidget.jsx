@@ -41,6 +41,7 @@ export default function FloatingWidget() {
                         alignItems: 'center',
                         gap: '12px'
                     }}
+                    className="floating-widget-btn"
                     onClick={() => {
                         document.getElementById('reservations')?.scrollIntoView({ behavior: 'smooth' });
                     }}
@@ -49,6 +50,12 @@ export default function FloatingWidget() {
                     <span style={{ color: 'white', fontWeight: 700, fontSize: '1rem' }}>Book Table</span>
                 </motion.div>
             )}
+            <style>{`
+                .floating-widget-btn:hover {
+                    box-shadow: 0 15px 45px rgba(230, 57, 70, 0.4) !important;
+                    border-color: rgba(255,255,255,0.3) !important;
+                }
+            `}</style>
         </AnimatePresence>
     );
 }

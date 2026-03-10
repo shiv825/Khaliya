@@ -59,20 +59,30 @@
 }
 
 .nav-tab {
-    background: none;
-    border: none;
-    color: #666;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 100%;
-    padding: 5px 0;
-    transition: color 0.3s ease;
-    cursor: pointer;
+    color: #666;
+    /* Original color from .nav-tab */
+    text-decoration: none;
     font-size: 1.2rem;
+    /* Original font-size from .nav-tab */
+    font-weight: 500;
+    padding: 0.5rem;
+    /* Ensure minimum 48px touch target area roughly */
+    min-width: 60px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    border-radius: 12px;
+    cursor: pointer;
+    /* Added from original .nav-tab */
+}
+
+/* Pressed State for Haptic Native Feel */
+.nav-tab:active {
+    transform: scale(0.92);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .nav-tab span {
@@ -133,7 +143,7 @@
     color: var(--primary-color, #E63946);
 }
 
-.nav-tab.book-btn.active::after {
+.native-nav-item.book-btn.active::after {
     display: none;
 }
 
@@ -519,7 +529,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 0.5rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-circle:active .icon-wrapper {
+    transform: scale(0.9);
+    filter: brightness(0.8);
 }
 
 .icon-wrapper {

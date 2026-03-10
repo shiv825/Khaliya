@@ -30,6 +30,16 @@ img {
     -webkit-touch-callout: none;
 }
 
+/* Base tap highlight removal for a Native App Feel */
+a,
+button,
+[role="button"],
+input,
+select,
+textarea {
+    -webkit-tap-highlight-color: transparent;
+}
+
 :root {
     /* Premium Luxury Brand Colors */
     --primary-color: #ff2a4d;
@@ -220,6 +230,8 @@ section {
     padding: 5rem 2rem;
     max-width: 1400px;
     margin: 0 auto;
+    scroll-margin-top: 80px;
+    /* Accounts for fixed navbar when jumping via anchor links */
 }
 
 /* Header removed - logo is now in navbar */
