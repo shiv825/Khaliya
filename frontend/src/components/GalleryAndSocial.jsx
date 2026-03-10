@@ -8,8 +8,8 @@ export default function GalleryAndSocial() {
     const images = [
         { src: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&fit=crop', alt: 'Indian Dish' },
         { src: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&fit=crop', alt: 'Indian Decor' },
-        { src: 'https://images.unsplash.com/photo-1626776876729-bab4369e5a5a?w=600&fit=crop', alt: 'Spices' },
-        { src: 'https://images.unsplash.com/photo-1606491956391-7d1bc678a1bc?w=600&fit=crop', alt: 'Dining Table' },
+        { src: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?w=600&fit=crop', alt: 'Spices' },
+        { src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&fit=crop', alt: 'Dining Table' },
         { src: 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?w=600&fit=crop', alt: 'Indian Food Spread' },
         { src: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&fit=crop', alt: 'Samosa' }
     ];
