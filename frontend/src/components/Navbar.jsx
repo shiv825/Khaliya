@@ -32,7 +32,12 @@ export default function Navbar() {
                     <h1 style={{ margin: 0, fontSize: '1.8rem', color: '#fff' }}>{t('common.name')}</h1>
                 </div>
 
-                <div className="nav-controls">
+                <div className="nav-controls" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ alignItems: 'center', gap: '8px', display: window.innerWidth > 768 ? 'flex' : 'none' }}>
+                        <span className="live-pulse-indicator"></span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '1px' }}>Open Now</span>
+                    </div>
+
                     <select
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
@@ -52,11 +57,11 @@ export default function Navbar() {
 
                 <AnimatePresence>
                     <div className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
-                        <a href="#home" onClick={toggleMenu}>{t('nav.home')}</a>
-                        <a href="#menu" onClick={toggleMenu}>{t('nav.menu')}</a>
-                        <a href="#loyalty" onClick={toggleMenu}><i className="fas fa-gem" style={{ color: 'var(--accent-color)', marginRight: '5px' }}></i> {t('nav.loyalty')}</a>
-                        <a href="#reservations" onClick={toggleMenu}>{t('nav.reservations')}</a>
-                        <a href="#contact" onClick={toggleMenu}>{t('nav.contact')}</a>
+                        <a style={{ cursor: 'pointer' }} onClick={(e) => { toggleMenu(); document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }); }}>{t('nav.home')}</a>
+                        <a style={{ cursor: 'pointer' }} onClick={(e) => { toggleMenu(); document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' }); }}>{t('nav.menu')}</a>
+                        <a style={{ cursor: 'pointer' }} onClick={(e) => { toggleMenu(); document.getElementById('loyalty')?.scrollIntoView({ behavior: 'smooth' }); }}><i className="fas fa-gem" style={{ color: 'var(--accent-color)', marginRight: '5px' }}></i> {t('nav.loyalty')}</a>
+                        <a style={{ cursor: 'pointer' }} onClick={(e) => { toggleMenu(); document.getElementById('reservations')?.scrollIntoView({ behavior: 'smooth' }); }}>{t('nav.reservations')}</a>
+                        <a style={{ cursor: 'pointer' }} onClick={(e) => { toggleMenu(); document.getElementById('hours')?.scrollIntoView({ behavior: 'smooth' }); }}>{t('nav.contact')}</a>
                     </div>
                 </AnimatePresence>
             </div>

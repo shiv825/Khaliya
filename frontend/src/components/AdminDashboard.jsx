@@ -33,6 +33,7 @@ export default function AdminDashboard({ onLogout }) {
     const [menu, setMenu] = useState([]);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [fetchError, setFetchError] = useState('');
     const navigate = useNavigate();
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -46,8 +47,10 @@ export default function AdminDashboard({ onLogout }) {
         try {
             const res = await axios.get(`${API_URL}/api/bookings`);
             setBookings(res.data || []);
+            setFetchError('');
         } catch (err) {
             console.error('Failed to fetch bookings', err);
+            setFetchError('Failed to connect to backend server. Make sure it is running.');
         }
     };
 
@@ -55,8 +58,10 @@ export default function AdminDashboard({ onLogout }) {
         try {
             const res = await axios.get(`${API_URL}/api/menu`);
             setMenu(res.data || []);
+            setFetchError('');
         } catch (err) {
             console.error('Failed to fetch menu', err);
+            setFetchError('Failed to connect to backend server. Make sure it is running.');
         }
     };
 
@@ -216,6 +221,12 @@ export default function AdminDashboard({ onLogout }) {
                     <button style={{ padding: '0.6rem 1.2rem', background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }} onClick={handleLogout}>Logout</button>
                 </div>
             </div>
+
+            {fetchError && (
+                <div style={{ background: '#fef2f2', color: '#ef4444', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #fca5a5', textAlign: 'center', fontWeight: 'bold' }}>
+                    <i className="fas fa-exclamation-triangle" style={{ marginRight: '8px' }}></i> {fetchError}
+                </div>
+            )}
 
             {activeTab === 'bookings' && (
                 <div className="admin-bookings">

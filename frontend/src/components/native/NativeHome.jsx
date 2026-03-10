@@ -131,6 +131,50 @@ export default function NativeHome({ setActiveTab }) {
                 </div>
             </motion.div>
 
+            {/* Daily Delight / Surprise Element */}
+            <motion.div
+                variants={itemVariants}
+                style={{ padding: '0 20px', marginBottom: '25px', marginTop: '-10px' }}
+            >
+                <motion.div
+                    whileTap={{ scale: 0.97 }}
+                    style={{
+                        background: 'linear-gradient(135deg, #1A2980 0%, #26D0CE 100%)',
+                        borderRadius: '20px',
+                        padding: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        boxShadow: '0 10px 30px rgba(38, 208, 206, 0.2)',
+                        cursor: 'pointer',
+                        color: 'white',
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}
+                    onClick={() => setActiveTab('menu')}
+                >
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '4px', opacity: 0.8 }}>Daily Delight</div>
+                        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>Free Dessert Today 🍰</h3>
+                        <p style={{ margin: '5px 0 0 0', fontSize: '0.85rem', opacity: 0.9 }}>Claim with your next order</p>
+                    </div>
+                    <div style={{
+                        background: 'rgba(255,255,255,0.2)',
+                        backdropFilter: 'blur(5px)',
+                        padding: '10px',
+                        borderRadius: '12px',
+                        zIndex: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <i className="fas fa-arrow-right" style={{ color: 'white' }}></i>
+                    </div>
+                    {/* Decorative backdrop */}
+                    <i className="fas fa-gift" style={{ position: 'absolute', right: '-15px', bottom: '-20px', fontSize: '100px', opacity: 0.1, zIndex: 1, transform: 'rotate(-15deg)' }}></i>
+                </motion.div>
+            </motion.div>
+
 
 
             {/* Active Offers Section */}
@@ -176,7 +220,7 @@ export default function NativeHome({ setActiveTab }) {
                     <div className="icon-wrapper loyalty-icon"><i className="fas fa-gift"></i></div>
                     <span>Rewards</span>
                 </motion.div>
-                <motion.div className="action-circle" whileTap={{ scale: 0.9 }}>
+                <motion.div className="action-circle" whileTap={{ scale: 0.9 }} onClick={() => window.open('https://www.google.com/maps/dir/?api=1&destination=22.6108,88.3370', '_blank')}>
                     <div className="icon-wrapper map-icon"><i className="fas fa-map-marker-alt"></i></div>
                     <span>Location</span>
                 </motion.div>

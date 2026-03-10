@@ -34,6 +34,26 @@ app.get('/api/menu', (req, res) => {
     res.json(menu);
 });
 
+app.post('/api/menu', (req, res) => {
+    const menu = readData('menu.json');
+    const newItem = { id: Date.now(), ...req.body };
+    menu.push(newItem);
+    writeData('menu.json', menu);
+    res.status(201).json({ message: 'Menu item added successfully', item: newItem });
+});
+
+app.delete('/api/menu/:id', (req, res) => {
+    const menu = readData('menu.json');
+    const filtered = menu.filter(m => (m.id == req.params.id || m.name == req.params.id));
+    const newMenu = menu.filter(m => !(m.id == req.params.id || m.name == req.params.id));
+    if (menu.length !== newMenu.length) {
+        writeData('menu.json', newMenu);
+        res.json({ message: 'Menu item deleted successfully' });
+    } else {
+        res.status(404).json({ message: 'Menu item not found' });
+    }
+});
+
 // API: Bookings
 app.get('/api/bookings', (req, res) => {
     const bookings = readData('bookings.json');
@@ -55,6 +75,17 @@ app.put('/api/bookings/:id', (req, res) => {
         bookings[index] = { ...bookings[index], ...req.body };
         writeData('bookings.json', bookings);
         res.json({ message: 'Booking updated', booking: bookings[index] });
+    } else {
+        res.status(404).json({ message: 'Booking not found' });
+    }
+});
+
+app.delete('/api/bookings/:id', (req, res) => {
+    const bookings = readData('bookings.json');
+    const filtered = bookings.filter(b => b.id != req.params.id);
+    if (bookings.length !== filtered.length) {
+        writeData('bookings.json', filtered);
+        res.json({ message: 'Booking deleted successfully' });
     } else {
         res.status(404).json({ message: 'Booking not found' });
     }

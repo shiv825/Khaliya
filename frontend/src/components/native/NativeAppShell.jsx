@@ -24,8 +24,12 @@ export default function NativeAppShell() {
         setIsAuthenticated(true);
     };
 
-    // Smooth scroll to top when changing tabs
+    // Smooth scroll to top when changing tabs and trigger haptic feedback
     const handleTabChange = (id) => {
+        // Haptic feedback for premium app feel (works on supported mobile devices)
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
         setActiveTab(id);
         window.scrollTo(0, 0);
     };

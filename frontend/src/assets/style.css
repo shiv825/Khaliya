@@ -218,7 +218,7 @@ button:disabled {
 
 section {
     padding: 5rem 2rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -349,8 +349,8 @@ nav a:hover::after {
 .hero-content {
     position: relative;
     z-index: 5;
-    max-width: 800px;
-    /* Wider for more impact */
+    max-width: 1100px;
+    /* Ultra-wide cinematic impact */
     margin: 0 auto;
     padding: 2.5rem;
     color: #fff;
@@ -2122,36 +2122,28 @@ nav a:hover {
 
 .nav-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
 }
 
 .nav-controls {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
+    gap: 1.5rem;
     padding: 0.8rem 1.5rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.language-selector {
-    padding: 0.4rem;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    background: white;
-    font-weight: bold;
-    width: auto !important;
-    max-width: 120px;
+    order: 2;
 }
 
 .nav-links {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    padding: 0.5rem 1rem 1rem;
-    transition: max-height 0.4s ease, opacity 0.4s ease;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 2rem;
+    order: 1;
 }
 
 .hamburger {

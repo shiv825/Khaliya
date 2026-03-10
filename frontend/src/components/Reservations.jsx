@@ -7,7 +7,7 @@ export default function Reservations({ predefinedTable }) {
     const [formData, setFormData] = useState({
         name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: ''
     });
-    const [message, setMessage] = useState('');
+    const [availableTables, setAvailableTables] = useState(null);
 
     useEffect(() => {
         if (predefinedTable) {
@@ -15,7 +15,31 @@ export default function Reservations({ predefinedTable }) {
         }
     }, [predefinedTable]);
 
-    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+    useEffect(() => {
+        if (formData.date && formData.time) {
+            // Mock real-time availability: deterministic based on date + time string
+            const hash = (formData.date + formData.time).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const tablesLeft = (hash % 5) + 1; // Randomly yields 1 to 5 tables
+            setAvailableTables(tablesLeft);
+        } else {
+            setAvailableTables(null);
+        }
+    }, [formData.date, formData.time]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        let newFormData = { ...formData, [name]: value };
+
+        // Guest count logic: Auto-suggest table type
+        if (name === 'guests') {
+            if (value === '1' || value === '2') newFormData.tableType = 'intimate';
+            else if (value === '3' || value === '4') newFormData.tableType = 'family';
+            else if (value === '5-6') newFormData.tableType = 'group';
+            else if (value === '7-10' || value === '10+') newFormData.tableType = 'party';
+        }
+
+        setFormData(newFormData);
+    };
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -23,13 +47,32 @@ export default function Reservations({ predefinedTable }) {
         e.preventDefault();
         axios.post(`${API_URL}/api/bookings`, formData)
             .then(res => {
-                setMessage(t('msg.bookingConfirmed') || 'Booking saved!');
+                import('sweetalert2').then(({ default: Swal }) => {
+                    Swal.fire({
+                        title: t('msg.bookingConfirmed') || 'Booking Confirmed!',
+                        text: `Thank you ${formData.name}. Your table is reserved for ${formData.date} at ${formData.time}. You will receive an SMS confirmation shortly.`,
+                        icon: 'success',
+                        confirmButtonColor: 'var(--accent-color)'
+                    });
+                }).catch(() => {
+                    alert(t('msg.bookingConfirmed') || 'Booking Confirmed!');
+                });
+
                 setFormData({ name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: '' });
-                setTimeout(() => setMessage(''), 5000);
+                setAvailableTables(null);
             })
             .catch(err => {
                 console.error(err);
-                setMessage(t('msg.bookingError') || 'Error saving booking');
+                import('sweetalert2').then(({ default: Swal }) => {
+                    Swal.fire({
+                        title: 'Oops!',
+                        text: t('msg.bookingError') || 'Error saving booking. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#e53935'
+                    });
+                }).catch(() => {
+                    alert(t('msg.bookingError') || 'Error saving booking');
+                });
             });
     };
 
@@ -56,7 +99,27 @@ export default function Reservations({ predefinedTable }) {
                 </label>
                 <label style={{ display: 'block', marginBottom: '1rem' }}>
                     <strong>{t('form.time')}</strong><br />
-                    <input name="time" type="time" value={formData.time} onChange={handleChange} required style={{ width: '100%', padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px', marginTop: '0.5rem' }} />
+                    <select name="time" value={formData.time} onChange={handleChange} required style={{ width: '100%', padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px', marginTop: '0.5rem' }}>
+                        <option value="">{t('form.selectTime') || 'Select a time slot'}</option>
+                        <optgroup label="Lunch">
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                        </optgroup>
+                        <optgroup label="Dinner">
+                            <option value="19:00">7:00 PM</option>
+                            <option value="20:00">8:00 PM</option>
+                            <option value="21:00">9:00 PM</option>
+                            <option value="22:00">10:00 PM</option>
+                        </optgroup>
+                    </select>
+                    {availableTables !== null && formData.date && (
+                        <div style={{ marginTop: '0.8rem', padding: '0.5rem', borderRadius: '4px', backgroundColor: availableTables < 3 ? '#ffebee' : '#e8f5e9', fontSize: '0.9rem', color: availableTables < 3 ? '#c62828' : '#2e7d32', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <i className={`fas ${availableTables < 3 ? 'fa-fire' : 'fa-check-circle'}`}></i>
+                            <span><strong>{availableTables} tables left</strong> for this time slot!</span>
+                        </div>
+                    )}
                 </label>
                 <label style={{ display: 'block', marginBottom: '1.5rem' }}>
                     <strong>{t('form.guests')}</strong><br />
@@ -84,11 +147,7 @@ export default function Reservations({ predefinedTable }) {
                 </label>
 
                 <button type="submit" className="btn" style={{ width: '100%' }}>{t('form.confirmButton')}</button>
-                {message && (
-                    <div style={{ marginTop: '1rem', padding: '0.8rem', borderRadius: '6px', background: '#e8f5e9', color: '#2e7d32' }}>
-                        {message}
-                    </div>
-                )}
+
                 <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>{t('reservations.confirmNote')}</p>
             </form>
         </section>

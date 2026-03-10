@@ -149,12 +149,38 @@ export default function HoursAndLocation() {
                     </div>
                 )}
 
+                {/* Scope CSS for the interactive map overlay */}
+                <style>
+                    {`
+                    .map-overlay-link:hover {
+                        opacity: 1 !important;
+                        background: rgba(0, 0, 0, 0.5) !important;
+                    }
+                    .map-overlay-link div {
+                        transform: scale(0.95);
+                        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                    }
+                    .map-overlay-link:hover div {
+                        transform: scale(1);
+                        box-shadow: 0 8px 25px rgba(230, 57, 70, 0.4) !important;
+                    }
+                `}
+                </style>
+
                 <h3 style={{ marginTop: '2rem', textAlign: 'center' }}>{t('track.mapTitle')}</h3>
-                <div className="map-container" data-aos="fade-up" data-aos-delay="200" style={{ marginTop: '3rem', borderRadius: 'var(--radius-xl)', overflow: 'hidden', boxShadow: '0 15px 40px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="map-container" data-aos="fade-up" data-aos-delay="200" style={{ marginTop: '3rem', borderRadius: 'var(--radius-xl)', overflow: 'hidden', boxShadow: '0 15px 40px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
+
+                    {/* Interactive overlay triggering the directions link */}
+                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}`} target="_blank" rel="noreferrer" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.2)', opacity: 0, transition: 'opacity 0.3s ease', textDecoration: 'none' }} className="map-overlay-link">
+                        <div style={{ background: 'var(--primary-color, #E63946)', padding: '15px 30px', borderRadius: '30px', color: 'white', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 5px 15px rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <i className="fas fa-directions"></i> Tap for Directions
+                        </div>
+                    </a>
+
                     <iframe
                         title="Khaliya Restaurant Location"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.003975762078!2d88.3347072!3d22.6108169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a02798f090d80c9%3A0xe104332b4b47ea87!2sKhaliya%20Restaurant!5e0!3m2!1sen!2sin!4v1714902123955!5m2!1sen!2sin"
-                        width="100%" height="450" style={{ border: 0, display: 'block' }} allowFullScreen="" loading="lazy">
+                        width="100%" height="450" style={{ border: 0, display: 'block', pointerEvents: 'none' }} allowFullScreen="" loading="lazy">
                     </iframe>
                 </div>
             </section>

@@ -48,8 +48,8 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 1 }}
                 >
-                    <a href="#reservations" className="btn btn-primary">{t('hero.makeReservation')}</a>
-                    <a href="#menu" className="btn btn-outline">{t('hero.seeMenu')}</a>
+                    <a onClick={() => { document.getElementById('reservations')?.scrollIntoView({ behavior: 'smooth' }); }} className="btn btn-primary" style={{ cursor: 'pointer' }}>{t('hero.makeReservation')}</a>
+                    <a onClick={() => { document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' }); }} className="btn btn-outline" style={{ cursor: 'pointer' }}>{t('hero.seeMenu')}</a>
                 </motion.div>
             </motion.div>
         </section>

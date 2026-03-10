@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 export default function NativeBook() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ date: '', time: '', guests: 2, tableType: '' });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
 
     const handleNext = () => setStep(prev => Math.min(prev + 1, 4));
     const handlePrev = () => setStep(prev => Math.max(prev - 1, 1));
@@ -12,7 +15,34 @@ export default function NativeBook() {
         return 'KH-' + Math.random().toString(36).substr(2, 6).toUpperCase();
     };
 
-    const [reservationId] = useState(generateReservationID());
+    const [reservationId, setReservationId] = useState(generateReservationID());
+
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+    const submitReservation = async () => {
+        setIsSubmitting(true);
+        setSubmitError('');
+        try {
+            const dataToSubmit = {
+                date: formData.date,
+                time: formData.time,
+                guests: formData.guests.toString(),
+                tableType: formData.tableType.toLowerCase(),
+                name: 'Native App User', // Hardcoded for now since no name field
+                phone: '1234567890'      // Hardcoded for now
+            };
+            const response = await axios.post(`${API_URL}/api/bookings`, dataToSubmit);
+            if (response.data.booking && response.data.booking.id) {
+                setReservationId(response.data.booking.id);
+            }
+            setIsSubmitting(false);
+            handleNext();
+        } catch (error) {
+            console.error('Error submitting reservation:', error);
+            setSubmitError('Failed to save reservation. Please try again.');
+            setIsSubmitting(false);
+        }
+    };
 
     const renderStepContent = () => {
         switch (step) {
@@ -103,11 +133,12 @@ export default function NativeBook() {
                             </div>
                         </div>
                         <div className="wizard-actions">
-                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-secondary" onClick={handlePrev}>Edit</motion.button>
-                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-success" onClick={handleNext}>
-                                Confirm Reservation
+                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-secondary" onClick={handlePrev} disabled={isSubmitting}>Edit</motion.button>
+                            <motion.button whileTap={{ scale: 0.95 }} className="native-btn-success" onClick={submitReservation} disabled={isSubmitting}>
+                                {isSubmitting ? 'Confirming...' : 'Confirm Reservation'}
                             </motion.button>
                         </div>
+                        {submitError && <div style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>{submitError}</div>}
                     </motion.div>
                 );
             case 4:

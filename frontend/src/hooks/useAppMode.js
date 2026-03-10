@@ -8,17 +8,27 @@ export function useAppMode() {
     const [isAppMode, setIsAppMode] = useState(false);
 
     useEffect(() => {
-        // Check if the app is installed and running in standalone mode
-        const mediaQuery = window.matchMedia('(display-mode: standalone)');
+        // Function to determine if we should show the App Mode
+        const checkAppMode = () => {
+            const isTabletOrMobile = window.innerWidth <= 1024;
+            // Only trigger Native App Shell if in standalone mode AND on a mobile/tablet screen size
+            return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) && isTabletOrMobile;
+        };
 
         // Initial check
-        setIsAppMode(mediaQuery.matches || window.navigator.standalone === true);
+        setIsAppMode(checkAppMode());
 
-        // Listen for changes (e.g., if user installs and it switches immediately)
-        const handleChange = (e) => setIsAppMode(e.matches);
+        // Listen for standalone mode changes & resize
+        const mediaQuery = window.matchMedia('(display-mode: standalone)');
+        const handleChange = () => setIsAppMode(checkAppMode());
+
         mediaQuery.addEventListener('change', handleChange);
+        window.addEventListener('resize', handleChange);
 
-        return () => mediaQuery.removeEventListener('change', handleChange);
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange);
+            window.removeEventListener('resize', handleChange);
+        };
     }, []);
 
     return isAppMode;

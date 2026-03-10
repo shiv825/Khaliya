@@ -12,6 +12,8 @@ import Loyalty from './Loyalty';
 import Reservations from './Reservations';
 import Footer from './Footer';
 import AiAssistant from './AiAssistant';
+import ChefSpecial from './ChefSpecial';
+import FloatingWidget from './FloatingWidget';
 
 export default function Home() {
     const [selectedTableType, setSelectedTableType] = useState('');
@@ -26,6 +28,7 @@ export default function Home() {
 
             <main>
                 <Hero />
+                <ChefSpecial />
                 <Movements />
                 <Testimonials />
                 <Menu />
@@ -41,6 +44,7 @@ export default function Home() {
 
             <Footer />
             <AiAssistant />
+            <FloatingWidget />
         </>
     );
 }
