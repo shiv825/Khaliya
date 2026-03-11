@@ -203,9 +203,9 @@ button::before {
 .btn:hover,
 button:hover {
     transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(211, 47, 47, 0.4), 0 0 15px rgba(211, 47, 47, 0.5);
+    box-shadow: 0 15px 35px rgba(255, 42, 77, 0.5), 0 0 20px rgba(255, 42, 77, 0.6);
     background: linear-gradient(135deg, #E53935, var(--primary-color));
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
 }
 
 .btn:hover::before,
@@ -1638,19 +1638,23 @@ nav a:hover {
 /* UI Enhancements */
 .menu-item {
     background: var(--bg-surface);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-light);
     display: flex;
     flex-direction: column;
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+    padding: 1.5rem;
+    /* Re-apply original padding */
 }
 
 .menu-item:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--accent-light);
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 42, 77, 0.15);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
 .tag {

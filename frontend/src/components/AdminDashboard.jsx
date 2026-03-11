@@ -15,6 +15,7 @@ import {
 import { Line, Bar } from 'react-chartjs-2';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
+import '../assets/admin-portal.css';
 
 ChartJS.register(
     CategoryScale,
@@ -201,29 +202,29 @@ export default function AdminDashboard({ onLogout }) {
     };
 
     return (
-        <div style={{ background: '#f0f2f5', minHeight: '100vh', padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
+        <div className="admin-portal-body">
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', background: 'white', padding: '1.2rem 2.5rem', borderRadius: '16px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <h1 style={{ margin: 0, color: '#E63946', fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' }}>Khaliya Admin</h1>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+            <div className="admin-header">
+                <div className="admin-header-title">
+                    <h1>Khaliya Admin</h1>
+                    <div className="admin-live-badge">
                         <motion.div
                             animate={{ scale: [1, 1.2, 1], opacity: [1, 0.6, 1] }}
                             transition={{ repeat: Infinity, duration: 2 }}
-                            style={{ width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%' }}
+                            className="admin-live-dot"
                         />
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase' }}>Live Sync</span>
+                        <span>Live Sync</span>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button style={{ padding: '0.6rem 1.2rem', background: activeTab === 'bookings' ? '#E63946' : 'transparent', color: activeTab === 'bookings' ? 'white' : '#666', border: activeTab === 'bookings' ? 'none' : '1px solid #eee', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, transition: 'all 0.2s' }} onClick={() => setActiveTab('bookings')}>Bookings</button>
-                    <button style={{ padding: '0.6rem 1.2rem', background: activeTab === 'menu' ? '#E63946' : 'transparent', color: activeTab === 'menu' ? 'white' : '#666', border: activeTab === 'menu' ? 'none' : '1px solid #eee', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, transition: 'all 0.2s' }} onClick={() => setActiveTab('menu')}>Menu Manager</button>
-                    <button style={{ padding: '0.6rem 1.2rem', background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }} onClick={handleLogout}>Logout</button>
+                <div className="admin-nav">
+                    <button className={activeTab === 'bookings' ? 'admin-tab-btn active' : 'admin-tab-btn'} onClick={() => setActiveTab('bookings')}>Bookings</button>
+                    <button className={activeTab === 'menu' ? 'admin-tab-btn active' : 'admin-tab-btn'} onClick={() => setActiveTab('menu')}>Menu Manager</button>
+                    <button className="admin-logout-btn" onClick={handleLogout}>Logout</button>
                 </div>
             </div>
 
             {fetchError && (
-                <div style={{ background: '#fef2f2', color: '#ef4444', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #fca5a5', textAlign: 'center', fontWeight: 'bold' }}>
+                <div className="admin-error-message">
                     <i className="fas fa-exclamation-triangle" style={{ marginRight: '8px' }}></i> {fetchError}
                 </div>
             )}
@@ -231,61 +232,38 @@ export default function AdminDashboard({ onLogout }) {
             {activeTab === 'bookings' && (
                 <div className="admin-bookings">
                     {/* Stats Grid */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '1rem',
-                        marginBottom: '2rem'
-                    }}>
+                    <div className="admin-stats-grid">
                         {[{ label: 'Total Bookings', value: bookings.length }, { label: 'Total Guests', value: totalGuests }, { label: 'Today Bookings', value: todayBookingsCount }, { label: 'Today Guests', value: todayGuestsCount }].map((stat, i) => (
-                            <div key={i} style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', textAlign: 'center' }}>
-                                <div style={{ fontSize: '0.9rem', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{stat.label}</div>
-                                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1a1a1a' }}>{stat.value}</div>
+                            <div key={i} className="admin-stat-card-lite">
+                                <div className="stat-label-lite">{stat.label}</div>
+                                <div className="stat-value-lite">{stat.value}</div>
                             </div>
                         ))}
                     </div>
 
                     {/* Charts Grid */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                        gap: '2rem',
-                        marginBottom: '2rem'
-                    }}>
-                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                            <h3 style={{ marginTop: 0 }}>Booking Trends (7 Days)</h3>
-                            <div style={{ height: '250px' }}>
+                    <div className="admin-charts-grid">
+                        <div className="admin-chart-card">
+                            <h3>Booking Trends (7 Days)</h3>
+                            <div className="chart-container">
                                 <Line data={charts.trends} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
                             </div>
                         </div>
-                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                            <h3 style={{ marginTop: 0 }}>Estimated Revenue</h3>
-                            <div style={{ height: '250px' }}>
+                        <div className="admin-chart-card">
+                            <h3>Estimated Revenue</h3>
+                            <div className="chart-container">
                                 <Bar data={charts.revenue} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
                             </div>
                         </div>
                     </div>
 
                     {/* Bookings List */}
-                    <div style={{ background: 'white', padding: 'clamp(1rem, 5vw, 2rem)', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            gap: '1rem',
-                            marginBottom: '1.5rem'
-                        }}>
-                            <h3 style={{ margin: 0 }}>All Bookings</h3>
-                            <div style={{
-                                display: 'flex',
-                                gap: '0.5rem',
-                                flexWrap: 'wrap',
-                                width: '100%',
-                                maxWidth: '500px'
-                            }}>
-                                <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: '150px', padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ddd' }} />
-                                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{ flex: 1, minWidth: '130px', padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ddd' }}>
+                    <div className="admin-bookings-list-container">
+                        <div className="admin-bookings-list-header">
+                            <h3>All Bookings</h3>
+                            <div className="admin-bookings-list-filters">
+                                <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="admin-filter-input" />
+                                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="admin-filter-select">
                                     <option value="all">All Status</option>
                                     <option value="pending">Pending</option>
                                     <option value="confirmed">Confirmed</option>
@@ -294,42 +272,21 @@ export default function AdminDashboard({ onLogout }) {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {filteredBookings.length === 0 ? <p style={{ textAlign: 'center', color: '#666' }}>No reservations found.</p> : filteredBookings.map((b) => (
-                                <div key={b.id} style={{
-                                    display: 'flex',
-                                    flexDirection: window.innerWidth < 768 ? 'column' : 'row',
-                                    justifyContent: 'space-between',
-                                    alignItems: window.innerWidth < 768 ? 'flex-start' : 'center',
-                                    padding: '1.2rem',
-                                    border: '1px solid #eee',
-                                    borderRadius: '8px',
-                                    background: b.status === 'confirmed' ? '#f0fdf4' : b.status === 'pending' ? '#fffbeb' : '#fef2f2',
-                                    gap: '1rem'
-                                }}>
-                                    <div>
-                                        <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '4px' }}>👤 {b.name || 'Guest'} <span style={{ fontSize: '0.8rem', color: '#666', fontWeight: 'normal' }}>#{b.id}</span></div>
-                                        <div style={{
-                                            color: '#555',
-                                            fontSize: '0.9rem',
-                                            display: 'flex',
-                                            flexWrap: 'wrap',
-                                            gap: '0.8rem'
-                                        }}>
+                        <div className="admin-bookings-list">
+                            {filteredBookings.length === 0 ? <p className="admin-empty-state-text">No reservations found.</p> : filteredBookings.map((b) => (
+                                <div key={b.id} className={`booking-list-item ${b.status}`}>
+                                    <div className="booking-info">
+                                        <div className="booking-guest-name">👤 {b.name || 'Guest'} <span className="booking-id">#{b.id}</span></div>
+                                        <div className="booking-details-grid">
                                             <span>📅 {b.date}</span> <span>🕐 {b.time}</span> <span>👥 {b.guests}</span>
                                             <span>📞 {b.phone}</span>
-                                            <span style={{ fontWeight: 'bold' }}>📍 Status: {b.status}</span>
+                                            <span className="booking-status-badge">📍 Status: {b.status}</span>
                                         </div>
                                     </div>
-                                    <div style={{
-                                        display: 'flex',
-                                        gap: '0.5rem',
-                                        width: window.innerWidth < 768 ? '100%' : 'auto',
-                                        flexWrap: 'wrap'
-                                    }}>
-                                        {b.status === 'pending' && <button onClick={() => confirmBooking(b.id)} style={{ flex: 1, background: '#22c55e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Confirm</button>}
-                                        <button onClick={() => deleteBooking(b.id)} style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Delete</button>
-                                        <button onClick={() => sendWhatsApp(b)} style={{ flex: 1, background: '#25D366', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}><i className="fab fa-whatsapp"></i> WhatsApp</button>
+                                    <div className="booking-actions">
+                                        {b.status === 'pending' && <button onClick={() => confirmBooking(b.id)} className="btn-confirm">Confirm</button>}
+                                        <button onClick={() => deleteBooking(b.id)} className="btn-delete-booking">Delete</button>
+                                        <button onClick={() => sendWhatsApp(b)} className="btn-whatsapp"><i className="fab fa-whatsapp"></i> WhatsApp</button>
                                     </div>
                                 </div>
                             ))}
@@ -340,21 +297,21 @@ export default function AdminDashboard({ onLogout }) {
             )}
 
             {activeTab === 'menu' && (
-                <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                        <h2 style={{ margin: 0 }}>Menu Manager</h2>
-                        <button onClick={addMenuItem} style={{ background: '#E63946', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>+ Add New Item</button>
+                <div className="admin-menu-manager-container">
+                    <div className="admin-menu-manager-header">
+                        <h2>Menu Manager</h2>
+                        <button onClick={addMenuItem} className="btn-add-menu-item">+ Add New Item</button>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                    <div className="admin-menu-manager-grid">
                         {menu.map((item, idx) => (
-                            <div key={idx} style={{ padding: '1.5rem', border: '1px solid #eee', borderRadius: '8px', background: '#fafafa' }}>
-                                <span style={{ background: '#ddd', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{item.category}</span>
-                                <h3 style={{ margin: '0.5rem 0' }}>{item.name}</h3>
-                                <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem', minHeight: '40px' }}>{item.description}</p>
-                                <div style={{ fontWeight: 'bold', color: '#16a34a', fontSize: '1.1rem' }}>{item.price}</div>
-                                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee', textAlign: 'right' }}>
-                                    <button onClick={() => deleteMenuItem(item.id || item.name)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Delete</button>
+                            <div key={idx} className="admin-menu-manager-item">
+                                <span className="menu-item-category">{item.category}</span>
+                                <h3>{item.name}</h3>
+                                <p className="menu-item-desc">{item.description}</p>
+                                <div className="menu-item-price">{item.price}</div>
+                                <div className="menu-item-actions">
+                                    <button onClick={() => deleteMenuItem(item.id || item.name)} className="btn-delete-menu-item">Delete</button>
                                 </div>
                             </div>
                         ))}
