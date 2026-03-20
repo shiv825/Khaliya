@@ -113,27 +113,49 @@
 
 @media (max-width: 768px) {
     .admin-layout {
-        flex-direction: column;
+        flex-direction: column !important;
     }
     .admin-sidebar {
+        width: 100% !important;
+        height: auto !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        padding: 10px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        z-index: 100 !important;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    }
+    .admin-sidebar > div:first-child, .admin-sidebar > button:last-child {
+        display: none !important;
+    }
+    .admin-sidebar nav {
+        flex-direction: row !important;
         width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 1rem;
+        gap: 0 !important;
+        justify-content: space-between !important;
+    }
+    .admin-sidebar nav button {
+        justify-content: center !important;
+        padding: 15px !important;
+        flex: 1;
+    }
+    .admin-sidebar span {
+        display: none !important;
     }
     .admin-main-content {
-        padding: 1rem;
+        padding: 1rem !important;
+        padding-bottom: 90px !important;
     }
     .booking-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1.5rem;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1.5rem !important;
     }
     .booking-item .actions {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem !important;
     }
 }

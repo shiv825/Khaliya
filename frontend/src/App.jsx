@@ -4,7 +4,6 @@ import Home from './components/Home';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import NativeAppShell from './components/native/NativeAppShell';
-import VoiceAssistantBtn from './components/VoiceAssistantBtn';
 import { useAppMode } from './hooks/useAppMode';
 import { LanguageProvider } from './context/LanguageContext';
 import { CartProvider } from './context/CartContext';
@@ -39,7 +38,6 @@ function App() {
             <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
             <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
           </Routes>
-          <VoiceAssistantBtn />
         </Router>
       </CartProvider>
     </LanguageProvider>

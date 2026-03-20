@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 export default function NativeProfile() {
+    const navigate = useNavigate();
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
 
@@ -135,6 +137,17 @@ export default function NativeProfile() {
                     <i className="fas fa-power-off"></i>
                     <span>Log out</span>
                     <i className="fas fa-chevron-right"></i>
+                </motion.div>
+
+                <motion.div
+                    className="zomato-menu-item"
+                    whileTap={{ background: '#fef2f2' }}
+                    onClick={() => navigate('/admin')}
+                    style={{ marginTop: '10px', borderTop: '1px solid #eee' }}
+                >
+                    <i className="fas fa-shield-alt" style={{ color: '#E63946' }}></i>
+                    <span style={{ fontWeight: '800', color: '#111' }}>Admin Command Center</span>
+                    <i className="fas fa-chevron-right" style={{ color: '#E63946' }}></i>
                 </motion.div>
             </div>
 

@@ -6,7 +6,12 @@ import Swal from 'sweetalert2';
 
 export default function CartDrawer({ isOpen, onClose }) {
     const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+
+    const getLocalized = (field) => {
+        if (field && typeof field === 'object') return field[language] || field.en || '';
+        return field || '';
+    };
 
     const handleCheckout = () => {
         if (cart.length === 0) return;
@@ -99,7 +104,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                                             <img src={item.image} style={{ width: '80px', height: '80px', borderRadius: '15px', objectFit: 'cover', border: '1px solid var(--border-color)' }} alt="" />
                                         </div>
                                         <div style={{ flex: 1 }}>
-                                            <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: '600' }}>{item.name}</h4>
+                                            <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: '600' }}>{getLocalized(item.name)}</h4>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <span style={{ fontWeight: '700', color: 'var(--accent-color)', fontSize: '1.2rem' }}>{item.price}</span>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '20px', border: '1px solid var(--border-light)' }}>
