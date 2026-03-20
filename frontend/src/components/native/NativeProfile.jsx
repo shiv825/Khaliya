@@ -1,9 +1,28 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 
 export default function NativeProfile() {
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
+
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const rotateX = useTransform(y, [-100, 100], [15, -15]);
+    const rotateY = useTransform(x, [-100, 100], [-15, 15]);
+
+    const handleTouchMove = (e) => {
+        const touch = e.touches[0];
+        const rect = e.currentTarget.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        x.set(touch.clientX - centerX);
+        y.set(touch.clientY - centerY);
+    };
+
+    const handleTouchEnd = () => {
+        x.set(0);
+        y.set(0);
+    };
 
     const handleAppLogout = () => {
         if (window.confirm('Are you sure you want to log out?')) {
@@ -40,19 +59,57 @@ export default function NativeProfile() {
                 </div>
             </div>
 
-            {/* Gold Banner */}
-            <motion.div
-                className="zomato-gold-banner"
-                whileTap={{ scale: 0.98 }}
+            {/* 3D Digital Platinum Card */}
+            <motion.div 
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={{ 
+                    perspective: 1200, 
+                    padding: '10px 15px',
+                    marginBottom: '10px'
+                }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ background: 'linear-gradient(135deg, #ffd700, #ffc107)', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <i className="fas fa-crown" style={{ color: '#1c1c1c', fontSize: '0.9rem' }}></i>
+                <motion.div
+                    style={{
+                        rotateX,
+                        rotateY,
+                        width: '100%',
+                        height: '200px',
+                        background: 'linear-gradient(135deg, #111 0%, #2a2a2a 50%, #000 100%)',
+                        borderRadius: '20px',
+                        padding: '20px',
+                        color: '#DAA520',
+                        boxShadow: '0 15px 35px rgba(0,0,0,0.3)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transformStyle: 'preserve-3d',
+                        border: '1px solid rgba(218, 165, 32, 0.4)'
+                    }}
+                >
+                    <div style={{ position: 'absolute', top: 0, left: '-100%', width: '50%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(218, 165, 32, 0.15), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 4s infinite' }}></div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(30px)' }}>
+                        <div>
+                            <div style={{ fontSize: '0.7rem', letterSpacing: '2px', fontWeight: '800', color: '#888' }}>ROYALTY PASS</div>
+                            <div style={{ fontSize: '1rem', fontFamily: "'Playfair Display', serif", marginTop: '2px', color: '#fff' }}>Gold Elite</div>
+                        </div>
+                        <i className="fas fa-crown" style={{ fontSize: '1.5rem', color: '#DAA520' }}></i>
                     </div>
-                    <span style={{ fontSize: '1rem', fontWeight: 700 }}>Join Zomato Gold</span>
-                </div>
-                <i className="fas fa-chevron-right" style={{ fontSize: '0.9rem' }}></i>
+
+                    <div style={{ transform: 'translateZ(50px)' }}>
+                        <div style={{ fontSize: '2.5rem', fontWeight: '900', letterSpacing: '1px', color: '#fff' }}>150</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#DAA520' }}>Spice Points</div>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(25px)' }}>
+                        <div style={{ fontSize: '0.9rem', fontWeight: '600', letterSpacing: '1px', color: '#ccc' }}>{user.name.toUpperCase()}</div>
+                    </div>
+                </motion.div>
             </motion.div>
+            <style>{`@keyframes shimmer { 0% { left: -100% } 50% { left: 200% } 100% { left: 200% } }`}</style>
 
             {/* More Section */}
             <div className="more-section-title">More</div>

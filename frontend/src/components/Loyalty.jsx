@@ -1,9 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 
 export default function Loyalty() {
     const { t } = useLanguage();
     const [points, setPoints] = useState(0);
+
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const rotateX = useTransform(y, [-150, 150], [15, -15]);
+    const rotateY = useTransform(x, [-150, 150], [-15, 15]);
+
+    const handleMouseMove = (event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        x.set(event.clientX - centerX);
+        y.set(event.clientY - centerY);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
 
     useEffect(() => {
         // Ported from loyalty.js local storage logic
@@ -88,16 +107,61 @@ export default function Loyalty() {
                     color: 'white',
                     boxShadow: 'var(--shadow-lg)'
                 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '2.5rem', marginBottom: '2.5rem' }}>
-                        <div>
-                            <h3 style={{ margin: 0, fontSize: '2rem', color: '#fff', fontFamily: 'var(--font-heading)' }}>Welcome, Member</h3>
-                            <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-muted)', fontSize: '1rem', letterSpacing: '1px' }}>ESTABLISHED 2024</p>
-                        </div>
-                        <div style={{ textAlign: 'right', background: 'rgba(218, 165, 32, 0.1)', padding: '1.5rem 2.5rem', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
-                            <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--accent-color)', lineHeight: 1, textShadow: '0 0 15px rgba(218, 165, 32, 0.3)' }}>{points}</div>
-                            <div style={{ color: 'var(--accent-light)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '800', marginTop: '5px' }}>Total Points</div>
-                        </div>
-                    </div>
+                    <motion.div 
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                        style={{ 
+                            perspective: 1500, 
+                            marginBottom: '3.5rem', 
+                            display: 'flex', 
+                            justifyContent: 'center',
+                            cursor: 'grab'
+                        }}
+                    >
+                        <motion.div
+                            style={{
+                                rotateX,
+                                rotateY,
+                                width: '100%',
+                                maxWidth: '450px',
+                                height: '260px',
+                                background: tier.name === 'Gold' ? 'linear-gradient(135deg, #FFD700 0%, #DAA520 50%, #B8860B 100%)' :
+                                            tier.name === 'Silver' ? 'linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 50%, #808080 100%)' :
+                                            'linear-gradient(135deg, #CD7F32 0%, #A0522D 50%, #8B4513 100%)',
+                                borderRadius: '20px',
+                                padding: '30px',
+                                color: '#000',
+                                boxShadow: '0 30px 60px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.4)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                transformStyle: 'preserve-3d'
+                            }}
+                        >
+                            <div style={{ position: 'absolute', top: 0, left: '-100%', width: '50%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 4s infinite' }}></div>
+                            
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(40px)' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.8rem', letterSpacing: '3px', fontWeight: '800' }}>KHALIYA ROYALTY</div>
+                                    <div style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', marginTop: '5px' }}>{tier.name} Elite</div>
+                                </div>
+                                <i className="fas fa-crown" style={{ fontSize: '2rem', opacity: 0.8 }}></i>
+                            </div>
+
+                            <div style={{ transform: 'translateZ(60px)' }}>
+                                <div style={{ fontSize: '3.5rem', fontWeight: '900', letterSpacing: '2px', textShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}>{points}</div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: '700', opacity: 0.8 }}>Available Spice Points</div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(30px)' }}>
+                                <div style={{ fontSize: '1.1rem', fontWeight: '600', letterSpacing: '1px' }}>VALUED MEMBER</div>
+                                <div style={{ fontSize: '0.8rem', fontWeight: '800' }}>EST 2024</div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                    <style>{`@keyframes shimmer { 0% { left: -100% } 50% { left: 200% } 100% { left: 200% } }`}</style>
 
                     <div style={{ background: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '25px', marginBottom: '3rem', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'flex-end' }}>
