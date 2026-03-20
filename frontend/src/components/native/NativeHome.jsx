@@ -100,21 +100,24 @@ export default function NativeHome({ setActiveTab }) {
                 onClick={() => setActiveTab('book')}
                 style={{ 
                     borderRadius: '20px', padding: '25px', marginBottom: '30px', 
-                    background: 'linear-gradient(135deg, rgba(20,20,20,0.8), rgba(10,10,10,0.9))',
+                    background: '#0a0a0a',
                     border: '1px solid rgba(218, 165, 32, 0.2)',
                     position: 'relative', overflow: 'hidden'
                 }}
             >
-                <div className="hero-content">
+                <video autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, opacity: 0.5 }}>
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-flames-from-a-pan-in-a-dark-kitchen-41880-large.mp4" type="video/mp4" />
+                </video>
+                <div className="hero-content" style={{ position: 'relative', zIndex: 1 }}>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", margin: '0 0 5px 0' }}>The Royal Table</h3>
-                    <p style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '15px' }}>Reserve your curated dining experience.</p>
+                    <p style={{ fontSize: '0.85rem', color: '#ccc', marginBottom: '15px' }}>Reserve your curated dining experience.</p>
                     <button className="native-btn-primary" style={{ 
                         backgroundColor: 'var(--primary-color, #DAA520)', 
                         color: '#0a0a0a', border: 'none', padding: '8px 18px', 
                         borderRadius: '20px', fontWeight: 'bold', fontSize: '0.85rem'
                     }}>Book Now</button>
                 </div>
-                <i className="fas fa-crown" style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.1, fontSize: '3rem', color: '#DAA520' }}></i>
+                <i className="fas fa-crown" style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.1, fontSize: '3rem', color: '#DAA520', zIndex: 1 }}></i>
             </motion.div>
 
             {/* Synced Specials */}

@@ -8,15 +8,29 @@ export default function Hero() {
     return (
         <section id="home" className="hero">
             {/* High-impact background video / image */}
-            <div className="hero-bg">
-                <motion.img
-                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop"
-                    alt="Restaurant Interior"
-                    className="hero-media"
-                    initial={{ scale: 1.15 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 6, ease: "easeOut" }}
-                />
+            <div className="hero-bg" style={{ overflow: 'hidden', position: 'relative' }}>
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        minWidth: '100%',
+                        minHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        transform: 'translate(-50%, -50%) scale(1.05)',
+                        objectFit: 'cover',
+                        zIndex: 0,
+                        filter: 'brightness(0.7)'
+                    }}
+                >
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-chef-pouring-sauce-over-a-dish-in-a-fine-dining-42036-large.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
             </div>
 
             <div className="hero-overlay-gradient"></div>
