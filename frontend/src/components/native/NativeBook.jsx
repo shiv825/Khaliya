@@ -13,6 +13,7 @@ export default function NativeBook() {
             case 1:
                 return (
                     <motion.div
+                        key="step1"
                         initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                         className="wizard-step"
                     >
@@ -33,6 +34,7 @@ export default function NativeBook() {
             case 2:
                 return (
                     <motion.div
+                        key="step2"
                         initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                         className="wizard-step"
                     >
@@ -71,6 +73,7 @@ export default function NativeBook() {
             case 3:
                 return (
                     <motion.div
+                        key="step3"
                         initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                         className="wizard-step"
                     >

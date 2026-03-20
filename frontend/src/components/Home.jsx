@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
 import Hero from './Hero';
+import FeaturedSpecials from './FeaturedSpecials';
 import Movements from './Movements';
 import Testimonials from './Testimonials';
 import Menu from './Menu';
@@ -12,6 +13,7 @@ import Loyalty from './Loyalty';
 import Reservations from './Reservations';
 import Footer from './Footer';
 import AiAssistant from './AiAssistant';
+import OfferPopup from './OfferPopup';
 
 export default function Home() {
     const [selectedTableType, setSelectedTableType] = useState('');
@@ -26,6 +28,7 @@ export default function Home() {
 
             <main>
                 <Hero />
+                <FeaturedSpecials />
                 <Movements />
                 <Testimonials />
                 <Menu />
@@ -41,6 +44,7 @@ export default function Home() {
 
             <Footer />
             <AiAssistant />
+            <OfferPopup />
         </>
     );
 }

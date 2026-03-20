@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import NativeAppShell from './components/native/NativeAppShell';
 import { useAppMode } from './hooks/useAppMode';
 import { LanguageProvider } from './context/LanguageContext';
+import { CartProvider } from './context/CartContext';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './assets/style.css';
@@ -30,13 +31,15 @@ function App() {
 
   return (
     <LanguageProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
-          <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
-          <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
-        </Routes>
-      </Router>
+      <CartProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
+            <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
+            <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
+          </Routes>
+        </Router>
+      </CartProvider>
     </LanguageProvider>
   );
 }

@@ -6,13 +6,22 @@
     height: 100vh;
     height: 100dvh;
     /* Dynamic viewport height for mobile browsers */
-    width: 100vw;
-    background-color: var(--bg-dark, #121212);
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    left: 0 !important;
+    --bg-dark: #0a0a0a;
+    --primary-color: #DAA520;
+    /* Zomato Crimson */
+    --text-white: #FFFFFF;
+    --text-gray: #696969;
+    --border-light: rgba(0, 0, 0, 0.08);
+    background-color: var(--bg-dark);
     color: white;
     overflow: hidden;
     position: fixed;
     top: 0;
-    left: 0;
 }
 
 .native-content-area {
@@ -37,8 +46,9 @@
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 100%;
-    height: 70px;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px);
     background: rgba(22, 22, 22, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -74,7 +84,7 @@
 }
 
 .nav-tab.active {
-    color: var(--primary-color, #E63946);
+    color: var(--primary-color, #DAA520);
 }
 
 .nav-tab.active::after {
@@ -85,7 +95,7 @@
     transform: translateX(-50%);
     width: 25px;
     height: 3px;
-    background: var(--primary-color, #E63946);
+    background: var(--primary-color, #DAA520);
     border-radius: 0 0 4px 4px;
     box-shadow: 0 2px 10px rgba(230, 57, 70, 0.4);
 }
@@ -105,7 +115,7 @@
     top: -10px;
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, var(--primary-color, #E63946), #ff6b6b);
+    background: linear-gradient(135deg, var(--primary-color, #DAA520), #ff6b6b);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -113,7 +123,7 @@
     color: white;
     font-size: 1.3rem;
     box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
-    border: 4px solid var(--bg-dark, #121212);
+    border: 4px solid var(--bg-dark, #0a0a0a);
     transition: transform 0.2s ease;
 }
 
@@ -122,20 +132,317 @@
 }
 
 .nav-tab.book-btn.active span {
-    color: var(--primary-color, #E63946);
+    color: var(--primary-color, #DAA520);
 }
 
 .nav-tab.book-btn.active::after {
     display: none;
 }
 
-/* -------------------------------------- */
-/* Native Home View Styles                */
-/* -------------------------------------- */
+/* Zomato Style Auth Landing */
+.zomato-landing {
+    height: 100vh;
+    background: #000;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+.landing-hero {
+    height: 60%;
+    width: 100%;
+    position: relative;
+}
+
+.landing-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.landing-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, #000, transparent);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    text-align: center;
+}
+
+.landing-overlay h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.zomato-logo-stripe {
+    background: #DAA520;
+    color: white;
+    padding: 5px 15px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    display: inline-block;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.auth-bottom-sheet {
+    background: white;
+    width: 100%;
+    flex: 1;
+    border-radius: 20px 20px 0 0;
+    padding: 30px 20px;
+    color: #1c1c1c;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-title {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #4f4f4f;
+    margin-bottom: 25px;
+}
+
+.phone-input-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.country-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+}
+
+.country-selector img {
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+}
+
+.phone-field {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.phone-field span {
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.phone-field input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 1.1rem;
+    color: #1c1c1c;
+}
+
+.zomato-btn-main {
+    background: #DAA520;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.social-login-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.social-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.google-icon {
+    color: #DB4437;
+}
+
+.mail-icon {
+    color: #1c1c1c;
+}
+
+.terms-text {
+    font-size: 0.75rem;
+    color: #696969;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* OTP Screen */
+.otp-container {
+    padding: 40px 20px;
+    background: white;
+    height: 100vh;
+    color: #1c1c1c;
+}
+
+.otp-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.otp-inputs {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.otp-box {
+    width: 45px;
+    height: 50px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    outline: none;
+}
+
+.otp-box:focus {
+    border-color: #DAA520;
+}
+
+/* Notification Screen */
+.notification-screen {
+    height: 100vh;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    color: #1c1c1c;
+}
+
+.notif-illustration {
+    width: 250px;
+    margin-bottom: 40px;
+}
+
+/* Zomato Profile Styles */
+.zomato-profile-card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #1c1c1c;
+}
+
+.zomato-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #DAA520;
+    border: 1px solid #eee;
+}
+
+.zomato-gold-banner {
+    background: #1c1c1c;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffc107;
+    margin: 10px 15px;
+    border-radius: 12px;
+}
+
+.more-section-title {
+    padding: 20px 15px 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1c1c1c;
+    background: #f8f8f8;
+}
+
+.zomato-menu-item {
+    background: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #1c1c1c;
+}
+
+.zomato-menu-item i:first-child {
+    width: 20px;
+    color: #696969;
+}
+
+.zomato-menu-item span {
+    flex: 1;
+    font-weight: 400;
+}
+
+.zomato-menu-item i:last-child {
+    font-size: 0.8rem;
+    color: #9c9c9c;
+}
+
+.profile-logout {
+    color: #DAA520 !important;
+}
+
+.profile-logout i {
+    color: #DAA520 !important;
+}
+
 .native-home {
     padding: 20px;
     padding-top: 50px;
     min-height: 80vh;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
 }
 
 .native-header .header-top {
@@ -162,7 +469,7 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    border: 2px solid var(--primary-color, #E63946);
+    border: 2px solid var(--primary-color, #DAA520);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -193,7 +500,7 @@
 }
 
 .native-btn-primary {
-    background: var(--primary-color, #E63946);
+    background: var(--primary-color, #DAA520);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -273,7 +580,7 @@
 }
 
 .see-all {
-    color: var(--primary-color, #E63946);
+    color: var(--primary-color, #DAA520);
     font-size: 0.85rem;
     font-weight: 600;
 }
@@ -344,7 +651,7 @@
 }
 
 .food-info .price {
-    color: var(--primary-color, #E63946);
+    color: var(--primary-color, #DAA520);
     font-weight: 700;
     font-size: 0.9rem;
 }
@@ -419,9 +726,9 @@
 }
 
 .category-tab.active {
-    background: var(--primary-color, #E63946);
+    background: var(--primary-color, #DAA520);
     color: white;
-    border-color: var(--primary-color, #E63946);
+    border-color: var(--primary-color, #DAA520);
     box-shadow: 0 4px 12px rgba(230, 57, 70, 0.4);
 }
 
@@ -501,7 +808,7 @@
 }
 
 .add-to-cart-btn:active {
-    background: var(--primary-color, #E63946);
+    background: var(--primary-color, #DAA520);
 }
 
 /* -------------------------------------- */
@@ -512,6 +819,8 @@
     padding-top: 40px;
     min-height: 80vh;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
 }
 
 .native-book-header {
@@ -536,7 +845,7 @@
 
 .progress-fill {
     height: 100%;
-    background: var(--primary-color, #E63946);
+    background: var(--primary-color, #DAA520);
     transition: width 0.4s ease;
 }
 
@@ -557,6 +866,8 @@
     position: relative;
     overflow-y: auto;
     padding-bottom: 30px;
+    min-height: 450px;
+    /* Ensure space for absolutely positioned children */
 }
 
 .wizard-step {
@@ -568,7 +879,7 @@
 
 .wizard-step h3 {
     margin: 0 0 20px 0;
-    color: var(--primary-color, #E63946);
+    color: var(--primary-color, #DAA520);
     font-size: 1.3rem;
 }
 
@@ -599,7 +910,7 @@
 
 .native-input:focus {
     outline: none;
-    border-color: var(--primary-color, #E63946);
+    border-color: var(--primary-color, #DAA520);
 }
 
 .stepper {
@@ -651,8 +962,8 @@
 
 .table-card.selected {
     background: rgba(230, 57, 70, 0.15);
-    border-color: var(--primary-color, #E63946);
-    color: var(--primary-color, #E63946);
+    border-color: var(--primary-color, #DAA520);
+    color: var(--primary-color, #DAA520);
 }
 
 .wizard-actions {
@@ -746,7 +1057,7 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    border: 3px solid var(--primary-color, #E63946);
+    border: 3px solid var(--primary-color, #DAA520);
     margin-bottom: 15px;
     box-shadow: 0 5px 20px rgba(230, 57, 70, 0.3);
 }
@@ -838,7 +1149,7 @@
     width: 40px;
     height: 40px;
     background: rgba(230, 57, 70, 0.1);
-    color: var(--primary-color, #E63946);
+    color: var(--primary-color, #DAA520);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -857,4 +1168,11 @@
 .settings-item .arrow {
     color: #666;
     font-size: 0.9rem;
+}
+
+@media (max-width: 380px) {
+    .native-header .greeting h2 { font-size: 1.5rem; }
+    .book-fab { width: 44px; height: 44px; font-size: 1.1rem; }
+    .nav-tab.book-btn { top: -12px; }
+    .nav-tab span { font-size: 0.65rem; }
 }

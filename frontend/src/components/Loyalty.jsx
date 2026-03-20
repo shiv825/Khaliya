@@ -67,81 +67,103 @@ export default function Loyalty() {
     };
 
     return (
-        <section id="loyalty" style={{ background: '#111', padding: '5rem 0' }} data-aos="fade-up">
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h2 style={{ color: 'var(--accent-light)' }}>{t('loyalty.title') || 'Spice Club Rewards'}</h2>
-                    <p style={{ color: '#aaa', maxWidth: '600px', margin: '0 auto' }}>
-                        {t('loyalty.sub') || 'Join our exclusive loyalty program. Earn points, tier up, and unlock secret menu items!'}
+        <section id="loyalty" style={{ background: 'var(--secondary-color)', padding: '8rem 0', position: 'relative', overflow: 'hidden' }} data-aos="fade-up">
+            <div className="section-bg-accent" style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', background: 'radial-gradient(circle at 50% 50%, rgba(218, 165, 32, 0.05) 0%, transparent 70%)', pointerEvents: 'none' }}></div>
+            
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem', position: 'relative', zIndex: 1 }}>
+                <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                    <span style={{ color: 'var(--accent-color)', letterSpacing: '4px', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '1rem', display: 'block' }}>Elite Membership</span>
+                    <h2 style={{ color: '#FFF', fontSize: '3rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>{t('loyalty.title') || 'Spice Club Rewards'}</h2>
+                    <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '1.1rem' }}>
+                        {t('loyalty.sub') || 'An exclusive circle for the culinary connoisseur. Earn, ascend, and indulge.'}
                     </p>
                 </div>
 
-                <div className="loyalty-container" style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    color: 'white'
+                <div className="loyalty-container futuristic-glass" style={{
+                    background: 'var(--bg-glass)',
+                    border: '1px solid var(--border-color)',
+                    backdropFilter: 'blur(15px)',
+                    borderRadius: '30px',
+                    padding: '3.5rem',
+                    color: 'white',
+                    boxShadow: 'var(--shadow-lg)'
                 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '2.5rem', marginBottom: '2.5rem' }}>
                         <div>
-                            <h3 style={{ margin: 0, fontSize: '1.5rem', color: '#fff' }}>Welcome Back!</h3>
-                            <p style={{ margin: '0.5rem 0 0 0', color: '#aaa', fontSize: '0.9rem' }}>Member since 2024</p>
+                            <h3 style={{ margin: 0, fontSize: '2rem', color: '#fff', fontFamily: 'var(--font-heading)' }}>Welcome, Member</h3>
+                            <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-muted)', fontSize: '1rem', letterSpacing: '1px' }}>ESTABLISHED 2024</p>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-color)', lineHeight: 1 }}>{points}</div>
-                            <div style={{ color: '#aaa', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Total Points</div>
+                        <div style={{ textAlign: 'right', background: 'rgba(218, 165, 32, 0.1)', padding: '1.5rem 2.5rem', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--accent-color)', lineHeight: 1, textShadow: '0 0 15px rgba(218, 165, 32, 0.3)' }}>{points}</div>
+                            <div style={{ color: 'var(--accent-light)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '800', marginTop: '5px' }}>Total Points</div>
                         </div>
                     </div>
 
-                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <span style={{ fontWeight: 600, color: tier.color, fontSize: '1.2rem' }}>{tier.icon} {tier.name} Tier</span>
-                            {tier.next && <span style={{ color: '#aaa', fontSize: '0.9rem' }}>{tier.next - points} pts to next tier</span>}
+                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '25px', marginBottom: '3rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'flex-end' }}>
+                            <div>
+                                <span style={{ fontWeight: 800, color: tier.color, fontSize: '1.8rem', display: 'block' }}>{tier.icon} {tier.name} Tier</span>
+                                <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Exclusive Privileges Active</span>
+                            </div>
+                            {tier.next && <span style={{ color: 'var(--accent-color)', fontSize: '0.9rem', fontWeight: '700' }}>{tier.next - points} XP TO NEXT TIER</span>}
                         </div>
-                        <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ width: '100%', height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
                             <div style={{
                                 width: `${progressPercent}%`,
                                 height: '100%',
-                                background: `linear-gradient(90deg, var(--accent-color), ${tier.color})`,
-                                borderRadius: '4px',
-                                transition: 'width 1s ease-in-out'
+                                background: `linear-gradient(90deg, #DAA520, #FFD700)`,
+                                borderRadius: '10px',
+                                transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                boxShadow: '0 0 15px var(--accent-color)'
                             }}></div>
                         </div>
                     </div>
 
-                    <h4 style={{ color: '#fff', marginBottom: '1rem' }}>Available Rewards</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-                        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <div style={{ fontSize: '1.2rem', marginBottom: '5px' }}>☕ Free Masala Chai</div>
-                                <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Redeem for a hot beverage</div>
+                    <h4 style={{ color: '#fff', marginBottom: '2rem', fontSize: '1.4rem', fontFamily: 'var(--font-heading)' }}>Curated Rewards</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                        {[
+                            { name: 'Free Masala Chai', icon: '☕', cost: 100, desc: 'House special brewed with secret spices' },
+                            { name: 'Samosa Plate', icon: '🥟', cost: 300, desc: 'Classic golden pastry with savory filling' },
+                            { name: '20% Dining Credit', icon: '🍛', cost: 800, desc: 'Valid for your next grand feast' }
+                        ].map((reward, idx) => (
+                            <div key={idx} className="reward-card" style={{ 
+                                background: 'rgba(255,255,255,0.03)', 
+                                padding: '2rem', 
+                                borderRadius: '20px', 
+                                border: '1px solid var(--border-color)',
+                                display: 'flex', 
+                                flexDirection: 'column',
+                                gap: '1.5rem',
+                                transition: 'var(--transition)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <span style={{ fontSize: '2.5rem' }}>{reward.icon}</span>
+                                    <span style={{ background: points >= reward.cost ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.05)', color: points >= reward.cost ? '#10B981' : '#666', padding: '4px 12px', borderRadius: '30px', fontSize: '0.7rem', fontWeight: '800' }}>
+                                        {points >= reward.cost ? 'AVAILABLE' : 'LOCKED'}
+                                    </span>
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '5px', color: '#fff' }}>{reward.name}</div>
+                                    <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>{reward.desc}</div>
+                                </div>
+                                <button 
+                                    onClick={() => handleRedeem(reward.cost, reward.name)} 
+                                    className="btn btn-primary" 
+                                    disabled={points < reward.cost}
+                                    style={{ 
+                                        width: '100%', 
+                                        padding: '12px', 
+                                        fontSize: '0.9rem', 
+                                        background: points >= reward.cost ? 'var(--primary-color)' : 'rgba(255,255,255,0.05)', 
+                                        color: points >= reward.cost ? '#000' : '#444',
+                                        border: 'none',
+                                        opacity: points >= reward.cost ? 1 : 0.5
+                                    }}
+                                >
+                                    {reward.cost} SPICE POINTS
+                                </button>
                             </div>
-                            <button onClick={() => handleRedeem(100, 'Free Masala Chai')} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 100 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 100 ? 'auto' : 'none', cursor: points >= 100 ? 'pointer' : 'not-allowed' }}>
-                                100 pts
-                            </button>
-                        </div>
-
-                        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <div style={{ fontSize: '1.2rem', marginBottom: '5px' }}>🥟 Free Samosa Plate</div>
-                                <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Classic Indian Starter</div>
-                            </div>
-                            <button onClick={() => handleRedeem(300, 'Free Samosa Plate')} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 300 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 300 ? 'auto' : 'none', cursor: points >= 300 ? 'pointer' : 'not-allowed' }}>
-                                300 pts
-                            </button>
-                        </div>
-
-                        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <div style={{ fontSize: '1.2rem', marginBottom: '5px' }}>🍛 20% Off Bill</div>
-                                <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Discount on grand total</div>
-                            </div>
-                            <button onClick={() => handleRedeem(800, '20% Off Bill')} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: points >= 800 ? 'var(--accent-color)' : '#444', pointerEvents: points >= 800 ? 'auto' : 'none', cursor: points >= 800 ? 'pointer' : 'not-allowed' }}>
-                                800 pts
-                            </button>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>

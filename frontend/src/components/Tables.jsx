@@ -51,7 +51,7 @@ export default function Tables({ onSelectTable }) {
             {/* Categories */}
             <div style={{ margin: '1rem 0', padding: '1.5rem', background: '#f0f9ff', borderRadius: '8px', borderLeft: '5px solid #2196F3' }}>
                 <p style={{ margin: '0.5rem 0', fontWeight: 'bold', color: '#333' }}>{t('tables.typesAvailable')}</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
                     <div className="table-type-card" onClick={() => setFilterType('intimate')} style={{ cursor: 'pointer', outline: filterType === 'intimate' ? '2px solid #2196F3' : 'none' }}>
                         <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🥂</div>
                         <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('form.typeIntimateName')}</strong>
@@ -105,7 +105,7 @@ export default function Tables({ onSelectTable }) {
             {/* Visual Map SVG placeholder logic (Optional, since CSS grid is there) */}
 
             {/* Table Grid */}
-            <div id="tableGrid" className="table-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
+            <div id="tableGrid" className="table-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
                 {filteredTables.map(t => {
                     const styleObj = getTypeStyle(t.type);
                     const isAvailable = t.status === 'available';

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
+import { useCart } from '../context/CartContext';
+import Swal from 'sweetalert2';
 
 export default function Menu() {
     const { t, language } = useLanguage();
+    const { addToCart } = useCart();
 
     const getFallbackMenu = () => [
         {
@@ -30,7 +33,7 @@ export default function Menu() {
                 "name": {
                         "en": "Paneer Tikka",
                         "hi": "पनीर टिक्का",
-                        "ar": "بانيير تيكا"
+                        "ar": "بانيयर تيكا"
                 },
                 "description": {
                         "en": "Cubed cottage cheese marinated in yogurt and spices, grilled in tandoor.",
@@ -68,7 +71,7 @@ export default function Menu() {
                 "name": {
                         "en": "Hara Bhara Kabab (6 pcs)",
                         "hi": "हरा भरा कबाब (6 पीसी)",
-                        "ar": "هارا بهارا كباب (6 قطع)"
+                        "ar": "هارा بهारा कबाब (6 قطع)"
                 },
                 "description": {
                         "en": "Healthy spinach and green pea patties with traditional herbs and spices.",
@@ -87,7 +90,7 @@ export default function Menu() {
                 "name": {
                         "en": "Fish Amritsari",
                         "hi": "फिश अमृतसरी",
-                        "ar": "سمك أمريتساري"
+                        "ar": "سمك أمरीتساري"
                 },
                 "description": {
                         "en": "Golden fried fish fillets flavored with carom seeds and authentic spices.",
@@ -206,7 +209,7 @@ export default function Menu() {
                 "description": {
                         "en": "Soft cottage cheese in rich tomato butter gravy. Vegetarian favorite.",
                         "hi": "समृद्ध टमाटर बटर ग्रेवी में नरम पनीर। शाकाहारी पसंदीदा।",
-                        "ar": "جبنة قريش ناعمة في مرق الزبدة الغني بالطماطم."
+                        "ar": "جبنة قريش ناعمة في مرق الزبدة الغني بالطमाطم."
                 },
                 "price": "₹320",
                 "tags": [
@@ -389,7 +392,7 @@ export default function Menu() {
                 "name": {
                         "en": "Mango Lassi",
                         "hi": "मैंगो लस्सी",
-                        "ar": "مانجو لاسي"
+                        "ar": "मानजो लاسی"
                 },
                 "description": {
                         "en": "Sweet and creamy yogurt-based drink made with fresh mangoes.",
@@ -402,7 +405,7 @@ export default function Menu() {
                 ],
                 "image": "/menu-images/mango-lassi.jpg"
         }
-];
+    ];
 
     const [menuItems, setMenuItems] = useState(getFallbackMenu());
     const [loading, setLoading] = useState(true);
@@ -413,13 +416,10 @@ export default function Menu() {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     useEffect(() => {
-        console.log("Khaliya Debug: Menu.jsx is trying to fetch from ->", API_URL);
         axios.get(`${API_URL}/api/menu`, { timeout: 5000 })
             .then(res => {
                 if (Array.isArray(res.data) && res.data.length > 0) {
                     setMenuItems(res.data);
-                } else {
-                    console.warn("API returned invalid data format, forcing fallback menu:", res.data);
                 }
             })
             .catch(err => {
@@ -465,24 +465,61 @@ export default function Menu() {
 
     return (
         <section id="menu" data-aos="fade-up">
-            <h2>{t('menu.title')}</h2>
+            <h2 style={{ marginBottom: '3rem' }}>{t('menu.title')}</h2>
 
-            <div className="menu-controls" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <div className="search-box" style={{ position: 'relative', minWidth: '300px' }}>
-                    <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t('menu.searchPlaceholder')} style={{ width: '100%', padding: '10px 15px 10px 40px', borderRadius: '50px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'var(--text-dark)' }} />
-                    <i className="fas fa-search" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}></i>
+            <div className="menu-controls" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '2.5rem', flexWrap: 'wrap', alignItems: 'center', padding: '0 1.5rem' }}>
+                <div className="search-box" style={{ position: 'relative', flex: '1 1 350px', maxWidth: '600px' }}>
+                    <input 
+                        type="text" 
+                        value={search} 
+                        onChange={e => setSearch(e.target.value)} 
+                        placeholder={t('menu.searchPlaceholder')} 
+                        style={{ 
+                            width: '100%', 
+                            padding: '16px 20px 16px 55px', 
+                            borderRadius: '50px', 
+                            border: '1px solid var(--border-color)', 
+                            background: 'var(--bg-glass)', 
+                            backdropFilter: 'blur(10px)',
+                            color: '#fff', 
+                            fontSize: '1rem',
+                            transition: 'var(--transition)',
+                            outline: 'none',
+                            boxShadow: 'var(--shadow-sm)'
+                        }} 
+                    />
+                    <i className="fas fa-search" style={{ position: 'absolute', left: '22px', top: '50%', transform: 'translateY(-50%)', color: 'var(--accent-color)', fontSize: '1.1rem' }}></i>
                 </div>
-                <div className="sort-box">
-                    <select value={sort} onChange={e => setSort(e.target.value)} style={{ padding: '10px 20px', borderRadius: '50px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'var(--text-dark)', cursor: 'pointer' }}>
-                        <option value="default">{t('menu.sortDefault')}</option>
-                        <option value="price-low">{t('menu.sortLow')}</option>
-                        <option value="price-high">{t('menu.sortHigh')}</option>
-                        <option value="popular">{t('menu.sortPopular')}</option>
+                <div className="sort-box" style={{ flex: '0 1 auto' }}>
+                    <select 
+                        value={sort} 
+                        onChange={e => setSort(e.target.value)} 
+                        style={{ 
+                            padding: '16px 35px', 
+                            borderRadius: '50px', 
+                            border: '1px solid var(--border-color)', 
+                            background: 'var(--bg-glass)', 
+                            backdropFilter: 'blur(10px)',
+                            color: '#fff', 
+                            cursor: 'pointer', 
+                            fontSize: '0.95rem',
+                            outline: 'none',
+                            appearance: 'none',
+                            backgroundImage: 'linear-gradient(45deg, transparent 50%, var(--accent-color) 50%), linear-gradient(135deg, var(--accent-color) 50%, transparent 50%)',
+                            backgroundPosition: 'calc(100% - 25px) calc(1em + 5px), calc(100% - 20px) calc(1em + 5px)',
+                            backgroundSize: '5px 5px, 5px 5px',
+                            backgroundRepeat: 'no-repeat'
+                        }}
+                    >
+                        <option value="default" style={{ background: '#121212' }}>{t('menu.sortDefault')}</option>
+                        <option value="price-low" style={{ background: '#121212' }}>{t('menu.sortLow')}</option>
+                        <option value="price-high" style={{ background: '#121212' }}>{t('menu.sortHigh')}</option>
+                        <option value="popular" style={{ background: '#121212' }}>{t('menu.sortPopular')}</option>
                     </select>
                 </div>
             </div>
 
-            <div className="menu-filters" style={{ display: 'flex', justifyContent: 'center', gap: '0.8rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+            <div className="menu-filters" style={{ display: 'flex', justifyContent: 'center', gap: '0.8rem', marginBottom: '3.5rem', flexWrap: 'wrap' }}>
                 {['All', 'Appetizer', 'Main Course', 'Bread', 'Dessert', 'Beverage'].map(cat => (
                     <button key={cat} onClick={() => setFilter(cat)} className={`btn menu-filter-btn ${filter === cat ? 'active' : ''}`}>
                         {t(cat === 'All' ? 'menu.catAll' : cat === 'Appetizer' ? 'menu.catAppetizer' : cat === 'Main Course' ? 'menu.catMain' : cat === 'Bread' ? 'menu.catBread' : cat === 'Dessert' ? 'menu.catDessert' : 'menu.catBeverage')}
@@ -492,38 +529,70 @@ export default function Menu() {
 
             <div id="menu-container" className="menu">
                 {loading ? (
-                    <div style={{ textAlign: 'center', width: '100%', padding: '2rem', color: '#666' }}>
-                        <i className="fas fa-spinner fa-spin"></i> <span>{t('menu.loading')}</span>
+                    <div style={{ textAlign: 'center', width: '100%', padding: '4rem', color: 'var(--accent-color)' }}>
+                        <i className="fas fa-spinner fa-spin fa-3x"></i>
                     </div>
                 ) : (
                     displayedMenu.map((item, index) => (
-                        <div key={index} className="menu-item" data-aos="fade-up" data-aos-delay={(index % 5) * 100}>
+                        <div key={index} className="menu-item" data-aos="fade-up" data-aos-delay={(index % 4) * 100} style={{ 
+                            background: 'var(--bg-glass)', 
+                            border: '1px solid var(--border-color)', 
+                            borderRadius: 'var(--radius-lg)',
+                            padding: '2rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            height: '100%',
+                            transition: 'var(--transition)'
+                        }}>
                             {item.image && (
-                                <div className="menu-item-image" style={{ width: '100%', height: '180px', overflow: 'hidden', borderRadius: '8px', marginBottom: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                                    <img loading="lazy" src={item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                                <div className="menu-item-image" style={{ width: '100%', height: '220px', overflow: 'hidden', borderRadius: '15px', marginBottom: '1.5rem', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}>
+                                    <img loading="lazy" src={item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
                                 </div>
                             )}
-                            <div className="menu-item-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-                                <span className="category">{getLocalized(item.category)}</span>
-                                <div className="menu-item-tags">
+                            <div className="menu-item-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <span className="category" style={{ letterSpacing: '1.5px', fontWeight: '700', fontSize: '0.75rem', color: 'var(--accent-light)' }}>{getLocalized(item.category)}</span>
+                                <div className="menu-item-tags" style={{ display: 'flex', gap: '8px' }}>
                                     {item.tags && item.tags.map(tag => {
-                                        if (tag === 'veg') return <span key={tag} className="tag tag-veg" title="Vegetarian">🌱</span>;
-                                        if (tag === 'non-veg') return <span key={tag} className="tag tag-nonveg" title="Non-Vegetarian">🍖</span>;
+                                        if (tag === 'veg') return <span key={tag} className="tag tag-veg" title="Vegetarian" style={{ filter: 'drop-shadow(0 0 5px rgba(0,255,0,0.3))' }}>🌱</span>;
+                                        if (tag === 'non-veg') return <span key={tag} className="tag tag-nonveg" title="Non-Vegetarian" style={{ filter: 'drop-shadow(0 0 5px rgba(255,0,0,0.3))' }}>🍖</span>;
                                         if (tag === 'spicy-1') return <span key={tag} className="tag tag-spicy" title="Mild Spicy">🌶️</span>;
-                                        if (tag === 'spicy-2') return <span key={tag} className="tag tag-spicy" title="Medium Spicy">🌶️🌶️</span>;
-                                        if (tag === 'spicy-3') return <span key={tag} className="tag tag-spicy" title="Extra Spicy">🌶️🌶️🌶️</span>;
+                                        if (tag === 'spicy-2') return <span key={tag} className="tag tag-spicy">🌶️🌶️</span>;
+                                        if (tag === 'spicy-3') return <span key={tag} className="tag tag-spicy">🌶️🌶️🌶️</span>;
                                         return null;
                                     })}
                                 </div>
                             </div>
-                            <h3>{getLocalized(item.name)}</h3>
-                            <p>{getLocalized(item.description)}</p>
-                            <div className="price" style={{ fontWeight: 700, color: 'var(--accent-color)', fontSize: '1.1rem', marginTop: '1rem' }}>{item.price}</div>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: '#FFF', fontFamily: 'var(--font-heading)' }}>{getLocalized(item.name)}</h3>
+                            <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.6', flex: 1 }}>{getLocalized(item.description)}</p>
+                            <div className="menu-item-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                                <div className="price" style={{ fontWeight: 800, color: 'var(--accent-color)', fontSize: '1.4rem' }}>{item.price}</div>
+                                <button 
+                                    className="btn btn-primary" 
+                                    style={{ padding: '8px 20px', fontSize: '0.8rem', borderRadius: '30px' }}
+                                    onClick={() => {
+                                        addToCart(item);
+                                        Swal.fire({
+                                            title: 'Selection Added',
+                                            text: `${getLocalized(item.name)} is now in your order`,
+                                            icon: 'success',
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000,
+                                            background: '#121212',
+                                            color: '#fff',
+                                            iconColor: '#DAA520'
+                                        });
+                                    }}
+                                >
+                                    <i className="fas fa-plus"></i> {t('common.add', 'Add')}
+                                </button>
+                            </div>
                         </div>
                     ))
                 )}
             </div>
-            <p style={{ marginTop: '2rem', color: '#666', textAlign: 'center' }}>{t('menu.note')}</p>
+            <p style={{ marginTop: '3rem', color: 'var(--text-muted)', textAlign: 'center', fontSize: '0.9rem' }}>{t('menu.note')}</p>
         </section>
     );
 }

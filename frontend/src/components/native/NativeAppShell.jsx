@@ -5,11 +5,14 @@ import NativeMenu from './NativeMenu';
 import NativeBook from './NativeBook';
 import NativeProfile from './NativeProfile';
 import NativeAuth from './NativeAuth';
+import NativeCart from './NativeCart';
+import OfferPopup from '../OfferPopup';
+import { useCart } from '../../context/CartContext';
 import '../../assets/native-style.css';
-import '../../assets/native-light-theme.css';
 
 export default function NativeAppShell() {
     const [activeTab, setActiveTab] = useState('home');
+    const { getCartCount } = useCart();
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         const storedUser = localStorage.getItem('khaliya_native_user');
         if (storedUser) {
@@ -37,6 +40,8 @@ export default function NativeAppShell() {
                 return <NativeHome key="home" setActiveTab={handleTabChange} />;
             case 'menu':
                 return <NativeMenu key="menu" />;
+            case 'cart':
+                return <NativeCart key="cart" />;
             case 'book':
                 return <NativeBook key="book" />;
             case 'profile':
@@ -45,6 +50,8 @@ export default function NativeAppShell() {
                 return <NativeHome key="home" setActiveTab={handleTabChange} />;
         }
     };
+
+    const cartCount = getCartCount();
 
     return (
         <AnimatePresence mode="wait">
@@ -100,13 +107,43 @@ export default function NativeAppShell() {
                             <span>Menu</span>
                         </button>
                         <button
+                            className={`nav-tab ${activeTab === 'cart' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('cart')}
+                            style={{ position: 'relative' }}
+                        >
+                            <i className="fas fa-shopping-cart"></i>
+                            <span>Cart</span>
+                            {cartCount > 0 && (
+                                <span style={{
+                                    position: 'absolute',
+                                    top: '5px',
+                                    right: '15px',
+                                    background: 'var(--primary-color, #DAA520)',
+                                    color: '#0a0a0a',
+                                    borderRadius: '50%',
+                                    width: '18px',
+                                    height: '18px',
+                                    fontSize: '0.65rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontWeight: 'bold',
+                                    border: '2px solid #0a0a0a'
+                                }}>{cartCount}</span>
+                            )}
+                        </button>
+                        <button
                             className={`nav-tab book-btn ${activeTab === 'book' ? 'active' : ''}`}
                             onClick={() => handleTabChange('book')}
                         >
-                            <div className="book-fab">
+                            <div className="book-fab" style={{ 
+                                background: 'linear-gradient(135deg, var(--primary-color, #DAA520), var(--accent-color, #FFD700))',
+                                color: '#0a0a0a',
+                                boxShadow: '0 8px 15px rgba(218, 165, 32, 0.4)'
+                            }}>
                                 <i className="fas fa-calendar-check"></i>
                             </div>
-                            <span>Book</span>
+                            <span style={{ color: activeTab === 'book' ? 'var(--primary-color, #DAA520)' : '#888' }}>Book</span>
                         </button>
                         <button
                             className={`nav-tab ${activeTab === 'profile' ? 'active' : ''}`}
@@ -116,8 +153,10 @@ export default function NativeAppShell() {
                             <span>Profile</span>
                         </button>
                     </div>
+                    <OfferPopup />
                 </motion.div>
             )}
         </AnimatePresence>
     );
 }
+
