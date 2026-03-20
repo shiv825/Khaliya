@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
+import AiMatchmaker from '../AiMatchmaker';
 
 /**
  * NativeMenu Component
@@ -44,6 +45,7 @@ export default function NativeMenu() {
     const [activeCategory, setActiveCategory] = useState('All');
     const [menuItems, setMenuItems] = useState(getFallbackMenu());
     const [loading, setLoading] = useState(true);
+    const [showMatchmaker, setShowMatchmaker] = useState(false);
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -80,8 +82,18 @@ export default function NativeMenu() {
 
     return (
         <div className="native-menu-view" style={{ padding: '20px', backgroundColor: 'var(--bg-dark, #0a0a0a)' }}>
-            <div className="native-menu-header" style={{ marginBottom: '25px' }}>
-                <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '2.2rem', color: 'white', margin: '0 0 15px 0' }}>{t('menu.title', 'Our Menu')}</h2>
+            <div className="native-menu-header" style={{ marginBottom: '25px', position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '2.2rem', color: 'white', margin: 0 }}>{t('menu.title', 'Our Menu')}</h2>
+                    <motion.button 
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setShowMatchmaker(true)}
+                        style={{ padding: '8px 15px', borderRadius: '20px', background: 'var(--primary-color)', color: '#000', border: 'none', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', boxShadow: '0 5px 15px rgba(218, 165, 32, 0.3)' }}
+                    >
+                        <i className="fas fa-magic"></i> Matchmaker
+                    </motion.button>
+                </div>
+                {showMatchmaker && <AiMatchmaker onClose={() => setShowMatchmaker(false)} />}
                 <div className="search-bar futuristic-glass" style={{ 
                     display: 'flex', alignItems: 'center', padding: '12px 15px', 
                     borderRadius: '12px', border: '1px solid rgba(218, 165, 32, 0.2)'

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import Swal from 'sweetalert2';
+import AiMatchmaker from './AiMatchmaker';
 
 export default function Menu() {
     const { t, language } = useLanguage();
@@ -412,6 +413,7 @@ export default function Menu() {
     const [filter, setFilter] = useState('All');
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState('default');
+    const [showMatchmaker, setShowMatchmaker] = useState(false);
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -464,8 +466,18 @@ export default function Menu() {
     }
 
     return (
-        <section id="menu" data-aos="fade-up">
-            <h2 style={{ marginBottom: '3rem' }}>{t('menu.title')}</h2>
+        <section id="menu" data-aos="fade-up" style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '3rem', position: 'relative', flexWrap: 'wrap', gap: '15px' }}>
+                <h2 style={{ margin: 0 }}>{t('menu.title')}</h2>
+                <button 
+                    onClick={() => setShowMatchmaker(true)}
+                    className="btn btn-primary"
+                    style={{ position: 'absolute', right: '0', padding: '12px 25px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, var(--primary-color), #FFD700)', color: '#000', border: 'none', boxShadow: '0 0 20px rgba(218, 165, 32, 0.4)', fontWeight: '800', cursor: 'pointer', zIndex: 10 }}
+                >
+                    <i className="fas fa-magic"></i> Curate for me
+                </button>
+            </div>
+            {showMatchmaker && <AiMatchmaker onClose={() => setShowMatchmaker(false)} />}
 
             <div className="menu-controls" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '2.5rem', flexWrap: 'wrap', alignItems: 'center', padding: '0 1.5rem' }}>
                 <div className="search-box" style={{ position: 'relative', flex: '1 1 350px', maxWidth: '600px' }}>
