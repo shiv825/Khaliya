@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import InteractiveFloorplan from '../InteractiveFloorplan';
 
 export default function NativeBook() {
     const [step, setStep] = useState(1);
@@ -47,20 +48,10 @@ export default function NativeBook() {
                                 <motion.button whileTap={{ scale: 0.9 }} className="stepper-btn" onClick={() => setFormData({ ...formData, guests: Math.min(20, formData.guests + 1) })}>+</motion.button>
                             </div>
                         </div>
-                        <div className="form-group-native table-types">
-                            <label>Seating Preference</label>
-                            <div className="table-grid">
-                                {['Indoor', 'Patio', 'Window', 'Private Booth'].map(type => (
-                                    <motion.div
-                                        whileTap={{ scale: 0.95 }}
-                                        key={type}
-                                        className={`table-card ${formData.tableType === type ? 'selected' : ''}`}
-                                        onClick={() => setFormData({ ...formData, tableType: type })}
-                                    >
-                                        {type}
-                                    </motion.div>
-                                ))}
-                            </div>
+                        <div className="form-group-native table-types" style={{ marginTop: '20px' }}>
+                            <label style={{ marginBottom: '15px', display: 'block', fontSize: '1.1rem', color: '#fff' }}>Visual Seating Preference</label>
+                            <InteractiveFloorplan onSelectTable={(type) => setFormData({ ...formData, tableType: type })} />
+                            {formData.tableType && <div style={{ marginTop: '15px', color: '#DAA520', textAlign: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>Selected: {formData.tableType}</div>}
                         </div>
                         <div className="wizard-actions">
                             <motion.button whileTap={{ scale: 0.95 }} className="native-btn-secondary" onClick={handlePrev}>Back</motion.button>
