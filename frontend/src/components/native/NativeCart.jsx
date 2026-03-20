@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import NativeOrder from './NativeOrder';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -13,17 +14,17 @@ export default function NativeCart() {
         return field || '';
     };
 
+    const [isOrdered, setIsOrdered] = useState(false);
+
     const handleCheckout = () => {
         if (cart.length === 0) return;
-        
-        Swal.fire({
-            title: 'Order Placed!',
-            text: 'Your selection has been sent to the kitchen. (Demo)',
-            icon: 'success',
-            confirmButtonColor: '#E63946'
-        });
+        setIsOrdered(true);
         clearCart();
     };
+
+    if (isOrdered) {
+        return <NativeOrder onClose={() => setIsOrdered(false)} />;
+    }
 
     return (
         <div className="native-cart" style={{ padding: '20px', paddingBottom: '100px' }}>
