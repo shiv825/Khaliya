@@ -43,18 +43,17 @@ export default function Reviews() {
     };
 
     return (
-        <section id="reviews" className="accent-section" style={{ marginTop: '2rem' }} data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
-            <h2>{t('reviews.title')}</h2>
-            <p style={{ color: 'var(--text-light)', maxWidth: '900px', margin: '0 auto 1rem auto', textAlign: 'center' }}>
+        <section id="reviews" className="accent-section" style={{ padding: '6rem 1.5rem' }} data-aos="fade-up">
+            <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.8rem' }}>{t('reviews.title')}</h2>
+            <p style={{ color: 'var(--text-light)', maxWidth: '800px', margin: '0 auto 3rem auto', textAlign: 'center', fontSize: '1.15rem' }}>
                 {t('reviews.instruction')}
             </p>
 
-            <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                    <input name="name" type="text" value={formData.name} onChange={handleChange} placeholder={t('reviews.namePlaceholder')} style={{ padding: '0.8rem', border: '1px solid var(--border-light)', borderRadius: '8px' }} />
-                    <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-                        <label style={{ fontWeight: 700 }}>{t('reviews.ratingLabel')}</label>
-                        <select name="rating" value={formData.rating} onChange={handleChange} required style={{ padding: '0.7rem', border: '1px solid var(--border-light)', borderRadius: '8px' }}>
+            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', background: 'var(--bg-surface)', padding: '2.5rem', borderRadius: '30px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem' }}>
+                        <input name="name" type="text" value={formData.name} onChange={handleChange} placeholder={t('reviews.namePlaceholder')} style={{ padding: '15px 20px', border: '1px solid var(--border-color)', borderRadius: '15px', background: 'var(--bg-body)', color: 'var(--text-dark)', outline: 'none' }} />
+                        <select name="rating" value={formData.rating} onChange={handleChange} required style={{ padding: '15px 20px', border: '1px solid var(--border-color)', borderRadius: '15px', background: 'var(--bg-body)', color: 'var(--text-dark)', outline: 'none', fontWeight: '700' }}>
                             <option value="">{t('reviews.selectRating')}</option>
                             <option value="5">★★★★★ 5</option>
                             <option value="4">★★★★ 4</option>
@@ -63,24 +62,29 @@ export default function Reviews() {
                             <option value="1">★ 1</option>
                         </select>
                     </div>
-                    <textarea name="text" rows="4" value={formData.text} onChange={handleChange} placeholder={t('reviews.textPlaceholder')} required style={{ padding: '0.8rem', border: '1px solid var(--border-light)', borderRadius: '8px' }}></textarea>
-                    <div style={{ display: 'flex', gap: '0.6rem' }}>
-                        <button type="submit" className="btn">{t('reviews.postButton')}</button>
-                        <button type="button" onClick={handleClear} className="btn" style={{ background: '#dc3545' }}>{t('reviews.clearButton')}</button>
+                    <textarea name="text" rows="4" value={formData.text} onChange={handleChange} placeholder={t('reviews.textPlaceholder')} required style={{ padding: '15px 20px', border: '1px solid var(--border-color)', borderRadius: '15px', background: 'var(--bg-body)', color: 'var(--text-dark)', outline: 'none', resize: 'none' }}></textarea>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <button type="submit" className="btn btn-primary" style={{ padding: '15px 30px', borderRadius: '50px', fontWeight: '800', flex: 2 }}>{t('reviews.postButton')}</button>
+                        <button type="button" onClick={handleClear} className="btn" style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', padding: '15px 30px', borderRadius: '50px', fontWeight: '800', flex: 1 }}>{t('reviews.clearButton')}</button>
                     </div>
                 </form>
 
-                <div style={{ marginTop: '1rem' }}>
-                    <h3 style={{ margin: '0 0 0.6rem 0' }}>{t('reviews.myReviews')}</h3>
-                    <div style={{ display: 'block', gap: '0.6rem' }}>
+                <div style={{ marginTop: '4rem' }}>
+                    <h3 style={{ margin: '0 0 2rem 0', textAlign: 'center', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>{t('reviews.myReviews')}</h3>
+                    <div style={{ display: 'grid', gap: '1.5rem' }}>
                         {reviews.length === 0 ? (
-                            <p style={{ color: '#999' }}>{t('reviews.none')}</p>
+                            <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--bg-surface)', borderRadius: '25px', border: '1px dashed var(--border-color)' }}>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: '600' }}>{t('reviews.none')}</p>
+                            </div>
                         ) : (
                             reviews.map((rev, i) => (
-                                <div key={i} style={{ padding: '10px', borderBottom: '1px solid #eee', marginBottom: '10px' }}>
-                                    <strong>{rev.name || 'Anonymous'}</strong> - {'★'.repeat(parseInt(rev.rating) || 5)}
-                                    <p style={{ margin: '5px 0' }}>{rev.text}</p>
-                                    <small style={{ color: '#999' }}>{new Date(rev.date).toLocaleDateString()}</small>
+                                <div key={i} className="testimonial-card" style={{ padding: '2rem', borderRadius: '25px', marginBottom: '0' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                                        <strong style={{ color: 'var(--primary-color)', fontSize: '1.2rem', fontFamily: 'var(--font-heading)' }}>{rev.name || 'Anonymous'}</strong>
+                                        <span style={{ color: 'var(--primary-color)', fontWeight: '800' }}>{'★'.repeat(parseInt(rev.rating) || 5)}</span>
+                                    </div>
+                                    <p style={{ margin: '0 0 1.2rem 0', color: 'var(--text-dark)', fontSize: '1.1rem', lineHeight: '1.7', fontStyle: 'italic' }}>"{rev.text}"</p>
+                                    <small style={{ color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>{new Date(rev.date).toLocaleDateString()}</small>
                                 </div>
                             ))
                         )}

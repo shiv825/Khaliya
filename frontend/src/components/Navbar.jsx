@@ -51,7 +51,7 @@ export default function Navbar() {
                         <h1 style={{ 
                             margin: 0, 
                             fontFamily: 'var(--font-heading)',
-                            background: 'linear-gradient(135deg, #FFF 0%, var(--accent-light) 100%)',
+                            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             fontSize: '1.8rem',
@@ -70,7 +70,7 @@ export default function Navbar() {
                                 position: 'relative', 
                                 cursor: 'pointer', 
                                 fontSize: '1.3rem', 
-                                color: '#fff',
+                                color: 'var(--text-dark)',
                                 transition: 'var(--transition)',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -78,7 +78,7 @@ export default function Navbar() {
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '50%',
-                                background: scrolled ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.2)'
+                                background: scrolled ? 'rgba(142, 28, 28, 0.05)' : 'rgba(255, 255, 255, 0.4)'
                             }}
                         >
                             <i className="fas fa-shopping-cart"></i>
@@ -110,17 +110,18 @@ export default function Navbar() {
                             style={{
                                 background: 'transparent',
                                 border: '1px solid var(--border-color)',
-                                color: '#fff',
+                                color: 'var(--text-dark)',
                                 padding: '4px 8px',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
                                 outline: 'none',
-                                fontSize: '0.8rem'
+                                fontSize: '0.8rem',
+                                fontWeight: '700'
                             }}
                         >
-                            <option value="en" style={{ background: '#121212' }}>EN</option>
-                            <option value="hi" style={{ background: '#121212' }}>हिंदी</option>
-                            <option value="ar" style={{ background: '#121212' }}>عربي</option>
+                            <option value="en" style={{ background: 'var(--bg-surface)', color: 'var(--text-dark)' }}>EN</option>
+                            <option value="hi" style={{ background: 'var(--bg-surface)', color: 'var(--text-dark)' }}>हिंदी</option>
+                            <option value="ar" style={{ background: 'var(--bg-surface)', color: 'var(--text-dark)' }}>عربي</option>
                         </select>
                         
                         <button 
@@ -136,9 +137,9 @@ export default function Navbar() {
                                 gap: '5px'
                             }}
                         >
-                            <span style={{ width: '25px', height: '2px', background: '#fff', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}></span>
-                            <span style={{ width: '25px', height: '2px', background: '#fff', transition: 'var(--transition)', opacity: isMenuOpen ? 0 : 1 }}></span>
-                            <span style={{ width: '25px', height: '2px', background: '#fff', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }}></span>
+                             <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}></span>
+                            <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', opacity: isMenuOpen ? 0 : 1 }}></span>
+                            <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }}></span>
                         </button>
                     </div>
 
@@ -148,22 +149,22 @@ export default function Navbar() {
                         right: 0,
                         height: '100vh',
                         width: isMenuOpen ? '100%' : '0',
-                        background: 'rgba(8, 8, 12, 0.98)',
-                        backdropFilter: 'blur(15px)',
+                        background: 'var(--bg-body)',
+                        backdropFilter: 'blur(20px)',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '2rem',
+                        gap: '2.5rem',
                         transition: 'var(--transition)',
                         overflow: 'hidden',
                         zIndex: 999
                     }}>
-                        <a href="#home" onClick={toggleMenu} style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff' }}>{t('nav.home')}</a>
-                        <a href="#menu" onClick={toggleMenu} style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff' }}>{t('nav.menu')}</a>
-                        <a href="#loyalty" onClick={toggleMenu} style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
-                        <a href="#reservations" onClick={toggleMenu} style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff' }}>{t('nav.reservations')}</a>
-                        <a href="#contact" onClick={toggleMenu} style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff' }}>{t('nav.contact')}</a>
+                        <a href="#home" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.home')}</a>
+                        <a href="#menu" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
+                        <a href="#loyalty" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
+                        <a href="#reservations" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
+                        <a href="#contact" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.contact')}</a>
                         
                         <button 
                             onClick={toggleMenu} 
@@ -173,8 +174,8 @@ export default function Navbar() {
                                 right: '2rem', 
                                 background: 'none', 
                                 border: 'none', 
-                                color: '#fff', 
-                                fontSize: '2rem', 
+                                color: 'var(--primary-color)', 
+                                fontSize: '2.5rem', 
                                 cursor: 'pointer' 
                             }}
                         >

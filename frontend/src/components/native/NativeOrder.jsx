@@ -26,51 +26,51 @@ export default function NativeOrder({ onClose }) {
             exit={{ opacity: 0, scale: 0.95 }}
             className="native-order-tracking"
             style={{ 
-                position: 'fixed', inset: 0, background: 'var(--bg-dark, #0a0a0a)', 
-                zIndex: 9999, padding: '20px', display: 'flex', flexDirection: 'column', color: '#fff',
+                position: 'fixed', inset: 0, background: 'var(--bg-body)', 
+                zIndex: 9999, padding: '20px', display: 'flex', flexDirection: 'column', color: 'var(--text-dark)',
                 overflowY: 'auto'
             }}
         >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', paddingTop: 'env(safe-area-inset-top, 20px)' }}>
-                <h2 style={{ margin: 0, fontFamily: 'var(--font-heading)', fontSize: '1.8rem' }}>Live Tracking</h2>
-                <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '35px', paddingTop: 'env(safe-area-inset-top, 20px)' }}>
+                <h2 style={{ margin: 0, fontFamily: 'var(--font-heading)', fontSize: '2.2rem', color: 'var(--primary-color)' }}>Live Order</h2>
+                <button onClick={onClose} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', color: 'var(--primary-color)', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
                     <i className="fas fa-times"></i>
                 </button>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '0 10px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px', padding: '30px 20px', marginBottom: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '700' }}>Estimated Arrival</div>
-                        <div style={{ fontSize: '3rem', fontWeight: '900', color: steps[step-1].color, marginTop: '10px', textShadow: `0 0 20px ${steps[step-1].color}44` }}>
-                            {step === 4 ? 'Arrived!' : '25-35 min'}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '0 5px' }}>
+                <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '30px', padding: '35px 25px', marginBottom: '30px', boxShadow: 'var(--shadow-md)' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '45px' }}>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '800' }}>{step === 4 ? 'DELIVERY COMPLETED' : 'EXPECTED ARRIVAL'}</div>
+                        <div style={{ fontSize: '3.4rem', fontWeight: '900', color: steps[step-1].color, marginTop: '12px', fontFamily: 'var(--font-heading)' }}>
+                            {step === 4 ? 'Arrived!' : '25-30 min'}
                         </div>
                     </div>
 
-                    <div style={{ position: 'relative', marginLeft: '25px', paddingBottom: '20px' }}>
+                    <div style={{ position: 'relative', marginLeft: '30px', paddingBottom: '10px' }}>
                         {/* Connecting Line */}
-                        <div style={{ position: 'absolute', left: '22px', top: '25px', bottom: '60px', width: '2px', background: 'rgba(255,255,255,0.1)', zIndex: 0 }}></div>
+                        <div style={{ position: 'absolute', left: '22px', top: '30px', bottom: '65px', width: '2px', background: 'var(--border-color)', zIndex: 0 }}></div>
 
                         {steps.map((s, idx) => {
                             const isActive = s.id === step;
                             const isPast = s.id <= step;
-                            const color = isPast ? s.color : 'rgba(255,255,255,0.15)';
+                            const color = isPast ? s.color : 'var(--text-muted)';
                             
                             return (
-                                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: idx !== steps.length - 1 ? '45px' : '0', position: 'relative', zIndex: 1, opacity: isPast ? 1 : 0.4 }}>
+                                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: '25px', marginBottom: idx !== steps.length - 1 ? '50px' : '0', position: 'relative', zIndex: 1, opacity: isPast ? 1 : 0.4 }}>
                                     <div style={{ 
-                                        width: '46px', height: '46px', borderRadius: '50%', 
-                                        background: isPast ? color : 'var(--bg-dark)', 
-                                        border: `2px solid ${color}`,
+                                        width: '48px', height: '48px', borderRadius: '18px', 
+                                        background: isPast ? color : 'var(--bg-body)', 
+                                        border: `2.5px solid ${color}`,
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        boxShadow: isActive ? `0 0 20px ${color}88` : 'none',
+                                        boxShadow: isActive ? `0 10px 25px ${color}44` : 'none',
                                         transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                                     }}>
-                                        <i className={`fas ${s.icon}`} style={{ color: isPast ? '#000' : '#fff', fontSize: '1.2rem' }}></i>
+                                        <i className={`fas ${s.icon}`} style={{ color: isPast ? '#FFF' : 'var(--text-muted)', fontSize: '1.2rem' }}></i>
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ fontSize: '1.25rem', fontWeight: '800', color: isPast ? '#fff' : 'var(--text-muted)', transition: 'color 0.3s ease' }}>{s.title}</div>
-                                        {isActive && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ fontSize: '0.85rem', color: color, marginTop: '6px', fontWeight: '600' }}>Updating in real-time...</motion.div>}
+                                        <div style={{ fontSize: '1.3rem', fontWeight: '900', color: isPast ? 'var(--text-dark)' : 'var(--text-muted)', transition: 'color 0.3s ease' }}>{s.title}</div>
+                                        {isActive && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ fontSize: '0.9rem', color: 'var(--primary-color)', marginTop: '8px', fontWeight: '700' }}>Updating in real-time...</motion.div>}
                                     </div>
                                 </div>
                             );
@@ -78,17 +78,17 @@ export default function NativeOrder({ onClose }) {
                     </div>
                 </div>
 
-                <div style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))', borderRadius: '20px', padding: '25px', display: 'flex', alignItems: 'center', gap: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ width: '55px', height: '55px', borderRadius: '50%', background: 'var(--bg-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(218, 165, 32, 0.3)', boxShadow: '0 10px 20px rgba(0,0,0,0.5)' }}>
-                        <i className="fas fa-phone-alt" style={{ color: 'var(--primary-color)', fontSize: '1.2rem' }}></i>
+                <div style={{ background: 'var(--bg-surface)', borderRadius: '25px', padding: '25px', display: 'flex', alignItems: 'center', gap: '20px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-md)' }}>
+                        <i className="fas fa-phone-alt" style={{ color: '#FFF', fontSize: '1.3rem' }}></i>
                     </div>
                     <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: '800', fontSize: '1.1rem', color: '#fff' }}>Need Help?</div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>Contact Restaurant Support</div>
+                        <div style={{ fontWeight: '900', fontSize: '1.2rem', color: 'var(--text-dark)' }}>Need Assistance?</div>
+                        <div style={{ color: 'var(--text-light)', fontSize: '0.95rem', marginTop: '4px', fontWeight: '600' }}>Contact Restaurant Concierge</div>
                     </div>
                 </div>
             </div>
-            <div style={{ height: '40px' }}></div>
+            <div style={{ height: '60px' }}></div>
         </motion.div>
     );
 }

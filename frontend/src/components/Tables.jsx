@@ -45,62 +45,66 @@ export default function Tables({ onSelectTable }) {
     };
 
     return (
-        <section id="tables">
-            <h2>{t('tables.title')}</h2>
-            <p style={{ fontSize: '1.1rem', color: '#333' }}><strong>{t('tables.sub')}</strong></p>
+        <section id="tables" style={{ padding: '6rem 1.5rem', background: 'var(--bg-body)' }}>
+            <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.8rem' }}>{t('tables.title')}</h2>
+            <p style={{ fontSize: '1.15rem', color: 'var(--text-light)', textAlign: 'center', marginBottom: '3rem', maxWidth: '800px', margin: '0 auto 3rem auto' }}>{t('tables.sub')}</p>
 
             {/* Categories */}
-            <div style={{ margin: '1rem 0', padding: '1.5rem', background: '#f0f9ff', borderRadius: '8px', borderLeft: '5px solid #2196F3' }}>
-                <p style={{ margin: '0.5rem 0', fontWeight: 'bold', color: '#333' }}>{t('tables.typesAvailable')}</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-                    <div className="table-type-card" onClick={() => setFilterType('intimate')} style={{ cursor: 'pointer', outline: filterType === 'intimate' ? '2px solid #2196F3' : 'none' }}>
-                        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🥂</div>
-                        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('form.typeIntimateName')}</strong>
-                        <p style={{ fontSize: '0.9rem', margin: 0, color: '#666' }}>{t('tables.typeIntimateSub')}</p>
+            <div style={{ margin: '2rem auto', padding: '2rem', background: 'var(--bg-surface)', borderRadius: '25px', border: '1px solid var(--border-color)', maxWidth: '1200px', boxShadow: 'var(--shadow-sm)' }}>
+                <p style={{ margin: '0 0 1.5rem 0', fontWeight: '800', color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px', textAlign: 'center', fontSize: '0.9rem' }}>{t('tables.typesAvailable')}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1.5rem' }}>
+                    <div className="table-type-card" onClick={() => setFilterType('intimate')} style={{ cursor: 'pointer', border: filterType === 'intimate' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: filterType === 'intimate' ? 'rgba(142, 28, 28, 0.05)' : 'transparent', padding: '1.5rem', borderRadius: '15px', textAlign: 'center', transition: 'var(--transition)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '0.8rem' }}>🥂</div>
+                        <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-dark)' }}>{t('form.typeIntimateName')}</strong>
+                        <p style={{ fontSize: '0.85rem', margin: 0, color: 'var(--text-light)' }}>{t('tables.typeIntimateSub')}</p>
                     </div>
-                    <div className="table-type-card" onClick={() => setFilterType('family')} style={{ cursor: 'pointer', outline: filterType === 'family' ? '2px solid #2196F3' : 'none' }}>
-                        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>👨‍👩‍👧‍👦</div>
-                        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('form.typeFamilyName')}</strong>
-                        <p style={{ fontSize: '0.9rem', margin: 0, color: '#666' }}>{t('tables.typeFamilySub')}</p>
+                    <div className="table-type-card" onClick={() => setFilterType('family')} style={{ cursor: 'pointer', border: filterType === 'family' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: filterType === 'family' ? 'rgba(142, 28, 28, 0.05)' : 'transparent', padding: '1.5rem', borderRadius: '15px', textAlign: 'center', transition: 'var(--transition)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '0.8rem' }}>👨‍👩‍👧‍👦</div>
+                        <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-dark)' }}>{t('form.typeFamilyName')}</strong>
+                        <p style={{ fontSize: '0.85rem', margin: 0, color: 'var(--text-light)' }}>{t('tables.typeFamilySub')}</p>
                     </div>
-                    <div className="table-type-card" onClick={() => setFilterType('group')} style={{ cursor: 'pointer', outline: filterType === 'group' ? '2px solid #2196F3' : 'none' }}>
-                        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🎉</div>
-                        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('form.typeGroupName')}</strong>
-                        <p style={{ fontSize: '0.9rem', margin: 0, color: '#666' }}>{t('tables.typeGroupSub')}</p>
+                    <div className="table-type-card" onClick={() => setFilterType('group')} style={{ cursor: 'pointer', border: filterType === 'group' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: filterType === 'group' ? 'rgba(142, 28, 28, 0.05)' : 'transparent', padding: '1.5rem', borderRadius: '15px', textAlign: 'center', transition: 'var(--transition)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '0.8rem' }}>🎉</div>
+                        <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-dark)' }}>{t('form.typeGroupName')}</strong>
+                        <p style={{ fontSize: '0.85rem', margin: 0, color: 'var(--text-light)' }}>{t('tables.typeGroupSub')}</p>
                     </div>
-                    <div className="table-type-card" onClick={() => setFilterType('party')} style={{ cursor: 'pointer', outline: filterType === 'party' ? '2px solid #2196F3' : 'none' }}>
-                        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🎊</div>
-                        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('form.typePartyName')}</strong>
-                        <p style={{ fontSize: '0.9rem', margin: 0, color: '#666' }}>{t('tables.typePartySub')}</p>
+                    <div className="table-type-card" onClick={() => setFilterType('party')} style={{ cursor: 'pointer', border: filterType === 'party' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: filterType === 'party' ? 'rgba(142, 28, 28, 0.05)' : 'transparent', padding: '1.5rem', borderRadius: '15px', textAlign: 'center', transition: 'var(--transition)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '0.8rem' }}>🎊</div>
+                        <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-dark)' }}>{t('form.typePartyName')}</strong>
+                        <p style={{ fontSize: '0.85rem', margin: 0, color: 'var(--text-light)' }}>{t('tables.typePartySub')}</p>
                     </div>
-                    <div className="table-type-card" onClick={() => setFilterType('window')} style={{ cursor: 'pointer', outline: filterType === 'window' ? '2px solid #2196F3' : 'none' }}>
-                        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🪟</div>
-                        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('form.typeWindowName')}</strong>
-                        <p style={{ fontSize: '0.9rem', margin: 0, color: '#666' }}>{t('tables.typeWindowSub')}</p>
+                    <div className="table-type-card" onClick={() => setFilterType('window')} style={{ cursor: 'pointer', border: filterType === 'window' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: filterType === 'window' ? 'rgba(142, 28, 28, 0.05)' : 'transparent', padding: '1.5rem', borderRadius: '15px', textAlign: 'center', transition: 'var(--transition)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '0.8rem' }}>🪟</div>
+                        <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-dark)' }}>{t('form.typeWindowName')}</strong>
+                        <p style={{ fontSize: '0.85rem', margin: 0, color: 'var(--text-light)' }}>{t('tables.typeWindowSub')}</p>
                     </div>
-                    <div className="table-type-card" onClick={() => setFilterType('all')} style={{ cursor: 'pointer', outline: filterType === 'all' ? '2px solid #2196F3' : 'none' }}>
-                        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📋</div>
-                        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('tables.viewAll')}</strong>
-                        <p style={{ fontSize: '0.9rem', margin: 0, color: '#666' }}>{t('tables.viewAllSub')}</p>
+                    <div className="table-type-card" onClick={() => setFilterType('all')} style={{ cursor: 'pointer', border: filterType === 'all' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: filterType === 'all' ? 'rgba(142, 28, 28, 0.05)' : 'transparent', padding: '1.5rem', borderRadius: '15px', textAlign: 'center', transition: 'var(--transition)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '0.8rem' }}>📋</div>
+                        <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-dark)' }}>{t('tables.viewAll')}</strong>
+                        <p style={{ fontSize: '0.85rem', margin: 0, color: 'var(--text-light)' }}>{t('tables.viewAllSub')}</p>
                     </div>
                 </div>
             </div>
 
-            {/* Legend */}
-            <div style={{ margin: '1rem 0', padding: '1.5rem', background: '#fff3e0', borderRadius: '8px', borderLeft: '5px solid #ff9800' }}>
-                <p style={{ margin: '0.5rem 0', fontWeight: 'bold', color: '#333' }}>{t('tables.legend')}</p>
-                <p style={{ margin: '0.5rem 0' }}>
-                    <span style={{ display: 'inline-block', width: '24px', height: '24px', background: 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)', borderRadius: '6px', marginRight: '0.8rem', verticalAlign: 'middle', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}></span>
-                    <strong>{t('tables.available')}</strong> <span>{t('tables.availableDesc')}</span>
-                </p>
-                <p style={{ margin: '0.5rem 0' }}>
-                    <span style={{ display: 'inline-block', width: '24px', height: '24px', background: 'linear-gradient(135deg, #f44336 0%, #ef5350 100%)', borderRadius: '6px', marginRight: '0.8rem', verticalAlign: 'middle', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}></span>
-                    <strong>{t('tables.booked')}</strong> <span>{t('tables.bookedDesc')}</span>
-                </p>
-            </div>
-
-            <div style={{ margin: '1rem 0', padding: '1.5rem', background: '#e8f5e9', borderRadius: '8px', borderLeft: '5px solid #4caf50' }}>
-                <p style={{ margin: 0, fontWeight: 'bold', color: '#2e7d32' }}>{t('tables.tip')}</p>
+            {/* Legend & Tip */}
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', maxWidth: '1200px', margin: '2rem auto' }}>
+                <div style={{ flex: 1, minWidth: '300px', padding: '1.5rem', background: 'var(--bg-surface)', borderRadius: '20px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+                    <p style={{ margin: '0 0 1rem 0', fontWeight: '800', color: 'var(--text-dark)', fontSize: '0.85rem', textTransform: 'uppercase' }}>{t('tables.legend')}</p>
+                    <div style={{ display: 'flex', gap: '2rem' }}>
+                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ display: 'inline-block', width: '20px', height: '20px', background: 'var(--primary-color)', borderRadius: '6px', boxShadow: '0 2px 5px rgba(142, 28, 28, 0.2)' }}></span>
+                            <strong style={{ fontSize: '0.9rem' }}>{t('tables.available')}</strong>
+                        </p>
+                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ display: 'inline-block', width: '20px', height: '20px', background: 'var(--text-muted)', borderRadius: '6px', opacity: 0.3 }}></span>
+                            <strong style={{ fontSize: '0.9rem' }}>{t('tables.booked')}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div style={{ flex: 1, minWidth: '300px', padding: '1.5rem', background: 'rgba(142, 28, 28, 0.05)', borderRadius: '20px', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <i className="fas fa-lightbulb" style={{ color: 'var(--primary-color)', fontSize: '1.4rem' }}></i>
+                    <p style={{ margin: 0, fontWeight: '700', color: 'var(--primary-color)', fontSize: '0.95rem' }}>{t('tables.tip')}</p>
+                </div>
             </div>
 
             {/* Visual Map SVG placeholder logic (Optional, since CSS grid is there) */}
@@ -114,55 +118,59 @@ export default function Tables({ onSelectTable }) {
 
             {/* Table Grid */}
             <div id="tableGrid" className="table-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
-                {filteredTables.map(t => {
-                    const styleObj = getTypeStyle(t.type);
-                    const isAvailable = t.status === 'available';
+                {filteredTables.map(table => {
+                    const styleObj = getTypeStyle(table.type);
+                    const isAvailable = table.status === 'available';
                     return (
                         <div
-                            key={t.id}
-                            onClick={() => handleTableClick(t)}
+                            key={table.id}
+                            onClick={() => handleTableClick(table)}
                             style={{
-                                background: isAvailable ? 'white' : '#ffebee',
-                                border: `2px solid ${isAvailable ? '#4caf50' : '#f44336'}`,
-                                borderRadius: '12px',
-                                padding: '1.5rem',
+                                background: isAvailable ? 'var(--bg-surface)' : 'rgba(0,0,0,0.03)',
+                                border: `1px solid ${selectedTable === table.id ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                borderRadius: '25px',
+                                padding: '2rem',
                                 textAlign: 'center',
                                 cursor: isAvailable ? 'pointer' : 'not-allowed',
-                                opacity: isAvailable ? 1 : 0.7,
-                                transition: 'all 0.3s ease',
-                                boxShadow: selectedTable === t.id ? '0 0 0 3px #1976d2' : '0 4px 6px rgba(0,0,0,0.05)',
+                                opacity: isAvailable ? 1 : 0.4,
+                                transition: 'var(--transition)',
+                                boxShadow: selectedTable === table.id ? 'var(--shadow-md)' : 'var(--shadow-sm)',
                                 position: 'relative',
                                 overflow: 'hidden'
                             }}
                             onMouseEnter={e => {
-                                if (isAvailable && selectedTable !== t.id) {
-                                    e.currentTarget.style.transform = 'translateY(-5px)';
-                                    e.currentTarget.style.boxShadow = '0 8px 15px rgba(0,0,0,0.1)';
+                                if (isAvailable && selectedTable !== table.id) {
+                                    e.currentTarget.style.transform = 'translateY(-10px)';
+                                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                                    e.currentTarget.style.borderColor = 'var(--primary-color)';
                                 }
                             }}
                             onMouseLeave={e => {
-                                if (isAvailable && selectedTable !== t.id) {
+                                if (isAvailable && selectedTable !== table.id) {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)';
+                                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                                    e.currentTarget.style.borderColor = 'var(--border-color)';
                                 }
                             }}
                         >
-                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{styleObj.icon}</div>
-                            <h4 style={{ margin: '0 0 0.5rem 0', color: styleObj.color }}>{t.name}</h4>
-                            <p style={{ margin: 0, fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
-                                <i className="fas fa-users" style={{ marginRight: '5px' }}></i>
-                                Max {t.capacity}
+                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{styleObj.icon}</div>
+                            <h4 style={{ margin: '0 0 0.8rem 0', color: 'var(--text-dark)', fontFamily: 'var(--font-heading)', fontSize: '1.3rem' }}>{table.name}</h4>
+                            <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.95rem', color: 'var(--text-light)', fontWeight: '600' }}>
+                                <i className="fas fa-users" style={{ marginRight: '8px', color: 'var(--primary-color)' }}></i>
+                                {table.capacity} {t('common.guests', 'Guests')}
                             </p>
                             <div style={{
-                                padding: '0.5rem',
-                                borderRadius: '4px',
-                                fontSize: '0.85rem',
-                                fontWeight: 'bold',
+                                padding: '0.8rem',
+                                borderRadius: '50px',
+                                fontSize: '0.8rem',
+                                fontWeight: '800',
                                 textTransform: 'uppercase',
-                                background: isAvailable ? '#e8f5e9' : '#ffebee',
-                                color: isAvailable ? '#2e7d32' : '#c62828'
+                                letterSpacing: '1px',
+                                background: isAvailable ? 'var(--primary-color)' : 'transparent',
+                                color: isAvailable ? '#fff' : 'var(--text-muted)',
+                                border: isAvailable ? 'none' : '1px solid var(--border-color)'
                             }}>
-                                {isAvailable ? 'Available' : 'Booked'}
+                                {isAvailable ? t('tables.available', 'Available') : t('tables.booked', 'Booked')}
                             </div>
                         </div>
                     );

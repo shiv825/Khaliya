@@ -27,24 +27,24 @@ export default function NativeCart() {
     }
 
     return (
-        <div className="native-cart" style={{ padding: '20px', paddingBottom: '100px' }}>
-            <div className="section-header" style={{ marginBottom: '25px' }}>
-                <h2 style={{ fontSize: '1.8rem', fontWeight: '800', margin: 0 }}>My Selection</h2>
-                <p style={{ color: '#666', margin: '5px 0 0 0' }}>Review and finalize your items</p>
+        <div className="native-cart" style={{ padding: '20px', paddingBottom: '120px' }}>
+            <div className="section-header" style={{ marginBottom: '30px' }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', color: 'var(--primary-color)', margin: 0 }}>{t('cart.title', 'My Selection')}</h2>
+                <p style={{ color: 'var(--text-light)', margin: '5px 0 0 0', fontWeight: '600' }}>Review and finalize your order</p>
             </div>
 
             <AnimatePresence mode="popLayout">
                 {cart.length === 0 ? (
                     <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        style={{ textAlign: 'center', padding: '60px 20px', background: '#fff', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}
+                        style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--bg-surface)', borderRadius: '30px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}
                     >
-                        <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                            <i className="fas fa-shopping-basket" style={{ fontSize: '2rem', color: '#cbd5e1' }}></i>
+                        <div style={{ width: '100px', height: '100px', background: 'var(--bg-body)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 25px' }}>
+                            <i className="fas fa-shopping-basket" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', opacity: 0.2 }}></i>
                         </div>
-                        <h3>Your cart is empty</h3>
-                        <p style={{ color: '#666' }}>Go to the menu to add some delicious items!</p>
+                        <h3 style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '1.5rem' }}>Your bag is empty</h3>
+                        <p style={{ color: 'var(--text-light)', fontWeight: '500' }}>Explore our menu to add royal flavors!</p>
                     </motion.div>
                 ) : (
                     <div className="cart-list">
@@ -59,38 +59,39 @@ export default function NativeCart() {
                                 style={{ 
                                     display: 'flex', 
                                     gap: '15px', 
-                                    background: '#fff', 
-                                    padding: '15px', 
-                                    borderRadius: '20px', 
+                                    background: 'var(--bg-surface)', 
+                                    padding: '18px', 
+                                    borderRadius: '25px', 
                                     marginBottom: '15px', 
-                                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                                    border: '1px solid var(--border-color)',
+                                    boxShadow: 'var(--shadow-sm)',
                                     alignItems: 'center'
                                 }}
                             >
-                                <div style={{ width: '70px', height: '70px', borderRadius: '15px', overflow: 'hidden' }}>
+                                <div style={{ width: '80px', height: '80px', borderRadius: '18px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
                                     <img src={item.image || 'https://via.placeholder.com/150'} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                                 
                                 <div style={{ flex: 1 }}>
-                                    <h4 style={{ margin: '0 0 5px 0', fontSize: '1rem', fontWeight: '700' }}>{getLocalized(item.name)}</h4>
-                                    <div style={{ color: 'var(--primary-color)', fontWeight: '800' }}>{item.price}</div>
+                                    <h4 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-dark)' }}>{getLocalized(item.name)}</h4>
+                                    <div style={{ color: 'var(--primary-color)', fontWeight: '900', fontSize: '1.1rem' }}>{item.price}</div>
                                 </div>
 
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', padding: '5px 12px', borderRadius: '12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'var(--bg-body)', padding: '8px 15px', borderRadius: '15px', border: '1px solid var(--border-color)' }}>
                                     <button 
                                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                        style={{ border: 'none', background: 'none', color: '#64748b', fontSize: '1rem', cursor: 'pointer' }}
-                                    >-</button>
-                                    <span style={{ fontWeight: '700', minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
+                                        style={{ border: 'none', background: 'none', color: 'var(--primary-color)', fontSize: '1.2rem', fontWeight: '900', cursor: 'pointer' }}
+                                    >—</button>
+                                    <span style={{ fontWeight: '900', minWidth: '20px', textAlign: 'center', color: 'var(--text-dark)' }}>{item.quantity}</span>
                                     <button 
                                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                        style={{ border: 'none', background: 'none', color: '#64748b', fontSize: '1rem', cursor: 'pointer' }}
+                                        style={{ border: 'none', background: 'none', color: 'var(--primary-color)', fontSize: '1.2rem', fontWeight: '900', cursor: 'pointer' }}
                                     >+</button>
                                 </div>
 
                                 <button 
                                     onClick={() => removeFromCart(item.id)}
-                                    style={{ border: 'none', background: 'rgba(230, 57, 70, 0.1)', color: '#E63946', width: '35px', height: '35px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    style={{ border: 'none', background: 'rgba(142, 28, 28, 0.05)', color: 'var(--primary-color)', width: '45px', height: '45px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                 >
                                     <i className="far fa-trash-alt"></i>
                                 </button>
@@ -101,26 +102,27 @@ export default function NativeCart() {
                             layout
                             className="cart-summary" 
                             style={{ 
-                                marginTop: '30px', 
-                                background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
-                                padding: '25px', 
-                                borderRadius: '24px', 
-                                color: '#fff',
-                                boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+                                marginTop: '35px', 
+                                background: 'var(--bg-surface)', 
+                                padding: '30px', 
+                                borderRadius: '30px', 
+                                color: 'var(--text-dark)',
+                                border: '1px solid var(--border-color)',
+                                boxShadow: 'var(--shadow-md)'
                             }}
                         >
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                                <span style={{ opacity: 0.7 }}>Subtotal</span>
-                                <span style={{ fontWeight: '700' }}>₹{getCartTotal()}</span>
+                                <span style={{ color: 'var(--text-light)', fontWeight: '600' }}>Subtotal</span>
+                                <span style={{ fontWeight: '800', color: 'var(--text-dark)' }}>₹{getCartTotal()}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                                <span style={{ opacity: 0.7 }}>Taxes & Charges</span>
-                                <span style={{ color: '#10b981' }}>FREE</span>
+                                <span style={{ color: 'var(--text-light)', fontWeight: '600' }}>Delivery Fee</span>
+                                <span style={{ color: '#10b981', fontWeight: '800' }}>COMPLIMENTARY</span>
                             </div>
-                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', marginBottom: '20px' }}></div>
+                            <div style={{ height: '1px', background: 'var(--border-color)', marginBottom: '20px' }}></div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                                <span style={{ fontSize: '1.2rem', fontWeight: '800' }}>Total</span>
-                                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#E63946' }}>₹{getCartTotal()}</span>
+                                <span style={{ fontSize: '1.3rem', fontWeight: '900', color: 'var(--text-dark)' }}>Total</span>
+                                <span style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-color)' }}>₹{getCartTotal()}</span>
                             </div>
 
                             <motion.button
@@ -129,17 +131,17 @@ export default function NativeCart() {
                                 onClick={handleCheckout}
                                 style={{ 
                                     width: '100%', 
-                                    padding: '18px', 
-                                    borderRadius: '16px', 
+                                    padding: '20px', 
+                                    borderRadius: '20px', 
                                     border: 'none', 
                                     background: 'var(--primary-color)', 
-                                    color: '#fff', 
-                                    fontSize: '1.1rem', 
+                                    color: '#FFF', 
+                                    fontSize: '1.2rem', 
                                     fontWeight: '800',
-                                    boxShadow: '0 10px 20px rgba(230, 57, 70, 0.3)'
+                                    boxShadow: 'var(--shadow-md)'
                                 }}
                             >
-                                Place Order
+                                Secure Checkout
                             </motion.button>
                         </motion.div>
                     </div>

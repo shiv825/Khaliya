@@ -43,32 +43,33 @@ export default function NativeProfile() {
     ];
 
     return (
-        <div style={{ background: '#f8f8f8', minHeight: '100vh', paddingBottom: '100px' }}>
+        <div style={{ background: 'var(--bg-body)', minHeight: '100vh', paddingBottom: '120px' }}>
             {/* Header / Back Arrow */}
-            <div style={{ padding: '20px 15px', display: 'flex', alignItems: 'center' }}>
-                <i className="fas fa-arrow-left" style={{ fontSize: '1.2rem', color: '#1c1c1c' }}></i>
+            <div style={{ padding: '30px 20px', display: 'flex', alignItems: 'center' }}>
+                <i className="fas fa-arrow-left" style={{ fontSize: '1.4rem', color: 'var(--primary-color)' }}></i>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--primary-color)', margin: '0 0 0 20px' }}>Your Profile</h2>
             </div>
 
             {/* Profile Card */}
-            <div className="zomato-profile-card" style={{ marginBottom: '10px' }}>
-                <div className="zomato-avatar">
+            <div className="zomato-profile-card" style={{ marginBottom: '15px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+                <div className="zomato-avatar" style={{ backgroundColor: 'var(--primary-color)', color: '#FFF', fontWeight: '800' }}>
                     {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1 }}>
-                    <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>{user.name}</h2>
-                    <p style={{ color: '#696969', margin: '2px 0 5px 0', fontSize: '0.9rem' }}>{user.email}</p>
-                    <span style={{ color: '#E23744', fontWeight: 500, fontSize: '0.85rem' }}>View profile <i className="fas fa-caret-right"></i></span>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user.name}</h2>
+                    <p style={{ color: 'var(--text-light)', margin: '2px 0 5px 0', fontSize: '0.95rem', fontWeight: '600' }}>{user.email}</p>
+                    <span style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.9rem' }}>Member Settings <i className="fas fa-caret-right"></i></span>
                 </div>
             </div>
 
-            {/* 3D Digital Platinum Card */}
+            {/* 3D Digital Membership Card - Saffron & Ivory Edition */}
             <motion.div 
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
                 style={{ 
                     perspective: 1200, 
                     padding: '10px 15px',
-                    marginBottom: '10px'
+                    marginBottom: '20px'
                 }}
             >
                 <motion.div
@@ -76,84 +77,88 @@ export default function NativeProfile() {
                         rotateX,
                         rotateY,
                         width: '100%',
-                        height: '200px',
-                        background: 'linear-gradient(135deg, #111 0%, #2a2a2a 50%, #000 100%)',
-                        borderRadius: '20px',
-                        padding: '20px',
-                        color: '#DAA520',
-                        boxShadow: '0 15px 35px rgba(0,0,0,0.3)',
+                        height: '220px',
+                        background: 'linear-gradient(135deg, var(--bg-surface) 0%, #FFF9E6 50%, var(--bg-surface) 100%)',
+                        borderRadius: '30px',
+                        padding: '25px',
+                        color: 'var(--primary-color)',
+                        boxShadow: '0 20px 40px rgba(142, 28, 28, 0.08)',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
                         position: 'relative',
                         overflow: 'hidden',
                         transformStyle: 'preserve-3d',
-                        border: '1px solid rgba(218, 165, 32, 0.4)'
+                        border: '2px solid rgba(142, 28, 28, 0.1)'
                     }}
                 >
-                    <div style={{ position: 'absolute', top: 0, left: '-100%', width: '50%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(218, 165, 32, 0.15), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 4s infinite' }}></div>
+                    <div style={{ position: 'absolute', top: 0, left: '-100%', width: '60%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(142, 28, 28, 0.05), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 4s infinite' }}></div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(30px)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(40px)' }}>
                         <div>
-                            <div style={{ fontSize: '0.7rem', letterSpacing: '2px', fontWeight: '800', color: '#888' }}>ROYALTY PASS</div>
-                            <div style={{ fontSize: '1rem', fontFamily: "'Playfair Display', serif", marginTop: '2px', color: '#fff' }}>Gold Elite</div>
+                            <div style={{ fontSize: '0.75rem', letterSpacing: '2px', fontWeight: '900', color: 'var(--primary-color)', opacity: 0.6 }}>ROYALTY PASS</div>
+                            <div style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', marginTop: '4px', color: 'var(--primary-color)', fontWeight: '900' }}>Saffron Elite</div>
                         </div>
-                        <i className="fas fa-crown" style={{ fontSize: '1.5rem', color: '#DAA520' }}></i>
+                        <div style={{ width: '45px', height: '45px', background: 'var(--primary-color)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
+                            <i className="fas fa-crown" style={{ fontSize: '1.5rem', color: '#FFF' }}></i>
+                        </div>
                     </div>
 
-                    <div style={{ transform: 'translateZ(50px)' }}>
-                        <div style={{ fontSize: '2.5rem', fontWeight: '900', letterSpacing: '1px', color: '#fff' }}>150</div>
-                        <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#DAA520' }}>Spice Points</div>
+                    <div style={{ transform: 'translateZ(60px)' }}>
+                        <div style={{ fontSize: '3rem', fontWeight: '900', letterSpacing: '2px', color: 'var(--primary-color)' }}>750</div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--primary-color)', opacity: 0.8 }}>Spice Points Earned</div>
                     </div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(25px)' }}>
-                        <div style={{ fontSize: '0.9rem', fontWeight: '600', letterSpacing: '1px', color: '#ccc' }}>{user.name.toUpperCase()}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(30px)' }}>
+                        <div style={{ fontSize: '1rem', fontWeight: '900', letterSpacing: '1px', color: 'var(--primary-color)', opacity: 0.7 }}>{user.name.toUpperCase()}</div>
                     </div>
                 </motion.div>
             </motion.div>
             <style>{`@keyframes shimmer { 0% { left: -100% } 50% { left: 200% } 100% { left: 200% } }`}</style>
 
             {/* More Section */}
-            <div className="more-section-title">More</div>
+            <div className="more-section-title" style={{ background: 'var(--bg-body)', color: 'var(--text-light)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', padding: '20px 20px 10px' }}>Account Settings</div>
 
             <div className="zomato-settings-list">
                 {menuItems.map((item, idx) => (
                     <motion.div
                         key={idx}
                         className="zomato-menu-item"
-                        whileTap={{ background: '#f0f0f0' }}
+                        whileTap={{ background: 'var(--bg-body)' }}
+                        style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-color)', padding: '20px' }}
                     >
-                        <i className={item.icon}></i>
-                        <span>{item.label}</span>
-                        <i className="fas fa-chevron-right"></i>
+                        <i className={item.icon} style={{ color: 'var(--primary-color)', fontSize: '1.2rem', width: '25px' }}></i>
+                        <span style={{ color: 'var(--text-dark)', fontWeight: '600' }}>{item.label}</span>
+                        <i className="fas fa-chevron-right" style={{ color: 'var(--border-color)', fontSize: '0.9rem' }}></i>
                     </motion.div>
                 ))}
 
                 <motion.div
                     className="zomato-menu-item profile-logout"
-                    whileTap={{ background: '#fff5f5' }}
+                    whileTap={{ background: '#FFF5F5' }}
                     onClick={handleAppLogout}
+                    style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-color)', padding: '20px' }}
                 >
-                    <i className="fas fa-power-off"></i>
-                    <span>Log out</span>
-                    <i className="fas fa-chevron-right"></i>
+                    <i className="fas fa-power-off" style={{ color: 'var(--primary-color)' }}></i>
+                    <span style={{ color: 'var(--primary-color)', fontWeight: '800' }}>Sign Out</span>
+                    <i className="fas fa-chevron-right" style={{ color: 'var(--primary-color)', opacity: 0.3 }}></i>
                 </motion.div>
 
                 <motion.div
                     className="zomato-menu-item"
                     whileTap={{ background: '#fef2f2' }}
                     onClick={() => navigate('/admin')}
-                    style={{ marginTop: '10px', borderTop: '1px solid #eee' }}
+                    style={{ marginTop: '20px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-surface)', padding: '20px' }}
                 >
-                    <i className="fas fa-shield-alt" style={{ color: '#E63946' }}></i>
-                    <span style={{ fontWeight: '800', color: '#111' }}>Admin Command Center</span>
-                    <i className="fas fa-chevron-right" style={{ color: '#E63946' }}></i>
+                    <i className="fas fa-shield-alt" style={{ color: 'var(--primary-color)' }}></i>
+                    <span style={{ fontWeight: '900', color: 'var(--text-dark)' }}>Admin Command Center</span>
+                    <i className="fas fa-external-link-alt" style={{ color: 'var(--primary-color)', fontSize: '0.9rem' }}></i>
                 </motion.div>
             </div>
 
-            <div style={{ padding: '30px', textAlign: 'center' }}>
-                <div style={{ opacity: 0.3, fontWeight: 700, fontSize: '2rem', letterSpacing: '2px', color: '#000' }}>khaliya</div>
-                <p style={{ color: '#aaa', fontSize: '0.8rem', marginTop: '5px' }}>v1.0.0 (Synced)</p>
+            <div style={{ padding: '40px', textAlign: 'center' }}>
+                <div style={{ opacity: 0.1, fontWeight: 900, fontSize: '2.5rem', letterSpacing: '4px', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>KHALIYA</div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '5px', fontWeight: '700' }}>v1.2.0 • Light Saffron Edition</p>
             </div>
         </div>
     );

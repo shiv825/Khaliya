@@ -97,29 +97,38 @@ export default function NativeAppShell() {
                             onClick={() => handleTabChange('home')}
                         >
                             <i className="fas fa-home"></i>
-                            <span>Home</span>
+                            <span>Menu</span>
                         </button>
                         <button
                             className={`nav-tab ${activeTab === 'menu' ? 'active' : ''}`}
                             onClick={() => handleTabChange('menu')}
                         >
                             <i className="fas fa-utensils"></i>
-                            <span>Menu</span>
+                            <span>Flavors</span>
+                        </button>
+                        <button
+                            className={`nav-tab book-btn ${activeTab === 'book' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('book')}
+                        >
+                            <div className="book-fab">
+                                <i className="fas fa-calendar-alt"></i>
+                            </div>
+                            <span>Book</span>
                         </button>
                         <button
                             className={`nav-tab ${activeTab === 'cart' ? 'active' : ''}`}
                             onClick={() => handleTabChange('cart')}
                             style={{ position: 'relative' }}
                         >
-                            <i className="fas fa-shopping-cart"></i>
-                            <span>Cart</span>
+                            <i className="fas fa-shopping-bag"></i>
+                            <span>Bag</span>
                             {cartCount > 0 && (
                                 <span style={{
                                     position: 'absolute',
-                                    top: '5px',
+                                    top: '8px',
                                     right: '15px',
-                                    background: 'var(--primary-color, #DAA520)',
-                                    color: '#0a0a0a',
+                                    background: 'var(--primary-color)',
+                                    color: '#FFFFFF',
                                     borderRadius: '50%',
                                     width: '18px',
                                     height: '18px',
@@ -127,30 +136,17 @@ export default function NativeAppShell() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontWeight: 'bold',
-                                    border: '2px solid #0a0a0a'
+                                    fontWeight: '800',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
                                 }}>{cartCount}</span>
                             )}
-                        </button>
-                        <button
-                            className={`nav-tab book-btn ${activeTab === 'book' ? 'active' : ''}`}
-                            onClick={() => handleTabChange('book')}
-                        >
-                            <div className="book-fab" style={{ 
-                                background: 'linear-gradient(135deg, var(--primary-color, #DAA520), var(--accent-color, #FFD700))',
-                                color: '#0a0a0a',
-                                boxShadow: '0 8px 15px rgba(218, 165, 32, 0.4)'
-                            }}>
-                                <i className="fas fa-calendar-check"></i>
-                            </div>
-                            <span style={{ color: activeTab === 'book' ? 'var(--primary-color, #DAA520)' : '#888' }}>Book</span>
                         </button>
                         <button
                             className={`nav-tab ${activeTab === 'profile' ? 'active' : ''}`}
                             onClick={() => handleTabChange('profile')}
                         >
                             <i className="fas fa-user-circle"></i>
-                            <span>Profile</span>
+                            <span>You</span>
                         </button>
                     </div>
                     <OfferPopup />

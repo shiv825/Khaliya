@@ -472,9 +472,9 @@ export default function Menu() {
                 <button 
                     onClick={() => setShowMatchmaker(true)}
                     className="btn btn-primary"
-                    style={{ position: 'absolute', right: '0', padding: '12px 25px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, var(--primary-color), #FFD700)', color: '#000', border: 'none', boxShadow: '0 0 20px rgba(218, 165, 32, 0.4)', fontWeight: '800', cursor: 'pointer', zIndex: 10 }}
+                    style={{ position: 'absolute', right: '0', padding: '12px 25px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, var(--primary-color), var(--accent-color))', color: '#fff', border: 'none', boxShadow: '0 10px 20px rgba(142, 28, 28, 0.2)', fontWeight: '700', cursor: 'pointer', zIndex: 10 }}
                 >
-                    <i className="fas fa-magic"></i> Curate for me
+                    <i className="fas fa-magic"></i> {t('menu.curate', 'Curate for me')}
                 </button>
             </div>
             {showMatchmaker && <AiMatchmaker onClose={() => setShowMatchmaker(false)} />}
@@ -493,7 +493,7 @@ export default function Menu() {
                             border: '1px solid var(--border-color)', 
                             background: 'var(--bg-glass)', 
                             backdropFilter: 'blur(10px)',
-                            color: '#fff', 
+                            color: 'var(--text-dark)', 
                             fontSize: '1rem',
                             transition: 'var(--transition)',
                             outline: 'none',
@@ -512,21 +512,22 @@ export default function Menu() {
                             border: '1px solid var(--border-color)', 
                             background: 'var(--bg-glass)', 
                             backdropFilter: 'blur(10px)',
-                            color: '#fff', 
+                            color: 'var(--text-dark)', 
                             cursor: 'pointer', 
                             fontSize: '0.95rem',
                             outline: 'none',
                             appearance: 'none',
-                            backgroundImage: 'linear-gradient(45deg, transparent 50%, var(--accent-color) 50%), linear-gradient(135deg, var(--accent-color) 50%, transparent 50%)',
+                            backgroundImage: 'linear-gradient(45deg, transparent 50%, var(--primary-color) 50%), linear-gradient(135deg, var(--primary-color) 50%, transparent 50%)',
                             backgroundPosition: 'calc(100% - 25px) calc(1em + 5px), calc(100% - 20px) calc(1em + 5px)',
                             backgroundSize: '5px 5px, 5px 5px',
-                            backgroundRepeat: 'no-repeat'
+                            backgroundRepeat: 'no-repeat',
+                            fontWeight: '600'
                         }}
                     >
-                        <option value="default" style={{ background: '#121212' }}>{t('menu.sortDefault')}</option>
-                        <option value="price-low" style={{ background: '#121212' }}>{t('menu.sortLow')}</option>
-                        <option value="price-high" style={{ background: '#121212' }}>{t('menu.sortHigh')}</option>
-                        <option value="popular" style={{ background: '#121212' }}>{t('menu.sortPopular')}</option>
+                        <option value="default" style={{ background: 'var(--bg-surface)' }}>{t('menu.sortDefault')}</option>
+                        <option value="price-low" style={{ background: 'var(--bg-surface)' }}>{t('menu.sortLow')}</option>
+                        <option value="price-high" style={{ background: 'var(--bg-surface)' }}>{t('menu.sortHigh')}</option>
+                        <option value="popular" style={{ background: 'var(--bg-surface)' }}>{t('menu.sortPopular')}</option>
                     </select>
                 </div>
             </div>
@@ -547,14 +548,15 @@ export default function Menu() {
                 ) : (
                     displayedMenu.map((item, index) => (
                         <div key={index} className="menu-item" data-aos="fade-up" data-aos-delay={(index % 4) * 100} style={{ 
-                            background: 'var(--bg-glass)', 
+                            background: 'var(--bg-surface)', 
                             border: '1px solid var(--border-color)', 
                             borderRadius: 'var(--radius-lg)',
                             padding: '2rem',
                             display: 'flex',
                             flexDirection: 'column',
                             height: '100%',
-                            transition: 'var(--transition)'
+                            transition: 'var(--transition)',
+                            boxShadow: 'var(--shadow-sm)'
                         }}>
                             {item.image && (
                                 <div className="menu-item-image" style={{ width: '100%', height: '220px', overflow: 'hidden', borderRadius: '15px', marginBottom: '1.5rem', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}>
@@ -574,10 +576,10 @@ export default function Menu() {
                                     })}
                                 </div>
                             </div>
-                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: '#FFF', fontFamily: 'var(--font-heading)' }}>{getLocalized(item.name)}</h3>
-                            <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.6', flex: 1 }}>{getLocalized(item.description)}</p>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>{getLocalized(item.name)}</h3>
+                            <p style={{ fontSize: '0.95rem', color: 'var(--text-light)', marginBottom: '1.5rem', lineHeight: '1.6', flex: 1 }}>{getLocalized(item.description)}</p>
                             <div className="menu-item-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                                <div className="price" style={{ fontWeight: 800, color: 'var(--accent-color)', fontSize: '1.4rem' }}>{item.price}</div>
+                                <div className="price" style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '1.4rem' }}>{item.price}</div>
                                 <button 
                                     className="btn btn-primary" 
                                     style={{ padding: '8px 20px', fontSize: '0.8rem', borderRadius: '30px' }}
@@ -591,9 +593,9 @@ export default function Menu() {
                                             position: 'top-end',
                                             showConfirmButton: false,
                                             timer: 3000,
-                                            background: '#121212',
-                                            color: '#fff',
-                                            iconColor: '#DAA520'
+                                            background: 'var(--bg-surface)',
+                                            color: 'var(--text-dark)',
+                                            iconColor: 'var(--primary-color)'
                                         });
                                     }}
                                 >

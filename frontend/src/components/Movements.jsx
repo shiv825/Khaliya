@@ -6,10 +6,10 @@ export default function Movements() {
 
     return (
         <section className="accent-section movements" data-aos="fade-up" data-aos-duration="800">
-            <h2 style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', color: 'var(--accent-color)', marginBottom: '1.5rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', marginBottom: '1.5rem', textAlign: 'center' }}>
                 {t('movements.title')}
             </h2>
-            <p style={{ color: 'var(--text-muted)', maxWidth: '900px', margin: '0 auto 3rem auto', textAlign: 'center', fontSize: '1.1rem', lineHeight: '1.8' }}>
+            <p style={{ color: 'var(--text-light)', maxWidth: '900px', margin: '0 auto 3rem auto', textAlign: 'center', fontSize: '1.1rem', lineHeight: '1.8' }}>
                 {t('movements.sub')}
             </p>
 
@@ -25,20 +25,20 @@ export default function Movements() {
             </div>
 
             <div className="movement-info" style={{ marginTop: '2.5rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <div className="movement-card futuristic-glass" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '2.5rem', textAlign: 'center', transition: 'var(--transition)', maxWidth: '350px' }}>
-                    <i className="fas fa-fire" style={{ fontSize: '2.5rem', color: 'var(--accent-color)', marginBottom: '1.5rem', display: 'block' }}></i>
-                    <strong style={{ fontSize: '1.4rem', color: '#fff', display: 'block', marginBottom: '1rem' }}>{t('movements.sizzle')}</strong>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}>{t('movements.sizzle_desc')}</p>
+                <div className="movement-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '25px', padding: '2.5rem', textAlign: 'center', transition: 'var(--transition)', maxWidth: '350px', boxShadow: 'var(--shadow-md)' }}>
+                    <i className="fas fa-fire" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '1.5rem', display: 'block' }}></i>
+                    <strong style={{ fontSize: '1.4rem', color: 'var(--text-dark)', display: 'block', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>{t('movements.sizzle')}</strong>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', lineHeight: '1.6' }}>{t('movements.sizzle_desc')}</p>
                 </div>
-                <div className="movement-card futuristic-glass" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '2.5rem', textAlign: 'center', transition: 'var(--transition)', maxWidth: '350px' }}>
-                    <i className="fas fa-utensils" style={{ fontSize: '2.5rem', color: 'var(--accent-color)', marginBottom: '1.5rem', display: 'block' }}></i>
-                    <strong style={{ fontSize: '1.4rem', color: '#fff', display: 'block', marginBottom: '1rem' }}>{t('movements.plating')}</strong>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}>{t('movements.plating_desc')}</p>
+                <div className="movement-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '25px', padding: '2.5rem', textAlign: 'center', transition: 'var(--transition)', maxWidth: '350px', boxShadow: 'var(--shadow-md)' }}>
+                    <i className="fas fa-utensils" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '1.5rem', display: 'block' }}></i>
+                    <strong style={{ fontSize: '1.4rem', color: 'var(--text-dark)', display: 'block', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>{t('movements.plating')}</strong>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', lineHeight: '1.6' }}>{t('movements.plating_desc')}</p>
                 </div>
-                <div className="movement-card futuristic-glass" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '2.5rem', textAlign: 'center', transition: 'var(--transition)', maxWidth: '350px' }}>
-                    <i className="fas fa-heart" style={{ fontSize: '2.5rem', color: 'var(--accent-color)', marginBottom: '1.5rem', display: 'block' }}></i>
-                    <strong style={{ fontSize: '1.4rem', color: '#fff', display: 'block', marginBottom: '1rem' }}>{t('movements.service')}</strong>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}>{t('movements.service_desc')}</p>
+                <div className="movement-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '25px', padding: '2.5rem', textAlign: 'center', transition: 'var(--transition)', maxWidth: '350px', boxShadow: 'var(--shadow-md)' }}>
+                    <i className="fas fa-heart" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '1.5rem', display: 'block' }}></i>
+                    <strong style={{ fontSize: '1.4rem', color: 'var(--text-dark)', display: 'block', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>{t('movements.service')}</strong>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', lineHeight: '1.6' }}>{t('movements.service_desc')}</p>
                 </div>
             </div>
         </section>

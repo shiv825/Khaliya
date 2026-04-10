@@ -70,11 +70,11 @@ export default function NativeAuth({ onLoginSuccess }) {
         <div className="zomato-landing">
             <div className="landing-hero">
                 <img
-                    src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&fit=crop"
-                    alt="Food delivery"
+                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&fit=crop"
+                    alt="Authentic Dining"
                 />
                 <div className="landing-overlay">
-                    <h1>India's #1 Authentic Cuisine Restaurant</h1>
+                    <h1>Savor. Celebrate.<br/>Every Moment.</h1>
                     <div>
                         <span className="zomato-logo-stripe">khaliya</span>
                     </div>
@@ -87,23 +87,24 @@ export default function NativeAuth({ onLoginSuccess }) {
                 animate={{ y: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
-                <p className="login-title">Log in or sign up</p>
+                <p className="login-title" style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontSize: '1.4rem' }}>Log in to your sanctuary</p>
 
                 <form onSubmit={handlePhoneSubmit}>
-                    <div className="phone-input-container">
-                        <div className="country-selector">
+                    <div className="phone-input-container" style={{ marginBottom: '25px' }}>
+                        <div className="country-selector" style={{ background: 'var(--bg-body)', border: '1px solid var(--border-color)', borderRadius: '15px' }}>
                             <img src="https://flagcdn.com/w40/in.png" alt="IN" />
-                            <i className="fas fa-caret-down"></i>
+                            <i className="fas fa-caret-down" style={{ color: 'var(--text-muted)' }}></i>
                         </div>
-                        <div className="phone-field">
-                            <span>+91</span>
+                        <div className="phone-field" style={{ background: 'var(--bg-body)', border: '1px solid var(--border-color)', borderRadius: '15px', padding: '15px' }}>
+                            <span style={{ fontWeight: '800', color: 'var(--primary-color)', marginRight: '10px' }}>+91</span>
                             <input
                                 type="tel"
-                                placeholder="Enter Phone Number"
+                                placeholder={language === 'hi' ? 'मोबाइल नंबर' : "Mobile Number"}
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                                 maxLength="10"
                                 required
+                                style={{ background: 'transparent', border: 'none', color: 'var(--text-dark)', fontWeight: '700', fontSize: '1.1rem', outline: 'none', width: '100%' }}
                             />
                         </div>
                     </div>
@@ -112,26 +113,27 @@ export default function NativeAuth({ onLoginSuccess }) {
                         type="submit"
                         className="zomato-btn-main"
                         disabled={phone.length < 10 || isLoading}
+                        style={{ opacity: (phone.length < 10 || isLoading) ? 0.6 : 1 }}
                     >
-                        {isLoading ? "Please wait..." : "Continue"}
+                        {isLoading ? "Please wait..." : "Next Step"}
                     </button>
                 </form>
 
-                <div className="social-login-grid">
-                    <div className="social-circle google-icon">
+                <div className="social-login-grid" style={{ marginTop: '10px' }}>
+                    <div className="social-circle futuristic-glass" style={{ color: '#DB4437' }}>
                         <i className="fab fa-google"></i>
                     </div>
-                    <div className="social-circle mail-icon">
+                    <div className="social-circle futuristic-glass" style={{ color: 'var(--primary-color)' }}>
                         <i className="fas fa-envelope"></i>
                     </div>
-                    <div className="social-circle">
+                    <div className="social-circle futuristic-glass" style={{ color: 'var(--text-muted)' }}>
                         <i className="fas fa-ellipsis-h"></i>
                     </div>
                 </div>
 
-                <p className="terms-text">
+                <p className="terms-text" style={{ marginTop: '30px', fontWeight: '600', color: 'var(--text-muted)' }}>
                     By continuing, you agree to our<br />
-                    <span style={{ textDecoration: 'underline' }}>Terms of Service</span> <span style={{ textDecoration: 'underline' }}>Privacy Policy</span> <span style={{ textDecoration: 'underline' }}>Content Policy</span>
+                    <span style={{ color: 'var(--primary-color)', textDecoration: 'underline' }}>Terms</span> & <span style={{ color: 'var(--primary-color)', textDecoration: 'underline' }}>Privacy Policy</span>
                 </p>
             </motion.div>
         </div>
@@ -142,20 +144,21 @@ export default function NativeAuth({ onLoginSuccess }) {
             className="otp-container"
             initial={{ x: 100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
+            style={{ background: 'var(--bg-body)', padding: '40px 20px' }}
         >
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px' }}>
-                <i className="fas fa-arrow-left" onClick={() => setStep('landing')} style={{ fontSize: '1.2rem' }}></i>
-                <h2 style={{ margin: '0 0 0 15px', fontSize: '1.2rem' }}>OTP Verification</h2>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '40px' }}>
+                <i className="fas fa-arrow-left" onClick={() => setStep('landing')} style={{ fontSize: '1.4rem', color: 'var(--primary-color)' }}></i>
+                <h2 style={{ margin: '0 0 0 20px', fontSize: '1.6rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>Verification Code</h2>
             </div>
 
-            <p style={{ color: '#4f4f4f', marginBottom: '10px', textAlign: 'center' }}>
-                We have sent a verification code to
+            <p style={{ color: 'var(--text-light)', marginBottom: '10px', textAlign: 'center', fontWeight: '600' }}>
+                We have sent an authentication code to
             </p>
-            <p style={{ fontWeight: 700, textAlign: 'center', marginBottom: '30px' }}>
+            <p style={{ fontWeight: '900', textAlign: 'center', marginBottom: '40px', fontSize: '1.4rem', color: 'var(--text-dark)' }}>
                 +91-{phone}
             </p>
 
-            <div className="otp-inputs">
+            <div className="otp-inputs" style={{ marginBottom: '40px' }}>
                 {otp.map((digit, i) => (
                     <input
                         key={i}
@@ -166,26 +169,35 @@ export default function NativeAuth({ onLoginSuccess }) {
                         value={digit}
                         onChange={(e) => handleOtpChange(i, e.target.value)}
                         autoFocus={i === 0}
+                        style={{ border: '2px solid var(--border-color)', background: 'var(--bg-surface)', color: 'var(--primary-color)', width: '50px', height: '60px', fontSize: '1.8rem', fontWeight: '900', borderRadius: '15px', shadow: 'var(--shadow-sm)' }}
                     />
                 ))}
             </div>
 
             <div style={{ textAlign: 'center' }}>
-                <p style={{ color: '#4f4f4f' }}>
-                    Didn't get the OTP? {timer > 0 ? (
-                        <span style={{ color: '#aaa' }}>Resend SMS in {timer}s</span>
+                <p style={{ color: 'var(--text-light)', fontWeight: '600' }}>
+                    Didn't get the code? {timer > 0 ? (
+                        <span style={{ color: 'var(--text-muted)' }}>Wait {timer}s</span>
                     ) : (
-                        <span style={{ color: '#E23744', fontWeight: 600 }}>Resend SMS</span>
+                        <span style={{ color: 'var(--primary-color)', fontWeight: '800', borderBottom: '1.5px solid' }}>Resend</span>
                     )}
                 </p>
-                <p style={{ color: '#E23744', marginTop: '20px', fontWeight: 500 }} onClick={() => setStep('landing')}>
-                    Go back to login methods
-                </p>
+                <motion.p 
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: 'var(--text-muted)', marginTop: '40px', fontWeight: '700', fontSize: '0.9rem' }} 
+                    onClick={() => setStep('landing')}
+                >
+                    Change phone number?
+                </motion.p>
             </div>
 
             {isLoading && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
-                    <div className="auth-spinner" style={{ borderTopColor: '#E23744' }}></div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+                    <motion.div 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        style={{ width: '40px', height: '40px', border: '4px solid var(--border-color)', borderTopColor: 'var(--primary-color)', borderRadius: '50%' }}
+                    ></motion.div>
                 </div>
             )}
         </motion.div>

@@ -17,9 +17,9 @@ export default function GalleryAndSocial() {
     return (
         <>
             <section id="social-feed" className="accent-section gsap-reveal">
-                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                    <h2>{t('social.title')}</h2>
-                    <p>{t('social.sub')}</p>
+                <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                    <h2 style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.8rem', marginBottom: '1rem' }}>{t('social.title')}</h2>
+                    <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>{t('social.sub')}</p>
                 </div>
                 <div className="instagram-grid">
                     <div className="insta-item"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80" alt="Restaurant Interior" /></div>
@@ -33,9 +33,9 @@ export default function GalleryAndSocial() {
 
             <section id="gallery" className="gsap-reveal" style={{ padding: '5rem 0' }}>
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                        <h2>Our Culinary Canvas</h2>
-                        <p>A visual journey through our exquisite dishes and warm ambiance.</p>
+                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                        <h2 style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.8rem', marginBottom: '1rem' }}>Our Culinary Canvas</h2>
+                        <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>A visual journey through our exquisite dishes and warm ambiance.</p>
                     </div>
 
                     <div className="masonry-gallery">

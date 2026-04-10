@@ -59,33 +59,33 @@ export default function HoursAndLocation() {
         <>
             <section id="hours" data-aos="fade-up" data-aos-duration="700">
                 <h2>{t('hours.title')}</h2>
-                <table className="hours-table" style={{ width: '100%', maxWidth: '800px', margin: '0 auto', borderCollapse: 'collapse', backgroundColor: 'var(--bg-surface)', color: 'var(--text-dark)' }}>
+                <table className="hours-table" style={{ width: '100%', maxWidth: '800px', margin: '0 auto', borderCollapse: 'collapse', backgroundColor: 'var(--bg-surface)', color: 'var(--text-dark)', borderRadius: '15px', overflow: 'hidden', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border-color)' }}>
                     <thead>
-                        <tr>
-                            <th style={{ padding: '15px', color: 'white' }}>{t('hours.day')}</th>
-                            <th style={{ padding: '15px', color: 'white' }}>{t('hours.opening')}</th>
-                            <th style={{ padding: '15px', color: 'white' }}>{t('hours.closing')}</th>
-                            <th style={{ padding: '15px', color: 'white' }}>{t('hours.status')}</th>
+                        <tr style={{ background: 'var(--primary-color)' }}>
+                            <th style={{ padding: '20px', color: '#FFFFFF', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>{t('hours.day')}</th>
+                            <th style={{ padding: '20px', color: '#FFFFFF', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>{t('hours.opening')}</th>
+                            <th style={{ padding: '20px', color: '#FFFFFF', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>{t('hours.closing')}</th>
+                            <th style={{ padding: '20px', color: '#FFFFFF', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>{t('hours.status')}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>{t('hours.monFri')}</td>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>11:00 AM</td>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>10:00 PM</td>
-                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid #333', color: '#4caf50', fontWeight: 'bold' }}>{t('hours.open')}</td>
+                            <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>{t('hours.monFri')}</td>
+                            <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>11:00 AM</td>
+                            <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>10:00 PM</td>
+                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: '#2e7d32', fontWeight: 'bold' }}>{t('hours.open')}</td>
                         </tr>
                         <tr>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>{t('hours.sat')}</td>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>10:00 AM</td>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>11:00 PM</td>
-                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid #333', color: '#4caf50', fontWeight: 'bold' }}>{t('hours.open')}</td>
+                            <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>{t('hours.sat')}</td>
+                            <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>10:00 AM</td>
+                            <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>11:00 PM</td>
+                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: '#2e7d32', fontWeight: 'bold' }}>{t('hours.open')}</td>
                         </tr>
                         <tr>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>{t('hours.sun')}</td>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>10:00 AM</td>
-                            <td style={{ padding: '15px', borderBottom: '1px solid #333', color: 'var(--text-dark)' }}>11:00 PM</td>
-                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid #333', color: '#4caf50', fontWeight: 'bold' }}>{t('hours.open')}</td>
+                            <td style={{ padding: '15px', borderBottom: 'none', color: 'var(--text-dark)' }}>{t('hours.sun')}</td>
+                            <td style={{ padding: '15px', borderBottom: 'none', color: 'var(--text-dark)' }}>10:00 AM</td>
+                            <td style={{ padding: '15px', borderBottom: 'none', color: 'var(--text-dark)' }}>11:00 PM</td>
+                            <td className="open" style={{ padding: '15px', borderBottom: 'none', color: '#2e7d32', fontWeight: 'bold' }}>{t('hours.open')}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -104,14 +104,14 @@ export default function HoursAndLocation() {
                 {locationState.lat && (
                     <div id="userLocation" className="location-card" data-aos="fade-up">
                         <div className="location-details">
-                            <h3 style={{ marginBottom: '1rem', color: 'var(--accent-light)' }}>{t('track.currentLocation') || "Your Location Found"}</h3>
+                            <h3 style={{ marginBottom: '1rem', color: 'var(--primary-color)' }}>{t('track.currentLocation') || "Your Location Found"}</h3>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '1rem' }}>
-                                <span style={{ fontSize: '3rem', fontWeight: '800', lineHeight: '1', color: 'var(--text-dark)' }}>{locationState.distance}</span>
+                                <span style={{ fontSize: '3rem', fontWeight: '800', lineHeight: '1', color: 'var(--primary-color)' }}>{locationState.distance}</span>
                                 <span style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>{t('track.kmAway') || "km away"}</span>
                             </div>
                             <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
-                                <i className="fas fa-clock" style={{ color: 'var(--accent-color)', marginRight: '8px' }}></i>
-                                {t('track.travelTimeLabel') || "Est. Time:"} {locationState.travelTime}
+                                <i className="fas fa-clock" style={{ color: 'var(--primary-color)', marginRight: '8px' }}></i>
+                                {t('track.travelTimeLabel') || "Est. Time:"} <strong>{locationState.travelTime}</strong>
                             </p>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                                 <i className="fas fa-map-marker-alt" style={{ marginRight: '5px' }}></i>
@@ -149,8 +149,8 @@ export default function HoursAndLocation() {
                     </div>
                 )}
 
-                <h3 style={{ marginTop: '2rem', textAlign: 'center' }}>{t('track.mapTitle')}</h3>
-                <div className="map-container" data-aos="fade-up" data-aos-delay="200" style={{ marginTop: '3rem', borderRadius: 'var(--radius-xl)', overflow: 'hidden', boxShadow: '0 15px 40px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <h3 style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--primary-color)' }}>{t('track.mapTitle')}</h3>
+                <div className="map-container" data-aos="fade-up" data-aos-delay="200" style={{ marginTop: '3rem', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border-color)' }}>
                     <iframe
                         title="Khaliya Restaurant Location"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.003975762078!2d88.3347072!3d22.6108169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a02798f090d80c9%3A0xe104332b4b47ea87!2sKhaliya%20Restaurant!5e0!3m2!1sen!2sin!4v1714902123955!5m2!1sen!2sin"

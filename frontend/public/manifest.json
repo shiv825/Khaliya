@@ -2,10 +2,12 @@
   "name": "Khaliya Restaurant - Authentic Indian Cuisine",
   "short_name": "Khaliya",
   "description": "Experience the finest authentic Indian cuisine at Khaliya Restaurant. Order online, manage reservations, and explore our rich menu.",
-  "start_url": ".",
+  "start_url": "/?mode=pwa",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#E63946",
+  "orientation": "portrait",
+  "background_color": "#FDFCF0",
+  "theme_color": "#8E1C1C",
   "categories": [
     "food",
     "lifestyle"
@@ -13,7 +15,7 @@
   "shortcuts": [
     {
       "name": "View Menu",
-      "url": "index.html#menu",
+      "url": "/#menu",
       "icons": [
         {
           "src": "pwa-icon-192.png",
@@ -24,7 +26,7 @@
     },
     {
       "name": "My Reservations",
-      "url": "index.html#reservations",
+      "url": "/#reservations",
       "icons": [
         {
           "src": "pwa-icon-192.png",

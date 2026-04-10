@@ -5,15 +5,15 @@ export default function Testimonials() {
     const { t } = useLanguage();
 
     return (
-        <section id="testimonials" className="accent-section" style={{ background: 'var(--bg-light)' }} data-aos="fade-up">
-            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                <h2>{t('testimonials.title')}</h2>
-                <p style={{ color: 'var(--text-light)', maxWidth: '700px', margin: '0 auto' }}>
+        <section id="testimonials" className="accent-section" data-aos="fade-up">
+            <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                <h2 style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.8rem', marginBottom: '1rem' }}>{t('testimonials.title')}</h2>
+                <p style={{ color: 'var(--text-light)', maxWidth: '700px', margin: '0 auto', fontSize: '1.1rem' }}>
                     {t('testimonials.sub')}
                 </p>
             </div>
 
-            <div className="testimonials-grid">
+            <div className="testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem', maxWidth: '1200px', margin: '0 auto' }}>
                 {/* Testimonial 1 */}
                 <div className="testimonial-card" data-aos="fade-up" data-aos-delay="100">
                     <i className="fas fa-quote-right quote"></i>

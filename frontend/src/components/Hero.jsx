@@ -50,10 +50,10 @@ export default function Hero() {
                         fontFamily: 'var(--font-heading)',
                         fontSize: 'clamp(3rem, 8vw, 6rem)',
                         fontWeight: '900',
-                        background: 'linear-gradient(135deg, #FFF 0%, var(--accent-color) 100%)',
+                        background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--accent-light) 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        textShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                        textShadow: '0 10px 30px rgba(142, 28, 28, 0.1)',
                         marginBottom: '30px',
                         letterSpacing: '-1px'
                     }}
@@ -68,12 +68,12 @@ export default function Hero() {
                     transition={{ duration: 1, delay: 0.7 }}
                     style={{
                         fontSize: '1.4rem',
-                        color: 'var(--text-light)',
+                        color: 'var(--text-dark)',
                         maxWidth: '800px',
                         margin: '0 auto 40px auto',
                         lineHeight: '1.6',
-                        fontWeight: '400',
-                        letterSpacing: '1px'
+                        fontWeight: '500',
+                        letterSpacing: '0.5px'
                     }}
                 >
                     {t('hero.sub')}
@@ -86,7 +86,7 @@ export default function Hero() {
                     transition={{ duration: 0.8, delay: 1 }}
                 >
                     <a href="#reservations" className="btn btn-primary">{t('hero.makeReservation')}</a>
-                    <a href="#menu" className="btn btn-outline">{t('hero.seeMenu')}</a>
+                    <a href="#menu" className="btn" style={{ marginLeft: '15px' }}>{t('hero.seeMenu')}</a>
                 </motion.div>
             </motion.div>
         </section>

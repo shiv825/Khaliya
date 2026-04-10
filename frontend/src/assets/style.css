@@ -19,35 +19,35 @@
 }
 
 :root {
-    /* Platinum Gold & Deep Charcoal Luxury Palette */
-    --primary-color: #DAA520; /* Goldenrod/Gold */
-    --secondary-color: #121212; /* Deep Charcoal */
-    --accent-color: #FFD700; /* Bright Gold */
-    --accent-light: #FFEA00;
-    --accent-glow: rgba(218, 165, 32, 0.4);
+    /* Royal Saffron & Ivory Luxury Palette */
+    --primary-color: #8E1C1C; /* Rich Saffron Red */
+    --secondary-color: #2C1B14; /* Deep Earthy Brown */
+    --accent-color: #C5A028; /* Antique Gold */
+    --accent-light: #D4AF37;
+    --accent-glow: rgba(142, 28, 28, 0.15);
 
-    /* Text & Background */
-    --text-dark: #FFFFFF;
-    --text-light: #E0E0E0;
-    --text-muted: #A0A0A0;
-    --bg-body: #08080C; /* Elite Dark */
-    --bg-surface: rgba(20, 20, 30, 0.8);
-    --bg-glass: rgba(15, 15, 15, 0.85);
-    --border-color: rgba(218, 165, 32, 0.2);
-    --border-light: rgba(255, 255, 255, 0.05);
+    /* Text & Background - Light Mode Focused */
+    --text-dark: #1E1E1E; /* Deep Charcoal for readability */
+    --text-light: #4A4A4A; /* Darkish grey for sub-text */
+    --text-muted: #717171;
+    --bg-body: #FDFCF0; /* Soft Ivory / Premium Cream */
+    --bg-surface: #FFFFFF;
+    --bg-glass: rgba(255, 255, 255, 0.92);
+    --border-color: rgba(142, 28, 28, 0.1);
+    --border-light: rgba(0, 0, 0, 0.08);
 
     /* Typography */
     --font-heading: 'Playfair Display', serif;
-    --font-body: 'Outfit', sans-serif;
+    --font-body: 'Lato', sans-serif;
 
-    /* Shadows & Effects */
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-md: 0 12px 24px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.7);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    /* Shadows & Effects (Softened for Light Theme) */
+    --shadow-sm: 0 4px 12px rgba(142, 28, 28, 0.05);
+    --shadow-md: 0 12px 32px rgba(142, 28, 28, 0.08);
+    --shadow-lg: 0 24px 64px rgba(142, 28, 28, 0.12);
+    --glass-shadow: 0 8px 32px 0 rgba(44, 27, 20, 0.05);
 
     /* Transitions & Borders */
-    --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     --radius-md: 12px;
     --radius-lg: 20px;
 }
@@ -55,8 +55,8 @@
 html {
     scroll-behavior: smooth;
     overflow-x: hidden !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -64,28 +64,28 @@ body {
     font-family: var(--font-body);
     background-color: var(--bg-body);
     color: var(--text-dark);
-    line-height: 1.6;
+    line-height: 1.7;
     overflow-x: hidden !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
     position: relative;
 }
 
 /* Typography Base */
 h1, h2, h3, h4 {
     font-family: var(--font-heading);
-    color: var(--accent-light);
-    line-height: 1.2;
-    letter-spacing: 0.5px;
+    color: var(--primary-color);
+    line-height: 1.25;
+    letter-spacing: 0.2px;
 }
 
 h2 {
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
-    margin-bottom: 3.5rem;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    margin-bottom: 4rem;
     text-align: center;
     position: relative;
     width: 100%;
-    color: #FFF;
+    color: var(--primary-color);
 }
 
 h2::after {
@@ -94,15 +94,15 @@ h2::after {
     bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
+    width: 80px;
     height: 3px;
-    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
 }
 
 p {
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
     color: var(--text-light);
-    font-weight: 300;
+    font-weight: 400;
 }
 
 img {
@@ -110,6 +110,7 @@ img {
     -webkit-touch-callout: none;
     max-width: 100%;
     height: auto;
+    object-fit: cover;
 }
 
 a {
@@ -118,44 +119,48 @@ a {
     transition: var(--transition);
 }
 
-/* Luxury Buttons */
+/* Luxury Buttons - Updated for Warm Theme */
 .btn, button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.8rem;
-    padding: 16px 40px;
-    background: linear-gradient(135deg, var(--secondary-color), #2A2A2A);
-    color: var(--accent-color);
+    padding: 16px 36px;
+    background: var(--bg-surface);
+    color: var(--primary-color);
     font-weight: 700;
     font-family: var(--font-body);
     border-radius: 50px;
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--primary-color);
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     position: relative;
     overflow: hidden;
     z-index: 1;
 }
 
 .btn-primary, button.primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    color: var(--secondary-color);
+    background: linear-gradient(135deg, var(--primary-color), #A93226);
+    color: #FFFFFF;
     border: none;
+    box-shadow: 0 10px 20px rgba(142, 28, 28, 0.2);
 }
 
 .btn:hover, button:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(218, 165, 32, 0.3);
-    border-color: var(--accent-light);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    background: var(--primary-color);
+    color: #FFFFFF;
 }
 
 .btn-primary:hover, button.primary:hover {
-    box-shadow: 0 15px 45px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 15px 30px rgba(142, 28, 28, 0.3);
+    transform: translateY(-5px);
+    filter: brightness(1.1);
 }
 
 /* Floating Navbar Fix */
@@ -165,7 +170,7 @@ nav {
     background: var(--bg-glass);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    padding: 1.5rem 2rem;
+    padding: 1.2rem 2rem;
     position: fixed;
     top: 0;
     left: 0;
@@ -186,13 +191,14 @@ nav {
 }
 
 nav a {
-    color: #FFFFFF;
-    font-weight: 600;
+    color: var(--text-dark);
+    font-weight: 700;
     font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     padding: 0.5rem 0;
     position: relative;
+    font-family: var(--font-body);
 }
 
 nav a::after {
@@ -202,12 +208,12 @@ nav a::after {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--accent-color);
+    background: var(--primary-color);
     transition: width 0.3s ease;
 }
 
 nav a:hover {
-    color: var(--accent-color);
+    color: var(--primary-color);
 }
 
 nav a:hover::after {
@@ -223,7 +229,7 @@ nav a:hover::after {
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: white;
+    color: var(--text-dark);
     overflow: hidden;
     margin-top: 0;
     background: var(--bg-body);
@@ -240,7 +246,7 @@ nav a:hover::after {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(8, 8, 12, 0.7), rgba(8, 8, 12, 0.95));
+    background: linear-gradient(to bottom, rgba(253, 252, 240, 0.4), rgba(253, 252, 240, 0.85));
     z-index: 1;
 }
 
@@ -341,81 +347,152 @@ section {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2.5rem;
 }
-
-.menu-item {
-    background: var(--bg-glass);
-    padding: 2.5rem;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-    border: 1px solid var(--border-color);
+/* Modern Luxury Footer */
+footer {
+    background: var(--bg-surface);
+    padding: 5rem 2rem 2rem 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
     position: relative;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
 }
 
-.menu-item:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--accent-color);
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: var(--primary-color);
+    border-radius: 2px;
 }
 
-.menu-item h3 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    color: #FFF;
-}
-
-.menu-item .category {
-    font-size: 0.8rem;
-    color: var(--accent-light);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-weight: 700;
+footer h3 {
+    font-family: var(--font-heading);
+    color: var(--primary-color);
+    font-size: 2.2rem;
     margin-bottom: 0.5rem;
+    letter-spacing: 2px;
 }
 
-.menu-item .price {
-    font-size: 1.6rem;
+footer p {
+    color: var(--text-light);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.social-links a {
+    color: var(--text-dark);
     font-weight: 700;
-    color: var(--accent-color);
-    margin-top: auto;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+    position: relative;
+    padding-bottom: 5px;
 }
 
-/* Movements Section (Culinary Art) */
-.movements .movement-track {
-    position: relative;
+.social-links a:hover {
+    color: var(--primary-color);
+}
+
+.social-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: var(--transition);
+}
+
+.social-links a:hover::after {
     width: 100%;
-    height: 400px;
-    overflow: hidden;
+}
+
+footer .copyright {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-light);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+footer .copyright span {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.accent-section {
+    background: var(--bg-body);
+    padding: 6rem 2rem;
+    position: relative;
+}
+
+.testimonial-card {
+    background: var(--bg-surface);
+    padding: 3rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
-}
-
-@media (max-width: 768px) {
-    .movements .movement-track { height: 280px; }
-}
-
-/* Table Status Luxury Grid */
-.table-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1.5rem;
-}
-
-.table-card {
-    background: var(--bg-surface);
-    padding: 2rem;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    text-align: center;
+    box-shadow: var(--shadow-md);
     transition: var(--transition);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.table-card:hover {
-    transform: scale(1.05);
-    border-color: var(--accent-color);
+.testimonial-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.testimonial-card .quote {
+    color: var(--primary-color);
+    font-size: 2rem;
+    opacity: 0.1;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.testimonial-stars {
+    color: var(--accent-light);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.testimonial-text {
+    font-style: italic;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.author-info h4 {
+    color: var(--primary-color);
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    margin-bottom: 0.2rem;
+}
+
+.author-info span {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
 }
 
 /* Rest of AOS Animations */

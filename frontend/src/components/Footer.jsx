@@ -6,14 +6,16 @@ export default function Footer() {
 
     return (
         <footer data-aos="fade-up" data-aos-duration="600">
-            <h3 style={{ color: 'white' }}>{t('common.name')}</h3>
+            <h3>{t('common.name')}</h3>
             <p>{t('footer.since')}</p>
             <div className="social-links">
-                <a href="https://www.facebook.com" target="_blank" rel="noreferrer">Facebook</a> |
-                <a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a> |
+                <a href="https://www.facebook.com" target="_blank" rel="noreferrer">Facebook</a>
+                <a href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a>
                 <a href="https://www.whatsapp.com" target="_blank" rel="noreferrer">WhatsApp</a>
             </div>
-            <p>&copy; 2024 <span>{t('common.name')}</span>. <span>{t('footer.rights')}</span></p>
+            <div className="copyright">
+                <p>&copy; 2024 <span>{t('common.name')}</span>. <span>{t('footer.rights')}</span></p>
+            </div>
         </footer>
     );
 }

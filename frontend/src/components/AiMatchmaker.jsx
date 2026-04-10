@@ -59,9 +59,9 @@ export default function AiMatchmaker({ onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             style={{
-                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+                position: 'fixed', inset: 0, background: 'rgba(253, 252, 240, 0.8)',
                 zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '20px', backdropFilter: 'blur(10px)'
+                padding: '20px', backdropFilter: 'blur(12px)'
             }}
         >
             <motion.div 
@@ -69,27 +69,27 @@ export default function AiMatchmaker({ onClose }) {
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 30 }}
                 style={{
-                    background: 'var(--bg-dark, #111)', width: '100%', maxWidth: '500px',
-                    borderRadius: '24px', overflow: 'hidden', position: 'relative',
-                    border: '1px solid rgba(218, 165, 32, 0.3)', boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
+                    background: 'var(--bg-surface)', width: '100%', maxWidth: '500px',
+                    borderRadius: '35px', overflow: 'hidden', position: 'relative',
+                    border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)'
                 }}
             >
-                <div style={{ padding: '25px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000' }}>
-                            <i className="fas fa-magic"></i>
+                <div style={{ padding: '30px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-body)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <div style={{ width: '50px', height: '50px', borderRadius: '15px', background: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', boxShadow: 'var(--shadow-sm)' }}>
+                            <i className="fas fa-magic" style={{ fontSize: '1.4rem' }}></i>
                         </div>
-                        <h2 style={{ margin: 0, fontFamily: 'var(--font-heading)', color: '#fff', fontSize: '1.4rem' }}>Culinary Matchmaker</h2>
+                        <h2 style={{ margin: 0, fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontSize: '1.8rem' }}>Culinary Matchmaker</h2>
                     </div>
-                    <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                    <button onClick={onClose} style={{ background: 'var(--bg-body)', border: '1px solid var(--border-color)', width: '40px', height: '40px', borderRadius: '50%', color: 'var(--primary-color)', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>&times;</button>
                 </div>
 
-                <div style={{ padding: '30px', minHeight: '350px', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ padding: '40px', minHeight: '420px', display: 'flex', flexDirection: 'column', background: 'var(--bg-surface)' }}>
                     <AnimatePresence mode="wait">
                         {step === 1 && (
                             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ flex: 1 }}>
-                                <h3 style={{ color: '#fff', marginBottom: '25px', textAlign: 'center', fontSize: '1.3rem' }}>What is your craving tonight?</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <h3 style={{ color: 'var(--primary-color)', marginBottom: '35px', textAlign: 'center', fontSize: '1.5rem', fontWeight: '900', fontFamily: 'var(--font-heading)' }}>What's your flavor today?</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                     {moods.map(m => (
                                         <motion.button 
                                             key={m.id}
@@ -97,13 +97,13 @@ export default function AiMatchmaker({ onClose }) {
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => { setSelections({ ...selections, mood: m.id }); setStep(2); }}
                                             style={{
-                                                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)',
-                                                borderRadius: '16px', padding: '20px', cursor: 'pointer', textAlign: 'center', color: '#fff',
-                                                transition: 'all 0.3s'
+                                                background: 'var(--bg-body)', border: '1.5px solid var(--border-color)',
+                                                borderRadius: '25px', padding: '30px 15px', cursor: 'pointer', textAlign: 'center', color: 'var(--text-dark)',
+                                                transition: 'all 0.3s', boxShadow: 'var(--shadow-sm)'
                                             }}
                                         >
-                                            <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>{m.icon}</div>
-                                            <div style={{ fontWeight: '600' }}>{m.label}</div>
+                                            <div style={{ fontSize: '3.2rem', marginBottom: '15px' }}>{m.icon}</div>
+                                            <div style={{ fontWeight: '900', fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-dark)' }}>{m.label}</div>
                                         </motion.button>
                                     ))}
                                 </div>
@@ -112,8 +112,8 @@ export default function AiMatchmaker({ onClose }) {
                         
                         {step === 2 && (
                             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ flex: 1 }}>
-                                <h3 style={{ color: '#fff', marginBottom: '25px', textAlign: 'center', fontSize: '1.3rem' }}>Select your beverage pairing:</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <h3 style={{ color: 'var(--primary-color)', marginBottom: '35px', textAlign: 'center', fontSize: '1.5rem', fontWeight: '900', fontFamily: 'var(--font-heading)' }}>Pair it with a beverage:</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                     {drinks.map(d => (
                                         <motion.button 
                                             key={d.id}
@@ -121,13 +121,13 @@ export default function AiMatchmaker({ onClose }) {
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => { setSelections({ ...selections, drink: d.id }); setStep(3); }}
                                             style={{
-                                                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)',
-                                                borderRadius: '16px', padding: '20px', cursor: 'pointer', textAlign: 'center', color: '#fff',
-                                                transition: 'all 0.3s'
+                                                background: 'var(--bg-body)', border: '1.5px solid var(--border-color)',
+                                                borderRadius: '25px', padding: '30px 15px', cursor: 'pointer', textAlign: 'center', color: 'var(--text-dark)',
+                                                transition: 'all 0.3s', boxShadow: 'var(--shadow-sm)'
                                             }}
                                         >
-                                            <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>{d.icon}</div>
-                                            <div style={{ fontWeight: '600' }}>{d.label}</div>
+                                            <div style={{ fontSize: '3.2rem', marginBottom: '15px' }}>{d.icon}</div>
+                                            <div style={{ fontWeight: '900', fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-dark)' }}>{d.label}</div>
                                         </motion.button>
                                     ))}
                                 </div>
@@ -135,16 +135,26 @@ export default function AiMatchmaker({ onClose }) {
                         )}
 
                         {step === 3 && (
-                            <motion.div key="step3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ flex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                <i className="fas fa-crown" style={{ fontSize: '3rem', color: 'var(--primary-color)', marginBottom: '15px' }}></i>
-                                <h3 style={{ color: '#fff', fontFamily: 'var(--font-heading)', fontSize: '1.8rem', margin: '0 0 10px 0' }}>{match.name}</h3>
-                                <p style={{ color: '#aaa', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '20px' }}>{match.desc}</p>
-                                <div style={{ width: '100%', height: '180px', borderRadius: '16px', overflow: 'hidden', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <motion.div key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ flex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                <div style={{ marginBottom: '25px' }}>
+                                    <i className="fas fa-crown" style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}></i>
+                                </div>
+                                <h3 style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.2rem', margin: '0 0 12px 0' }}>{match.name}</h3>
+                                <p style={{ color: 'var(--text-light)', fontSize: '1.15rem', lineHeight: '1.6', marginBottom: '30px', fontWeight: '600' }}>{match.desc}</p>
+                                <div style={{ width: '100%', height: '240px', borderRadius: '30px', overflow: 'hidden', marginBottom: '35px', border: '2px solid var(--border-color)', boxShadow: 'var(--shadow-md)' }}>
                                     <img src={match.image} alt="Combo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                                 <div style={{ display: 'flex', gap: '15px' }}>
-                                    <button onClick={() => setStep(1)} style={{ flex: 1, padding: '15px', background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>Restart</button>
-                                    <button onClick={handleAdd} style={{ flex: 2, padding: '15px', background: 'var(--primary-color)', border: 'none', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 20px rgba(218, 165, 32, 0.4)' }}>Add for {match.price}</button>
+                                    <motion.button 
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => setStep(1)} 
+                                        style={{ flex: 1, padding: '18px', background: 'var(--bg-body)', border: '1.5px solid var(--border-color)', color: 'var(--primary-color)', borderRadius: '18px', fontWeight: '900', cursor: 'pointer', transition: 'all 0.3s' }}
+                                    >Restart</motion.button>
+                                    <motion.button 
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={handleAdd} 
+                                        style={{ flex: 2, padding: '18px', background: 'var(--primary-color)', border: 'none', color: '#FFF', borderRadius: '18px', fontWeight: '900', cursor: 'pointer', boxShadow: 'var(--shadow-md)' }}
+                                    >Add Combo {match.price}</motion.button>
                                 </div>
                             </motion.div>
                         )}

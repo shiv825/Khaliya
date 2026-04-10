@@ -60,92 +60,94 @@ export default function AiAssistant() {
 
     return (
         <div className="khali-assistant">
-            <div className={`khali-window futuristic-glass ${isOpen ? 'active' : ''}`} style={{ 
+            <div className={`khali-window ${isOpen ? 'active' : ''}`} style={{ 
                 display: isOpen ? 'flex' : 'none',
                 position: 'fixed',
-                bottom: '90px',
+                bottom: '100px',
                 right: '30px',
                 width: '380px',
                 height: '550px',
                 flexDirection: 'column',
-                background: 'rgba(18, 18, 18, 0.95)',
-                backdropFilter: 'blur(15px)',
+                background: 'var(--bg-surface)',
                 border: '1px solid var(--border-color)',
-                borderRadius: '24px',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-                zIndex: 1000,
+                borderRadius: '30px',
+                boxShadow: 'var(--shadow-lg)',
+                zIndex: 10000,
                 overflow: 'hidden'
             }}>
                 <div className="khali-header" style={{ 
-                    padding: '20px 25px', 
-                    background: 'linear-gradient(90deg, #1A1A1A, #121212)', 
+                    padding: '25px', 
+                    background: 'var(--bg-body)', 
                     borderBottom: '1px solid var(--border-color)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <div className="title" style={{ color: 'var(--accent-color)', fontWeight: '800', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '10px', height: '10px', background: '#10B981', borderRadius: '50%', boxShadow: '0 0 10px #10B981' }}></div>
-                        Khali AI
+                    <div className="title" style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-heading)' }}>
+                        <div style={{ width: '10px', height: '10px', background: '#10B981', borderRadius: '50%', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)' }}></div>
+                        Khali Concierge
                     </div>
-                    <button onClick={() => setIsOpen(false)} style={{ background: 'transparent', border: 'none', color: '#999', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                    <button onClick={() => setIsOpen(false)} style={{ background: 'rgba(0,0,0,0.05)', border: 'none', width: '32px', height: '32px', borderRadius: '50%', color: 'var(--text-dark)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-times"></i></button>
                 </div>
 
-                <div className="khali-chat-area" style={{ flex: 1, padding: '25px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div className="khali-chat-area" style={{ flex: 1, padding: '25px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px', background: 'var(--bg-surface)' }}>
                     {messages.map((m, i) => (
                         <div key={i} className={`khali-msg ${m.type}`} style={{ 
                             alignSelf: m.type === 'bot' ? 'flex-start' : 'flex-end',
-                            background: m.type === 'bot' ? 'rgba(255,255,255,0.05)' : 'var(--primary-color)',
-                            color: m.type === 'bot' ? '#FFF' : '#000',
+                            background: m.type === 'bot' ? 'var(--bg-body)' : 'var(--primary-color)',
+                            color: m.type === 'bot' ? 'var(--text-dark)' : '#FFF',
                             padding: '12px 18px',
-                            borderRadius: m.type === 'bot' ? '18px 18px 18px 4px' : '18px 18px 4px 18px',
+                            borderRadius: m.type === 'bot' ? '20px 20px 20px 4px' : '20px 20px 4px 20px',
                             fontSize: '0.95rem',
                             maxWidth: '85%',
-                            lineHeight: '1.5',
-                            border: m.type === 'bot' ? '1px solid rgba(255,255,255,0.1)' : 'none'
+                            lineHeight: '1.6',
+                            fontWeight: '500',
+                            border: m.type === 'bot' ? '1px solid var(--border-color)' : 'none',
+                            boxShadow: 'var(--shadow-sm)'
                         }}>
                             {m.text}
                         </div>
                     ))}
                     {isTyping && (
-                        <div className="khali-msg bot typing" style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.05)', padding: '12px 18px', borderRadius: '18px 18px 18px 4px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="typing-dots" style={{ display: 'flex', gap: '4px' }}>
-                                <span style={{ width: '6px', height: '6px', background: 'var(--accent-color)', borderRadius: '50%', opacity: 0.6 }}></span>
-                                <span style={{ width: '6px', height: '6px', background: 'var(--accent-color)', borderRadius: '50%', opacity: 0.8 }}></span>
-                                <span style={{ width: '6px', height: '6px', background: 'var(--accent-color)', borderRadius: '50%' }}></span>
+                        <div className="khali-msg bot typing" style={{ alignSelf: 'flex-start', background: 'var(--bg-body)', padding: '15px 20px', borderRadius: '20px 20px 20px 4px', border: '1px solid var(--border-color)' }}>
+                            <div className="typing-dots" style={{ display: 'flex', gap: '5px' }}>
+                                <span style={{ width: '6px', height: '6px', background: 'var(--primary-color)', borderRadius: '50%', opacity: 0.4 }}></span>
+                                <span style={{ width: '6px', height: '6px', background: 'var(--primary-color)', borderRadius: '50%', opacity: 0.7 }}></span>
+                                <span style={{ width: '6px', height: '6px', background: 'var(--primary-color)', borderRadius: '50%' }}></span>
                             </div>
                         </div>
                     )}
                     <div ref={chatEndRef} />
                 </div>
 
-                <div className="khali-suggestions" style={{ display: 'flex', gap: '8px', padding: '0 25px 15px 25px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+                <div className="khali-suggestions" style={{ display: 'flex', gap: '10px', padding: '0 25px 20px 25px', overflowX: 'auto', whiteSpace: 'nowrap', background: 'var(--bg-surface)' }}>
                     {suggestions.map((s, i) => (
                         <button key={i} onClick={() => handleSend(s.query)} style={{ 
-                            padding: '8px 15px', 
-                            background: 'rgba(218, 165, 32, 0.1)', 
+                            padding: '10px 18px', 
+                            background: 'var(--bg-body)', 
                             border: '1px solid var(--border-color)', 
                             borderRadius: '30px', 
-                            color: 'var(--accent-color)', 
-                            fontSize: '0.8rem', 
+                            color: 'var(--primary-color)', 
+                            fontSize: '0.85rem', 
                             cursor: 'pointer',
-                            fontWeight: '700'
+                            fontWeight: '800',
+                            transition: 'var(--transition)'
                         }}>
                             {s.label}
                         </button>
                     ))}
                 </div>
 
-                <div className="khali-input-area" style={{ padding: '20px 25px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '10px' }}>
+                <div className="khali-input-area" style={{ padding: '20px 25px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '12px', background: 'var(--bg-body)' }}>
                     <input
                         type="text"
                         value={inputVal}
                         onChange={e => setInputVal(e.target.value)}
                         onKeyPress={e => e.key === 'Enter' && handleSend()}
-                        placeholder="Inquire here..."
-                        style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '30px', padding: '12px 20px', color: '#FFF', outline: 'none' }}
+                        placeholder="Type your message..."
+                        style={{ flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '30px', padding: '12px 25px', color: 'var(--text-dark)', outline: 'none', fontWeight: '500' }}
                     />
-                    <button onClick={() => handleSend()} style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary-color)', color: '#000', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button onClick={() => handleSend()} style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary-color)', color: '#FFF', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
                         <i className="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -160,16 +162,16 @@ export default function AiAssistant() {
                     position: 'fixed',
                     bottom: '30px',
                     right: '30px',
-                    width: '65px',
-                    height: '65px',
+                    width: '70px',
+                    height: '70px',
                     borderRadius: '50%',
                     background: 'var(--primary-color)',
-                    boxShadow: '0 10px 30px rgba(218, 165, 32, 0.4)',
+                    boxShadow: 'var(--shadow-md)',
                     border: 'none',
-                    color: '#000',
-                    fontSize: '1.6rem',
+                    color: '#FFF',
+                    fontSize: '1.8rem',
                     cursor: 'pointer',
-                    zIndex: 999,
+                    zIndex: 9999,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'

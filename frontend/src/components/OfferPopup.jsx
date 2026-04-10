@@ -41,14 +41,13 @@ export default function OfferPopup() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.8, y: 50 }}
                         style={{
-                            background: '#fff',
                             borderRadius: '30px',
                             maxWidth: '450px',
                             width: '100%',
                             overflow: 'hidden',
                             position: 'relative',
-                            boxShadow: '0 25px 50px rgba(0,0,0,0.3)',
-                            background: 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)'
+                            boxShadow: 'var(--shadow-lg)',
+                            background: 'var(--bg-surface)'
                         }}
                     >
                         <button 
@@ -66,65 +65,70 @@ export default function OfferPopup() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                zIndex: 1
+                                zIndex: 1,
+                                color: 'var(--text-dark)'
                             }}
                         >
                             <i className="fas fa-times"></i>
                         </button>
 
-                        <div className="offer-image" style={{ height: '200px', background: 'url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80") center/cover' }}>
+                        <div className="offer-image" style={{ height: '220px', background: 'url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80") center/cover' }}>
                             <div style={{
                                 height: '100%',
-                                background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%)',
+                                background: 'linear-gradient(to bottom, transparent 0%, rgba(142, 28, 28, 0.4) 100%)',
                                 display: 'flex',
                                 alignItems: 'flex-end',
-                                padding: '20px'
+                                padding: '25px'
                             }}>
                                 <span style={{
-                                    background: 'var(--accent-color)',
+                                    background: 'var(--primary-color)',
                                     color: '#fff',
-                                    padding: '5px 15px',
-                                    borderRadius: '10px',
+                                    padding: '6px 18px',
+                                    borderRadius: '12px',
                                     fontWeight: '800',
-                                    fontSize: '0.9rem'
+                                    fontSize: '0.8rem',
+                                    letterSpacing: '1px',
+                                    textTransform: 'uppercase'
                                 }}>LIMITED OFFER</span>
                             </div>
                         </div>
 
-                        <div className="offer-content" style={{ padding: '30px', textAlign: 'center' }}>
-                            <h2 style={{ fontSize: '1.8rem', marginBottom: '10px', color: '#1a1a1a' }}>
+                        <div className="offer-content" style={{ padding: '35px', textAlign: 'center' }}>
+                            <h2 style={{ fontSize: '2rem', marginBottom: '12px', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>
                                 {t('offer.title', 'Unlock 15% Off!')}
                             </h2>
-                            <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '25px' }}>
+                            <p style={{ color: 'var(--text-light)', lineHeight: '1.7', marginBottom: '30px', fontWeight: '500' }}>
                                 {t('offer.sub', 'Join our loyalty family and get an instant discount code for your first online reservation!')}
                             </p>
 
-                            <div className="offer-form" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <div className="offer-form" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                                 <input 
                                     type="email" 
                                     placeholder={t('offer.emailPlaceholder', 'Enter your email')}
                                     style={{
-                                        padding: '15px 20px',
+                                        padding: '18px 25px',
                                         borderRadius: '15px',
-                                        border: '1px solid #ddd',
+                                        border: '1px solid var(--border-color)',
                                         fontSize: '1rem',
-                                        outline: 'none'
+                                        outline: 'none',
+                                        background: 'var(--bg-body)',
+                                        color: 'var(--text-dark)',
+                                        transition: 'var(--transition)'
                                     }}
                                 />
                                 <button
                                     className="btn btn-primary"
                                     onClick={handleClose}
                                     style={{
-                                        padding: '15px',
-                                        borderRadius: '15px',
-                                        fontWeight: '700',
-                                        fontSize: '1.1rem',
-                                        boxShadow: '0 10px 20px rgba(var(--accent-rgb), 0.3)'
+                                        padding: '18px',
+                                        borderRadius: '50px',
+                                        fontWeight: '800',
+                                        fontSize: '1.1rem'
                                     }}
                                 >
                                     {t('offer.cta', 'Claim My Discount')}
                                 </button>
-                                <p style={{ fontSize: '0.8rem', color: '#999', marginTop: '5px' }}>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px', fontWeight: '600' }}>
                                     {t('offer.footer', 'No spam. Just delicious updates and exclusive deals.')}
                                 </p>
                             </div>

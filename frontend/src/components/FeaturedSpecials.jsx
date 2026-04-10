@@ -73,6 +73,7 @@ export default function FeaturedSpecials({ isNative = false }) {
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
+                    style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '3rem' }}
                 >
                     {t('specials.title', 'Chef\'s Featured Specials')}
                 </motion.h2>
@@ -96,12 +97,12 @@ export default function FeaturedSpecials({ isNative = false }) {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 }}
-                        whileHover={{ y: -10, boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
+                        whileHover={{ y: -10, boxShadow: 'var(--shadow-lg)' }}
                         style={{
                             borderRadius: 'var(--radius-lg)',
                             overflow: 'hidden',
                             border: '1px solid var(--border-color)',
-                            background: 'var(--bg-glass)',
+                            background: 'var(--bg-surface)',
                             display: 'flex',
                             flexDirection: 'column',
                             height: '100%',
@@ -115,7 +116,7 @@ export default function FeaturedSpecials({ isNative = false }) {
                                 top: '15px',
                                 right: '15px',
                                 background: 'linear-gradient(135deg, var(--primary-color), var(--accent-color))',
-                                color: 'var(--secondary-color)',
+                                color: '#FFFFFF',
                                 padding: '6px 18px',
                                 borderRadius: '30px',
                                 fontSize: '0.75rem',
@@ -126,13 +127,13 @@ export default function FeaturedSpecials({ isNative = false }) {
                                 {item.badge}
                             </div>
                         </div>
-                        <div className="special-info" style={{ padding: '25px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                            <h3 style={{ fontSize: '1.6rem', marginBottom: '12px', color: '#FFF' }}>{getLocalized(item.name)}</h3>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '25px', flex: 1 }}>
+                         <div className="special-info" style={{ padding: '25px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            <h3 style={{ fontSize: '1.6rem', marginBottom: '12px', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>{getLocalized(item.name)}</h3>
+                            <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '25px', flex: 1 }}>
                                 {getLocalized(item.description)}
                             </p>
                             <div className="special-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                                <span style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}>{item.price}</span>
+                                <span style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{item.price}</span>
                                 <button 
                                     className="btn btn-primary" 
                                     style={{ padding: '10px 24px', fontSize: '0.85rem' }}
@@ -146,9 +147,9 @@ export default function FeaturedSpecials({ isNative = false }) {
                                             position: 'top-end',
                                             showConfirmButton: false,
                                             timer: 3000,
-                                            background: '#121212',
-                                            color: '#fff',
-                                            iconColor: '#DAA520'
+                                            background: 'var(--bg-surface)',
+                                            color: 'var(--text-dark)',
+                                            iconColor: 'var(--primary-color)'
                                         });
                                     }}
                                 >

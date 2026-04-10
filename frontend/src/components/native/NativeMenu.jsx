@@ -74,50 +74,51 @@ export default function NativeMenu() {
 
     if (loading) {
         return (
-            <div className="native-loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', color: 'var(--primary-color, #DAA520)' }}>
+            <div className="native-loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', color: 'var(--primary-color)' }}>
                 <i className="fas fa-spinner fa-spin fa-2x"></i>
             </div>
         );
     }
 
     return (
-        <div className="native-menu-view" style={{ padding: '20px', backgroundColor: 'var(--bg-dark, #0a0a0a)' }}>
-            <div className="native-menu-header" style={{ marginBottom: '25px', position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '2.2rem', color: 'white', margin: 0 }}>{t('menu.title', 'Our Menu')}</h2>
+        <div className="native-menu-view">
+            <div className="native-menu-header" style={{ marginBottom: '30px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', color: 'var(--primary-color)', margin: 0 }}>{t('menu.title', 'Our Menu')}</h2>
                     <motion.button 
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setShowMatchmaker(true)}
-                        style={{ padding: '8px 15px', borderRadius: '20px', background: 'var(--primary-color)', color: '#000', border: 'none', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', boxShadow: '0 5px 15px rgba(218, 165, 32, 0.3)' }}
+                        style={{ padding: '10px 18px', borderRadius: '30px', background: 'var(--primary-color)', color: '#FFF', border: 'none', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', boxShadow: 'var(--shadow-sm)' }}
                     >
                         <i className="fas fa-magic"></i> Matchmaker
                     </motion.button>
                 </div>
                 {showMatchmaker && <AiMatchmaker onClose={() => setShowMatchmaker(false)} />}
                 <div className="search-bar futuristic-glass" style={{ 
-                    display: 'flex', alignItems: 'center', padding: '12px 15px', 
-                    borderRadius: '12px', border: '1px solid rgba(218, 165, 32, 0.2)'
+                    display: 'flex', alignItems: 'center', padding: '15px 20px', 
+                    borderRadius: '15px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)'
                 }}>
-                    <i className="fas fa-search" style={{ color: '#888', marginRight: '10px' }}></i>
+                    <i className="fas fa-search" style={{ color: 'var(--text-muted)', marginRight: '12px' }}></i>
                     <input 
                         type="text" 
                         placeholder={t('menu.searchPlaceholder', 'Find your flavor...')} 
-                        style={{ background: 'transparent', border: 'none', color: 'white', width: '100%', outline: 'none' }}
+                        style={{ background: 'transparent', border: 'none', color: 'var(--text-dark)', width: '100%', outline: 'none', fontWeight: '500' }}
                     />
                 </div>
             </div>
 
-            <div className="native-categories" style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '15px' }}>
+            <div className="native-categories" style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '20px', marginBottom: '10px' }}>
                 {categories.map(cat => (
                     <button
                         key={cat}
                         className={`category-tab ${activeCategory === cat ? 'active' : ''}`}
                         onClick={() => setActiveCategory(cat)}
                         style={{
-                            padding: '8px 20px', borderRadius: '20px', border: '1px solid rgba(218, 165, 32, 0.3)',
-                            backgroundColor: activeCategory === cat ? 'var(--primary-color, #DAA520)' : 'rgba(255,255,255,0.05)',
-                            color: activeCategory === cat ? '#0a0a0a' : '#aaa',
-                            fontWeight: '600', whiteSpace: 'nowrap', transition: 'all 0.3s'
+                            padding: '10px 25px', borderRadius: '30px', border: '1px solid var(--border-color)',
+                            backgroundColor: activeCategory === cat ? 'var(--primary-color)' : 'var(--bg-surface)',
+                            color: activeCategory === cat ? '#FFF' : 'var(--text-muted)',
+                            fontWeight: '800', whiteSpace: 'nowrap', transition: 'var(--transition)',
+                            fontSize: '0.9rem', boxShadow: 'var(--shadow-sm)'
                         }}
                     >
                         {cat === 'All' ? 'All' : cat}
@@ -125,30 +126,32 @@ export default function NativeMenu() {
                 ))}
             </div>
 
-            <div className="native-menu-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '15px' }}>
+            <div className="native-menu-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <AnimatePresence>
                     {filteredItems.map((item, index) => (
                         <motion.div
                             key={item.id || index}
-                            initial={{ opacity: 0, scale: 0.9 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             className="native-menu-card futuristic-glass"
                             style={{ 
-                                background: 'rgba(20, 20, 20, 0.7)', borderRadius: '18px', 
-                                border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden'
+                                background: 'var(--bg-surface)', borderRadius: '25px', 
+                                border: '1px solid var(--border-color)', overflow: 'hidden',
+                                boxShadow: 'var(--shadow-sm)'
                             }}
                         >
-                            <div style={{ height: '160px', position: 'relative' }}>
+                            <div style={{ height: '150px', position: 'relative' }}>
                                 <img src={item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 <div style={{ 
-                                    position: 'absolute', bottom: '10px', left: '10px',
-                                    backgroundColor: 'rgba(10,10,10,0.8)', color: 'var(--primary-color, #DAA520)',
-                                    padding: '4px 10px', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.85rem'
+                                    position: 'absolute', top: '12px', right: '12px',
+                                    backgroundColor: 'var(--primary-color)', color: '#FFFFFF',
+                                    padding: '5px 12px', borderRadius: '12px', fontWeight: '900', fontSize: '0.9rem',
+                                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
                                 }}>₹{item.price}</div>
                             </div>
-                            <div style={{ padding: '15px' }}>
-                                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem', fontFamily: "'Playfair Display', serif" }}>{getLocalized(item.name)}</h3>
-                                <p style={{ fontSize: '0.75rem', color: '#888', lineHeight: '1.3', marginBottom: '15px', height: '3.9em', overflow: 'hidden' }}>
+                            <div style={{ padding: '15px 12px 12px' }}>
+                                <h3 style={{ margin: '0 0 6px 0', fontSize: '1rem', fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontWeight: '800' }}>{getLocalized(item.name)}</h3>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', lineHeight: '1.4', marginBottom: '15px', height: '4.2em', overflow: 'hidden', fontWeight: '500' }}>
                                     {getLocalized(item.description)}
                                 </p>
                                 <button
@@ -157,19 +160,19 @@ export default function NativeMenu() {
                                         Swal.fire({ title: 'Added!', text: `${getLocalized(item.name)} added`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
                                     }}
                                     style={{ 
-                                        width: '100%', backgroundColor: 'var(--primary-color, #DAA520)', 
-                                        color: '#0a0a0a', border: 'none', padding: '8px', borderRadius: '10px',
-                                        fontWeight: 'bold', fontSize: '0.85rem'
+                                        width: '100%', backgroundColor: 'var(--bg-body)', 
+                                        color: 'var(--primary-color)', border: '1px solid var(--primary-color)', padding: '10px', borderRadius: '15px',
+                                        fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'var(--transition)'
                                     }}
                                 >
-                                    <i className="fas fa-plus"></i> Add
+                                    <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i> Add
                                 </button>
                             </div>
                         </motion.div>
                     ))}
                 </AnimatePresence>
             </div>
-            <div style={{ height: '100px' }}></div>
+            <div style={{ height: '120px' }}></div>
         </div>
     );
 }
