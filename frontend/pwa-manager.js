@@ -25,9 +25,6 @@ const PWAManager = {
             e.preventDefault();
             // Stash the event so it can be triggered later.
             PWAManager.deferredPrompt = e;
-
-            // Show banner immediately when prompt is ready
-            PWAManager.showInstallBanner();
         });
 
         window.addEventListener('appinstalled', (evt) => {

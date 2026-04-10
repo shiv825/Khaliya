@@ -25,23 +25,6 @@
 <body>
   <div id="root"></div>
 
-  <!-- PWA Install Banner -->
-  <div id="pwaInstallBanner" class="pwa-install-banner">
-    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-      <img src="./pwa-icon-192.png" alt="App Icon" class="pwa-banner-icon"
-        style="width: 40px; height: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
-      <div class="pwa-banner-text" style="flex: 1; text-align: left;">
-        <h4 style="margin: 0; font-size: 1rem; color: #333;">Khaliya App</h4>
-      </div>
-    </div>
-    <div class="pwa-banner-actions" style="display: flex; gap: 12px; align-items: center; flex-direction: row;">
-      <button onclick="document.getElementById('pwaInstallBanner').classList.remove('active')" class="btn-text"
-        style="background: transparent; border: none; cursor: pointer; color: #555; font-size: 0.9rem; padding: 0;">Close</button>
-      <button onclick="window.promptInstall()" class="btn"
-        style="border-radius: 6px; padding: 8px 16px; background: #E63946; color: white; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; margin-top: 0;">Install</button>
-    </div>
-  </div>
-
   <script type="module" src="./src/main.jsx"></script>
   <script type="module" src="./pwa-manager.js"></script>
   <script>
