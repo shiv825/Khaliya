@@ -10,7 +10,7 @@ const PWAManager = {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 // Use relative path for universal hosting compatibility
-                navigator.serviceWorker.register('/service-worker.js')
+                navigator.serviceWorker.register('./service-worker.js')
                     .then(reg => {
                         console.log('✅ Service Worker registered:', reg.scope);
                     })
@@ -26,8 +26,10 @@ const PWAManager = {
             // Stash the event so it can be triggered later.
             PWAManager.deferredPrompt = e;
 
-            // Show banner immediately when prompt is ready
-            PWAManager.showInstallBanner();
+            // Only show if user hasn't explicitly dismissed it previously
+            if (localStorage.getItem('pwaPromptClosed') !== 'true') {
+                PWAManager.showInstallBanner();
+            }
         });
 
         window.addEventListener('appinstalled', (evt) => {
@@ -62,8 +64,16 @@ const PWAManager = {
     closeInstallBanner: () => {
         const banner = document.getElementById('pwaInstallBanner');
         if (banner) banner.classList.remove('active');
+    },
+
+    dismissInstallBanner: () => {
+        PWAManager.closeInstallBanner();
+        // Remember their choice so they are not annoyed again
+        localStorage.setItem('pwaPromptClosed', 'true');
     }
 };
+
+window.PWAManager = PWAManager;
 
 window.promptInstall = PWAManager.promptInstall;
 document.addEventListener('DOMContentLoaded', PWAManager.init);
