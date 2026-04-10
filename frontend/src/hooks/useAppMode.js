@@ -11,8 +11,20 @@ export function useAppMode() {
         // Function to determine if we should show the App Mode
         const checkAppMode = () => {
             const isTabletOrMobile = window.innerWidth <= 1024;
-            // Only trigger Native App Shell if in standalone mode AND on a mobile/tablet screen size
-            return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) && isTabletOrMobile;
+            
+            // Check if URL has the ?app=true flag from manifest.json start_url
+            if (window.location.search.includes('app=true')) {
+                sessionStorage.setItem('isLaunchedFromAppIcon', 'true');
+            }
+            
+            // Allow Native App Shell ONLY if they specifically launched the installed app
+            // (either they just launched it, or they are keeping the app open in this session)
+            const isLaunchedFromAppIcon = sessionStorage.getItem('isLaunchedFromAppIcon') === 'true';
+            
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+            // Only trigger Native App Shell if in standalone mode AND launched from icon AND on mobile
+            return isStandalone && isLaunchedFromAppIcon && isTabletOrMobile;
         };
 
         // Initial check
