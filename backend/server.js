@@ -60,6 +60,50 @@ app.put('/api/bookings/:id', (req, res) => {
     }
 });
 
+// -- AUTH OTP LOGIC --
+let pendingOtps = {}; // { phone: { code, expiry } }
+
+app.post('/api/auth/request-otp', (req, res) => {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ message: 'Phone number is required' });
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = Date.now() + 5 * 60 * 1000; // 5 mins
+
+    pendingOtps[phone] = { otp, expiry };
+
+    console.log('\n' + '='.repeat(40));
+    console.log(`🚀 [AUTH] OTP for +91-${phone} is: \x1b[32m${otp}\x1b[0m`);
+    console.log('='.repeat(40) + '\n');
+
+    res.json({ message: 'OTP sent successfully (Simulated)' });
+});
+
+app.post('/api/auth/verify-otp', (req, res) => {
+    const { phone, code } = req.body;
+    const record = pendingOtps[phone];
+
+    if (!record) {
+        return res.status(400).json({ success: false, message: 'No OTP requested for this number' });
+    }
+
+    if (Date.now() > record.expiry) {
+        delete pendingOtps[phone];
+        return res.status(400).json({ success: false, message: 'OTP expired' });
+    }
+
+    if (record.otp === code) {
+        delete pendingOtps[phone];
+        return res.json({ 
+            success: true, 
+            user: { name: 'Shiv Kumar', email: 'shiv@khaliya.luxury', phone } 
+        });
+    } else {
+        res.status(400).json({ success: false, message: 'Invalid OTP code' });
+    }
+});
+
 // API: Reviews
 app.get('/api/reviews', (req, res) => {
     const reviews = readData('reviews.json');

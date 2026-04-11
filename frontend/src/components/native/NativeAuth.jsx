@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import NativeNotification from './NativeNotification';
 
@@ -18,14 +19,22 @@ export default function NativeAuth({ onLoginSuccess }) {
         return () => clearInterval(interval);
     }, [step, timer]);
 
-    const handlePhoneSubmit = (e) => {
+    const handlePhoneSubmit = async (e) => {
         e.preventDefault();
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         if (phone.length === 10) {
             setIsLoading(true);
-            setTimeout(() => {
+            try {
+                await axios.post(`${API_URL}/api/auth/request-otp`, { phone });
                 setIsLoading(false);
                 setStep('otp');
-            }, 1000);
+                setTimer(30);
+                setOtp(['', '', '', '', '', '']);
+            } catch (err) {
+                console.error(err);
+                setIsLoading(false);
+                alert('Connection failed. Is the server running?');
+            }
         }
     };
 
@@ -47,12 +56,24 @@ export default function NativeAuth({ onLoginSuccess }) {
         }
     };
 
-    const verifyOTP = (code) => {
+    const verifyOTP = async (code) => {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         setIsLoading(true);
-        setTimeout(() => {
+        try {
+            const res = await axios.post(`${API_URL}/api/auth/verify-otp`, { phone, code });
+            if (res.data.success) {
+                setIsLoading(false);
+                setStep('notification');
+            }
+        } catch (err) {
+            console.error(err);
             setIsLoading(false);
-            setStep('notification');
-        }, 1200);
+            const msg = err.response?.data?.message || 'Verification failed';
+            alert(msg);
+            setOtp(['', '', '', '', '', '']);
+            const firstInput = document.getElementById('otp-0');
+            if (firstInput) firstInput.focus();
+        }
     };
 
     const finalizeLogin = () => {
@@ -179,7 +200,12 @@ export default function NativeAuth({ onLoginSuccess }) {
                     Didn't get the code? {timer > 0 ? (
                         <span style={{ color: 'var(--text-muted)' }}>Wait {timer}s</span>
                     ) : (
-                        <span style={{ color: 'var(--primary-color)', fontWeight: '800', borderBottom: '1.5px solid' }}>Resend</span>
+                        <span 
+                            onClick={handlePhoneSubmit}
+                            style={{ color: 'var(--primary-color)', fontWeight: '800', borderBottom: '1.5px solid', cursor: 'pointer' }}
+                        >
+                            Resend
+                        </span>
                     )}
                 </p>
                 <motion.p 
