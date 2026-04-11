@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 export default function AiAssistant() {
     const [isOpen, setIsOpen] = useState(false);
@@ -145,10 +146,10 @@ export default function AiAssistant() {
                     ))}
                     {isTyping && (
                         <div className="khali-msg bot typing" style={{ alignSelf: 'flex-start', background: 'var(--bg-body)', padding: '15px 20px', borderRadius: '20px 20px 20px 4px', border: '1px solid var(--border-color)' }}>
-                            <div className="typing-dots" style={{ display: 'flex', gap: '5px' }}>
-                                <span style={{ width: '6px', height: '6px', background: 'var(--primary-color)', borderRadius: '50%', opacity: 0.4 }}></span>
-                                <span style={{ width: '6px', height: '6px', background: 'var(--primary-color)', borderRadius: '50%', opacity: 0.7 }}></span>
-                                <span style={{ width: '6px', height: '6px', background: 'var(--primary-color)', borderRadius: '50%' }}></span>
+                            <div className="typing-dots" style={{ display: 'flex', gap: '8px' }}>
+                                <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} style={{ width: '8px', height: '8px', background: 'var(--primary-color)', borderRadius: '50%' }}></motion.span>
+                                <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} style={{ width: '8px', height: '8px', background: 'var(--primary-color)', borderRadius: '50%' }}></motion.span>
+                                <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} style={{ width: '8px', height: '8px', background: 'var(--primary-color)', borderRadius: '50%' }}></motion.span>
                             </div>
                         </div>
                     )}
@@ -218,7 +219,7 @@ export default function AiAssistant() {
                   title="Speak with Luxury Concierge"
                   style={{
                     position: 'fixed',
-                    bottom: '30px',
+                    bottom: 'calc(30px + var(--pwa-offset, 0px))',
                     right: '30px',
                     width: '70px',
                     height: '70px',
@@ -236,6 +237,12 @@ export default function AiAssistant() {
                   }}
                 >
                     <i className="fas fa-concierge-bell"></i>
+                    <style>{`
+                        @media (max-width: 768px) {
+                            .khali-trigger { --pwa-offset: 75px; }
+                            .khali-window { bottom: 160px !important; width: 90% !important; left: 5% !important; right: 5% !important; }
+                        }
+                    `}</style>
                 </button>
             )}
         </div>

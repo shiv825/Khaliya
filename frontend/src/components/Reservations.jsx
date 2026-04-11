@@ -97,7 +97,14 @@ export default function Reservations({ predefinedTable }) {
                                 }}
                             >
                                 <i className="fas fa-check-circle"></i>
-                                {t('reservations.selectedTable', 'Space Reserved:')} {selectedTableInfo.type} ({selectedTableInfo.id})
+                                <span style={{ flex: 1 }}>{t('reservations.selectedTable', 'Space Reserved:')} {selectedTableInfo.type} ({selectedTableInfo.id})</span>
+                                <button 
+                                    type="button"
+                                    onClick={() => { setSelectedTableInfo(null); setFormData(prev => ({ ...prev, tableType: '', guests: '' })); }}
+                                    style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
                             </motion.div>
                         )}
                     </AnimatePresence>

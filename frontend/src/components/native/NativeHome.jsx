@@ -129,21 +129,39 @@ export default function NativeHome({ setActiveTab }) {
                 <FeaturedSpecials isNative={true} />
             </div>
 
-            {/* Offers Slider */}
+            {/* Offers Slider - Luxury Voucher Aesthetic */}
             <div className="native-section" style={{ marginBottom: '40px' }}>
+                <div className="section-header" style={{ marginBottom: '20px' }}>
+                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--primary-color)' }}>Elite Perks</h3>
+                </div>
                 <div className="horizontal-scroll" style={{ display: 'flex', gap: '20px', overflowX: 'auto', paddingBottom: '15px' }}>
-                    {offers.map(offer => (
-                        <div key={offer.id} style={{ 
-                            minWidth: '280px', padding: '25px', borderRadius: '25px', 
-                            backgroundColor: 'var(--bg-surface)', border: `2px dashed ${offer.color}`,
-                            position: 'relative', boxShadow: 'var(--shadow-sm)'
-                        }}>
-                            <h3 style={{ margin: 0, color: offer.color, fontSize: '1.4rem', fontWeight: '900' }}>{offer.title}</h3>
-                            <p style={{ margin: '8px 0 15px 0', fontSize: '1rem', color: 'var(--text-light)', fontWeight: '600' }}>{offer.desc}</p>
-                            <div style={{ padding: '8px 15px', background: 'var(--bg-body)', borderRadius: '12px', fontSize: '0.9rem', display: 'inline-block', fontWeight: '800', border: '1px solid var(--border-color)' }}>
-                                Code: <span style={{ color: offer.color }}>{offer.code}</span>
-                            </div>
-                        </div>
+                    {offers.map((offer, idx) => (
+                        <motion.div 
+                            key={offer.id} 
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: idx * 0.1 }}
+                            style={{ 
+                                minWidth: '280px', padding: '30px', borderRadius: '30px', 
+                                background: `linear-gradient(135deg, var(--bg-surface) 0%, ${offer.bg} 100%)`, 
+                                border: `1px solid ${offer.color}33`,
+                                position: 'relative', boxShadow: 'var(--shadow-md)',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <div style={{ position: 'absolute', top: '50%', right: '-20px', width: '40px', height: '40px', background: 'var(--bg-body)', borderRadius: '50%', transform: 'translateY(-50%)' }}></div>
+                            <div style={{ position: 'absolute', top: '50%', left: '-20px', width: '40px', height: '40px', background: 'var(--bg-body)', borderRadius: '50%', transform: 'translateY(-50%)' }}></div>
+                            
+                            <h3 style={{ margin: 0, color: offer.color, fontSize: '1.8rem', fontWeight: '900', fontFamily: 'var(--font-heading)' }}>{offer.title}</h3>
+                            <p style={{ margin: '8px 0 20px 0', fontSize: '1.1rem', color: 'var(--text-dark)', fontWeight: '700' }}>{offer.desc}</p>
+                            <button style={{ 
+                                background: offer.color, color: '#FFF', border: 'none', 
+                                padding: '10px 20px', borderRadius: '50px', fontWeight: '800', 
+                                fontSize: '0.8rem', textTransform: 'uppercase' 
+                            }}>
+                                {offer.code}
+                            </button>
+                        </motion.div>
                     ))}
                 </div>
             </div>

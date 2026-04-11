@@ -90,6 +90,20 @@
     --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.8);
 }
 
+/* Film Grain Overlay for Evening Mode */
+.app-theme-evening::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+}
+
 html {
     scroll-behavior: smooth;
     overflow-x: hidden !important;
@@ -107,6 +121,7 @@ body {
     width: 100% !important;
     max-width: 100% !important;
     position: relative;
+    transition: background-color 0.8s ease, color 0.8s ease;
 }
 
 /* Typography Base */
@@ -197,8 +212,15 @@ a {
 
 .btn-primary:hover, button.primary:hover {
     box-shadow: 0 15px 30px rgba(211, 47, 47, 0.3);
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02);
     filter: brightness(1.1);
+}
+
+/* Luxury Card Hover Effects */
+.testimonial-card:hover, .native-menu-card:hover, .reward-card:hover, .native-hero-card:hover {
+    transform: translateY(-8px) scale(1.01) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border-color: var(--accent-color) !important;
 }
 
 /* Floating Navbar Fix */
