@@ -141,7 +141,7 @@ export default function NativeMenu() {
                             }}
                         >
                             <div style={{ height: '150px', position: 'relative' }}>
-                                <img src={item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img src={item.image?.startsWith('/') ? `.${item.image}` : item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 <div style={{ 
                                     position: 'absolute', top: '12px', right: '12px',
                                     backgroundColor: 'var(--primary-color)', color: '#FFFFFF',
