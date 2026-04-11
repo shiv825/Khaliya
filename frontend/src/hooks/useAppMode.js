@@ -8,17 +8,36 @@ export function useAppMode() {
     const [isAppMode, setIsAppMode] = useState(false);
 
     useEffect(() => {
-        // Check if the app is installed and running in standalone mode
-        const mediaQuery = window.matchMedia('(display-mode: standalone)');
+        // Strict separation: To avoid aggressive Android WebAPK intent interception 
+        // where opening a normal link forces the standalone container, we DEMAND
+        // the ?mode=pwa query parameter to show the Native App Shell.
+        // This parameter is set in manifest.json "start_url".
 
-        // Initial check
-        setIsAppMode(mediaQuery.matches || window.navigator.standalone === true);
+        const searchParams = new URLSearchParams(window.location.search);
+        
+        // 1. Explicit query param (Strongest signal from manifest.json start_url)
+        if (searchParams.has('mode') && searchParams.get('mode') === 'pwa') {
+            setIsAppMode(true);
+            return;
+        }
 
-        // Listen for changes (e.g., if user installs and it switches immediately)
-        const handleChange = (e) => setIsAppMode(e.matches);
-        mediaQuery.addEventListener('change', handleChange);
+        // 2. iOS Safari standalone mode (iOS does not reliably pass start_url query params when added to homescreen)
+        if (window.navigator.standalone === true) {
+            setIsAppMode(true);
+            return;
+        }
 
-        return () => mediaQuery.removeEventListener('change', handleChange);
+        // 3. Optional fallback: If they explicitly request website
+        if (searchParams.has('mode') && searchParams.get('mode') === 'website') {
+            setIsAppMode(false);
+            return;
+        }
+
+        // Force website mode by default for ALL other generic loads
+        // We DO NOT trust window.matchMedia('(display-mode: standalone)') here
+        // because it causes false positives in in-app browsers and WebAPK intents.
+        setIsAppMode(false);
+
     }, []);
 
     return isAppMode;

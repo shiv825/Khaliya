@@ -13,10 +13,10 @@ export default function NativeOrder({ onClose }) {
     }, []);
 
     const steps = [
-        { id: 1, title: 'Order Confirmed', icon: 'fa-check-circle', color: '#10B981' },
-        { id: 2, title: 'Preparing in Kitchen', icon: 'fa-fire-burner', color: 'var(--primary-color, #DAA520)' },
-        { id: 3, title: 'Out for Delivery', icon: 'fa-motorcycle', color: '#3B82F6' },
-        { id: 4, title: 'Delivered', icon: 'fa-box-open', color: '#8B5CF6' }
+        { id: 1, title: 'Order Confirmed', icon: 'fa-check-circle', color: 'var(--spice-emerald)' },
+        { id: 2, title: 'Preparing in Kitchen', icon: 'fa-fire-burner', color: 'var(--spice-saffron)' },
+        { id: 3, title: 'Out for Delivery', icon: 'fa-motorcycle', color: '#3F51B5' },
+        { id: 4, title: 'Delivered', icon: 'fa-box-open', color: 'var(--primary-color)' }
     ];
 
     return (

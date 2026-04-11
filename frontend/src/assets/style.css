@@ -19,32 +19,34 @@
 }
 
 :root {
-    /* Royal Saffron & Ivory Luxury Palette */
-    --primary-color: #8E1C1C; /* Rich Saffron Red */
-    --secondary-color: #2C1B14; /* Deep Earthy Brown */
-    --accent-color: #C5A028; /* Antique Gold */
-    --accent-light: #D4AF37;
-    --accent-glow: rgba(142, 28, 28, 0.15);
+    /* Vibrant Spice Harmony - Premium Colorful Palette */
+    --primary-color: #D32F2F; /* Bold Chili Red */
+    --secondary-color: #311B92; /* Deep Indigo Star Anise */
+    --accent-color: #FFB300; /* Vibrant Turmeric Yellow */
+    --accent-light: #FFC107;
+    --spice-emerald: #2E7D32; /* Cardamom Green */
+    --spice-saffron: #FF8F00; /* Rich Saffron Orange */
+    --accent-glow: rgba(211, 47, 47, 0.15);
 
-    /* Text & Background - Light Mode Focused */
-    --text-dark: #1E1E1E; /* Deep Charcoal for readability */
-    --text-light: #4A4A4A; /* Darkish grey for sub-text */
-    --text-muted: #717171;
-    --bg-body: #FDFCF0; /* Soft Ivory / Premium Cream */
+    /* Text & Background - Warm & Energetic */
+    --text-dark: #1A1A1A;
+    --text-light: #424242;
+    --text-muted: #757575;
+    --bg-body: #FFFBED; /* Warm Pearl Masala */
     --bg-surface: #FFFFFF;
-    --bg-glass: rgba(255, 255, 255, 0.92);
-    --border-color: rgba(142, 28, 28, 0.1);
-    --border-light: rgba(0, 0, 0, 0.08);
+    --bg-glass: rgba(255, 255, 255, 0.94);
+    --border-color: rgba(211, 47, 47, 0.08);
+    --border-light: rgba(0, 0, 0, 0.05);
 
     /* Typography */
     --font-heading: 'Playfair Display', serif;
     --font-body: 'Lato', sans-serif;
 
-    /* Shadows & Effects (Softened for Light Theme) */
-    --shadow-sm: 0 4px 12px rgba(142, 28, 28, 0.05);
-    --shadow-md: 0 12px 32px rgba(142, 28, 28, 0.08);
-    --shadow-lg: 0 24px 64px rgba(142, 28, 28, 0.12);
-    --glass-shadow: 0 8px 32px 0 rgba(44, 27, 20, 0.05);
+    /* Shadows & Effects (Colorful Glows) */
+    --shadow-sm: 0 4px 12px rgba(211, 47, 47, 0.06);
+    --shadow-md: 0 12px 32px rgba(211, 47, 47, 0.1);
+    --shadow-lg: 0 24px 64px rgba(211, 47, 47, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(49, 27, 146, 0.05);
 
     /* Transitions & Borders */
     --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -119,7 +121,7 @@ a {
     transition: var(--transition);
 }
 
-/* Luxury Buttons - Updated for Warm Theme */
+/* Luxury Buttons - Updated for Vibrant Spice Theme */
 .btn, button {
     display: inline-flex;
     align-items: center;
@@ -144,10 +146,10 @@ a {
 }
 
 .btn-primary, button.primary {
-    background: linear-gradient(135deg, var(--primary-color), #A93226);
+    background: linear-gradient(135deg, var(--spice-saffron), var(--primary-color));
     color: #FFFFFF;
     border: none;
-    box-shadow: 0 10px 20px rgba(142, 28, 28, 0.2);
+    box-shadow: 0 10px 20px rgba(211, 47, 47, 0.2);
 }
 
 .btn:hover, button:hover {
@@ -158,7 +160,7 @@ a {
 }
 
 .btn-primary:hover, button.primary:hover {
-    box-shadow: 0 15px 30px rgba(142, 28, 28, 0.3);
+    box-shadow: 0 15px 30px rgba(211, 47, 47, 0.3);
     transform: translateY(-5px);
     filter: brightness(1.1);
 }
@@ -498,4 +500,192 @@ footer .copyright span {
 /* Rest of AOS Animations */
 [data-aos] {
     transition-duration: 0.8s !important;
+}
+/* --- Interactive Map Styles --- */
+.map-container:hover .map-overlay {
+    opacity: 1 !important;
+    background: rgba(142, 28, 28, 0.4) !important;
+}
+
+.map-container:hover iframe {
+    transform: scale(1.02);
+    filter: brightness(0.8) grayscale(0.2);
+}
+
+.map-overlay div {
+    transition: var(--transition);
+}
+
+.map-container:hover .map-overlay div {
+    transform: translateY(0) scale(1.1);
+}
+
+.map-overlay div {
+    transform: translateY(20px) scale(1);
+}
+
+.route-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: var(--bg-body);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    color: var(--text-dark);
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.route-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+    transform: translateX(5px);
+    border-color: var(--primary-color);
+}
+
+.route-btn:hover i {
+    color: #fff !important;
+}
+
+/* --- PWA Install Banner (Vibrant Spice Style) --- */
+.pwa-banner {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: auto;
+    z-index: 10000;
+    background: rgba(255, 251, 237, 0.98);
+    backdrop-filter: blur(15px);
+    border-bottom: 2px solid var(--primary-color);
+    border-top: none;
+    box-shadow: 0 10px 40px rgba(211, 47, 47, 0.15);
+    padding: 20px;
+    transform: translateY(-110%);
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    visibility: hidden;
+}
+
+.pwa-banner.active {
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.pwa-banner-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.pwa-icon {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.pwa-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pwa-content {
+    flex: 1;
+}
+
+.pwa-content h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.pwa-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    line-height: 1.4;
+}
+
+.pwa-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.pwa-btn-install {
+    background: linear-gradient(135deg, var(--spice-saffron), var(--primary-color));
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(211, 47, 47, 0.2);
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.pwa-btn-install:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(211, 47, 47, 0.3);
+}
+
+.pwa-btn-later {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.pwa-btn-later:hover {
+    background: rgba(0,0,0,0.03);
+    color: var(--text-dark);
+}
+
+@media (min-width: 769px) {
+    .pwa-banner {
+        left: 50%;
+        right: auto;
+        top: 20px;
+        transform: translate(-50%, -150%);
+        width: 450px;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(211, 47, 47, 0.2);
+    }
+    
+    .pwa-banner.active {
+        transform: translate(-50%, 0);
+    }
+}
+
+@media (max-width: 500px) {
+    .pwa-banner-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+    
+    .pwa-actions {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .pwa-actions button {
+        flex: 1;
+    }
 }

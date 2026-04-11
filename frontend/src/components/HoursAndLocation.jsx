@@ -150,12 +150,78 @@ export default function HoursAndLocation() {
                 )}
 
                 <h3 style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--primary-color)' }}>{t('track.mapTitle')}</h3>
-                <div className="map-container" data-aos="fade-up" data-aos-delay="200" style={{ marginTop: '3rem', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border-color)' }}>
+                <div 
+                    className="map-container" 
+                    data-aos="fade-up" 
+                    data-aos-delay="200" 
+                    style={{ 
+                        marginTop: '3rem', 
+                        borderRadius: 'var(--radius-lg)', 
+                        overflow: 'hidden', 
+                        boxShadow: 'var(--shadow-md)', 
+                        border: '1px solid var(--border-color)',
+                        position: 'relative',
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                        const origin = locationState.lat ? `${locationState.lat},${locationState.lng}` : '';
+                        const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}`;
+                        window.open(url, '_blank');
+                    }}
+                >
                     <iframe
                         title="Khaliya Restaurant Location"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.003975762078!2d88.3347072!3d22.6108169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a02798f090d80c9%3A0xe104332b4b47ea87!2sKhaliya%20Restaurant!5e0!3m2!1sen!2sin!4v1714902123955!5m2!1sen!2sin"
-                        width="100%" height="450" style={{ border: 0, display: 'block' }} allowFullScreen="" loading="lazy">
+                        width="100%" height="450" style={{ border: 0, display: 'block', pointerEvents: 'none' }} allowFullScreen="" loading="lazy">
                     </iframe>
+                    
+                    {/* Overlay for Directions */}
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'var(--transition)',
+                        opacity: 0,
+                        zIndex: 10
+                    }} className="map-overlay">
+                        <div style={{
+                            background: 'var(--primary-color)',
+                            color: '#fff',
+                            padding: '12px 24px',
+                            borderRadius: '30px',
+                            fontWeight: '800',
+                            boxShadow: 'var(--shadow-lg)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px'
+                        }}>
+                            <i className="fas fa-directions"></i>
+                            Get Live Directions
+                        </div>
+                    </div>
+                    
+                    {/* Status badge when location is found */}
+                    {locationState.distance && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '20px',
+                            right: '20px',
+                            background: 'rgba(255,255,255,0.95)',
+                            padding: '10px 20px',
+                            borderRadius: '15px',
+                            boxShadow: 'var(--shadow-sm)',
+                            zIndex: 11,
+                            border: '1px solid var(--primary-color)',
+                            backdropFilter: 'blur(5px)'
+                        }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Royal Distance</div>
+                            <div style={{ fontSize: '1.2rem', fontWeight: '900', color: 'var(--primary-color)' }}>{locationState.distance} km</div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)' }}>~ {locationState.travelTime}</div>
+                        </div>
+                    )}
                 </div>
             </section>
         </>

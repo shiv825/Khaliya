@@ -533,11 +533,34 @@ export default function Menu() {
             </div>
 
             <div className="menu-filters" style={{ display: 'flex', justifyContent: 'center', gap: '0.8rem', marginBottom: '3.5rem', flexWrap: 'wrap' }}>
-                {['All', 'Appetizer', 'Main Course', 'Bread', 'Dessert', 'Beverage'].map(cat => (
-                    <button key={cat} onClick={() => setFilter(cat)} className={`btn menu-filter-btn ${filter === cat ? 'active' : ''}`}>
-                        {t(cat === 'All' ? 'menu.catAll' : cat === 'Appetizer' ? 'menu.catAppetizer' : cat === 'Main Course' ? 'menu.catMain' : cat === 'Bread' ? 'menu.catBread' : cat === 'Dessert' ? 'menu.catDessert' : 'menu.catBeverage')}
-                    </button>
-                ))}
+                {['All', 'Appetizer', 'Main Course', 'Bread', 'Dessert', 'Beverage'].map(cat => {
+                    const isActive = filter === cat;
+                    const catColors = {
+                        'All': 'var(--primary-color)',
+                        'Appetizer': 'var(--spice-emerald)',
+                        'Main Course': 'var(--primary-color)',
+                        'Bread': 'var(--spice-saffron)',
+                        'Dessert': 'var(--accent-color)',
+                        'Beverage': 'var(--secondary-color)'
+                    };
+                    return (
+                        <button 
+                            key={cat} 
+                            onClick={() => setFilter(cat)} 
+                            className={`btn menu-filter-btn ${isActive ? 'active' : ''}`}
+                            style={{
+                                background: isActive ? catColors[cat] : 'var(--bg-surface)',
+                                color: isActive ? '#fff' : 'var(--text-dark)',
+                                borderColor: isActive ? catColors[cat] : 'var(--border-color)',
+                                padding: '12px 24px',
+                                boxShadow: isActive ? `0 8px 20px ${catColors[cat]}44` : 'var(--shadow-sm)',
+                                fontWeight: '700'
+                            }}
+                        >
+                            {t(cat === 'All' ? 'menu.catAll' : cat === 'Appetizer' ? 'menu.catAppetizer' : cat === 'Main Course' ? 'menu.catMain' : cat === 'Bread' ? 'menu.catBread' : cat === 'Dessert' ? 'menu.catDessert' : 'menu.catBeverage')}
+                        </button>
+                    );
+                })}
             </div>
 
             <div id="menu-container" className="menu">

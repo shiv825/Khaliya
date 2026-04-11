@@ -36,9 +36,9 @@ export default function Loyalty() {
     }, []);
 
     const getTierInfo = (pts) => {
-        if (pts >= 1000) return { name: 'Gold', icon: '👑', color: '#ffd700', next: null };
-        if (pts >= 500) return { name: 'Silver', icon: '🥈', color: '#c0c0c0', next: 1000 };
-        return { name: 'Bronze', icon: '🥉', color: '#cd7f32', next: 500 };
+        if (pts >= 1000) return { name: 'Saffron', icon: '👑', color: 'var(--spice-saffron)', next: null };
+        if (pts >= 500) return { name: 'Emerald', icon: '💎', color: 'var(--spice-emerald)', next: 1000 };
+        return { name: 'Chili', icon: '🌶️', color: 'var(--primary-color)', next: 500 };
     };
 
     const tier = getTierInfo(points);
@@ -125,12 +125,12 @@ export default function Loyalty() {
                                 width: '100%',
                                 maxWidth: '450px',
                                 height: '260px',
-                                background: tier.name === 'Gold' ? 'linear-gradient(135deg, #FFD700 0%, #DAA520 50%, #B8860B 100%)' :
-                                            tier.name === 'Silver' ? 'linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 50%, #808080 100%)' :
-                                            'linear-gradient(135deg, #CD7F32 0%, #A0522D 50%, #8B4513 100%)',
+                                background: tier.name === 'Saffron' ? 'linear-gradient(135deg, #FF8F00 0%, #FFB300 50%, #FFD54F 100%)' :
+                                            tier.name === 'Emerald' ? 'linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%)' :
+                                            'linear-gradient(135deg, #B71C1C 0%, #D32F2F 50%, #E57373 100%)',
                                 borderRadius: '25px',
                                 padding: '35px',
-                                color: '#000',
+                                color: '#FFF',
                                 boxShadow: '0 40px 80px rgba(44, 27, 20, 0.25), inset 0 0 20px rgba(255,255,255,0.4)',
                                 display: 'flex',
                                 flexDirection: 'column',

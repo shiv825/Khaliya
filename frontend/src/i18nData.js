@@ -160,11 +160,21 @@ export const i18nData = {
             laterBtn: 'Later',
             installed: '🎉 App installed successfully!',
             offlineNotify: '🔌 You are offline. Changes will sync when reconnected.',
-            notificationsEnabled: '🔔 Notifications enabled!'
+            notificationsEnabled: '🔔 Notifications enabled!',
+            manualTitle: 'How to Install',
+            stepiOS: 'Tap the Share icon ⎋ at the bottom, then scroll down and tap "Add to Home Screen".',
+            stepAndroid: 'Tap the menu icon ⋮ at the top right, then tap "Install App" or "Add to Home Screen".',
+            stepDesktop: 'Look for the install icon 🖥️ in your browser address bar and click to install.',
+            howToInstallBtn: 'How to Install?'
         },
         social: {
             title: 'Moments at Khaliya',
             sub: 'Tag us @KhaliyaRestaurant to be featured in our monthly gallery!'
+        },
+        specials: {
+            title: "Chef's Featured Specials",
+            sub: "Experience the unique flavors of the season with our curated selections.",
+            cta: "Explored More"
         }
     },
     hi: {
@@ -328,11 +338,21 @@ export const i18nData = {
             laterBtn: 'बाद में',
             installed: '🎉 ऐप सफलतापूर्वक इंस्टॉल हो गया!',
             offlineNotify: '🔌 आप ऑफ़लाइन हैं। दोबारा जुड़ने पर परिवर्तन सिंक होंगे।',
-            notificationsEnabled: '🔔 सूचनाएं चालू हो गईं!'
+            notificationsEnabled: '🔔 सूचनाएं चालू हो गईं!',
+            manualTitle: 'कैसे इंस्टॉल करें',
+            stepiOS: 'नीचे शेयर आइकन ⎋ पर टैप करें, फिर नीचे स्क्रॉल करें और "होम स्क्रीन में जोड़ें" पर टैप करें।',
+            stepAndroid: 'ऊपर दाईं ओर मेनू आइकन ⋮ पर टैप करें, फिर "ऐप्लिकेशन इंस्टॉल करें" या "होम स्क्रीन में जोड़ें" पर टैप करें।',
+            stepDesktop: 'अपने ब्राउज़र एड्रेस बार में ইন্সटॉल आइकन 🖥️ देखें और इंस्टॉल करने के लिए क्लिक करें।',
+            howToInstallBtn: 'कैसे इंस्टॉल करें?'
         },
         social: {
             title: 'खालिया में पल',
-            sub: 'हमारी मासिक गैलरी में प्रदर्शित होने के लिए हमें @KhaliyaRestaurant टैग करें!'
+            sub: 'हमारी मासिक गैلरी में प्रदर्शित होने के लिए हमें @KhaliyaRestaurant टैग करें!'
+        },
+        specials: {
+            title: "शेफ के विशेष व्यंजन",
+            sub: "हमारे क्यूरेटेड चयनों के साथ सीज़न के अनूठे स्वादों का अनुभव करें।",
+            cta: "और देखें"
         }
     },
     ar: {
@@ -496,11 +516,21 @@ export const i18nData = {
             laterBtn: 'لاحقاً',
             installed: '🎉 تم تثبيت التطبيق بنجاح!',
             offlineNotify: '🔌 أنت غير متصل بالإنترنت. ستتم مزامنة التغييرات عند إعادة الاتصال.',
-            notificationsEnabled: '🔔 تم تفعيل التنبيهات!'
+            notificationsEnabled: '🔔 تم تفعيل التنبيهات!',
+            manualTitle: 'كيفية التثبيت',
+            stepiOS: 'اضغط على أيقونة المشاركة ⎋ في الأسفل، ثم قم بالتمرير لأسفل واضغط على "إضافة إلى الشاشة الرئيسية".',
+            stepAndroid: 'اضغط على أيقونة القائمة ⋮ في أعلى اليمين، ثم اضغط على "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".',
+            stepDesktop: 'ابحث عن أيقونة التثبيت 🖥️ في شريط عنوان المتصفح وانقر للتثبيت.',
+            howToInstallBtn: 'كيف أثبت؟'
         },
         social: {
             title: 'لحظات في خاليا',
             sub: 'أشر إلينا على @KhaliyaRestaurant ليتم عرضك في معرضنا الشهري!'
+        },
+        specials: {
+            title: "مأكولات الشيف الخاصة",
+            sub: "استمتع بالنكهات الفريدة للموسم مع اختياراتنا المنسقة.",
+            cta: "استكشف المزيد"
         }
     }
 };

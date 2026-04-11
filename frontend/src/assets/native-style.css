@@ -11,17 +11,19 @@
     padding: 0 !important;
     left: 0 !important;
     
-    /* Theme Variables */
-    --primary-color: #8E1C1C;
-    --accent-color: #C5A028;
-    --bg-body: #FDFCF0;
+    /* Vibrant Spice Harmony - Premium Colorful Palette */
+    --primary-color: #D32F2F; /* Chili Red */
+    --accent-color: #FFB300; /* Turmeric Yellow */
+    --spice-emerald: #2E7D32; /* Cardamom Green */
+    --spice-saffron: #FF8F00; /* Saffron Orange */
+    --bg-body: #FFFBED; /* Warm Pearl Masala */
     --bg-surface: #FFFFFF;
-    --text-dark: #1E1E1E;
-    --text-light: #4A4A4A;
-    --text-muted: #717171;
-    --border-color: rgba(142, 28, 28, 0.1);
-    --shadow-sm: 0 4px 12px rgba(142, 28, 28, 0.05);
-    --shadow-md: 0 12px 24px rgba(142, 28, 28, 0.08);
+    --text-dark: #1A1A1A;
+    --text-light: #424242;
+    --text-muted: #757575;
+    --border-color: rgba(211, 47, 47, 0.08);
+    --shadow-sm: 0 4px 12px rgba(211, 47, 47, 0.06);
+    --shadow-md: 0 12px 24px rgba(211, 47, 47, 0.1);
 
     background-color: var(--bg-body);
     color: var(--text-dark);

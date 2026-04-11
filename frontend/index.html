@@ -26,11 +26,11 @@
   <div id="root"></div>
 
   <script type="module" src="./src/main.jsx"></script>
-  <script type="module" src="./pwa-manager.js"></script>
+  <script type="module" src="/pwa-manager.js?v=2.2"></script>
   <script>
     // CACHE BUSTER: Force clear service worker and cache to ensure new CSS loads
     (function () {
-      if (!localStorage.getItem('cache_busted_v1')) {
+      if (!localStorage.getItem('cache_busted_v2')) {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function (registrations) {
             for (let registration of registrations) {
@@ -43,11 +43,28 @@
             for (let name of names) caches.delete(name);
           });
         }
-        localStorage.setItem('cache_busted_v1', 'true');
+        localStorage.setItem('cache_busted_v2', 'true');
         setTimeout(() => window.location.reload(true), 500);
       }
     })();
   </script>
+
+  <!-- PWA Install Banner -->
+  <div id="pwaInstallBanner" class="pwa-banner">
+    <div class="pwa-banner-inner">
+      <div class="pwa-icon">
+        <img src="./pwa-icon-192.png" alt="Khaliya Logo">
+      </div>
+      <div class="pwa-content">
+        <h3 id="pwaInstallTitle">Install Khaliya App</h3>
+        <p id="pwaInstallDesc">Fast access to our menu and live order updates.</p>
+      </div>
+      <div class="pwa-actions">
+        <button id="pwaInstallBtn" class="pwa-btn-install" onclick="window.promptInstall()">Install</button>
+        <button id="pwaLaterBtn" class="pwa-btn-later">Later</button>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
