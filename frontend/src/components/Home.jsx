@@ -8,7 +8,6 @@ import Menu from './Menu';
 import Reviews from './Reviews';
 import HoursAndLocation from './HoursAndLocation';
 import Tables from './Tables';
-import PrivateDining from './PrivateDining';
 import GalleryAndSocial from './GalleryAndSocial';
 import Loyalty from './Loyalty';
 import Reservations from './Reservations';
@@ -36,7 +35,6 @@ export default function Home() {
                 <Reviews />
                 <HoursAndLocation />
                 <Tables onSelectTable={handleTableSelect} />
-                <PrivateDining />
                 <GalleryAndSocial />
                 <Loyalty />
 
