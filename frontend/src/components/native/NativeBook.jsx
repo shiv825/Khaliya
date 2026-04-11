@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import InteractiveFloorplan from '../InteractiveFloorplan';
 
@@ -144,7 +145,30 @@ export default function NativeBook() {
                             <motion.button 
                                 whileTap={{ scale: 0.95 }} 
                                 className="zomato-btn-main" 
-                                onClick={() => Swal.fire({ title: 'Reserved!', text: 'Your royal table awaits.', icon: 'success', confirmButtonColor: '#8E1C1C' })}
+                                onClick={() => {
+                                    const storedUser = localStorage.getItem('khaliya_native_user');
+                                    const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
+                                    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                                    
+                                    const payload = {
+                                        ...formData,
+                                        name: user.name,
+                                        phone: user.phone || '9999999999',
+                                        email: user.email || 'guest@khaliya.pwa',
+                                        source: 'App'
+                                    };
+
+                                    axios.post(`${API_URL}/api/bookings`, payload)
+                                        .then(() => {
+                                            Swal.fire({ title: 'Reserved!', text: 'Your royal table awaits.', icon: 'success', confirmButtonColor: '#8E1C1C' });
+                                            setStep(1);
+                                            setFormData({ date: '', time: '', guests: 2, tableType: '' });
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                            Swal.fire('Error', 'Failed to connect. Please try again.', 'error');
+                                        });
+                                }}
                                 style={{ flex: 2, margin: 0 }}
                             >
                                 Confirm Table

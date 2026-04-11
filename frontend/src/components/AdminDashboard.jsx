@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,19 +41,58 @@ export default function AdminDashboard({ onLogout }) {
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+    const [lastFetchCount, setLastFetchCount] = useState(0);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const bookingIdsRef = useRef(new Set());
+
     useEffect(() => {
-        fetchBookings();
+        fetchBookings(true); // Initial fetch
         fetchMenu();
-        // Auto-close sidebar on small screens
+        
+        // Start Real-Time Polling (5 seconds)
+        const pollInterval = setInterval(() => {
+            fetchBookings(false);
+        }, 5000);
+
         if (window.innerWidth < 1024) setIsSidebarOpen(false);
+        
+        return () => clearInterval(pollInterval);
     }, []);
 
-    const fetchBookings = async () => {
+    const fetchBookings = async (isInitial = false) => {
+        setIsSyncing(true);
         try {
             const res = await axios.get(`${API_URL}/api/bookings`);
-            setBookings(res.data || []);
+            const data = res.data || [];
+            
+            // Check for new bookings to notify
+            if (!isInitial && data.length > 0) {
+                const newBookings = data.filter(b => !bookingIdsRef.current.has(b.id));
+                if (newBookings.length > 0) {
+                    newBookings.forEach(nb => {
+                        Swal.fire({
+                            title: 'New Booking!',
+                            text: `${nb.name} just reserved via ${nb.source || 'Web'}`,
+                            icon: 'info',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 4000,
+                            timerProgressBar: true,
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                    });
+                }
+            }
+
+            // Update refs and state
+            data.forEach(b => bookingIdsRef.current.add(b.id));
+            setBookings(data);
         } catch (err) {
             console.error('Failed to fetch bookings', err);
+        } finally {
+            setTimeout(() => setIsSyncing(false), 800);
         }
     };
 
@@ -349,12 +388,24 @@ export default function AdminDashboard({ onLogout }) {
                 
                 {/* Header / Top Bar */}
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-                    <div>
-                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
-                            {activeTab === 'bookings' ? 'Reservations Control' : activeTab === 'menu' ? 'Menu Management' : 'Performance Insights'}
-                        </h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+                                {activeTab === 'bookings' ? 'Reservations Control' : activeTab === 'menu' ? 'Menu Management' : 'Performance Insights'}
+                            </h2>
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                background: 'rgba(16, 185, 129, 0.1)', 
+                                padding: '4px 10px', 
+                                borderRadius: '20px',
+                                marginLeft: '10px'
+                            }}>
+                                <div className={`sync-dot ${isSyncing ? 'syncing' : ''}`} style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%' }}></div>
+                                <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#10b981', textTransform: 'uppercase' }}>Live Sync</span>
+                            </div>
+                        </div>
                         <p style={{ color: 'var(--admin-text-muted)', margin: '5px 0 0 0' }}>Manage your restaurant operations effectively</p>
-                    </div>
                     
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', marginRight: '10px' }}>
@@ -462,6 +513,9 @@ export default function AdminDashboard({ onLogout }) {
                                                         <span className="item-detail"><i className="far fa-clock"></i> {b.time}</span>
                                                         <span className="item-detail"><i className="fas fa-users"></i> {b.guests} Guests</span>
                                                         <span className="item-detail"><i className="fas fa-phone"></i> {b.phone}</span>
+                                                        <span className={`source-badge ${b.source === 'App' ? 'source-app' : 'source-web'}`}>
+                                                            <i className={`fas ${b.source === 'App' ? 'fa-mobile-alt' : 'fa-laptop'}`}></i> {b.source || 'Web'}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>

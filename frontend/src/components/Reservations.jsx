@@ -44,7 +44,8 @@ export default function Reservations({ predefinedTable }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(`${API_URL}/api/bookings`, formData)
+        const payload = { ...formData, source: 'Website' };
+        axios.post(`${API_URL}/api/bookings`, payload)
             .then(res => {
                 setMessage(t('msg.bookingConfirmed') || 'Booking saved!');
                 setFormData({ name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: '' });
