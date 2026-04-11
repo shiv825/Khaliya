@@ -577,13 +577,13 @@ footer .copyright span {
     margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .pwa-icon {
-    width: 60px;
-    height: 60px;
-    min-width: 60px;
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -601,32 +601,32 @@ footer .copyright span {
 }
 
 .pwa-content h3 {
-    margin: 0 0 4px 0;
-    font-size: 1.2rem;
+    margin: 0 0 2px 0;
+    font-size: 1rem;
     color: var(--primary-color);
     font-weight: 800;
 }
 
 .pwa-content p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-light);
     line-height: 1.4;
 }
 
 .pwa-actions {
     display: flex;
-    gap: 12px;
+    gap: 8px;
 }
 
 .pwa-btn-install {
     background: linear-gradient(135deg, var(--spice-saffron), var(--primary-color));
     color: #fff;
     border: none;
-    padding: 12px 28px;
-    border-radius: 30px;
+    padding: 8px 18px;
+    border-radius: 20px;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     cursor: pointer;
     box-shadow: 0 8px 15px rgba(211, 47, 47, 0.2);
     transition: var(--transition);
@@ -642,10 +642,10 @@ footer .copyright span {
     background: transparent;
     color: var(--text-muted);
     border: 1px solid var(--border-color);
-    padding: 12px 24px;
-    border-radius: 30px;
+    padding: 8px 16px;
+    border-radius: 20px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
@@ -662,7 +662,7 @@ footer .copyright span {
         right: auto;
         top: 20px;
         transform: translate(-50%, -150%);
-        width: 450px;
+        width: 380px;
         border: 1px solid var(--border-color);
         border-radius: 20px;
         box-shadow: 0 10px 40px rgba(211, 47, 47, 0.2);
