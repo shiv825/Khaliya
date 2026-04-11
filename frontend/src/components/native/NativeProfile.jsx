@@ -62,7 +62,7 @@ export default function NativeProfile() {
                 </div>
             </div>
 
-            {/* 3D Digital Membership Card - Saffron & Ivory Edition */}
+            {/* 3D Digital Membership Card - Gold Saffron High-Res Edition */}
             <motion.div 
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -77,40 +77,42 @@ export default function NativeProfile() {
                         rotateX,
                         rotateY,
                         width: '100%',
-                        height: '220px',
-                        background: 'linear-gradient(135deg, var(--bg-surface) 0%, #FFF9E6 50%, var(--bg-surface) 100%)',
+                        height: '240px',
+                        background: 'linear-gradient(135deg, #FF8F00 0%, #FFB300 30%, #FFD54F 100%)',
                         borderRadius: '30px',
-                        padding: '25px',
-                        color: 'var(--primary-color)',
-                        boxShadow: '0 20px 40px rgba(142, 28, 28, 0.08)',
+                        padding: '30px',
+                        color: '#FFF',
+                        boxShadow: '0 40px 80px rgba(255, 143, 0, 0.25), inset 0 0 20px rgba(255,255,255,0.4)',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
                         position: 'relative',
                         overflow: 'hidden',
                         transformStyle: 'preserve-3d',
-                        border: '2px solid rgba(142, 28, 28, 0.1)'
+                        border: '1px solid rgba(255,255,255,0.2)'
                     }}
                 >
-                    <div style={{ position: 'absolute', top: 0, left: '-100%', width: '60%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(142, 28, 28, 0.05), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 4s infinite' }}></div>
+                    <div style={{ position: 'absolute', top: 0, left: '-100%', width: '100%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 2.5s infinite ease-out' }}></div>
+                    
+                    <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', pointerEvents: 'none' }}></div>
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(40px)' }}>
                         <div>
-                            <div style={{ fontSize: '0.75rem', letterSpacing: '2px', fontWeight: '900', color: 'var(--primary-color)', opacity: 0.6 }}>ROYALTY PASS</div>
-                            <div style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', marginTop: '4px', color: 'var(--primary-color)', fontWeight: '900' }}>Saffron Elite</div>
+                            <div style={{ fontSize: '0.8rem', letterSpacing: '2.5px', fontWeight: '900', color: '#FFF', opacity: 0.8 }}>PREMIUM CLUB</div>
+                            <div style={{ fontSize: '1.4rem', fontFamily: 'var(--font-heading)', marginTop: '4px', color: '#FFF', fontWeight: '900' }}>Saffron Select</div>
                         </div>
-                        <div style={{ width: '45px', height: '45px', background: 'var(--primary-color)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
-                            <i className="fas fa-crown" style={{ fontSize: '1.5rem', color: '#FFF' }}></i>
+                        <div style={{ width: '50px', height: '50px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(5px)', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-crown" style={{ fontSize: '1.6rem', color: '#FFF' }}></i>
                         </div>
                     </div>
 
                     <div style={{ transform: 'translateZ(60px)' }}>
-                        <div style={{ fontSize: '3rem', fontWeight: '900', letterSpacing: '2px', color: 'var(--primary-color)' }}>750</div>
-                        <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--primary-color)', opacity: 0.8 }}>Spice Points Earned</div>
+                        <div style={{ fontSize: '3.5rem', fontWeight: '900', letterSpacing: '2px', color: '#FFF' }}>750</div>
+                        <div style={{ fontSize: '1rem', fontWeight: '800', color: '#FFF', opacity: 0.9 }}>Available Spice Points</div>
                     </div>
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(30px)' }}>
-                        <div style={{ fontSize: '1rem', fontWeight: '900', letterSpacing: '1px', color: 'var(--primary-color)', opacity: 0.7 }}>{user.name.toUpperCase()}</div>
+                        <div style={{ fontSize: '1.1rem', fontWeight: '900', letterSpacing: '1.5px', color: '#FFF' }}>{user.name.toUpperCase()}</div>
                     </div>
                 </motion.div>
             </motion.div>

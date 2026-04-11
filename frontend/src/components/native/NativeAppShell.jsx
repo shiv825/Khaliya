@@ -7,6 +7,7 @@ import NativeProfile from './NativeProfile';
 import NativeAuth from './NativeAuth';
 import NativeCart from './NativeCart';
 import OfferPopup from '../OfferPopup';
+import AiAssistant from '../AiAssistant';
 import { useCart } from '../../context/CartContext';
 import '../../assets/native-style.css';
 
@@ -149,10 +150,10 @@ export default function NativeAppShell() {
                             <span>You</span>
                         </button>
                     </div>
+                    <AiAssistant />
                     <OfferPopup />
                 </motion.div>
             )}
         </AnimatePresence>
     );
 }
-
