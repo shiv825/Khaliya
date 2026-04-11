@@ -33,7 +33,15 @@ export default function Hero() {
                 </video>
             </div>
 
-            <div className="hero-overlay-gradient"></div>
+            <div className="hero-overlay-gradient" style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 50%, var(--bg-body) 100%)',
+                zIndex: 1
+            }}></div>
+
+            {/* Floating Gold Particles Decoration (Optional) */}
+            <div className="hero-accents" style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: 'radial-gradient(circle at 20% 30%, rgba(218, 165, 32, 0.05) 0%, transparent 50%)' }}></div>
 
             <motion.div
                 className="hero-content"
@@ -48,14 +56,15 @@ export default function Hero() {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     style={{
                         fontFamily: 'var(--font-heading)',
-                        fontSize: 'clamp(3rem, 8vw, 6rem)',
+                        fontSize: 'clamp(3.5rem, 10vw, 7rem)',
                         fontWeight: '900',
-                        background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--accent-light) 100%)',
+                        background: 'linear-gradient(135deg, #FFFFFF 0%, var(--accent-color) 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        textShadow: '0 10px 30px rgba(142, 28, 28, 0.1)',
-                        marginBottom: '30px',
-                        letterSpacing: '-1px'
+                        textShadow: '0 15px 45px rgba(0, 0, 0, 0.4)',
+                        marginBottom: '20px',
+                        letterSpacing: '-2px',
+                        lineHeight: 1.1
                     }}
                 >
                     {t('hero.title')}
@@ -67,13 +76,14 @@ export default function Hero() {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1, delay: 0.7 }}
                     style={{
-                        fontSize: '1.4rem',
-                        color: 'var(--text-dark)',
-                        maxWidth: '800px',
-                        margin: '0 auto 40px auto',
+                        fontSize: 'clamp(1rem, 2vw, 1.6rem)',
+                        color: 'rgba(255,255,255,0.9)',
+                        maxWidth: '850px',
+                        margin: '0 auto 50px auto',
                         lineHeight: '1.6',
                         fontWeight: '500',
-                        letterSpacing: '0.5px'
+                        letterSpacing: '1px',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.3)'
                     }}
                 >
                     {t('hero.sub')}

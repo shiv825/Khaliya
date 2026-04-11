@@ -30,8 +30,10 @@ const PWAManager = {
             // Stash the event so it can be triggered later.
             PWAManager.deferredPrompt = e;
             
-            // Show banner immediately when prompt is ready
-            PWAManager.showInstallBanner();
+            // Show banner immediately when prompt is ready, if not dismissed
+            if (!sessionStorage.getItem('pwa_dismissed')) {
+                PWAManager.showInstallBanner();
+            }
         });
 
         window.addEventListener('appinstalled', (evt) => {
@@ -93,6 +95,7 @@ const PWAManager = {
             if (laterBtn) {
                 laterBtn.onclick = () => {
                     console.log('⏳ [PWA] User clicked "Later"');
+                    sessionStorage.setItem('pwa_dismissed', 'true');
                     PWAManager.closeInstallBanner();
                 };
             }

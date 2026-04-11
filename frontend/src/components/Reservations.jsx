@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
+import InteractiveFloorplan from './InteractiveFloorplan';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Reservations({ predefinedTable }) {
     const { t } = useLanguage();
@@ -9,11 +11,32 @@ export default function Reservations({ predefinedTable }) {
     });
     const [message, setMessage] = useState('');
 
+    const [selectedTableInfo, setSelectedTableInfo] = useState(null);
+
     useEffect(() => {
         if (predefinedTable) {
             setFormData(prev => ({ ...prev, tableType: predefinedTable }));
         }
     }, [predefinedTable]);
+
+    const handleTableSelect = (type, id) => {
+        const guestsMap = {
+            'Window 2-Seater': '2',
+            'Main Dining 4-Seater': '4',
+            'VIP Booth': '2',
+            'Large Family Table': '7-10',
+            'Outdoor Patio': '4'
+        };
+        
+        setFormData(prev => ({
+            ...prev,
+            tableType: type.toLowerCase().includes('window') ? 'window' : 
+                       type.toLowerCase().includes('family') ? 'family' : 
+                       type.toLowerCase().includes('vip') ? 'intimate' : 'group',
+            guests: guestsMap[type] || ''
+        }));
+        setSelectedTableInfo({ id, type });
+    };
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -37,7 +60,11 @@ export default function Reservations({ predefinedTable }) {
         <section id="reservations" style={{ padding: '6rem 1.5rem', background: 'var(--bg-body)' }}>
             <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
                 <h2 style={{ marginBottom: '1.5rem' }}>{t('reservations.title')}</h2>
-                <p style={{ color: 'var(--text-light)', marginBottom: '3rem', fontSize: '1.1rem' }}>{t('reservations.sub', 'Secure your table for an unforgettable culinary experience.')}</p>
+                <p style={{ color: 'var(--text-light)', marginBottom: '4rem', fontSize: '1.1rem' }}>{t('reservations.sub', 'Secure your table for an unforgettable culinary experience.')}</p>
+                
+                <div style={{ marginBottom: '4rem' }}>
+                    <InteractiveFloorplan onSelectTable={(type, id) => handleTableSelect(type, id)} />
+                </div>
                 
                 <form onSubmit={handleSubmit} style={{ 
                     background: 'var(--bg-surface)', 
@@ -49,6 +76,32 @@ export default function Reservations({ predefinedTable }) {
                     border: '1px solid var(--border-color)',
                     textAlign: 'left'
                 }}>
+                    <AnimatePresence>
+                        {selectedTableInfo && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                style={{ 
+                                    background: 'rgba(218, 165, 32, 0.1)', 
+                                    padding: '15px 20px', 
+                                    borderRadius: '12px', 
+                                    border: '1px solid var(--accent-color)',
+                                    marginBottom: '2rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    color: 'var(--primary-color)',
+                                    fontWeight: '800',
+                                    fontSize: '0.9rem'
+                                }}
+                            >
+                                <i className="fas fa-check-circle"></i>
+                                {t('reservations.selectedTable', 'Space Reserved:')} {selectedTableInfo.type} ({selectedTableInfo.id})
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
                         <label style={{ display: 'block' }}>
                             <strong style={{ fontSize: '0.9rem', color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('form.name')}</strong>

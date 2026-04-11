@@ -8,8 +8,8 @@ export default function Loyalty() {
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
-    const rotateX = useTransform(y, [-150, 150], [15, -15]);
-    const rotateY = useTransform(x, [-150, 150], [-15, 15]);
+    const rotateX = useTransform(y, [-150, 150], [25, -25]);
+    const rotateY = useTransform(x, [-150, 150], [-25, 25]);
 
     const handleMouseMove = (event) => {
         const rect = event.currentTarget.getBoundingClientRect();
@@ -125,22 +125,27 @@ export default function Loyalty() {
                                 width: '100%',
                                 maxWidth: '450px',
                                 height: '260px',
-                                background: tier.name === 'Saffron' ? 'linear-gradient(135deg, #FF8F00 0%, #FFB300 50%, #FFD54F 100%)' :
-                                            tier.name === 'Emerald' ? 'linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%)' :
-                                            'linear-gradient(135deg, #B71C1C 0%, #D32F2F 50%, #E57373 100%)',
+                                background: tier.name === 'Saffron' ? 'linear-gradient(135deg, #FF8F00 0%, #FFB300 30%, #FFD54F 100%)' :
+                                            tier.name === 'Emerald' ? 'linear-gradient(135deg, #1B5E20 0%, #2E7D32 30%, #4CAF50 100%)' :
+                                            'linear-gradient(135deg, #961919 0%, #D32F2F 30%, #E57373 100%)',
                                 borderRadius: '25px',
                                 padding: '35px',
                                 color: '#FFF',
-                                boxShadow: '0 40px 80px rgba(44, 27, 20, 0.25), inset 0 0 20px rgba(255,255,255,0.4)',
+                                boxShadow: tier.name === 'Saffron' ? '0 40px 80px rgba(255, 143, 0, 0.25), inset 0 0 20px rgba(255,255,255,0.4)' :
+                                           tier.name === 'Emerald' ? '0 40px 80px rgba(27, 94, 32, 0.25), inset 0 0 20px rgba(255,255,255,0.4)' :
+                                           '0 40px 80px rgba(211, 47, 47, 0.25), inset 0 0 20px rgba(255,255,255,0.4)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 justifyContent: 'space-between',
                                 position: 'relative',
                                 overflow: 'hidden',
-                                transformStyle: 'preserve-3d'
+                                transformStyle: 'preserve-3d',
+                                border: '1px solid rgba(255,255,255,0.2)'
                             }}
                         >
-                            <div style={{ position: 'absolute', top: 0, left: '-100%', width: '100%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 4s infinite' }}></div>
+                            <div style={{ position: 'absolute', top: 0, left: '-100%', width: '100%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 2.5s infinite ease-out' }}></div>
+                            
+                            <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', pointerEvents: 'none' }}></div>
                             
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(40px)' }}>
                                 <div>

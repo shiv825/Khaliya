@@ -5,6 +5,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import NativeAppShell from './components/native/NativeAppShell';
 import { useAppMode } from './hooks/useAppMode';
+import { useDynamicTheme } from './hooks/useDynamicTheme';
 import { LanguageProvider } from './context/LanguageContext';
 import { CartProvider } from './context/CartContext';
 import AOS from 'aos';
@@ -15,30 +16,34 @@ import './assets/loyalty.css';
 
 function App() {
   const isAppMode = useAppMode();
+  const theme = useDynamicTheme();
 
   const [isAdminAuth, setIsAdminAuth] = React.useState(
     sessionStorage.getItem('adminLoggedIn') === 'true'
   );
+
   useEffect(() => {
     AOS.init({
       duration: 800,
       once: true,
       offset: 50,
       easing: 'ease-out',
-      disable: 'mobile' // Completely disable AOS on small devices for maximum speed
+      disable: 'mobile' 
     });
   }, []);
 
   return (
     <LanguageProvider>
       <CartProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
-            <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
-            <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
-          </Routes>
-        </Router>
+        <div className={`app-theme-${theme}`}>
+          <Router>
+            <Routes>
+              <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
+              <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
+              <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
+            </Routes>
+          </Router>
+        </div>
       </CartProvider>
     </LanguageProvider>
   );

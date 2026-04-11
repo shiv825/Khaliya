@@ -15,7 +15,7 @@ export default function InteractiveFloorplan({ onSelectTable }) {
     const handleSelect = (table) => {
         if (!table.isAvailable) return;
         setSelectedId(table.id);
-        if (onSelectTable) onSelectTable(table.type);
+        if (onSelectTable) onSelectTable(table.type, table.id);
     };
 
     return (

@@ -19,39 +19,75 @@
 }
 
 :root {
-    /* Vibrant Spice Harmony - Premium Colorful Palette */
-    --primary-color: #D32F2F; /* Bold Chili Red */
-    --secondary-color: #311B92; /* Deep Indigo Star Anise */
-    --accent-color: #FFB300; /* Vibrant Turmeric Yellow */
+    /* Base Modern Luxury Palette */
+    --primary-color: #D32F2F; 
+    --secondary-color: #311B92;
+    --accent-color: #FFB300;
     --accent-light: #FFC107;
-    --spice-emerald: #2E7D32; /* Cardamom Green */
-    --spice-saffron: #FF8F00; /* Rich Saffron Orange */
+    --spice-emerald: #2E7D32;
+    --spice-saffron: #FF8F00;
     --accent-glow: rgba(211, 47, 47, 0.15);
 
-    /* Text & Background - Warm & Energetic */
     --text-dark: #1A1A1A;
     --text-light: #424242;
     --text-muted: #757575;
-    --bg-body: #FFFBED; /* Warm Pearl Masala */
+    --bg-body: #FFFBED;
     --bg-surface: #FFFFFF;
     --bg-glass: rgba(255, 255, 255, 0.94);
     --border-color: rgba(211, 47, 47, 0.08);
     --border-light: rgba(0, 0, 0, 0.05);
 
-    /* Typography */
     --font-heading: 'Playfair Display', serif;
     --font-body: 'Lato', sans-serif;
 
-    /* Shadows & Effects (Colorful Glows) */
     --shadow-sm: 0 4px 12px rgba(211, 47, 47, 0.06);
     --shadow-md: 0 12px 32px rgba(211, 47, 47, 0.1);
     --shadow-lg: 0 24px 64px rgba(211, 47, 47, 0.15);
     --glass-shadow: 0 8px 32px 0 rgba(49, 27, 146, 0.05);
 
-    /* Transitions & Borders */
     --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     --radius-md: 12px;
     --radius-lg: 20px;
+}
+
+/* --- Dynamic Theme Extensions --- */
+
+/* Morning Mode: 5am - 12pm (Fresh, Bright) */
+.app-theme-morning {
+    --bg-body: #FDFCF0;
+    --primary-color: #B71C1C;
+    --accent-color: #FF8F00;
+    --spice-emerald: #1B5E20;
+    --text-dark: #1F1F1F;
+    --bg-surface: #FFFFFF;
+}
+
+/* Afternoon Mode: 12pm - 6pm (Warm, Sunset) */
+.app-theme-afternoon {
+    --bg-body: #FFF8E1;
+    --primary-color: #E65100;
+    --accent-color: #FFD600;
+    --spice-saffron: #F57C00;
+    --text-dark: #212121;
+    --bg-surface: rgba(255, 255, 255, 0.96);
+}
+
+/* Evening Mode: 6pm - 5am (Deep Luxury Gold & Charcoal) */
+.app-theme-evening {
+    --bg-body: #0F0F0F;
+    --bg-surface: #1A1A1A;
+    --bg-glass: rgba(26, 26, 26, 0.85);
+    --text-dark: #F5F5F5;
+    --text-light: #E0E0E0;
+    --text-muted: #9E9E9E;
+    --primary-color: #D32F2F;
+    --accent-color: #DAA520; /* Luxury Gold */
+    --accent-light: #FFD700;
+    --border-color: rgba(218, 165, 32, 0.15);
+    --border-light: rgba(255, 255, 255, 0.05);
+    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 12px 40px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.8);
 }
 
 html {
@@ -577,13 +613,13 @@ footer .copyright span {
     margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
 .pwa-icon {
-    width: 45px;
-    height: 45px;
-    min-width: 45px;
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -601,32 +637,32 @@ footer .copyright span {
 }
 
 .pwa-content h3 {
-    margin: 0 0 2px 0;
-    font-size: 1rem;
+    margin: 0 0 4px 0;
+    font-size: 1.2rem;
     color: var(--primary-color);
     font-weight: 800;
 }
 
 .pwa-content p {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--text-light);
     line-height: 1.4;
 }
 
 .pwa-actions {
     display: flex;
-    gap: 8px;
+    gap: 12px;
 }
 
 .pwa-btn-install {
     background: linear-gradient(135deg, var(--spice-saffron), var(--primary-color));
     color: #fff;
     border: none;
-    padding: 8px 18px;
-    border-radius: 20px;
+    padding: 12px 28px;
+    border-radius: 30px;
     font-weight: 800;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     cursor: pointer;
     box-shadow: 0 8px 15px rgba(211, 47, 47, 0.2);
     transition: var(--transition);
@@ -642,10 +678,10 @@ footer .copyright span {
     background: transparent;
     color: var(--text-muted);
     border: 1px solid var(--border-color);
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 12px 24px;
+    border-radius: 30px;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
@@ -662,7 +698,7 @@ footer .copyright span {
         right: auto;
         top: 20px;
         transform: translate(-50%, -150%);
-        width: 380px;
+        width: 450px;
         border: 1px solid var(--border-color);
         border-radius: 20px;
         box-shadow: 0 10px 40px rgba(211, 47, 47, 0.2);

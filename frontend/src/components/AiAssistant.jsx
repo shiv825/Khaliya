@@ -7,6 +7,7 @@ export default function AiAssistant() {
     ]);
     const [inputVal, setInputVal] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [isListening, setIsListening] = useState(false);
     const [suggestions] = useState([
         { label: '📖 Menu', query: 'show menu' },
         { label: '📅 Book Table', query: 'how to book' },
@@ -27,6 +28,12 @@ export default function AiAssistant() {
     const getAIResponse = (input) => {
         const text = input.toLowerCase();
 
+        // Specific Pairings Logic
+        if (text.includes("biryani")) return "Our Chicken Biryani is legendary. I highly recommend pairing it with our cool Cucumber Raita and a fresh Garlic Naan to balance the spices.";
+        if (text.includes("butter chicken")) return "Ah, the Butter Chicken! It's best enjoyed with a Roomali Roti or Butter Naan. Would you like to see our bread selection?";
+        if (text.includes("paneer")) return "Our Paneer dishes are rich and creamy. They pair beautifully with a crisp Mango Lassi to cleanse the palate.";
+        if (text.includes("kebab") || text.includes("kabab")) return "Succulent Kebabs deserve a zesty companion. Try them with our Mint Chutney and a side of pickled onions.";
+
         if (text.includes("time") || text.includes("open") || text.includes("hours")) return KNOWLEDGE_BASE.hours;
         if (text.includes("menu") || text.includes("food") || text.includes("dish")) return KNOWLEDGE_BASE.menu;
         if (text.includes("book") || text.includes("reserve") || text.includes("table")) return KNOWLEDGE_BASE.book;
@@ -35,7 +42,35 @@ export default function AiAssistant() {
         if (text.includes("contact") || text.includes("phone") || text.includes("call")) return KNOWLEDGE_BASE.contact;
         if (text.includes("special") || text.includes("today")) return "Today's signatures include Truffle Dal Makhani and Saffron Chicken Tikka. Check the Featured Specials section for more!";
 
-        return "I'm still learning! For specific inquiries, please feel free to call us at +91 123 456 7890. Can I help you with our menu or hours?";
+        return "I'm your luxury culinary guide. Ask me about our signature pairings, vegan options, or how to reserve the best table!";
+    };
+
+    const toggleListen = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Speech recognition is not supported in this browser. Please try Chrome or Edge.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+        recognition.onerror = () => setIsListening(false);
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInputVal(transcript);
+            handleSend(transcript);
+        };
+
+        if (isListening) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
     };
 
     const handleSend = (query = null) => {
@@ -138,18 +173,41 @@ export default function AiAssistant() {
                     ))}
                 </div>
 
-                <div className="khali-input-area" style={{ padding: '20px 25px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '12px', background: 'var(--bg-body)' }}>
+                <div className="khali-input-area" style={{ padding: '20px 25px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '12px', background: 'var(--bg-body)', alignItems: 'center' }}>
+                    <button 
+                        onClick={toggleListen}
+                        style={{ 
+                            width: '45px', 
+                            height: '45px', 
+                            borderRadius: '50%', 
+                            background: isListening ? 'var(--primary-color)' : 'rgba(0,0,0,0.05)', 
+                            color: isListening ? '#FFF' : 'var(--text-dark)', 
+                            border: 'none', 
+                            cursor: 'pointer',
+                            transition: 'var(--transition)',
+                            animation: isListening ? 'voicePulse 1.5s infinite' : 'none'
+                        }}
+                    >
+                        <i className={`fas fa-${isListening ? 'microphone' : 'microphone-alt'}`}></i>
+                    </button>
                     <input
                         type="text"
                         value={inputVal}
                         onChange={e => setInputVal(e.target.value)}
                         onKeyPress={e => e.key === 'Enter' && handleSend()}
-                        placeholder="Type your message..."
+                        placeholder={isListening ? "Listening..." : "Type your message..."}
                         style={{ flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '30px', padding: '12px 25px', color: 'var(--text-dark)', outline: 'none', fontWeight: '500' }}
                     />
                     <button onClick={() => handleSend()} style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary-color)', color: '#FFF', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
                         <i className="fas fa-paper-plane"></i>
                     </button>
+                    <style>{`
+                        @keyframes voicePulse {
+                            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
+                            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); }
+                            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+                        }
+                    `}</style>
                 </div>
             </div>
 
