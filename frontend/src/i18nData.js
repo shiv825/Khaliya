@@ -2,7 +2,7 @@ export const i18nData = {
     en: {
         common: { 
             name: 'Khaliya Restaurant',
-            add: 'Add to Order',
+            add: 'Order Now',
             orderNow: 'Order Now'
         },
         loyalty: { title: 'Spice Club Rewards', sub: 'Join our exclusive loyalty program. Earn points, tier up, and unlock secret menu items!' },
@@ -184,7 +184,7 @@ export const i18nData = {
     hi: {
         common: { 
             name: 'खालिया रेस्टोरेंट',
-            add: 'ऑर्डर में जोड़ें',
+            add: 'अभी ऑर्डर करें',
             orderNow: 'अभी ऑर्डर करें'
         },
         loyalty: { title: 'स्पाइस क्लब रिवार्ड्स', sub: 'हमारे विशेष लॉयल्टी कार्यक्रम में शामिल हों। अंक अर्जित करें, टियर अप करें और गुप्त मेनू आइटम अनलॉक करें!' },
@@ -366,7 +366,7 @@ export const i18nData = {
     ar: {
         common: { 
             name: 'مطعم خاليا',
-            add: 'أضف إلى الطلب',
+            add: 'اطلب الآن',
             orderNow: 'اطلب الآن'
         },
         loyalty: { title: 'مكافآت نادي سبايس', sub: 'انضم إلى برنامج الولاء الحصري الخاص بنا. اكسب النقاط، وارتقِ في المستويات، وافتح عناصر القائمة السرية!' },

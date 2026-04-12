@@ -165,7 +165,7 @@ export default function NativeMenu() {
                                         fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'var(--transition)'
                                     }}
                                 >
-                                    <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i> Add
+                                    <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i> {t('common.add', 'Order Now')}
                                 </button>
                             </div>
                         </motion.div>
