@@ -16,15 +16,15 @@ export const LanguageProvider = ({ children }) => {
         }
     }, [language]);
 
-    const t = (key) => {
+    const t = (key, fallback) => {
         const keys = key.split('.');
         let result = i18nData[language] || i18nData.en;
-        if (!result) return key;
+        if (!result) return fallback || key;
         for (const k of keys) {
             if (result && result[k]) result = result[k];
-            else return key;
+            else return fallback || key;
         }
-        return typeof result === 'string' ? result : key;
+        return typeof result === 'string' ? result : (fallback || key);
     };
 
     return (

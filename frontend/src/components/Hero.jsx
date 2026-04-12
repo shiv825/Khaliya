@@ -96,7 +96,7 @@ export default function Hero() {
                     transition={{ duration: 0.8, delay: 1 }}
                 >
                     <a href="#reservations" className="btn btn-primary">{t('hero.makeReservation')}</a>
-                    <a href="#menu" className="btn" style={{ marginLeft: '15px' }}>{t('hero.seeMenu')}</a>
+                    <a href="#menu" className="btn">{t('hero.seeMenu')}</a>
                 </motion.div>
             </motion.div>
         </section>

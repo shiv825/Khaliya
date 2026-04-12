@@ -418,18 +418,20 @@ export default function Menu() {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     useEffect(() => {
-        axios.get(`${API_URL}/api/menu`, { timeout: 5000 })
+        let isMounted = true;
+        axios.get(`${API_URL}/api/menu`, { timeout: 8000 })
             .then(res => {
-                if (Array.isArray(res.data) && res.data.length > 0) {
+                if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
                     setMenuItems(res.data);
                 }
             })
             .catch(err => {
-                console.error('Error fetching menu, using fallback:', err);
+                console.warn('API Menu fetch failed, staying with fallback:', err.message);
             })
             .finally(() => {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             });
+        return () => { isMounted = false; };
     }, []);
 
     const getLocalized = (field) => {
@@ -466,7 +468,7 @@ export default function Menu() {
     }
 
     return (
-        <section id="menu" data-aos="fade-up" style={{ position: 'relative' }}>
+        <section id="menu" style={{ position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '3rem', position: 'relative', flexWrap: 'wrap', gap: '15px' }}>
                 <h2 style={{ margin: 0 }}>{t('menu.title')}</h2>
                 <button 
@@ -569,64 +571,73 @@ export default function Menu() {
                         <i className="fas fa-spinner fa-spin fa-3x"></i>
                     </div>
                 ) : (
-                    displayedMenu.map((item, index) => (
-                        <div key={index} className="menu-item" data-aos="fade-up" data-aos-delay={(index % 4) * 100} style={{ 
-                            background: 'var(--bg-surface)', 
-                            border: '1px solid var(--border-color)', 
-                            borderRadius: 'var(--radius-lg)',
-                            padding: '2rem',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            height: '100%',
-                            transition: 'var(--transition)',
-                            boxShadow: 'var(--shadow-sm)'
-                        }}>
-                            {item.image && (
-                                <div className="menu-item-image" style={{ width: '100%', height: '220px', overflow: 'hidden', borderRadius: '15px', marginBottom: '1.5rem', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}>
-                                    <img loading="lazy" src={item.image?.startsWith('/') ? `.${item.image}` : item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                    displayedMenu.length > 0 ? (
+                        displayedMenu.map((item, index) => (
+                            <div key={item.id || index} className="menu-item" style={{ 
+                                background: 'var(--bg-surface)', 
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: 'var(--radius-lg)',
+                                padding: '2rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                height: '100%',
+                                transition: 'var(--transition)',
+                                boxShadow: 'var(--shadow-sm)'
+                            }}>
+                                {item.image && (
+                                    <div className="menu-item-image" style={{ width: '100%', height: '220px', overflow: 'hidden', borderRadius: '15px', marginBottom: '1.5rem', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)', background: '#eee' }}>
+                                        <img loading="lazy" src={item.image?.startsWith('/') ? `.${item.image}` : item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                                    </div>
+                                )}
+                                <div className="menu-item-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <span className="category" style={{ letterSpacing: '1.5px', fontWeight: '700', fontSize: '0.75rem', color: 'var(--accent-light)' }}>{getLocalized(item.category)}</span>
+                                    <div className="menu-item-tags" style={{ display: 'flex', gap: '8px' }}>
+                                        {item.tags && Array.isArray(item.tags) && item.tags.map(tag => {
+                                            if (tag === 'veg') return <span key={tag} className="tag tag-veg" title="Vegetarian" style={{ filter: 'drop-shadow(0 0 5px rgba(0,255,0,0.3))' }}>🌱</span>;
+                                            if (tag === 'non-veg') return <span key={tag} className="tag tag-nonveg" title="Non-Vegetarian" style={{ filter: 'drop-shadow(0 0 5px rgba(255,0,0,0.3))' }}>🍖</span>;
+                                            if (tag === 'spicy-1') return <span key={tag} className="tag tag-spicy" title="Mild Spicy">🌶️</span>;
+                                            if (tag === 'spicy-2') return <span key={tag} className="tag tag-spicy">🌶️🌶️</span>;
+                                            if (tag === 'spicy-3') return <span key={tag} className="tag tag-spicy">🌶️🌶️🌶️</span>;
+                                            return null;
+                                        })}
+                                    </div>
                                 </div>
-                            )}
-                            <div className="menu-item-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                <span className="category" style={{ letterSpacing: '1.5px', fontWeight: '700', fontSize: '0.75rem', color: 'var(--accent-light)' }}>{getLocalized(item.category)}</span>
-                                <div className="menu-item-tags" style={{ display: 'flex', gap: '8px' }}>
-                                    {item.tags && item.tags.map(tag => {
-                                        if (tag === 'veg') return <span key={tag} className="tag tag-veg" title="Vegetarian" style={{ filter: 'drop-shadow(0 0 5px rgba(0,255,0,0.3))' }}>🌱</span>;
-                                        if (tag === 'non-veg') return <span key={tag} className="tag tag-nonveg" title="Non-Vegetarian" style={{ filter: 'drop-shadow(0 0 5px rgba(255,0,0,0.3))' }}>🍖</span>;
-                                        if (tag === 'spicy-1') return <span key={tag} className="tag tag-spicy" title="Mild Spicy">🌶️</span>;
-                                        if (tag === 'spicy-2') return <span key={tag} className="tag tag-spicy">🌶️🌶️</span>;
-                                        if (tag === 'spicy-3') return <span key={tag} className="tag tag-spicy">🌶️🌶️🌶️</span>;
-                                        return null;
-                                    })}
+                                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>{getLocalized(item.name)}</h3>
+                                <p style={{ fontSize: '0.95rem', color: 'var(--text-light)', marginBottom: '1.5rem', lineHeight: '1.6', flex: 1 }}>{getLocalized(item.description)}</p>
+                                <div className="menu-item-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                                    <div className="price" style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '1.4rem' }}>{item.price}</div>
+                                    <button 
+                                        className="btn btn-primary" 
+                                        style={{ padding: '8px 20px', fontSize: '0.8rem', borderRadius: '30px' }}
+                                        onClick={() => {
+                                            if (item) {
+                                                addToCart(item);
+                                                Swal.fire({
+                                                    title: 'Selection Added',
+                                                    text: `${getLocalized(item.name)} is now in your order`,
+                                                    icon: 'success',
+                                                    toast: true,
+                                                    position: 'top-end',
+                                                    showConfirmButton: false,
+                                                    timer: 3000,
+                                                    background: 'var(--bg-surface)',
+                                                    color: 'var(--text-dark)',
+                                                    iconColor: 'var(--primary-color)'
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        <i className="fas fa-plus"></i> {t('common.add', 'Add')}
+                                    </button>
                                 </div>
                             </div>
-                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>{getLocalized(item.name)}</h3>
-                            <p style={{ fontSize: '0.95rem', color: 'var(--text-light)', marginBottom: '1.5rem', lineHeight: '1.6', flex: 1 }}>{getLocalized(item.description)}</p>
-                            <div className="menu-item-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                                <div className="price" style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '1.4rem' }}>{item.price}</div>
-                                <button 
-                                    className="btn btn-primary" 
-                                    style={{ padding: '8px 20px', fontSize: '0.8rem', borderRadius: '30px' }}
-                                    onClick={() => {
-                                        addToCart(item);
-                                        Swal.fire({
-                                            title: 'Selection Added',
-                                            text: `${getLocalized(item.name)} is now in your order`,
-                                            icon: 'success',
-                                            toast: true,
-                                            position: 'top-end',
-                                            showConfirmButton: false,
-                                            timer: 3000,
-                                            background: 'var(--bg-surface)',
-                                            color: 'var(--text-dark)',
-                                            iconColor: 'var(--primary-color)'
-                                        });
-                                    }}
-                                >
-                                    <i className="fas fa-plus"></i> {t('common.add', 'Add')}
-                                </button>
-                            </div>
+                        ))
+                    ) : (
+                        <div style={{ textAlign: 'center', width: '100%', padding: '4rem', color: 'var(--text-muted)' }}>
+                            <p>No dishes found matching your selection.</p>
+                            <button onClick={() => {setFilter('All'); setSearch('');}} className="btn">Reset Filters</button>
                         </div>
-                    ))
+                    )
                 )}
             </div>
             <p style={{ marginTop: '3rem', color: 'var(--text-muted)', textAlign: 'center', fontSize: '0.9rem' }}>{t('menu.note')}</p>

@@ -5,9 +5,33 @@ import InteractiveFloorplan from '../InteractiveFloorplan';
 
 export default function NativeBook() {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ date: '', time: '', guests: 2, tableType: '' });
+    const [formData, setFormData] = useState({ date: '', time: '', guests: 2, tableType: '', specialRequests: '' });
+    const [availability, setAvailability] = useState({ bookedSlots: {}, maxCapacity: 4 });
+    const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
-    const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+    const fetchAvailability = async (date, tableType) => {
+        if (!date || !tableType) return;
+        setIsLoadingSlots(true);
+        try {
+            const res = await axios.get(`${API_URL}/api/bookings/availability`, {
+                params: { date, tableType }
+            });
+            setAvailability(res.data);
+        } catch (err) {
+            console.error('Failed to fetch availability', err);
+        } finally {
+            setIsLoadingSlots(false);
+        }
+    };
+
+    const handleNext = () => {
+        if (step === 1 && formData.date && formData.tableType) {
+            fetchAvailability(formData.date, formData.tableType);
+        }
+        setStep(prev => Math.min(prev + 1, 3));
+    };
     const handlePrev = () => setStep(prev => Math.max(prev - 1, 1));
 
     const renderStepContent = () => {
@@ -31,14 +55,21 @@ export default function NativeBook() {
                             />
                         </div>
                         <div className="form-group-native" style={{ marginBottom: '30px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-light)', fontWeight: '700', fontSize: '0.9rem' }}>Time</label>
-                            <input 
-                                type="time" 
-                                value={formData.time} 
-                                onChange={e => setFormData({ ...formData, time: e.target.value })} 
-                                className="native-input"
-                                style={{ width: '100%', padding: '15px', borderRadius: '15px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'var(--text-dark)', fontWeight: '600' }}
-                            />
+                            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-light)', fontWeight: '700', fontSize: '0.9rem' }}>Preferred Time</label>
+                            <div className="time-slot-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                                {['11:00', '13:00', '18:00', '19:00', '20:00', '21:00'].map(slot => (
+                                    <button 
+                                        key={slot}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, time: slot })}
+                                        className={`time-slot-btn ${formData.time === slot ? 'selected' : ''}`}
+                                        style={{ height: '60px' }}
+                                    >
+                                        {slot}
+                                    </button>
+                                ))}
+                            </div>
+                            <small style={{ color: 'var(--text-muted)', marginTop: '8px', display: 'block' }}>Availability will be confirmed in the next step</small>
                         </div>
                         <motion.button 
                             whileTap={{ scale: 0.95 }} 
@@ -130,9 +161,18 @@ export default function NativeBook() {
                                 <span style={{ color: 'var(--text-light)', fontWeight: '600' }}><i className="fas fa-users" style={{ marginRight: '8px' }}></i> Guests</span>
                                 <strong style={{ color: 'var(--text-dark)', fontWeight: '800' }}>{formData.guests} People</strong>
                             </div>
-                            <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', padding: '15px 0' }}>
+                            <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', padding: '15px 0', borderBottom: '1px solid var(--border-color)' }}>
                                 <span style={{ color: 'var(--text-light)', fontWeight: '600' }}><i className="fas fa-chair" style={{ marginRight: '8px' }}></i> Seating</span>
                                 <strong style={{ color: 'var(--primary-color)', fontWeight: '900' }}>{formData.tableType}</strong>
+                            </div>
+                            <div className="summary-row" style={{ padding: '15px 0' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-light)', fontSize: '0.85rem' }}>Special Requests</label>
+                                <textarea 
+                                    placeholder="Add notes for the host..."
+                                    value={formData.specialRequests}
+                                    onChange={e => setFormData({ ...formData, specialRequests: e.target.value })}
+                                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-body)', minHeight: '80px' }}
+                                />
                             </div>
                         </div>
                         <div className="wizard-actions" style={{ display: 'flex', gap: '15px' }}>

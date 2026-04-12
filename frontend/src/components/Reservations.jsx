@@ -7,17 +7,48 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Reservations({ predefinedTable }) {
     const { t } = useLanguage();
     const [formData, setFormData] = useState({
-        name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: ''
+        name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: '', specialRequests: ''
     });
     const [message, setMessage] = useState('');
+    const [availability, setAvailability] = useState({ bookedSlots: {}, maxCapacity: 4 });
+    const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
     const [selectedTableInfo, setSelectedTableInfo] = useState(null);
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     useEffect(() => {
+        // AI Suggestion pre-fill
+        const aiMatch = sessionStorage.getItem('khaliya_ai_match');
+        if (aiMatch) {
+            setFormData(prev => ({ ...prev, specialRequests: `AI Suggestion: ${aiMatch}` }));
+            sessionStorage.removeItem('khaliya_ai_match');
+        }
+
         if (predefinedTable) {
             setFormData(prev => ({ ...prev, tableType: predefinedTable }));
         }
     }, [predefinedTable]);
+
+    useEffect(() => {
+        if (formData.date && formData.tableType) {
+            fetchAvailability();
+        }
+    }, [formData.date, formData.tableType]);
+
+    const fetchAvailability = async () => {
+        setIsLoadingSlots(true);
+        try {
+            const res = await axios.get(`${API_URL}/api/bookings/availability`, {
+                params: { date: formData.date, tableType: formData.tableType }
+            });
+            setAvailability(res.data);
+        } catch (err) {
+            console.error('Failed to fetch availability', err);
+        } finally {
+            setIsLoadingSlots(false);
+        }
+    };
 
     const handleTableSelect = (type, id) => {
         const guestsMap = {
@@ -134,9 +165,46 @@ export default function Reservations({ predefinedTable }) {
                         </label>
                         <label style={{ display: 'block' }}>
                             <strong style={{ fontSize: '0.9rem', color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('form.time')}</strong>
-                            <input name="time" type="time" value={formData.time} onChange={handleChange} required style={{ width: '100%', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', marginTop: '0.5rem', background: 'var(--bg-body)', color: 'var(--text-dark)' }} />
+                            <div className="time-slot-grid">
+                                {['11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'].map(slot => {
+                                    const bookedCount = availability.bookedSlots[slot] || 0;
+                                    const isFull = bookedCount >= availability.maxCapacity;
+                                    const isSelected = formData.time === slot;
+                                    
+                                    return (
+                                        <button 
+                                            key={slot}
+                                            type="button"
+                                            disabled={isFull || !formData.date || !formData.tableType}
+                                            onClick={() => setFormData({ ...formData, time: slot })}
+                                            className={`time-slot-btn ${isSelected ? 'selected' : ''}`}
+                                        >
+                                            {slot}
+                                            <span className="slot-status">
+                                                {isFull ? 'Full' : `${availability.maxCapacity - bookedCount} Left`}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            {(!formData.date || !formData.tableType) && <small style={{ color: 'var(--primary-color)', marginTop: '8px', display: 'block' }}>Please select Date and Table Type first</small>}
                         </label>
                     </div>
+
+                    <label style={{ display: 'block', marginTop: '1.5rem' }}>
+                        <strong style={{ fontSize: '0.9rem', color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>Special Requests / Occasion (Optional)</strong>
+                        <textarea 
+                            name="specialRequests" 
+                            value={formData.specialRequests} 
+                            onChange={handleChange} 
+                            placeholder="Birthday, anniversary, AI recommendations, or dietary needs..." 
+                            style={{ 
+                                width: '100%', padding: '1rem', border: '1px solid var(--border-color)', 
+                                borderRadius: '8px', marginTop: '0.5rem', background: 'var(--bg-body)', 
+                                color: 'var(--text-dark)', minHeight: '100px', resize: 'vertical' 
+                            }} 
+                        />
+                    </label>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
                         <label style={{ display: 'block' }}>

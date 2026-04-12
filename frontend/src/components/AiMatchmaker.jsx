@@ -152,9 +152,21 @@ export default function AiMatchmaker({ onClose }) {
                                     >Restart</motion.button>
                                     <motion.button 
                                         whileTap={{ scale: 0.95 }}
-                                        onClick={handleAdd} 
+                                        onClick={() => {
+                                            sessionStorage.setItem('khaliya_ai_match', match.name);
+                                            onClose();
+                                            // Smooth scroll to reservations section
+                                            const resSection = document.getElementById('reservations');
+                                            if (resSection) {
+                                                resSection.scrollIntoView({ behavior: 'smooth' });
+                                            } else {
+                                                // If in PWA (Native) mode, we might need a different navigation
+                                                // But for now, simple redirection or notification works
+                                                window.location.hash = 'native-book'; 
+                                            }
+                                        }} 
                                         style={{ flex: 2, padding: '18px', background: 'var(--primary-color)', border: 'none', color: '#FFF', borderRadius: '18px', fontWeight: '900', cursor: 'pointer', boxShadow: 'var(--shadow-md)' }}
-                                    >Add Combo {match.price}</motion.button>
+                                    >Reserve with Match</motion.button>
                                 </div>
                             </motion.div>
                         )}

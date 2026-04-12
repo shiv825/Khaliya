@@ -15,8 +15,12 @@ import {
     Legend,
     Filler
 } from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import '../assets/admin-style.css';
+
+import {
+    ArcElement
+} from 'chart.js';
 
 ChartJS.register(
     CategoryScale,
@@ -24,6 +28,7 @@ ChartJS.register(
     PointElement,
     LineElement,
     BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend,
@@ -213,6 +218,22 @@ export default function AdminDashboard({ onLogout }) {
         });
 
         const labels = last7Days.map(d => d.substring(5)); // MM-DD
+        
+        // Source Data
+        const sourceCounts = { 'Website': 0, 'App': 0 };
+        bookings.forEach(b => {
+            const s = b.source === 'App' ? 'App' : 'Website';
+            sourceCounts[s]++;
+        });
+
+        // Peak Hour Data (Last 30 days)
+        const hourCounts = {};
+        bookings.forEach(b => {
+            if (b.time) {
+                hourCounts[b.time] = (hourCounts[b.time] || 0) + 1;
+            }
+        });
+
         return {
             trends: {
                 labels,
@@ -235,6 +256,23 @@ export default function AdminDashboard({ onLogout }) {
                     backgroundColor: '#457B9D',
                     borderRadius: 8,
                     barThickness: 20
+                }]
+            },
+            sources: {
+                labels: ['Website', 'App'],
+                datasets: [{
+                    data: [sourceCounts['Website'], sourceCounts['App']],
+                    backgroundColor: ['#1D3557', '#E63946'],
+                    borderWidth: 0
+                }]
+            },
+            peakHours: {
+                labels: Object.keys(hourCounts).sort(),
+                datasets: [{
+                    label: 'Volume',
+                    data: Object.keys(hourCounts).sort().map(k => hourCounts[k]),
+                    backgroundColor: '#FFB703',
+                    borderRadius: 4
                 }]
             }
         };
@@ -442,14 +480,20 @@ export default function AdminDashboard({ onLogout }) {
                             </div>
 
                             {/* Charts Wrapper */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', marginBottom: '2.5rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2.5rem' }}>
                                 <div className="admin-glass-card" style={{ padding: '2rem', background: '#fff' }}>
                                     <h4 style={{ margin: '0 0 1.5rem 0' }}>Reservation Trends</h4>
                                     <div style={{ height: '240px' }}><Line data={charts.trends} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }} /></div>
                                 </div>
                                 <div className="admin-glass-card" style={{ padding: '2rem', background: '#fff' }}>
-                                    <h4 style={{ margin: '0 0 1.5rem 0' }}>Revenue Potential</h4>
-                                    <div style={{ height: '240px' }}><Bar data={charts.revenue} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div>
+                                    <h4 style={{ margin: '0 0 1.5rem 0' }}>Booking Sources</h4>
+                                    <div style={{ height: '240px', display: 'flex', justifyContent: 'center' }}>
+                                        <Pie data={charts.sources} options={{ responsive: true, maintainAspectRatio: false }} />
+                                    </div>
+                                </div>
+                                <div className="admin-glass-card" style={{ padding: '2rem', background: '#fff' }}>
+                                    <h4 style={{ margin: '0 0 1.5rem 0' }}>Peak Dining Hours</h4>
+                                    <div style={{ height: '240px' }}><Bar data={charts.peakHours} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div>
                                 </div>
                             </div>
 
@@ -517,6 +561,11 @@ export default function AdminDashboard({ onLogout }) {
                                                             <i className={`fas ${b.source === 'App' ? 'fa-mobile-alt' : 'fa-laptop'}`}></i> {b.source || 'Web'}
                                                         </span>
                                                     </div>
+                                                    {b.specialRequests && (
+                                                        <div style={{ marginTop: '10px', padding: '10px', background: '#f8fafc', borderRadius: '8px', borderLeft: '3px solid #64748b', fontSize: '0.9rem', color: '#475569' }}>
+                                                            <strong>Note:</strong> {b.specialRequests}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 

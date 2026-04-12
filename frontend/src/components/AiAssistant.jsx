@@ -239,8 +239,15 @@ export default function AiAssistant() {
                     <i className="fas fa-concierge-bell"></i>
                     <style>{`
                         @media (max-width: 768px) {
-                            .khali-trigger { --pwa-offset: 75px; }
-                            .khali-window { bottom: 160px !important; width: 90% !important; left: 5% !important; right: 5% !important; }
+                            .khali-trigger { 
+                                --pwa-offset: 85px; 
+                                width: 55px !important; 
+                                height: 55px !important; 
+                                font-size: 1.4rem !important;
+                                right: 15px !important;
+                                bottom: calc(15px + var(--pwa-offset)) !important;
+                            }
+                            .khali-window { bottom: 160px !important; width: 92% !important; left: 4% !important; right: 4% !important; }
                         }
                     `}</style>
                 </button>

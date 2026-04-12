@@ -11,6 +11,15 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
+// Capacity Map: Maximum tables available per type per 30-min slot
+const CAPACITY_MAP = {
+    'intimate': 4,
+    'family': 6,
+    'group': 3,
+    'party': 2,
+    'window': 5
+};
+
 // Helper logic for JSON files (acting as simple DB)
 const getFilePath = (fileName) => path.join(__dirname, fileName);
 
@@ -40,9 +49,39 @@ app.get('/api/bookings', (req, res) => {
     res.json(bookings);
 });
 
+app.get('/api/bookings/availability', (req, res) => {
+    const { date, tableType } = req.query;
+    if (!date || !tableType) return res.status(400).json({ message: 'Date and Table Type are required' });
+
+    const bookings = readData('bookings.json');
+    const filtered = bookings.filter(b => b.date === date && b.tableType === tableType);
+    
+    // Count bookings per time slot
+    const slotCounts = {};
+    filtered.forEach(b => {
+        slotCounts[b.time] = (slotCounts[b.time] || 0) + 1;
+    });
+
+    const maxCapacity = CAPACITY_MAP[tableType.toLowerCase()] || 4;
+    
+    res.json({
+        date,
+        tableType,
+        maxCapacity,
+        bookedSlots: slotCounts
+    });
+});
+
 app.post('/api/bookings', (req, res) => {
     const bookings = readData('bookings.json');
-    const newBooking = { id: Date.now(), timestamp: new Date().toLocaleString(), status: 'pending', ...req.body };
+    const newBooking = { 
+        id: Date.now(), 
+        timestamp: new Date().toLocaleString(), 
+        status: 'pending', 
+        source: 'Website', // Default source
+        specialRequests: '', // Default request
+        ...req.body 
+    };
     bookings.push(newBooking);
     writeData('bookings.json', bookings);
     res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
