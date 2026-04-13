@@ -34,8 +34,8 @@ export default function GalleryAndSocial() {
             <section id="gallery" className="gsap-reveal" style={{ padding: '5rem 0' }}>
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <h2 style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.8rem', marginBottom: '1rem' }}>Our Culinary Canvas</h2>
-                        <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>A visual journey through our exquisite dishes and warm ambiance.</p>
+                        <h2 style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2.8rem', marginBottom: '1rem' }}>{t('gallery.title')}</h2>
+                        <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>{t('gallery.sub')}</p>
                     </div>
 
                     <div className="masonry-gallery">

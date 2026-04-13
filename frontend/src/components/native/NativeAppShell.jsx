@@ -9,10 +9,12 @@ import NativeCart from './NativeCart';
 import OfferPopup from '../OfferPopup';
 import AiAssistant from '../AiAssistant';
 import { useCart } from '../../context/CartContext';
+import { useLanguage } from '../../context/LanguageContext';
 import '../../assets/native-style.css';
 
 export default function NativeAppShell() {
     const [activeTab, setActiveTab] = useState('home');
+    const { t } = useLanguage();
     const { getCartCount } = useCart();
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         const storedUser = localStorage.getItem('khaliya_native_user');
@@ -98,14 +100,14 @@ export default function NativeAppShell() {
                             onClick={() => handleTabChange('home')}
                         >
                             <i className="fas fa-home"></i>
-                            <span>Menu</span>
+                            <span>{t('nav.menu')}</span>
                         </button>
                         <button
                             className={`nav-tab ${activeTab === 'menu' ? 'active' : ''}`}
                             onClick={() => handleTabChange('menu')}
                         >
                             <i className="fas fa-utensils"></i>
-                            <span>Flavors</span>
+                            <span>{t('nav.flavors')}</span>
                         </button>
                         <button
                             className={`nav-tab book-btn ${activeTab === 'book' ? 'active' : ''}`}
@@ -114,7 +116,7 @@ export default function NativeAppShell() {
                             <div className="book-fab">
                                 <i className="fas fa-calendar-alt"></i>
                             </div>
-                            <span>Book</span>
+                            <span>{t('nav.reservations')}</span>
                         </button>
                         <button
                             className={`nav-tab ${activeTab === 'cart' ? 'active' : ''}`}
@@ -122,7 +124,7 @@ export default function NativeAppShell() {
                             style={{ position: 'relative' }}
                         >
                             <i className="fas fa-shopping-bag"></i>
-                            <span>Bag</span>
+                            <span>{t('nav.bag')}</span>
                             {cartCount > 0 && (
                                 <span style={{
                                     position: 'absolute',
@@ -147,7 +149,7 @@ export default function NativeAppShell() {
                             onClick={() => handleTabChange('profile')}
                         >
                             <i className="fas fa-user-circle"></i>
-                            <span>You</span>
+                            <span>{t('nav.profile')}</span>
                         </button>
                     </div>
                     <AiAssistant />

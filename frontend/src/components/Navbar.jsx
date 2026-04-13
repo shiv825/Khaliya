@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Navbar() {
     const { language, setLanguage, t } = useLanguage();
@@ -102,27 +103,7 @@ export default function Navbar() {
                             )}
                         </div>
 
-                        <select
-                            value={language}
-                            onChange={(e) => setLanguage(e.target.value)}
-                            className="language-selector"
-                            title="Select language"
-                            style={{
-                                background: 'transparent',
-                                border: '1px solid var(--border-color)',
-                                color: 'var(--text-dark)',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                outline: 'none',
-                                fontSize: '0.8rem',
-                                fontWeight: '700'
-                            }}
-                        >
-                            <option value="en" style={{ background: 'var(--bg-surface)', color: 'var(--text-dark)' }}>EN</option>
-                            <option value="hi" style={{ background: 'var(--bg-surface)', color: 'var(--text-dark)' }}>हिंदी</option>
-                            <option value="ar" style={{ background: 'var(--bg-surface)', color: 'var(--text-dark)' }}>عربي</option>
-                        </select>
+                        <LanguageSwitcher />
                         
                         <button 
                             className={`hamburger ${isMenuOpen ? 'active' : ''}`} 

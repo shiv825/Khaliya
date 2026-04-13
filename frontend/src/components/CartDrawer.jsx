@@ -16,8 +16,8 @@ export default function CartDrawer({ isOpen, onClose }) {
     const handleCheckout = () => {
         if (cart.length === 0) return;
         Swal.fire({
-            title: 'Order Summary',
-            text: 'Your selection has been finalized! (Demo)',
+            title: t('cart.orderSummary'),
+            text: t('cart.orderConfirmed'),
             icon: 'success',
             confirmButtonColor: '#E63946'
         });
@@ -72,7 +72,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
                             <h2 style={{ margin: 0, fontSize: '2.2rem', fontFamily: 'var(--font-heading)', color: 'var(--primary-color)' }}>
-                                {t('cart.title', 'My Selection')}
+                                {t('cart.title')}
                             </h2>
                             <button onClick={onClose} style={{ background: 'var(--bg-body)', border: 'none', width: '40px', height: '40px', borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'var(--transition)' }}>
                                 <i className="fas fa-times"></i>
@@ -95,7 +95,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                                     }}>
                                         <i className="fas fa-shopping-basket" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', opacity: 0.4 }}></i>
                                     </div>
-                                    <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: '600' }}>No treasures selected yet</p>
+                                    <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: '600' }}>{t('cart.empty')}</p>
                                 </div>
                             ) : (
                                 cart.map(item => (
@@ -125,7 +125,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                         {cart.length > 0 && (
                             <div style={{ background: 'var(--bg-body)', padding: '30px', borderRadius: '25px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '25px', alignItems: 'baseline' }}>
-                                    <span style={{ color: 'var(--text-light)', fontSize: '1.1rem', fontWeight: '600' }}>Total Amount</span>
+                                    <span style={{ color: 'var(--text-light)', fontSize: '1.1rem', fontWeight: '600' }}>{t('cart.total')}</span>
                                     <span style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-color)' }}>₹{getCartTotal()}</span>
                                 </div>
                                 <button 
@@ -133,7 +133,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                                     className="btn btn-primary" 
                                     style={{ width: '100%', padding: '20px', borderRadius: '40px', fontWeight: '800', letterSpacing: '1.5px', fontSize: '1.1rem' }}
                                 >
-                                    Finalize Selection
+                                    {t('cart.checkout')}
                                 </button>
                             </div>
                         )}

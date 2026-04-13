@@ -2,15 +2,29 @@ export const i18nData = {
     en: {
         common: { 
             name: 'Khaliya Restaurant',
-            add: 'Order Now',
-            orderNow: 'Order Now'
+            add: 'Add Item',
+            orderNow: 'Add Item'
         },
+        COMMON: { ADD: 'Add Item' },
         loyalty: { title: 'Spice Club Rewards', sub: 'Join our exclusive loyalty program. Earn points, tier up, and unlock secret menu items!' },
         seasonal: { text: 'Flash Deal: 20% OFF on all Starters!' },
         nav: {
             home: 'Home', menu: 'Menu', hours: 'Hours', track: 'Find Us',
             tables: '🪑 Tables', bookings: '📊 Bookings', menuManager: '📝 Menu Manager',
-            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reservations', loyalty: 'Spice Club'
+            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reservations', loyalty: 'Spice Club',
+            profile: 'Profile', bag: 'Bag', flavors: 'Flavors'
+        },
+        gallery: {
+            title: 'Our Culinary Canvas',
+            sub: 'A visual journey through our exquisite dishes and warm ambiance.'
+        },
+        cart: {
+            title: 'My Selection',
+            empty: 'No treasures selected yet',
+            total: 'Total Amount',
+            checkout: 'Finalize Selection',
+            orderSummary: 'Order Summary',
+            orderConfirmed: 'Your selection has been finalized! (Demo)'
         },
         header: { sub: 'Authentic Indian Cuisine • Est. 2020' },
         hero: {
@@ -139,7 +153,13 @@ export const i18nData = {
             postButton: 'Post Review',
             clearButton: 'Clear All (Local)',
             myReviews: 'My Reviews',
-            none: 'No reviews yet.'
+            none: 'No reviews yet.',
+            selectLanguage: 'Choose Language',
+            yourProfile: 'Your Profile',
+            accountSettings: 'Account Settings',
+            memberSettings: 'Member Settings',
+            signOut: 'Sign Out',
+            signOutConfirm: 'Are you sure you want to log out?'
         },
         msg: {
             bookingSavedLocally: 'Booking saved locally',
@@ -184,15 +204,29 @@ export const i18nData = {
     hi: {
         common: { 
             name: 'खालिया रेस्टोरेंट',
-            add: 'अभी ऑर्डर करें',
-            orderNow: 'अभी ऑर्डर करें'
+            add: 'आइटम जोड़ें',
+            orderNow: 'आइटम जोड़ें'
         },
+        COMMON: { ADD: 'आइटम जोड़ें' },
         loyalty: { title: 'स्पाइस क्लब रिवार्ड्स', sub: 'हमारे विशेष लॉयल्टी कार्यक्रम में शामिल हों। अंक अर्जित करें, टियर अप करें और गुप्त मेनू आइटम अनलॉक करें!' },
         seasonal: { text: 'फ्लैश डील: सभी स्टार्टर्स पर 20% की छूट!' },
         nav: {
             home: 'होम', menu: 'मेनू', hours: 'घंटे', track: 'हम कहाँ हैं',
             tables: '🪑 टेबल', bookings: '📊 बुकिंग्स', menuManager: '📝 मेनू प्रबंधक',
-            settings: '⚙️ सेटिंग्स', logout: '🚪 लॉगआउट', contact: 'संपर्क', reservations: 'आरक्षण', loyalty: 'रिवार्ड्स'
+            settings: '⚙️ सेटिंग्स', logout: '🚪 लॉगआउट', contact: 'संपर्क', reservations: 'आरक्षण', loyalty: 'रिवार्ड्स',
+            profile: 'प्रोफ़ाइल', bag: 'थैला', flavors: 'फ्लेवर'
+        },
+        gallery: {
+            title: 'हमारी पाक कैनवास',
+            sub: 'हमारे उत्कृष्ट व्यंजनों और गर्म वातावरण के माध्यम से एक दृश्य यात्रा।'
+        },
+        cart: {
+            title: 'मेरी पसंद',
+            empty: 'अभी तक कोई खजाना नहीं चुना गया है',
+            total: 'कुल राशि',
+            checkout: 'पसंद को अंतिम रूप दें',
+            orderSummary: 'आदेश सारांश',
+            orderConfirmed: 'आपकी पसंद को अंतिम रूप दे दिया गया है! (डेमो)'
         },
         header: { sub: 'प्रामाणिक भारतीय व्यंजन • स्था. 2020' },
         hero: {
@@ -321,7 +355,13 @@ export const i18nData = {
             postButton: 'समीक्षा पोस्ट करें',
             clearButton: 'सभी हटाएँ (स्थानीय)',
             myReviews: 'मेरी समीक्षाएं',
-            none: 'अभी तक कोई समीक्षा नहीं।'
+            none: 'अभी तक कोई समीक्षा नहीं.',
+            selectLanguage: 'भाषा चुनें',
+            yourProfile: 'आपकी प्रोफ़ाइल',
+            accountSettings: 'खाता सेटिंग्स',
+            memberSettings: 'सदस्य सेटिंग्स',
+            signOut: 'साइन आउट',
+            signOutConfirm: 'क्या आप वाकई लॉग आउट करना चाहते हैं?'
         },
         msg: {
             bookingSavedLocally: 'बुकिंग स्थानीय रूप से सहेजी गई',
@@ -366,15 +406,29 @@ export const i18nData = {
     ar: {
         common: { 
             name: 'مطعم خاليا',
-            add: 'اطلب الآن',
-            orderNow: 'اطلب الآن'
+            add: 'إضافة عنصر',
+            orderNow: 'إضافة عنصر'
         },
+        COMMON: { ADD: 'إضافة عنصر' },
         loyalty: { title: 'مكافآت نادي سبايس', sub: 'انضم إلى برنامج الولاء الحصري الخاص بنا. اكسب النقاط، وارتقِ في المستويات، وافتح عناصر القائمة السرية!' },
         seasonal: { text: 'عرض فلاش: خصم 20% على جميع المقبلات!' },
         nav: {
             home: 'الصفحة الرئيسية', menu: 'القائمة', hours: 'ساعات العمل', track: 'اعثر علينا',
             tables: '🪑 الطاولات', bookings: '📊 الحجوزات', menuManager: '📝 مدير القائمة',
-            settings: '⚙️ الإعدادات', logout: '🚪 تسجيل الخروج', contact: 'اتصل بنا', reservations: 'الحجوزات', loyalty: 'مكافآت'
+            settings: '⚙️ الإعدادات', logout: '🚪 تسجيل الخروج', contact: 'اتصل بنا', reservations: 'الحجوزات', loyalty: 'مكافآت',
+            profile: 'الملف الشخصي', bag: 'الحقيبة', flavors: 'النكهات'
+        },
+        gallery: {
+            title: 'لوحة الطهي الخاصة بنا',
+            sub: 'رحلة بصرية عبر أطباقنا الرائعة وأجوائنا الدافئة.'
+        },
+        cart: {
+            title: 'اختياري',
+            empty: 'لم يتم اختيار أي كنوز بعد',
+            total: 'المبلغ الإجمالي',
+            checkout: 'إتمام الاختيار',
+            orderSummary: 'ملخص الطلب',
+            orderConfirmed: 'تم تأكيد اختيارك! (تجريبي)'
         },
         header: { sub: 'المأكولات الهندية الأصيلة • تأسس عام 2020' },
         hero: {
@@ -503,7 +557,13 @@ export const i18nData = {
             postButton: 'إرسال التقييم',
             clearButton: 'مسح الكل (محلي)',
             myReviews: 'مراجعاتي',
-            none: 'لا توجد تقييمات بعد.'
+            none: 'لا توجد تقييمات بعد.',
+            selectLanguage: 'اختر اللغة',
+            yourProfile: 'ملفك الشخصي',
+            accountSettings: 'إعدادات الحساب',
+            memberSettings: 'إعدادات العضو',
+            signOut: 'تسجيل الخروج',
+            signOutConfirm: 'هل أنت متأكد أنك تريد تسجيل الخروج؟'
         },
         msg: {
             bookingSavedLocally: 'تم حفظ الحجز محليًا',

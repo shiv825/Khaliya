@@ -19,35 +19,35 @@
 }
 
 :root {
-    /* Base Modern Luxury Palette */
-    --primary-color: #D32F2F; 
-    --secondary-color: #311B92;
-    --accent-color: #FFB300;
-    --accent-light: #FFC107;
-    --spice-emerald: #2E7D32;
-    --spice-saffron: #FF8F00;
-    --accent-glow: rgba(211, 47, 47, 0.15);
+    /* Vibrant Spice Harmony Palette */
+    --primary-color: #E63946; 
+    --secondary-color: #4361EE;
+    --accent-color: #FB8500;
+    --accent-light: #FFB703;
+    --spice-emerald: #06D6A0;
+    --spice-saffron: #FF9F1C;
+    --accent-glow: rgba(230, 57, 70, 0.2);
 
-    --text-dark: #1A1A1A;
-    --text-light: #424242;
-    --text-muted: #757575;
-    --bg-body: #FFFBED;
+    --text-dark: #023047;
+    --text-light: #219EBC;
+    --text-muted: #8ECAE6;
+    --bg-body: #FFFAF1;
     --bg-surface: #FFFFFF;
-    --bg-glass: rgba(255, 255, 255, 0.94);
-    --border-color: rgba(211, 47, 47, 0.08);
-    --border-light: rgba(0, 0, 0, 0.05);
+    --bg-glass: rgba(255, 255, 255, 0.96);
+    --border-color: rgba(230, 57, 70, 0.15);
+    --border-light: rgba(67, 97, 238, 0.1);
 
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Lato', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
 
-    --shadow-sm: 0 4px 12px rgba(211, 47, 47, 0.06);
-    --shadow-md: 0 12px 32px rgba(211, 47, 47, 0.1);
-    --shadow-lg: 0 24px 64px rgba(211, 47, 47, 0.15);
-    --glass-shadow: 0 8px 32px 0 rgba(49, 27, 146, 0.05);
+    --shadow-sm: 0 8px 16px rgba(2, 48, 71, 0.05);
+    --shadow-md: 0 16px 32px rgba(2, 48, 71, 0.1);
+    --shadow-lg: 0 32px 64px rgba(2, 48, 71, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(67, 97, 238, 0.1);
 
-    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    --radius-md: 12px;
-    --radius-lg: 20px;
+    --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --radius-md: 16px;
+    --radius-lg: 32px;
 }
 
 /* --- Dynamic Theme Extensions --- */
@@ -72,22 +72,22 @@
     --bg-surface: rgba(255, 255, 255, 0.96);
 }
 
-/* Evening Mode: 6pm - 5am (Deep Luxury Gold & Charcoal) */
+/* Evening Mode: 6pm - 5am (Luminous Midnight Spice) */
 .app-theme-evening {
-    --bg-body: #0F0F0F;
-    --bg-surface: #1A1A1A;
-    --bg-glass: rgba(26, 26, 26, 0.85);
-    --text-dark: #F5F5F5;
+    --bg-body: #011627;
+    --bg-surface: #0B243B;
+    --bg-glass: rgba(11, 36, 59, 0.9);
+    --text-dark: #FDFFFC;
     --text-light: #E0E0E0;
     --text-muted: #9E9E9E;
-    --primary-color: #D32F2F;
-    --accent-color: #DAA520; /* Luxury Gold */
+    --primary-color: #E71D36;
+    --accent-color: #FF9F1C;
     --accent-light: #FFD700;
-    --border-color: rgba(218, 165, 32, 0.15);
-    --border-light: rgba(255, 255, 255, 0.05);
-    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 12px 40px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.8);
+    --border-color: rgba(255, 159, 28, 0.3);
+    --border-light: rgba(255, 255, 255, 0.15);
+    --shadow-sm: 0 8px 30px rgba(0, 0, 0, 0.6);
+    --shadow-md: 0 20px 50px rgba(0, 0, 0, 0.8);
+    --shadow-lg: 0 40px 100px rgba(0, 0, 0, 0.9);
 }
 
 /* Film Grain Overlay for Evening Mode */
@@ -827,4 +827,53 @@ footer .copyright span {
     font-size: 0.65rem;
     font-weight: 500;
     text-transform: uppercase;
+}
+
+/* --- RTL Support Utilities --- */
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] .main-nav {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .nav-links {
+    left: 0;
+    right: auto;
+}
+
+[dir="rtl"] .nav-cart-btn span {
+    right: auto;
+    left: -2px;
+}
+
+[dir="rtl"] .btn i, 
+[dir="rtl"] button i {
+    margin-right: 0;
+    margin-left: 0.8rem;
+}
+
+[dir="rtl"] .testimonial-card .quote {
+    right: auto;
+    left: 20px;
+}
+
+[dir="rtl"] .social-links {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .hero-title,
+[dir="rtl"] .hero-sub {
+    text-align: center; /* keep hero centered */
+}
+
+[dir="rtl"] .pwa-icon {
+    margin-right: 0;
+    margin-left: 20px;
+}
+
+[dir="rtl"] .route-btn i {
+    transform: rotate(180deg);
 }

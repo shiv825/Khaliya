@@ -49,19 +49,19 @@ export default function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
             >
-                <motion.h2
+                <motion.h1 
                     className="hero-title"
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
-                    style={{
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    style={{ 
                         fontFamily: 'var(--font-heading)',
                         fontSize: 'clamp(3.5rem, 10vw, 7rem)',
                         fontWeight: '900',
-                        background: 'linear-gradient(135deg, #FFFFFF 0%, var(--accent-color) 100%)',
+                        background: 'linear-gradient(135deg, #FDFFFC 0%, var(--accent-light) 50%, var(--spice-saffron) 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        textShadow: '0 15px 45px rgba(0, 0, 0, 0.4)',
+                        filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.3))',
                         marginBottom: '20px',
                         letterSpacing: '-2px',
                         lineHeight: 1.1
