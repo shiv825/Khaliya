@@ -8,7 +8,5 @@ import { i18nData } from './i18nData'
 window.KHALIYA_i18n = i18nData;
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <App />
 )

@@ -26,7 +26,17 @@
   <div id="root"></div>
 
   <script type="module" src="./src/main.jsx"></script>
-  <script type="module" src="/pwa-manager.js?v=2.6"></script>
+  <script type="module" src="/pwa-manager.js?v=2.7"></script>
+  <script>
+    // DIAGNOSTIC CORE: Catch initialization failures
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      var errBox = document.createElement('div');
+      errBox.style = "position:fixed;top:0;left:0;width:100%;background:#8E1C1C;color:#fff;padding:20px;z-index:10000;font-family:monospace;font-size:12px;box-sizing:border-box;word-break:break-all";
+      errBox.innerHTML = "<strong>CRITICAL ERROR:</strong><br>" + msg + "<br><br>Source: " + url + ":" + lineNo;
+      document.body.appendChild(errBox);
+      return false;
+    };
+  </script>
   <script>
     // CACHE BUSTER: Force clear service worker and cache to ensure new CSS loads
     (function () {
@@ -43,8 +53,8 @@
               for (let name of names) caches.delete(name);
             });
           }
-          localStorage.setItem('cache_busted_v3', 'true');
-          setTimeout(() => window.location.reload(true), 1200);
+          localStorage.setItem('cache_busted_v4', 'true');
+          setTimeout(() => window.location.reload(true), 1500);
         }
     })();
   </script>

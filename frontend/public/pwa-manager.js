@@ -155,5 +155,7 @@ const PWAManager = {
 window.promptInstall = PWAManager.promptInstall;
 window.forceShowPwaBanner = PWAManager.showInstallBanner;
 
-// Initialize immediately
-PWAManager.init();
+// Initialize with slight delay to ensure translations are available from the main bundle
+setTimeout(() => {
+    PWAManager.init();
+}, 500);
