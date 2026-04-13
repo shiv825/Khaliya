@@ -1,6 +1,8 @@
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import LanguageSwitcher from '../LanguageSwitcher';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 
 export default function NativeProfile() {
     const navigate = useNavigate();

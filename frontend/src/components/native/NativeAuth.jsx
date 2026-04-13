@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import NativeNotification from './NativeNotification';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function NativeAuth({ onLoginSuccess }) {
+    const { language, t } = useLanguage();
     const [step, setStep] = useState('landing'); // landing, otp, notification
     const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -136,7 +138,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                         disabled={phone.length < 10 || isLoading}
                         style={{ opacity: (phone.length < 10 || isLoading) ? 0.6 : 1 }}
                     >
-                        {isLoading ? "Please wait..." : "Next Step"}
+                        {isLoading ? (language === 'hi' ? 'कृपया प्रतीक्षा करें...' : "Please wait...") : (language === 'hi' ? 'अगला कदम' : "Next Step")}
                     </button>
                 </form>
 
