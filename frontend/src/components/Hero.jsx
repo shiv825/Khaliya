@@ -68,7 +68,7 @@ export default function Hero() {
                     }}
                 >
                     {t('hero.title')}
-                </motion.h2>
+                </motion.h1>
 
                 <motion.p
                     className="hero-sub"
