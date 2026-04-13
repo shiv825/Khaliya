@@ -26,26 +26,26 @@
   <div id="root"></div>
 
   <script type="module" src="./src/main.jsx"></script>
-  <script type="module" src="/pwa-manager.js?v=2.5"></script>
+  <script type="module" src="/pwa-manager.js?v=2.6"></script>
   <script>
     // CACHE BUSTER: Force clear service worker and cache to ensure new CSS loads
     (function () {
-      if (!localStorage.getItem('cache_busted_v2')) {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function (registrations) {
-            for (let registration of registrations) {
-              registration.unregister();
-            }
-          });
+        if (!localStorage.getItem('cache_busted_v3')) {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+              for (let registration of registrations) {
+                registration.unregister();
+              }
+            });
+          }
+          if ('caches' in window) {
+            caches.keys().then(function (names) {
+              for (let name of names) caches.delete(name);
+            });
+          }
+          localStorage.setItem('cache_busted_v3', 'true');
+          setTimeout(() => window.location.reload(true), 1200);
         }
-        if ('caches' in window) {
-          caches.keys().then(function (names) {
-            for (let name of names) caches.delete(name);
-          });
-        }
-        localStorage.setItem('cache_busted_v2', 'true');
-        setTimeout(() => window.location.reload(true), 500);
-      }
     })();
   </script>
 
