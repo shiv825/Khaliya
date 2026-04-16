@@ -5,6 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
 import AiMatchmaker from '../AiMatchmaker';
+import masterMenu from '../../data/menu.json';
 
 /**
  * NativeMenu Component
@@ -43,7 +44,8 @@ export default function NativeMenu() {
     ];
 
     const [activeCategory, setActiveCategory] = useState('All');
-    const [menuItems, setMenuItems] = useState(getFallbackMenu());
+    const [menuItems, setMenuItems] = useState(masterMenu);
+
     const [loading, setLoading] = useState(true);
     const [showMatchmaker, setShowMatchmaker] = useState(false);
 
@@ -141,7 +143,12 @@ export default function NativeMenu() {
                             }}
                         >
                             <div style={{ height: '150px', position: 'relative' }}>
-                                <img src={item.image?.startsWith('/') ? `.${item.image}` : item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img 
+                                    src={item.image?.startsWith('/') ? `.${item.image}` : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
+                                    alt={getLocalized(item.name)} 
+                                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop' }}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                />
                                 <div style={{ 
                                     position: 'absolute', top: '12px', right: '12px',
                                     backgroundColor: 'var(--primary-color)', color: '#FFFFFF',

@@ -4,6 +4,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
 import FeaturedSpecials from '../FeaturedSpecials';
+import masterMenu from '../../data/menu.json';
 
 /**
  * NativeHome Component
@@ -16,12 +17,15 @@ export default function NativeHome({ setActiveTab }) {
     const { t } = useLanguage();
     const { addToCart } = useCart();
 
-    const popularItems = [
-        { id: 'p1', name: "Butter Chicken", price: "450", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=500&fit=crop", tag: "Bestseller" },
-        { id: 'p2', name: "Garlic Naan", price: "80", image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&fit=crop", tag: "Must Try" },
-        { id: 'p3', name: "Mutton Biryani", price: "550", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&fit=crop", tag: "Chef's Special" },
-        { id: 'p4', name: "Crispy Samosa", price: "60", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&fit=crop", tag: "Snack" },
-    ];
+    // Get popular items from Master Menu (Bestsellers / Featured)
+    const popularItems = masterMenu.slice(0, 8).map(item => ({
+        id: item.name.en,
+        name: item.name.en,
+        price: item.price.replace('₹', ''),
+        image: item.image?.startsWith('/') ? `.${item.image}` : item.image,
+        tag: item.tags?.includes('spicy-2') ? "Bestseller" : "Must Try"
+    }));
+
 
     const offers = [
         { id: 1, title: "20% OFF", desc: "First Order", code: "WELCOME20", bg: "rgba(218, 165, 32, 0.15)", color: "#DAA520" },
@@ -180,7 +184,12 @@ export default function NativeHome({ setActiveTab }) {
                             boxShadow: 'var(--shadow-sm)'
                         }}>
                             <div style={{ height: '140px', position: 'relative' }}>
-                                <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img 
+                                    src={item.image} 
+                                    alt={item.name} 
+                                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop' }}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                />
                                 <div className="add-btn" onClick={() => {
                                     addToCart({ ...item, price: `₹${item.price}` });
                                     Swal.fire({ title: 'Added!', text: `${item.name} added`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
