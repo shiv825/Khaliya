@@ -17,7 +17,7 @@ export default function NativeSplash({ onAnimationComplete }) {
         <div className="native-splash" style={{
             height: '100vh',
             width: '100vw',
-            background: '#011627',
+            background: 'var(--primary-color)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -28,10 +28,10 @@ export default function NativeSplash({ onAnimationComplete }) {
             zIndex: 10000,
             overflow: 'hidden'
         }}>
-            {/* Elegant Background Particles (CSS based) */}
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, pointerEvents: 'none' }}>
-                <div style={{ position: 'absolute', top: '20%', left: '10%', width: '100px', height: '100px', background: '#FFD700', borderRadius: '50%', filter: 'blur(60px)' }}></div>
-                <div style={{ position: 'absolute', bottom: '20%', right: '10%', width: '150px', height: '150px', background: '#FFD700', borderRadius: '50%', filter: 'blur(80px)' }}></div>
+            {/* Vibrant Background Saffron Glow */}
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.2, pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', top: '20%', left: '10%', width: '180px', height: '180px', background: '#F4A261', borderRadius: '50%', filter: 'blur(80px)' }}></div>
+                <div style={{ position: 'absolute', bottom: '20%', right: '10%', width: '220px', height: '220px', background: '#F4A261', borderRadius: '50%', filter: 'blur(100px)' }}></div>
             </div>
 
             <motion.div
@@ -59,12 +59,12 @@ export default function NativeSplash({ onAnimationComplete }) {
                     transition={{ delay: 0.5, duration: 1 }}
                     style={{
                         fontFamily: 'var(--font-heading)',
-                        color: '#FFD700',
+                        color: '#FFFFFF',
                         fontSize: '3.5rem',
                         margin: 0,
                         textTransform: 'uppercase',
                         fontWeight: '800',
-                        textShadow: '0 4px 15px rgba(0,0,0,0.8)'
+                        textShadow: '0 4px 15px rgba(0,0,0,0.1)'
                     }}
                 >
                     Khaliya
@@ -76,7 +76,7 @@ export default function NativeSplash({ onAnimationComplete }) {
                     transition={{ delay: 1, duration: 1 }}
                     style={{
                         height: '2px',
-                        background: 'linear-gradient(90deg, transparent, #FFD700, transparent)',
+                        background: 'linear-gradient(90deg, transparent, #FFFFFF, transparent)',
                         margin: '15px auto',
                         maxWidth: '200px'
                     }}
@@ -87,14 +87,14 @@ export default function NativeSplash({ onAnimationComplete }) {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.5, duration: 0.8 }}
                     style={{
-                        color: 'rgba(255, 215, 0, 0.6)',
+                        color: 'rgba(255, 255, 255, 0.85)',
                         letterSpacing: '3px',
                         textTransform: 'uppercase',
                         fontSize: '0.8rem',
                         fontWeight: '700'
                     }}
                 >
-                    The Royal Sanctuary
+                    Taste of Sanctuary
                 </motion.p>
             </motion.div>
 
@@ -119,8 +119,8 @@ export default function NativeSplash({ onAnimationComplete }) {
                     style={{
                         height: '100%',
                         width: '30%',
-                        background: '#FFD700',
-                        boxShadow: '0 0 10px #FFD700'
+                        background: '#FFFFFF',
+                        boxShadow: '0 0 10px #FFFFFF'
                     }}
                 ></motion.div>
             </motion.div>

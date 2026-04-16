@@ -45,14 +45,20 @@ export default function NativeHome({ setActiveTab }) {
                 initial={{ y: -30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6 }}
-                style={{ padding: '30px 0 20px 0' }}
+                style={{ 
+                    padding: '40px 20px 30px', 
+                    background: 'linear-gradient(135deg, var(--primary-color) 0%, #D32F2F 100%)',
+                    borderRadius: '0 0 35px 35px',
+                    boxShadow: 'var(--shadow-md)',
+                    marginBottom: '20px'
+                }}
             >
                 <div className="header-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className="greeting">
-                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', margin: 0, color: 'var(--primary-color)' }}>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', margin: 0, color: '#FFFFFF', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
                             Dhanyavad, {firstName}
                         </h2>
-                        <p style={{ margin: '5px 0 0 0', fontSize: '1rem', color: 'var(--text-light)', fontWeight: '600' }}>Welcome back to Khaliya</p>
+                        <p style={{ margin: '5px 0 0 0', fontSize: '1rem', color: 'rgba(255,255,255,0.9)', fontWeight: '600' }}>Explore Khaliya Sanctuary</p>
                     </div>
                     <motion.div
                         className="user-avatar"

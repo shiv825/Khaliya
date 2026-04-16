@@ -84,13 +84,23 @@ export default function NativeMenu() {
 
     return (
         <div className="native-menu-view">
-            <div className="native-menu-header" style={{ marginBottom: '30px' }}>
+            <div className="native-menu-header" style={{ 
+                padding: '40px 20px 30px', 
+                background: 'linear-gradient(135deg, var(--primary-color) 0%, #D32F2F 100%)',
+                color: '#FFF',
+                borderRadius: '0 0 35px 35px',
+                boxShadow: 'var(--shadow-md)',
+                marginBottom: '20px'
+            }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', color: 'var(--primary-color)', margin: 0 }}>{t('menu.title', 'Our Menu')}</h2>
+                    <div className="menu-title-block">
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', color: '#FFFFFF', margin: 0, textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>{t('menu.title', 'Our Menu')}</h2>
+                        <p style={{ margin: 0, color: 'rgba(255,255,255,0.9)', fontSize: '0.9rem', fontWeight: '600' }}>Flavor Sanctuary</p>
+                    </div>
                     <motion.button 
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setShowMatchmaker(true)}
-                        style={{ padding: '10px 18px', borderRadius: '30px', background: 'var(--primary-color)', color: '#FFF', border: 'none', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', boxShadow: 'var(--shadow-sm)' }}
+                        style={{ padding: '10px 18px', borderRadius: '30px', background: 'rgba(255,255,255,0.2)', color: '#FFF', border: '1px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(10px)', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}
                     >
                         <i className="fas fa-magic"></i> Matchmaker
                     </motion.button>

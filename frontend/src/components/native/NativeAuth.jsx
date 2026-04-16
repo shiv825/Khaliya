@@ -139,9 +139,9 @@ export default function NativeAuth({ onLoginSuccess }) {
     };
 
     const renderLanding = () => (
-        <div className="native-auth-landing luxury-dark-theme" style={{ 
+        <div className="native-auth-landing vibrant-theme" style={{ 
             height: '100vh', 
-            background: 'linear-gradient(180deg, #011627 0%, #000 100%)',
+            background: 'linear-gradient(180deg, #F8F9FA 0%, #FFFFFF 100%)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -203,25 +203,25 @@ export default function NativeAuth({ onLoginSuccess }) {
                 }}
             >
                 <h2 style={{ 
-                    color: '#FFF', 
+                    color: 'var(--text-dark)', 
                     fontSize: '1.4rem', 
                     textAlign: 'center', 
                     marginBottom: '30px',
                     fontFamily: 'var(--font-heading)',
-                    fontWeight: '400',
-                    letterSpacing: '1px'
-                }}>Sign in with your Invitation</h2>
+                    fontWeight: '700',
+                    letterSpacing: '0.5px'
+                }}>Welcome to Khaliya</h2>
 
                 <form onSubmit={handlePhoneSubmit}>
                     <div className="phone-wrapper" style={{ marginBottom: '25px' }}>
                         <div style={{ 
                             display: 'flex', 
                             alignItems: 'center',
-                            background: 'rgba(0,0,0,0.4)',
-                            border: '1px solid rgba(212, 175, 55, 0.3)',
+                            background: '#FFF',
+                            border: '2px solid var(--border-color)',
                             borderRadius: '20px',
                             padding: '18px 24px',
-                            boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5)'
+                            boxShadow: 'var(--shadow-sm)'
                         }}>
                              <span style={{ color: '#D4AF37', fontWeight: '800', marginRight: '15px', fontSize: '1.2rem' }}>+91</span>
                             <input
@@ -234,9 +234,9 @@ export default function NativeAuth({ onLoginSuccess }) {
                                 style={{ 
                                     background: 'transparent', 
                                     border: 'none', 
-                                    color: '#FFF', 
+                                    color: 'var(--text-dark)', 
                                     fontSize: '1.3rem', 
-                                    fontWeight: '500',
+                                    fontWeight: '700',
                                     outline: 'none',
                                     width: '100%',
                                     letterSpacing: '3px'
