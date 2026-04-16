@@ -12,7 +12,7 @@ export default function NativeBook() {
     const [availability, setAvailability] = useState({ bookedSlots: {}, maxCapacity: 4 });
     const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
-    const API_URL = '/api';
+    const API_URL = import.meta.env.VITE_API_URL || '/api';
 
     const fetchAvailability = async (date, tableType) => {
         if (!date || !tableType) return;
@@ -223,7 +223,7 @@ export default function NativeBook() {
                                 onClick={() => {
                                     const storedUser = localStorage.getItem('khaliya_native_user');
                                     const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
-                                    const API_URL = '/api';
+                                    const API_URL = import.meta.env.VITE_API_URL || '/api';
                                     
                                     const payload = {
                                         ...formData,

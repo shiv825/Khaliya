@@ -44,7 +44,7 @@ export default function AdminDashboard({ onLogout }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const navigate = useNavigate();
 
-    const API_URL = '/api';
+    const API_URL = import.meta.env.VITE_API_URL || '/api';
 
     const [lastFetchCount, setLastFetchCount] = useState(0);
     const [isSyncing, setIsSyncing] = useState(false);

@@ -23,7 +23,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['https://shiv825.github.io', 'http://localhost:5173', 'http://localhost:3000'],
+    credentials: true
+}));
 app.use(bodyParser.json());
 
 // Diagnostic Logger: Log every request to help debug 404s on the user's laptop

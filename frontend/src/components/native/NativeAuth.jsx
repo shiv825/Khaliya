@@ -12,9 +12,8 @@ export default function NativeAuth({ onLoginSuccess }) {
     const [timer, setTimer] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Get API URL dynamically - Use relative path /api to work on all deployments
-    // If running in development, Vite handles the proxy to 5000
-    const API_URL = '/api'; 
+    // Get API URL dynamically - Use PUBLIC URL if provided, else fallback to /api for relative serving
+    const API_URL = import.meta.env.VITE_API_URL || '/api'; 
 
     // Timer for OTP resend
     useEffect(() => {

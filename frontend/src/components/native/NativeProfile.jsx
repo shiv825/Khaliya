@@ -37,7 +37,18 @@ export default function NativeProfile() {
         }
     };
 
-    const menuItems = [
+    // Detect if running as standalone PWA
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    const baseMenuItems = [
+        { icon: 'fas fa-globe', label: t('reviews.selectLanguage'), action: () => setShowLangSelector(true) },
+        { icon: 'fas fa-thumbs-up', label: 'Your feedback' },
+        { icon: 'fas fa-info-circle', label: 'About' },
+        { icon: 'fas fa-cog', label: 'Settings' }
+    ];
+
+    // Only add download option if NOT in standalone mode
+    const menuItems = isStandalone ? baseMenuItems : [
         { icon: 'fas fa-arrow-alt-circle-down', label: 'Download Khaliya App', action: () => {
             if (window.promptInstall) {
                 window.promptInstall();
@@ -45,10 +56,7 @@ export default function NativeProfile() {
                 alert('App download is currently unavailable. Please refresh and try again.');
             }
         }},
-        { icon: 'fas fa-globe', label: t('reviews.selectLanguage'), action: () => setShowLangSelector(true) },
-        { icon: 'fas fa-thumbs-up', label: 'Your feedback' },
-        { icon: 'fas fa-info-circle', label: 'About' },
-        { icon: 'fas fa-cog', label: 'Settings' }
+        ...baseMenuItems
     ];
 
     return (

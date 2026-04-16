@@ -47,7 +47,7 @@ export default function NativeMenu() {
     const [loading, setLoading] = useState(true);
     const [showMatchmaker, setShowMatchmaker] = useState(false);
 
-    const API_URL = '/api';
+    const API_URL = import.meta.env.VITE_API_URL || '/api';
 
     useEffect(() => {
         axios.get(`${API_URL}/menu`, { timeout: 5000 })
