@@ -25,14 +25,8 @@ export default function Loyalty() {
     };
 
     useEffect(() => {
-        // Ported from loyalty.js local storage logic
-        const storedStatus = localStorage.getItem('khaliya_loyalty_status');
-        if (storedStatus) {
-            setPoints(JSON.parse(storedStatus).points || 0);
-        } else {
-            setPoints(150); // Give 150 points for signing up
-            localStorage.setItem('khaliya_loyalty_status', JSON.stringify({ points: 150, tier: 'Silver' }));
-        }
+        // Website is now static/showcase only
+        setPoints(0); 
     }, []);
 
     const getTierInfo = (pts) => {
@@ -156,39 +150,21 @@ export default function Loyalty() {
                             </div>
 
                             <div style={{ transform: 'translateZ(60px)' }}>
-                                <div style={{ fontSize: '3.5rem', fontWeight: '900', letterSpacing: '2px', textShadow: '2px 2px 4px rgba(0,0,0,0.1)' }}>{points}</div>
-                                <div style={{ fontSize: '0.9rem', fontWeight: '700', opacity: 0.7 }}>Available Spice Points</div>
+                                <div style={{ fontSize: '2rem', fontWeight: '900', letterSpacing: '2px', textShadow: '2px 2px 4px rgba(0,0,0,0.1)' }}>SPICE CLUB</div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: '700', opacity: 0.7 }}>Experience the Legacy</div>
                             </div>
                             
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(30px)' }}>
-                                <div style={{ fontSize: '1.1rem', fontWeight: '600', letterSpacing: '1px' }}>VALUED MEMBER</div>
+                                <div style={{ fontSize: '1.1rem', fontWeight: '600', letterSpacing: '1px' }}>KHALIYA GUEST</div>
                                 <div style={{ fontSize: '0.8rem', fontWeight: '800', opacity: 0.7 }}>EST 2024</div>
                             </div>
                         </motion.div>
                     </motion.div>
                     <style>{`@keyframes shimmer { 0% { left: -100% } 50% { left: 200% } 100% { left: 200% } }`}</style>
 
-                    <div style={{ background: 'var(--bg-body)', padding: '2.5rem', borderRadius: '25px', marginBottom: '4rem', border: '1px solid var(--border-color)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'flex-end' }}>
-                            <div>
-                                <span style={{ fontWeight: 800, color: tier.color, fontSize: '1.8rem', display: 'block' }}>{tier.icon} {tier.name} Tier</span>
-                                <span style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Exclusive Privileges Active</span>
-                            </div>
-                            {tier.next && <span style={{ color: 'var(--primary-color)', fontSize: '0.9rem', fontWeight: '700' }}>{tier.next - points} XP TO NEXT TIER</span>}
-                        </div>
-                        <div style={{ width: '100%', height: '14px', background: 'rgba(0,0,0,0.05)', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
-                            <motion.div 
-                                initial={{ width: 0 }}
-                                animate={{ width: `${progressPercent}%` }}
-                                transition={{ duration: 1.5, ease: "easeOut" }}
-                                style={{
-                                    height: '100%',
-                                    background: `linear-gradient(90deg, var(--primary-color), var(--accent-light))`,
-                                    borderRadius: '10px',
-                                    boxShadow: '0 0 15px rgba(142, 28, 28, 0.2)'
-                                }}
-                            ></motion.div>
-                        </div>
+                    <div style={{ background: 'var(--bg-body)', padding: '2.5rem', borderRadius: '25px', marginBottom: '4rem', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+                        <h3 style={{ color: 'var(--primary-color)', fontSize: '1.4rem', fontWeight: '800', marginBottom: '10px' }}>Exclusive Rewards & Points Tracking</h3>
+                        <p style={{ color: 'var(--text-light)', marginBottom: 0 }}>Download the Khaliya App to join our elite circle and start earning Spice Points on every order.</p>
                     </div>
 
                     <h4 style={{ color: 'var(--primary-color)', marginBottom: '2.5rem', fontSize: '1.8rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>Curated Rewards</h4>
@@ -219,19 +195,19 @@ export default function Loyalty() {
                                     <div style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '8px', color: 'var(--text-dark)', fontFamily: 'var(--font-heading)' }}>{reward.name}</div>
                                     <div style={{ color: 'var(--text-light)', fontSize: '0.95rem', lineHeight: '1.5' }}>{reward.desc}</div>
                                 </div>
-                                <button 
-                                    onClick={() => handleRedeem(reward.cost, reward.name)} 
-                                    className={points >= reward.cost ? 'btn btn-primary' : 'btn'} 
-                                    disabled={points < reward.cost}
-                                    style={{ 
-                                        width: '100%', 
-                                        padding: points >= reward.cost ? '16px' : '15px', 
-                                        fontSize: '0.9rem', 
-                                        opacity: points >= reward.cost ? 1 : 0.4
-                                    }}
-                                >
-                                    {reward.cost} SPICE POINTS
-                                </button>
+                                <div style={{ 
+                                    width: '100%', 
+                                    padding: '16px', 
+                                    fontSize: '0.9rem', 
+                                    background: 'var(--bg-body)',
+                                    color: 'var(--text-muted)',
+                                    fontWeight: '800',
+                                    borderRadius: '15px',
+                                    textAlign: 'center',
+                                    border: '1px dashed var(--border-color)'
+                                }}>
+                                    USE KHALIYA APP TO REDEEM
+                                </div>
                             </div>
                         ))}
                     </div>
