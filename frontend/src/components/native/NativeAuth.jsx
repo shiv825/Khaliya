@@ -3,6 +3,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import NativeNotification from './NativeNotification';
 import { useLanguage } from '../../context/LanguageContext';
+import Swal from 'sweetalert2';
 
 export default function NativeAuth({ onLoginSuccess }) {
     const { language = 'en', t } = useLanguage();
@@ -11,6 +12,8 @@ export default function NativeAuth({ onLoginSuccess }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
+    const [demoMode, setDemoMode] = useState(false);
+    const [localCode, setLocalCode] = useState(null);
 
     // Get API URL dynamically - Priority: Global Config -> Environment Var -> Relative /api
     const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api'; 
@@ -39,10 +42,26 @@ export default function NativeAuth({ onLoginSuccess }) {
                     console.log('🧪 [AUTH] Running in Simulated mode. Check server console for OTP.');
                 }
             } catch (err) {
-                console.error('Login error:', err);
+                console.warn('⚠️ Server Unreachable. Entering Smart Fallback (Demo Mode)...');
                 setIsLoading(false);
-                const errorMsg = err.response?.data?.message || 'Connection failed. Please check your internet and try again.';
-                alert(`⚠️ Authentication Error: ${errorMsg}`);
+                
+                // GENERATE LOCAL OTP FOR DEMO
+                const fallbackCode = Math.floor(100000 + Math.random() * 900000).toString();
+                setLocalCode(fallbackCode);
+                setDemoMode(true);
+                setStep('otp');
+                setOtp(['', '', '', '', '', '']);
+                setTimer(60);
+
+                // Show the code to the user in a premium way
+                Swal.fire({
+                    title: 'Sanctuary Offline',
+                    text: `Entering Demo Mode. Use verification code: ${fallbackCode}`,
+                    icon: 'info',
+                    background: '#011627',
+                    color: '#FFD700',
+                    confirmButtonColor: '#D4AF37'
+                });
             }
         }
     };
@@ -91,6 +110,14 @@ export default function NativeAuth({ onLoginSuccess }) {
         } catch (err) {
             console.error(err);
             setIsLoading(false);
+            
+            // CHECK FOR LOCAL VERIFICATION
+            if (demoMode && code === localCode) {
+                if (navigator.vibrate) navigator.vibrate([30, 50]);
+                setStep('notification');
+                return;
+            }
+
             const msg = err.response?.data?.message || 'Incorrect verification code. Please try again.';
             alert(`🔒 Security Alert: ${msg}`);
             setOtp(['', '', '', '', '', '']);
