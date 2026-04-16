@@ -54,10 +54,10 @@ export default function AdminDashboard({ onLogout }) {
         fetchBookings(true); // Initial fetch
         fetchMenu();
         
-        // Start Real-Time Polling (5 seconds)
+        // Start Phase 2: Super-Fast 2.5s Polling for "Instant" feel
         const pollInterval = setInterval(() => {
             fetchBookings(false);
-        }, 5000);
+        }, 2500); 
 
         if (window.innerWidth < 1024) setIsSidebarOpen(false);
         
@@ -439,8 +439,8 @@ export default function AdminDashboard({ onLogout }) {
                                 borderRadius: '20px',
                                 marginLeft: '10px'
                             }}>
-                                <div className={`sync-dot ${isSyncing ? 'syncing' : ''}`} style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%' }}></div>
-                                <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#10b981', textTransform: 'uppercase' }}>Live Sync</span>
+                                <div className={`sync-dot ${isSyncing ? 'syncing' : ''}`} style={{ width: '10px', height: '10px', background: '#10b981', borderRadius: '50%' }}></div>
+                                <span style={{ fontSize: '0.75rem', fontWeight: '900', color: '#10b981', textTransform: 'uppercase', letterSpacing: '1px' }}>Real-Time Command</span>
                             </div>
                         </div>
                         <p style={{ color: 'var(--admin-text-muted)', margin: '5px 0 0 0' }}>Manage your restaurant operations effectively</p>
@@ -535,47 +535,59 @@ export default function AdminDashboard({ onLogout }) {
                                             <p>No reservations found matching your criteria.</p>
                                         </div>
                                     ) : filteredBookings.map((b) => (
-                                        <div key={b.id} className="booking-item">
-                                            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                                        <div key={b.id} className="booking-item futuristic-row" style={{
+                                            borderLeft: `6px solid ${b.status === 'confirmed' ? '#22c55e' : b.status === 'pending' ? '#FFB703' : '#ef4444'}`,
+                                            boxShadow: 'var(--shadow-sm)',
+                                            padding: '20px 25px'
+                                        }}>
+                                            <div style={{ display: 'flex', gap: '25px', alignItems: 'center', flex: 1 }}>
                                                 <div style={{ 
-                                                    width: '56px', 
-                                                    height: '56px', 
-                                                    borderRadius: '16px', 
+                                                    width: '60px', 
+                                                    height: '60px', 
+                                                    borderRadius: '18px', 
                                                     background: b.status === 'confirmed' ? '#dcfce7' : b.status === 'pending' ? '#fef3c7' : '#fee2e2',
                                                     color: b.status === 'confirmed' ? '#166534' : b.status === 'pending' ? '#92400e' : '#991b1b',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    fontSize: '1.2rem'
+                                                    fontSize: '1.4rem',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                                                 }}>
                                                     <i className={`fas ${b.tableType === 'Premium' ? 'fa-crown' : 'fa-check'}`}></i>
                                                 </div>
-                                                <div>
-                                                    <div style={{ fontWeight: '800', fontSize: '1.1rem', color: '#0f172a' }}>{b.name || 'Anonymous Guest'} <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '400' }}>#{b.id}</span></div>
-                                                    <div style={{ marginTop: '5px', display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                                                        <h3 style={{ margin: 0, fontWeight: '800', fontSize: '1.25rem', color: '#1e293b' }}>{b.name || 'Anonymous Guest'}</h3>
+                                                        <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '600' }}>#{b.id}</span>
+                                                    </div>
+                                                    <div style={{ marginTop: '8px', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                                                         <span className="item-detail"><i className="far fa-calendar-alt"></i> {b.date}</span>
                                                         <span className="item-detail"><i className="far fa-clock"></i> {b.time}</span>
                                                         <span className="item-detail"><i className="fas fa-users"></i> {b.guests} Guests</span>
                                                         <span className="item-detail"><i className="fas fa-phone"></i> {b.phone}</span>
-                                                        <span className={`source-badge ${b.source === 'App' ? 'source-app' : 'source-web'}`}>
+                                                        <span className={`source-badge ${b.source === 'App' ? 'source-app' : 'source-web'}`} style={{ fontSize: '0.65rem', padding: '4px 10px' }}>
                                                             <i className={`fas ${b.source === 'App' ? 'fa-mobile-alt' : 'fa-laptop'}`}></i> {b.source || 'Web'}
                                                         </span>
                                                     </div>
                                                     {b.specialRequests && (
-                                                        <div style={{ marginTop: '10px', padding: '10px', background: '#f8fafc', borderRadius: '8px', borderLeft: '3px solid #64748b', fontSize: '0.9rem', color: '#475569' }}>
-                                                            <strong>Note:</strong> {b.specialRequests}
+                                                        <div style={{ marginTop: '12px', padding: '12px 15px', background: '#f8fafc', borderRadius: '10px', borderLeft: '3px solid #64748b', fontSize: '0.9rem', color: '#475569', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.02)' }}>
+                                                            <strong>Special Note:</strong> {b.specialRequests}
                                                         </div>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            <div className="actions" style={{ display: 'flex', gap: '0.8rem' }}>
-                                                <span className={`item-badge badge-${b.status}`} style={{ alignSelf: 'center', marginRight: '10px' }}>{b.status}</span>
-                                                {b.status === 'pending' && (
-                                                    <button onClick={() => confirmBooking(b.id)} style={{ background: '#22c55e', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontWeight: '700' }}>Confirm</button>
-                                                )}
-                                                <button onClick={() => sendWhatsApp(b)} style={{ background: '#25D366', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer' }}><i className="fab fa-whatsapp"></i> WhatsApp</button>
-                                                <button onClick={() => deleteBooking(b.id)} style={{ background: '#fef2f2', color: '#ef4444', border: 'none', padding: '10px 12px', borderRadius: '12px', cursor: 'pointer' }}><i className="far fa-trash-alt"></i></button>
+                                            <div className="actions" style={{ display: 'flex', gap: '10px', marginLeft: '20px' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <span className={`item-badge badge-${b.status}`} style={{ textAlign: 'center', fontSize: '0.65rem' }}>{b.status}</span>
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        {b.status === 'pending' && (
+                                                            <button onClick={() => confirmBooking(b.id)} className="admin-btn-success-small" title="Confirm Booking"><i className="fas fa-check"></i></button>
+                                                        )}
+                                                        <button onClick={() => sendWhatsApp(b)} className="admin-btn-wa-small" title="Send WhatsApp"><i className="fab fa-whatsapp"></i></button>
+                                                        <button onClick={() => deleteBooking(b.id)} className="admin-btn-danger-small" title="Delete"><i className="far fa-trash-alt"></i></button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}

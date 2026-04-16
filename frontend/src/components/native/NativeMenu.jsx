@@ -45,9 +45,15 @@ export default function NativeMenu() {
 
     const [activeCategory, setActiveCategory] = useState('All');
     const [menuItems, setMenuItems] = useState(masterMenu);
+    
+    // Reset visible count when category changes for speed
+    useEffect(() => {
+        setVisibleCount(20);
+    }, [activeCategory]);
 
     const [loading, setLoading] = useState(true);
     const [showMatchmaker, setShowMatchmaker] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(20); // PERFORMANCE: Limit initial render
 
     const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
 
@@ -73,6 +79,8 @@ export default function NativeMenu() {
     const filteredItems = activeCategory === 'All'
         ? menuItems
         : menuItems.filter(item => getLocalized(item.category) === activeCategory);
+
+    const visibleItems = filteredItems.slice(0, visibleCount);
 
     if (loading) {
         return (
@@ -140,7 +148,7 @@ export default function NativeMenu() {
 
             <div className="native-menu-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <AnimatePresence>
-                    {filteredItems.map((item, index) => (
+                    {visibleItems.map((item, index) => (
                         <motion.div
                             key={item.id || index}
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -189,6 +197,26 @@ export default function NativeMenu() {
                     ))}
                 </AnimatePresence>
             </div>
+
+            {/* PERFORMANCE: Load More Button */}
+            {filteredItems.length > visibleCount && (
+                <div style={{ textAlign: 'center', marginTop: '30px' }}>
+                    <button 
+                        onClick={() => setVisibleCount(prev => prev + 20)}
+                        style={{ 
+                            padding: '12px 30px', 
+                            borderRadius: '25px', 
+                            background: 'var(--primary-color)', 
+                            color: '#FFF', 
+                            border: 'none', 
+                            fontWeight: '800',
+                            boxShadow: 'var(--shadow-md)'
+                        }}
+                    >
+                        See More ({filteredItems.length - visibleCount} items left)
+                    </button>
+                </div>
+            )}
             <div style={{ height: '120px' }}></div>
         </div>
     );
