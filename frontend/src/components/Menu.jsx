@@ -415,7 +415,7 @@ export default function Menu() {
     const [sort, setSort] = useState('default');
     const [showMatchmaker, setShowMatchmaker] = useState(false);
 
-    const API_URL = import.meta.env.VITE_API_URL || '/api';
+    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
 
     useEffect(() => {
         let isMounted = true;

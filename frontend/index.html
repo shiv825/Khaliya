@@ -58,6 +58,8 @@
         localStorage.setItem('nuclear_reset_v9', 'true');
         setTimeout(function() { window.location.reload(true); }, 2000);
       }
+      // 4. RUNTIME CONFIGURATION: Allow easy API URL overrides
+      window.KHALIYA_API_URL = ""; // SET YOUR RENDER URL HERE (e.g., "https://api.render.com")
     })();
   </script>
 

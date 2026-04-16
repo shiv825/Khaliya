@@ -11,7 +11,7 @@ export default function Reviews() {
         fetchReviews();
     }, []);
 
-    const API_URL = import.meta.env.VITE_API_URL || '/api';
+    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
 
     const fetchReviews = () => {
         axios.get(`${API_URL}/reviews`, { timeout: 5000 })

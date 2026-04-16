@@ -12,8 +12,8 @@ export default function NativeAuth({ onLoginSuccess }) {
     const [timer, setTimer] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Get API URL dynamically - Use PUBLIC URL if provided, else fallback to /api for relative serving
-    const API_URL = import.meta.env.VITE_API_URL || '/api'; 
+    // Get API URL dynamically - Priority: Global Config -> Environment Var -> Relative /api
+    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api'; 
 
     // Timer for OTP resend
     useEffect(() => {
