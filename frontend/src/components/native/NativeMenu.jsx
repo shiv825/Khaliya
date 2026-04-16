@@ -15,7 +15,11 @@ export default function NativeMenu() {
     const { t, language } = useLanguage();
     const { addToCart } = useCart();
     
-    // Luxury Fallback Menu
+    // Helper for multi-language fields
+    const getLocalized = (field) => {
+        if (field && typeof field === 'object') return field[language] || field.en || '';
+        return field || '';
+    };
     const getFallbackMenu = () => [
         {
             "category": "Appetizer",
@@ -53,12 +57,15 @@ export default function NativeMenu() {
 
     const [loading, setLoading] = useState(true);
     const [showMatchmaker, setShowMatchmaker] = useState(false);
-    const [visibleCount, setVisibleCount] = useState(24); // Optimization: slightly more for better scroll filling
-    const [isRenderReady, setIsRenderReady] = useState(false); // New: Delay list render for "Instant" feel
+    const [visibleCount, setVisibleCount] = useState(12); // Speed: Start smaller
+    const [isRenderReady, setIsRenderReady] = useState(false); 
 
     // Initial mount delay to let the UI thread breathe
     useEffect(() => {
-        const timer = setTimeout(() => setIsRenderReady(true), 150);
+        const timer = setTimeout(() => {
+            setIsRenderReady(true);
+            setVisibleCount(24); // Expand after initial clear mount
+        }, 100);
         return () => clearTimeout(timer);
     }, []);
 
@@ -88,13 +95,11 @@ export default function NativeMenu() {
         return filteredItems.slice(0, visibleCount);
     }, [filteredItems, visibleCount]);
 
-    if (loading) {
-        return (
-            <div className="native-loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', color: 'var(--primary-color)' }}>
-                <i className="fas fa-spinner fa-spin fa-2x"></i>
-            </div>
-        );
-    }
+    const CardSkeleton = () => (
+        <div className="skeleton-card" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '25px', height: '280px', position: 'relative', overflow: 'hidden' }}>
+            <div className="shimmer" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)', animation: 'shimmer 1.5s infinite' }}></div>
+        </div>
+    );
 
     return (
         <div className="native-menu-view">
@@ -153,51 +158,55 @@ export default function NativeMenu() {
             </div>
 
             <div className="native-menu-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                    {isRenderReady && visibleItems.map((item, index) => (
-                        <div
-                            key={item.id || index}
-                            className="native-menu-card"
-                            style={{ 
-                                background: '#FFFFFF', borderRadius: '25px', 
-                                border: '1px solid var(--border-color)', overflow: 'hidden',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
-                            }}
-                        >
-                            <div style={{ height: '150px', position: 'relative' }}>
-                                <img 
-                                    src={item.image?.startsWith('/') ? `.${item.image}` : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
-                                    alt={getLocalized(item.name)} 
-                                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop' }}
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                                />
-                                <div style={{ 
-                                    position: 'absolute', top: '12px', right: '12px',
-                                    backgroundColor: 'var(--primary-color)', color: '#FFFFFF',
-                                    padding: '5px 12px', borderRadius: '12px', fontWeight: '900', fontSize: '0.9rem',
-                                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                                }}>₹{item.price}</div>
+                    {!isRenderReady || loading ? (
+                        Array(8).fill(0).map((_, i) => <CardSkeleton key={i} />)
+                    ) : (
+                        visibleItems.map((item, index) => (
+                            <div
+                                key={item.id || index}
+                                className="native-menu-card"
+                                style={{ 
+                                    background: '#FFFFFF', borderRadius: '25px', 
+                                    border: '1px solid var(--border-color)', overflow: 'hidden',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
+                                }}
+                            >
+                                <div style={{ height: '150px', position: 'relative' }}>
+                                    <img 
+                                        src={item.image?.startsWith('/') ? `.${item.image}` : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
+                                        alt={getLocalized(item.name)} 
+                                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop' }}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    />
+                                    <div style={{ 
+                                        position: 'absolute', top: '12px', right: '12px',
+                                        backgroundColor: 'var(--primary-color)', color: '#FFFFFF',
+                                        padding: '5px 12px', borderRadius: '12px', fontWeight: '900', fontSize: '0.9rem',
+                                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                                    }}>₹{item.price}</div>
+                                </div>
+                                <div style={{ padding: '15px 12px 12px' }}>
+                                    <h3 style={{ margin: '0 0 6px 0', fontSize: '1rem', fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontWeight: '800' }}>{getLocalized(item.name)}</h3>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', lineHeight: '1.4', marginBottom: '15px', height: '4.2em', overflow: 'hidden', fontWeight: '500' }}>
+                                        {getLocalized(item.description)}
+                                    </p>
+                                    <button
+                                        onClick={() => {
+                                            addToCart(item);
+                                            Swal.fire({ title: 'Added!', text: `${getLocalized(item.name)} added`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
+                                        }}
+                                        style={{ 
+                                            width: '100%', backgroundColor: 'var(--bg-body)', 
+                                            color: 'var(--primary-color)', border: '1px solid var(--primary-color)', padding: '10px', borderRadius: '15px',
+                                            fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'var(--transition)'
+                                        }}
+                                    >
+                                        <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i> {t('common.add', 'Order Now')}
+                                    </button>
+                                </div>
                             </div>
-                            <div style={{ padding: '15px 12px 12px' }}>
-                                <h3 style={{ margin: '0 0 6px 0', fontSize: '1rem', fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontWeight: '800' }}>{getLocalized(item.name)}</h3>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', lineHeight: '1.4', marginBottom: '15px', height: '4.2em', overflow: 'hidden', fontWeight: '500' }}>
-                                    {getLocalized(item.description)}
-                                </p>
-                                <button
-                                    onClick={() => {
-                                        addToCart(item);
-                                        Swal.fire({ title: 'Added!', text: `${getLocalized(item.name)} added`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
-                                    }}
-                                    style={{ 
-                                        width: '100%', backgroundColor: 'var(--bg-body)', 
-                                        color: 'var(--primary-color)', border: '1px solid var(--primary-color)', padding: '10px', borderRadius: '15px',
-                                        fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'var(--transition)'
-                                    }}
-                                >
-                                    <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i> {t('common.add', 'Order Now')}
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
             </div>
 
             {/* PERFORMANCE: Load More Button */}
