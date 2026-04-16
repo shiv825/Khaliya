@@ -3,7 +3,15 @@ const PWAManager = {
     lastLang: localStorage.getItem('lang') || 'en',
 
     init: () => {
-        console.log('🚀 [PWA] Manager v2.2 Initialized');
+        console.log('🚀 [PWA] Manager v2.3 Initialized');
+        
+        // Handle debug force mode
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('pwa_reset')) {
+            console.log('🧹 [PWA] Resetting dismissal state via URL param');
+            sessionStorage.removeItem('pwa_dismissed');
+        }
+
         PWAManager.registerServiceWorker();
         PWAManager.setupInstallPrompt();
         PWAManager.setupLaterButton();
@@ -13,11 +21,38 @@ const PWAManager = {
     registerServiceWorker: () => {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
+                navigator.serviceWorker.register('/service-worker.js')
                     .then(reg => {
                         console.log('✅ [PWA] Service Worker registered:', reg.scope);
+                        
+                        // Force check for updates immediately on load
+                        reg.update();
+
+                        // Listener for when a new service worker is found
+                        reg.addEventListener('updatefound', () => {
+                            const newWorker = reg.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('✨ [PWA] New version available! Reloading in 1s...');
+                                    setTimeout(() => window.location.reload(), 1000);
+                                }
+                            });
+                        });
                     })
-                    .catch(err => console.error('❌ [PWA] SW Registration failed:', err));
+                    .catch(err => {
+                        console.error('❌ [PWA] SW Registration failed:', err);
+                        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+                    });
+            });
+
+            // Handle the case where the service worker has already updated but needs a refresh
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    console.log('♻️ [PWA] Controller changed (new version activated). Reloading...');
+                    window.location.reload();
+                }
             });
         }
     },
@@ -31,8 +66,13 @@ const PWAManager = {
             PWAManager.deferredPrompt = e;
             
             // Show banner immediately when prompt is ready, if not dismissed
-            if (!sessionStorage.getItem('pwa_dismissed')) {
+            const isDismissed = sessionStorage.getItem('pwa_dismissed');
+            console.log('🔍 [PWA] Checking dismissal state:', isDismissed);
+            
+            if (!isDismissed) {
                 PWAManager.showInstallBanner();
+            } else {
+                console.log('ℹ️ [PWA] Banner suppressed: Already dismissed in this session.');
             }
         });
 
@@ -49,9 +89,7 @@ const PWAManager = {
 
     promptInstall: () => {
         if (!PWAManager.deferredPrompt) {
-            console.log('⚠️ [PWA] Install prompt not available.');
-            // Even if prompt is unavailable, the user just wants the button. 
-            // The browser dictates if the prompt shows or not.
+            console.error('❌ [PWA] Install prompt not available. User clicked Install too early or browser blocked it.');
             return;
         }
 
@@ -73,31 +111,47 @@ const PWAManager = {
         if (banner) {
             PWAManager.updateBannerContent();
             banner.classList.add('active');
+            console.log('🎬 [PWA] Banner is now ACTIVE');
             
             // Haptic feedback if available
             if ("vibrate" in navigator) {
-                navigator.vibrate(50);
+                try {
+                    navigator.vibrate(50);
+                } catch(e) { /* Ignore vibration errors if blocked */ }
             }
         } else {
-            console.warn('❌ [PWA] Banner element #pwaInstallBanner not found in DOM');
+            console.error('❌ [PWA] Banner element #pwaInstallBanner not found in DOM');
         }
     },
 
     closeInstallBanner: () => {
         const banner = document.getElementById('pwaInstallBanner');
-        if (banner) banner.classList.remove('active');
+        if (banner) {
+            console.log('🙈 [PWA] Closing banner');
+            banner.classList.remove('active');
+        }
     },
 
     setupLaterButton: () => {
-        // Robust later button setup
         const attachLater = () => {
             const laterBtn = document.getElementById('pwaLaterBtn');
             if (laterBtn) {
-                laterBtn.onclick = () => {
+                // Clear any existing onclick to avoid duplicates
+                laterBtn.onclick = null;
+                
+                laterBtn.addEventListener('click', (e) => {
+                    if (!e.isTrusted) {
+                        console.warn('⚠️ [PWA] Untrusted click detected on Later button! Preventing automatic dismissal.');
+                        // If it's not a real user click, we might want to ignore it
+                        // but for now let's just log and continue to see the trace.
+                        console.trace('Programmatic Click Trace');
+                        return; 
+                    }
+                    
                     console.log('⏳ [PWA] User clicked "Later"');
                     sessionStorage.setItem('pwa_dismissed', 'true');
                     PWAManager.closeInstallBanner();
-                };
+                });
             }
         };
 
@@ -124,18 +178,13 @@ const PWAManager = {
 
         if (title) title.innerText = i18n.pwa?.installTitle || 'Install Khaliya App';
         if (desc) desc.innerText = i18n.pwa?.installDesc || 'Fast access to our menu.';
-
-        if (installBtn) {
-            installBtn.innerText = i18n.pwa?.installBtn || 'Install';
-        }
-        
-        if (laterBtn) laterBtn.innerText = 'Cancel';
+        if (installBtn) installBtn.innerText = i18n.pwa?.installBtn || 'Install';
+        if (laterBtn) laterBtn.innerText = i18n.pwa?.cancelBtn || 'Later';
     },
 
     listenForLanguageChanges: () => {
         window.addEventListener('storage', (e) => {
             if (e.key === 'lang') {
-                console.log('🌐 [PWA] Language change detected via storage');
                 PWAManager.updateBannerContent();
             }
         });
@@ -143,7 +192,6 @@ const PWAManager = {
         setInterval(() => {
             const currentLang = localStorage.getItem('lang') || 'en';
             if (PWAManager.lastLang !== currentLang) {
-                console.log('🌐 [PWA] Language change detected via poller:', currentLang);
                 PWAManager.lastLang = currentLang;
                 PWAManager.updateBannerContent();
             }
@@ -155,7 +203,8 @@ const PWAManager = {
 window.promptInstall = PWAManager.promptInstall;
 window.forceShowPwaBanner = PWAManager.showInstallBanner;
 
-// Initialize with slight delay to ensure translations are available from the main bundle
+// Initialize with slight delay to ensure translations are available
 setTimeout(() => {
     PWAManager.init();
-}, 500);
+}, 800);
+

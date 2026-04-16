@@ -47,10 +47,10 @@ export default function NativeMenu() {
     const [loading, setLoading] = useState(true);
     const [showMatchmaker, setShowMatchmaker] = useState(false);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = '/api';
 
     useEffect(() => {
-        axios.get(`${API_URL}/api/menu`, { timeout: 5000 })
+        axios.get(`${API_URL}/menu`, { timeout: 5000 })
             .then(res => {
                 if (Array.isArray(res.data) && res.data.length > 0) {
                     setMenuItems(res.data);

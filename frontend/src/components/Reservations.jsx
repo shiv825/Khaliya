@@ -15,7 +15,7 @@ export default function Reservations({ predefinedTable }) {
 
     const [selectedTableInfo, setSelectedTableInfo] = useState(null);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = '/api';
 
     useEffect(() => {
         // AI Suggestion pre-fill
@@ -39,7 +39,7 @@ export default function Reservations({ predefinedTable }) {
     const fetchAvailability = async () => {
         setIsLoadingSlots(true);
         try {
-            const res = await axios.get(`${API_URL}/api/bookings/availability`, {
+            const res = await axios.get(`${API_URL}/bookings/availability`, {
                 params: { date: formData.date, tableType: formData.tableType }
             });
             setAvailability(res.data);
@@ -74,7 +74,7 @@ export default function Reservations({ predefinedTable }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         const payload = { ...formData, source: 'Website' };
-        axios.post(`${API_URL}/api/bookings`, payload)
+        axios.post(`${API_URL}/bookings`, payload)
             .then(res => {
                 setMessage(t('msg.bookingConfirmed') || 'Booking saved!');
                 setFormData({ name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: '' });
@@ -92,9 +92,6 @@ export default function Reservations({ predefinedTable }) {
                 <h2 style={{ marginBottom: '1.5rem' }}>{t('reservations.title')}</h2>
                 <p style={{ color: 'var(--text-light)', marginBottom: '4rem', fontSize: '1.1rem' }}>{t('reservations.sub', 'Secure your table for an unforgettable culinary experience.')}</p>
                 
-                <div style={{ marginBottom: '4rem' }}>
-                    <InteractiveFloorplan onSelectTable={(type, id) => handleTableSelect(type, id)} />
-                </div>
                 
                 <form onSubmit={handleSubmit} style={{ 
                     background: 'var(--bg-surface)', 

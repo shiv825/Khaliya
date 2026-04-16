@@ -87,3 +87,31 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* PWA Immersive Mode Adjustments */
+@media (display-mode: standalone), (min-width: 1px) {
+  .native-app-shell {
+    overscroll-behavior-y: none; /* Disable pull-to-refresh */
+  }
+
+  /* Hide scrollbars for all elements in App Mode */
+  .custom-scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .custom-scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Prevent blue highlight on tap for images and buttons */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
+  }
+
+  /* Modern Notch Support */
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+}

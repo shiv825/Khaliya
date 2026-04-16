@@ -4,6 +4,7 @@ import Home from './components/Home';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import NativeAppShell from './components/native/NativeAppShell';
+import NativeSplash from './components/native/NativeSplash';
 import { useAppMode } from './hooks/useAppMode';
 import { useDynamicTheme } from './hooks/useDynamicTheme';
 import { LanguageProvider } from './context/LanguageContext';
@@ -32,17 +33,23 @@ function App() {
     });
   }, []);
 
+  const [showSplash, setShowSplash] = React.useState(isAppMode);
+
   return (
     <LanguageProvider>
       <CartProvider>
         <div className={`app-theme-${theme}`}>
-          <Router>
-            <Routes>
-              <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
-              <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
-              <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
-            </Routes>
-          </Router>
+          {isAppMode && showSplash ? (
+            <NativeSplash onAnimationComplete={() => setShowSplash(false)} />
+          ) : (
+            <Router>
+              <Routes>
+                <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
+                <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
+                <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
+              </Routes>
+            </Router>
+          )}
         </div>
       </CartProvider>
     </LanguageProvider>

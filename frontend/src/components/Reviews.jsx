@@ -11,10 +11,10 @@ export default function Reviews() {
         fetchReviews();
     }, []);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = '/api';
 
     const fetchReviews = () => {
-        axios.get(`${API_URL}/api/reviews`, { timeout: 5000 })
+        axios.get(`${API_URL}/reviews`, { timeout: 5000 })
             .then(res => setReviews(res.data || []))
             .catch(err => console.error('Error fetching reviews:', err));
     };
@@ -25,7 +25,7 @@ export default function Reviews() {
         e.preventDefault();
         if (!formData.rating || !formData.text) return;
 
-        axios.post(`${API_URL}/api/reviews`, {
+        axios.post(`${API_URL}/reviews`, {
             ...formData,
             date: new Date().toISOString()
         })

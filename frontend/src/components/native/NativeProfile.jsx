@@ -38,6 +38,13 @@ export default function NativeProfile() {
     };
 
     const menuItems = [
+        { icon: 'fas fa-arrow-alt-circle-down', label: 'Download Khaliya App', action: () => {
+            if (window.promptInstall) {
+                window.promptInstall();
+            } else {
+                alert('App download is currently unavailable. Please refresh and try again.');
+            }
+        }},
         { icon: 'fas fa-globe', label: t('reviews.selectLanguage'), action: () => setShowLangSelector(true) },
         { icon: 'fas fa-thumbs-up', label: 'Your feedback' },
         { icon: 'fas fa-info-circle', label: 'About' },

@@ -32,6 +32,10 @@ export default function NativeAppShell() {
 
     // Smooth scroll to top when changing tabs
     const handleTabChange = (id) => {
+        // Haptic feedback for tab change
+        if ("vibrate" in navigator) {
+            navigator.vibrate(10);
+        }
         setActiveTab(id);
         window.scrollTo(0, 0);
     };
@@ -63,8 +67,8 @@ export default function NativeAppShell() {
                     key="auth"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.5 }}
                 >
                     <NativeAuth onLoginSuccess={handleLoginSuccess} />
                 </motion.div>
@@ -72,29 +76,39 @@ export default function NativeAppShell() {
                 <motion.div
                     key="app"
                     className="native-app-shell"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
                 >
-                    {/* Main Content Area: Renders only the active tab with smooth transition */}
-                    <div className="native-content-area custom-scrollbar-hide">
+                    {/* Main Content Area */}
+                    <div className="native-content-area custom-scrollbar-hide" style={{ 
+                        flex: 1, 
+                        overflowY: 'auto', 
+                        WebkitOverflowScrolling: 'touch',
+                        paddingTop: 'env(safe-area-inset-top, 20px)' 
+                    }}>
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab}
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.98 }}
-                                transition={{ duration: 0.25, ease: "easeOut" }}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
                                 style={{ minHeight: '100%' }}
                             >
                                 {renderActiveTab()}
                             </motion.div>
                         </AnimatePresence>
-                        <div style={{ height: '80px' }}></div> {/* Safe area for bottom nav */}
+                        <div style={{ height: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}></div>
                     </div>
 
                     {/* Bottom Navigation Bar */}
-                    <div className="native-bottom-nav">
+                    <div className="native-bottom-nav" style={{ 
+                        paddingBottom: 'env(safe-area-inset-bottom, 10px)',
+                        background: 'rgba(1, 22, 39, 0.95)',
+                        backdropFilter: 'blur(10px)',
+                        borderTop: '1px solid rgba(255, 215, 0, 0.1)'
+                    }}>
                         <button
                             className={`nav-tab ${activeTab === 'home' ? 'active' : ''}`}
                             onClick={() => handleTabChange('home')}

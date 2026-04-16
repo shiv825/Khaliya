@@ -44,7 +44,7 @@ export default function AdminDashboard({ onLogout }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const navigate = useNavigate();
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = '/api';
 
     const [lastFetchCount, setLastFetchCount] = useState(0);
     const [isSyncing, setIsSyncing] = useState(false);
@@ -67,7 +67,7 @@ export default function AdminDashboard({ onLogout }) {
     const fetchBookings = async (isInitial = false) => {
         setIsSyncing(true);
         try {
-            const res = await axios.get(`${API_URL}/api/bookings`);
+            const res = await axios.get(`${API_URL}/bookings`);
             const data = res.data || [];
             
             // Check for new bookings to notify
@@ -103,7 +103,7 @@ export default function AdminDashboard({ onLogout }) {
 
     const fetchMenu = async () => {
         try {
-            const res = await axios.get(`${API_URL}/api/menu`);
+            const res = await axios.get(`${API_URL}/menu`);
             setMenu(res.data || []);
         } catch (err) {
             console.error('Failed to fetch menu', err);
@@ -130,7 +130,7 @@ export default function AdminDashboard({ onLogout }) {
     // -- BOOKINGS LOGIC --
     const confirmBooking = async (id) => {
         try {
-            await axios.put(`${API_URL}/api/bookings/${id}`, { status: 'confirmed' });
+            await axios.put(`${API_URL}/bookings/${id}`, { status: 'confirmed' });
             fetchBookings();
             Swal.fire({ title: 'Confirmed!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
         } catch (err) { console.error(err); }
@@ -147,7 +147,7 @@ export default function AdminDashboard({ onLogout }) {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`${API_URL}/api/bookings/${id}`);
+                await axios.delete(`${API_URL}/bookings/${id}`);
                 fetchBookings();
                 Swal.fire('Deleted!', 'Booking has been deleted.', 'success');
             } catch (err) { console.error(err); }
@@ -302,7 +302,7 @@ export default function AdminDashboard({ onLogout }) {
 
         if (formValues && formValues.name && formValues.price) {
             try {
-                await axios.post(`${API_URL}/api/menu`, formValues);
+                await axios.post(`${API_URL}/menu`, formValues);
                 fetchMenu();
                 Swal.fire('Success', 'Item added to menu', 'success');
             } catch (err) { Swal.fire('Error', 'Failed to add item', 'error'); }
@@ -335,7 +335,7 @@ export default function AdminDashboard({ onLogout }) {
     const toggleMenuAvailability = async (id, currentStatus) => {
         const newStatus = currentStatus === 'sold-out' ? 'available' : 'sold-out';
         try {
-            await axios.put(`${API_URL}/api/menu/${id}`, { status: newStatus });
+            await axios.put(`${API_URL}/menu/${id}`, { status: newStatus });
             fetchMenu();
             Swal.fire({ title: 'Updated!', text: `Item is now ${newStatus}`, icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
         } catch (err) { console.error('Failed to update menu status', err); }
@@ -352,7 +352,7 @@ export default function AdminDashboard({ onLogout }) {
         });
 
         if (result.isConfirmed) {
-            await axios.delete(`${API_URL}/api/menu/${id}`);
+            await axios.delete(`${API_URL}/menu/${id}`);
             fetchMenu();
             Swal.fire('Removed!', 'Menu item deleted.', 'success');
         }

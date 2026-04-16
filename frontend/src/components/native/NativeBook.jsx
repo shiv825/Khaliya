@@ -3,6 +3,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import InteractiveFloorplan from '../InteractiveFloorplan';
 import { useLanguage } from '../../context/LanguageContext';
+import Swal from 'sweetalert2';
 
 export default function NativeBook() {
     const { t } = useLanguage();
@@ -11,13 +12,13 @@ export default function NativeBook() {
     const [availability, setAvailability] = useState({ bookedSlots: {}, maxCapacity: 4 });
     const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = '/api';
 
     const fetchAvailability = async (date, tableType) => {
         if (!date || !tableType) return;
         setIsLoadingSlots(true);
         try {
-            const res = await axios.get(`${API_URL}/api/bookings/availability`, {
+            const res = await axios.get(`${API_URL}/bookings/availability`, {
                 params: { date, tableType }
             });
             setAvailability(res.data);
@@ -111,17 +112,49 @@ export default function NativeBook() {
                             </div>
                         </div>
                         <div className="form-group-native table-types" style={{ marginTop: '20px' }}>
-                            <label style={{ marginBottom: '20px', display: 'block', fontSize: '1.1rem', color: 'var(--primary-color)', fontWeight: '800' }}>Visual Seating Preference</label>
-                            <InteractiveFloorplan onSelectTable={(type) => setFormData({ ...formData, tableType: type })} />
-                            {formData.tableType && (
-                                <div style={{ 
-                                    marginTop: '20px', padding: '12px', background: 'rgba(142, 28, 28, 0.05)', 
-                                    color: 'var(--primary-color)', textAlign: 'center', fontWeight: '900', 
-                                    fontSize: '1.1rem', borderRadius: '12px', border: '1px dashed var(--primary-color)' 
-                                }}>
-                                    <i className="fas fa-check-circle"></i> Selected: {formData.tableType}
-                                </div>
-                            )}
+                            <label style={{ marginBottom: '20px', display: 'block', fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: '800' }}>Select Seating Preference</label>
+                            
+                            <div style={{ display: 'grid', gap: '15px' }}>
+                                {[
+                                    { id: 'intimate', label: 'Intimate Table', sub: 'Perfect for couples', icon: '🥂' },
+                                    { id: 'family', label: 'Family Booth', sub: 'Cozy for families', icon: '👨‍👩‍👧‍👦' },
+                                    { id: 'window', label: 'Window View', sub: 'Scenic city views', icon: '🪟' },
+                                    { id: 'group', label: 'Group Table', sub: 'Great for friends', icon: '🎉' },
+                                    { id: 'party', label: 'Party Hall', sub: 'Grand celebrations', icon: '🎊' }
+                                ].map((type) => (
+                                    <motion.div
+                                        key={type.id}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => setFormData({ ...formData, tableType: type.id })}
+                                        style={{
+                                            padding: '18px',
+                                            borderRadius: '20px',
+                                            background: formData.tableType === type.id ? 'var(--bg-surface)' : 'rgba(142, 28, 28, 0.02)',
+                                            border: `2px solid ${formData.tableType === type.id ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '15px',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                    >
+                                        <div style={{ 
+                                            fontSize: '1.5rem', width: '50px', height: '50px', 
+                                            borderRadius: '12px', background: formData.tableType === type.id ? 'var(--primary-color)' : 'var(--bg-surface)',
+                                            color: formData.tableType === type.id ? '#FFF' : 'var(--primary-color)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                        }}>
+                                            {type.icon}
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: '800', color: 'var(--text-dark)', fontSize: '1rem' }}>{type.label}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>{type.sub}</div>
+                                        </div>
+                                        {formData.tableType === type.id && (
+                                            <i className="fas fa-check-circle" style={{ color: 'var(--primary-color)', fontSize: '1.2rem' }}></i>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
                         <div className="wizard-actions" style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
                             <motion.button 
@@ -190,7 +223,7 @@ export default function NativeBook() {
                                 onClick={() => {
                                     const storedUser = localStorage.getItem('khaliya_native_user');
                                     const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
-                                    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                                    const API_URL = '/api';
                                     
                                     const payload = {
                                         ...formData,
@@ -200,7 +233,7 @@ export default function NativeBook() {
                                         source: 'App'
                                     };
 
-                                    axios.post(`${API_URL}/api/bookings`, payload)
+                                    axios.post(`${API_URL}/bookings`, payload)
                                         .then(() => {
                                             Swal.fire({ title: 'Reserved!', text: 'Your royal table awaits.', icon: 'success', confirmButtonColor: '#8E1C1C' });
                                             setStep(1);

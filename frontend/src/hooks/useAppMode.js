@@ -8,34 +8,34 @@ export function useAppMode() {
     const [isAppMode, setIsAppMode] = useState(false);
 
     useEffect(() => {
-        // Strict separation: To avoid aggressive Android WebAPK intent interception 
-        // where opening a normal link forces the standalone container, we DEMAND
-        // the ?mode=pwa query parameter to show the Native App Shell.
-        // This parameter is set in manifest.json "start_url".
-
+        // Robust detection for Native App Mode
         const searchParams = new URLSearchParams(window.location.search);
         
         // 1. Explicit query param (Strongest signal from manifest.json start_url)
-        if (searchParams.has('mode') && searchParams.get('mode') === 'pwa') {
-            setIsAppMode(true);
-            return;
-        }
+        const hasModeParam = searchParams.has('mode') && searchParams.get('mode') === 'pwa';
+        
+        // 2. Browser display-mode (Standalone/Fullscreen)
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.matchMedia('(display-mode: fullscreen)').matches ||
+                           window.navigator.standalone === true;
 
-        // 2. iOS Safari standalone mode (iOS does not reliably pass start_url query params when added to homescreen)
-        if (window.navigator.standalone === true) {
-            setIsAppMode(true);
-            return;
-        }
+        // 3. Forced website override
+        const isForcedWebsite = searchParams.has('mode') && searchParams.get('mode') === 'website';
 
-        // 3. Optional fallback: If they explicitly request website
-        if (searchParams.has('mode') && searchParams.get('mode') === 'website') {
+        // 4. Detected Mobile Device (Recovery Override)
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isForcedWebsite) {
             setIsAppMode(false);
             return;
         }
 
-        // Force website mode by default for ALL other generic loads
-        // We DO NOT trust window.matchMedia('(display-mode: standalone)') here
-        // because it causes false positives in in-app browsers and WebAPK intents.
+        if (hasModeParam || isStandalone || isMobileDevice) {
+            setIsAppMode(true);
+            return;
+        }
+
+        // Default to false (Website mode)
         setIsAppMode(false);
 
     }, []);

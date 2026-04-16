@@ -145,23 +145,16 @@ export default function Navbar() {
                         <a href="#menu" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
                         <a href="#loyalty" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
                         <a href="#reservations" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
-                        <a href="#contact" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.contact')}</a>
-                        
-                        <button 
-                            onClick={toggleMenu} 
-                            style={{ 
-                                position: 'absolute', 
-                                top: '2rem', 
-                                right: '2rem', 
-                                background: 'none', 
-                                border: 'none', 
-                                color: 'var(--primary-color)', 
-                                fontSize: '2.5rem', 
-                                cursor: 'pointer' 
-                            }}
-                        >
-                            <i className="fas fa-times"></i>
-                        </button>
+                        <div style={{
+                            marginTop: 'auto',
+                            paddingBottom: '2rem',
+                            opacity: 0.3,
+                            fontSize: '0.8rem',
+                            color: 'var(--primary-color)',
+                            fontFamily: 'monospace'
+                        }}>
+                            v15.0.4-HARDENED
+                        </div>
                     </div>
                 </div>
             </motion.nav>

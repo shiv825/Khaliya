@@ -415,11 +415,11 @@ export default function Menu() {
     const [sort, setSort] = useState('default');
     const [showMatchmaker, setShowMatchmaker] = useState(false);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = '/api';
 
     useEffect(() => {
         let isMounted = true;
-        axios.get(`${API_URL}/api/menu`, { timeout: 8000 })
+        axios.get(`${API_URL}/menu`, { timeout: 8000 })
             .then(res => {
                 if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
                     setMenuItems(res.data);

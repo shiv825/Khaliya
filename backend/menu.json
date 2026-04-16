@@ -378,6 +378,62 @@
         "image": "/menu-images/gulab-jamun.jpg"
     },
     {
+        "category": "Appetizer",
+        "name": {
+            "en": "Murgh Malai Tikka",
+            "hi": "मुर्ग मलाई टिक्का",
+            "ar": "دجاج مالاي تيكا"
+        },
+        "description": {
+            "en": "Creamy, melt-in-the-mouth chicken chunks marinated in cheese and cream.",
+            "hi": "चीज़ और क्रीम में मैरीनेट किए हुए मलाईदार, मुँह में घुल जाने वाले चिकन के टुकड़े।",
+            "ar": "قطع دجاج كريمية تذوب في الفم متبلة بالجبن والقشطة."
+        },
+        "price": "₹380",
+        "tags": [
+            "non-veg",
+            "spicy-1"
+        ],
+        "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Dal Tadka",
+            "hi": "दाल तड़का",
+            "ar": "دال तadca"
+        },
+        "description": {
+            "en": "Yellow lentils tempered with ghee, cumin, garlic, and red chilies. A soulful classic.",
+            "hi": "घी, जीरा, लहसुन और लाल मिर्च के तड़के वाली पीली दाल। एक आत्मिक क्लासिक।",
+            "ar": "عدس أصفر مقلي بالسمن والكمون والثوم والفلفل الأحمر. طبق كلاسيكي مريح."
+        },
+        "price": "₹240",
+        "tags": [
+            "veg",
+            "spicy-2"
+        ],
+        "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Kashmiri Pulao",
+            "hi": "कश्मीरी पुलाव",
+            "ar": "كشميري بولاو"
+        },
+        "description": {
+            "en": "Fragrant rice cooked with fruits, nuts, and delicate saffron. Royal and aromatic.",
+            "hi": "फलों, मेवों और केसर के साथ पकाया गया सुगंधित चावल। शाही और खुशबूदार।",
+            "ar": "أرز عطري مطبوخ بالفواكه والمكسرات والزعفران الرقيق. ملكي وعطري."
+        },
+        "price": "₹320",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&fit=crop"
+    },
+    {
         "category": "Beverage",
         "name": {
             "en": "Mango Lassi",
