@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
@@ -53,9 +53,14 @@ export default function NativeMenu() {
 
     const [loading, setLoading] = useState(true);
     const [showMatchmaker, setShowMatchmaker] = useState(false);
-    const [visibleCount, setVisibleCount] = useState(20); // PERFORMANCE: Limit initial render
+    const [visibleCount, setVisibleCount] = useState(24); // Optimization: slightly more for better scroll filling
+    const [isRenderReady, setIsRenderReady] = useState(false); // New: Delay list render for "Instant" feel
 
-    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+    // Initial mount delay to let the UI thread breathe
+    useEffect(() => {
+        const timer = setTimeout(() => setIsRenderReady(true), 150);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         axios.get(`${API_URL}/menu`, { timeout: 5000 })
@@ -68,19 +73,20 @@ export default function NativeMenu() {
             .finally(() => setLoading(false));
     }, [API_URL]);
 
-    const getLocalized = (field) => {
-        if (field && typeof field === 'object') return field[language] || field.en || '';
-        return field || '';
-    };
+    const categories = useMemo(() => {
+        const backendCategories = [...new Set(menuItems.map(item => getLocalized(item.category)).filter(Boolean))];
+        return ['All', ...backendCategories];
+    }, [menuItems, language]);
 
-    const backendCategories = [...new Set(menuItems.map(item => getLocalized(item.category)).filter(Boolean))];
-    const categories = ['All', ...backendCategories];
+    const filteredItems = useMemo(() => {
+        return activeCategory === 'All'
+            ? menuItems
+            : menuItems.filter(item => getLocalized(item.category) === activeCategory);
+    }, [menuItems, activeCategory, language]);
 
-    const filteredItems = activeCategory === 'All'
-        ? menuItems
-        : menuItems.filter(item => getLocalized(item.category) === activeCategory);
-
-    const visibleItems = filteredItems.slice(0, visibleCount);
+    const visibleItems = useMemo(() => {
+        return filteredItems.slice(0, visibleCount);
+    }, [filteredItems, visibleCount]);
 
     if (loading) {
         return (
@@ -147,17 +153,14 @@ export default function NativeMenu() {
             </div>
 
             <div className="native-menu-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                <AnimatePresence>
-                    {visibleItems.map((item, index) => (
-                        <motion.div
+                    {isRenderReady && visibleItems.map((item, index) => (
+                        <div
                             key={item.id || index}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="native-menu-card futuristic-glass"
+                            className="native-menu-card"
                             style={{ 
-                                background: 'var(--bg-surface)', borderRadius: '25px', 
+                                background: '#FFFFFF', borderRadius: '25px', 
                                 border: '1px solid var(--border-color)', overflow: 'hidden',
-                                boxShadow: 'var(--shadow-sm)'
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
                             }}
                         >
                             <div style={{ height: '150px', position: 'relative' }}>
@@ -193,9 +196,8 @@ export default function NativeMenu() {
                                     <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i> {t('common.add', 'Order Now')}
                                 </button>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
-                </AnimatePresence>
             </div>
 
             {/* PERFORMANCE: Load More Button */}

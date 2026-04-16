@@ -8,6 +8,8 @@ export default function NativeProfile() {
     const navigate = useNavigate();
     const { t } = useLanguage();
     const [showLangSelector, setShowLangSelector] = useState(false);
+    const [activeModal, setActiveModal] = useState(null); // 'membership', 'feedback', 'about', 'settings'
+    
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
 
@@ -42,9 +44,9 @@ export default function NativeProfile() {
 
     const baseMenuItems = [
         { icon: 'fas fa-globe', label: t('reviews.selectLanguage'), action: () => setShowLangSelector(true) },
-        { icon: 'fas fa-thumbs-up', label: 'Your feedback' },
-        { icon: 'fas fa-info-circle', label: 'About' },
-        { icon: 'fas fa-cog', label: 'Settings' }
+        { icon: 'fas fa-thumbs-up', label: 'Your feedback', action: () => setActiveModal('feedback') },
+        { icon: 'fas fa-info-circle', label: 'About', action: () => setActiveModal('about') },
+        { icon: 'fas fa-cog', label: 'Settings', action: () => setActiveModal('settings') }
     ];
 
     // Only add download option if NOT in standalone mode
@@ -75,7 +77,7 @@ export default function NativeProfile() {
                 <div style={{ flex: 1 }}>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user.name}</h2>
                     <p style={{ color: 'var(--text-light)', margin: '2px 0 5px 0', fontSize: '0.95rem', fontWeight: '600' }}>{user.email}</p>
-                    <span style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.9rem' }}>{t('reviews.memberSettings')} <i className="fas fa-caret-right"></i></span>
+                    <span onClick={() => setActiveModal('membership')} style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer' }}>{t('reviews.memberSettings')} <i className="fas fa-caret-right"></i></span>
                 </div>
             </div>
 
@@ -224,6 +226,91 @@ export default function NativeProfile() {
                             </div>
                             <LanguageSwitcher mode="list" />
                         </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Profile Detail Modals */}
+            <AnimatePresence>
+                {activeModal && (
+                    <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                        style={{
+                            position: 'fixed',
+                            inset: 0,
+                            background: 'var(--bg-body)',
+                            zIndex: 3000,
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <div style={{ padding: '30px 20px', display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--border-color)' }}>
+                            <button onClick={() => setActiveModal(null)} style={{ background: 'none', border: 'none', padding: '10px', marginRight: '10px' }}>
+                                <i className="fas fa-arrow-left" style={{ fontSize: '1.4rem', color: 'var(--primary-color)' }}></i>
+                            </button>
+                            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--primary-color)', margin: 0, textTransform: 'capitalize' }}>
+                                {activeModal === 'membership' ? 'Saffron Membership' : activeModal}
+                            </h2>
+                        </div>
+
+                        <div style={{ flex: 1, padding: '30px 20px', overflowY: 'auto' }}>
+                            {activeModal === 'membership' && (
+                                <div style={{ textAlign: 'center' }}>
+                                    <i className="fas fa-crown" style={{ fontSize: '4rem', color: 'var(--primary-color)', marginBottom: '20px' }}></i>
+                                    <h3 style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--text-dark)' }}>Saffron Select</h3>
+                                    <p style={{ color: 'var(--text-light)', fontWeight: '600' }}>You have 750 Spice Points</p>
+                                    <div style={{ marginTop: '30px', background: 'var(--bg-surface)', padding: '20px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
+                                        <h4 style={{ color: 'var(--primary-color)', fontWeight: '800' }}>Member Perks</h4>
+                                        <ul style={{ textAlign: 'left', listStyle: 'none', padding: 0, marginTop: '15px' }}>
+                                            <li style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}><i className="fas fa-star" style={{ color: '#F4A261' }}></i> Priority Seating</li>
+                                            <li style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}><i className="fas fa-star" style={{ color: '#F4A261' }}></i> Complimentary Dessert</li>
+                                            <li style={{ display: 'flex', gap: '10px' }}><i className="fas fa-star" style={{ color: '#F4A261' }}></i> Exclusive Tasting Events</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeModal === 'feedback' && (
+                                <div>
+                                    <textarea 
+                                        placeholder="How was your experience at Khaliya?"
+                                        style={{ width: '100%', height: '150px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '15px', outline: 'none', color: 'var(--text-dark)', fontWeight: '500' }}
+                                    ></textarea>
+                                    <button 
+                                        onClick={() => { Swal.fire({ title: 'Thank you!', text: 'Your feedback matters.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 }); setActiveModal(null); }}
+                                        style={{ width: '100%', background: 'var(--primary-color)', color: '#FFF', border: 'none', padding: '15px', borderRadius: '20px', fontWeight: '800', marginTop: '20px' }}
+                                    >Submit Feedback</button>
+                                </div>
+                            )}
+
+                            {activeModal === 'about' && (
+                                <div style={{ color: 'var(--text-dark)' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary-color)' }}>Our Legacy</h3>
+                                    <p style={{ fontWeight: '500', lineHeight: '1.6' }}>Khaliya Sanctuary is more than just a restaurant; it is a celebration of the legendary saffron heritage, blending authentic Indian flavors with modern culinary artistry.</p>
+                                    <div style={{ marginTop: '20px' }}>
+                                        <p><strong>Address:</strong> High Street, Flavor Town</p>
+                                        <p><strong>Hours:</strong> 11:00 AM - 11:00 PM</p>
+                                        <p><strong>Contact:</strong> +91 82527 31784</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeModal === 'settings' && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                    <div style={{ padding: '20px', background: 'var(--bg-surface)', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontWeight: '700' }}>Push Notifications</span>
+                                        <div style={{ width: '40px', height: '20px', background: 'var(--primary-color)', borderRadius: '10px' }}></div>
+                                    </div>
+                                    <div style={{ padding: '20px', background: 'var(--bg-surface)', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontWeight: '700' }}>Offline Mode</span>
+                                        <div style={{ width: '40px', height: '20px', background: 'var(--border-color)', borderRadius: '10px' }}></div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
