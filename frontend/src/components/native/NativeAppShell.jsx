@@ -14,8 +14,11 @@ import '../../assets/native-style.css';
 
 export default function NativeAppShell() {
     const [activeTab, setActiveTab] = useState('home');
-    const { t } = useLanguage();
-    const { getCartCount } = useCart();
+    const langContext = useLanguage();
+    const cartContext = useCart();
+    
+    const t = langContext ? langContext.t : (k, f) => f || k;
+    const getCartCount = cartContext ? cartContext.getCartCount : () => 0;
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         const storedUser = localStorage.getItem('khaliya_native_user');
         if (storedUser) {
@@ -103,12 +106,7 @@ export default function NativeAppShell() {
                     </div>
 
                     {/* Bottom Navigation Bar */}
-                    <div className="native-bottom-nav" style={{ 
-                        paddingBottom: 'env(safe-area-inset-bottom, 10px)',
-                        background: 'rgba(1, 22, 39, 0.95)',
-                        backdropFilter: 'blur(10px)',
-                        borderTop: '1px solid rgba(255, 215, 0, 0.1)'
-                    }}>
+                    <div className="native-bottom-nav">
                         <button
                             className={`nav-tab ${activeTab === 'home' ? 'active' : ''}`}
                             onClick={() => handleTabChange('home')}

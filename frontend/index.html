@@ -13,53 +13,79 @@
   <script>
     // 1. ADVANCED DIAGNOSTIC GUARD: Catch EVERYTHING
     (function() {
-      function showDiag(msg, detail) {
+      window.khaliyaNuclearReset = function() {
+        if (confirm("Factory Reset will clear your cart and session to fix loading issues. Continue?")) {
+          try {
+            localStorage.clear();
+            sessionStorage.clear();
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(rs) {
+                for(let r of rs) r.unregister();
+              });
+            }
+            if ('caches' in window) {
+              caches.keys().then(function(ns) {
+                for(let n of ns) caches.delete(n);
+              });
+            }
+          } catch(e) {}
+          window.location.href = window.location.pathname + "?reset=" + Date.now();
+        }
+      };
+
+      window.showKhaliyaDiag = function(msg, detail) {
+        if (document.getElementById('khaliya-diag')) {
+          var d = document.getElementById('khaliya-diag-detail');
+          if (d) d.innerText += "\n" + (detail || "");
+          return;
+        }
         var div = document.createElement('div');
-        div.style = "position:fixed;top:0;left:0;width:100%;background:#8E1C1C;color:#fff;padding:25px;z-index:99999;font-family:sans-serif;font-weight:bold;box-sizing:border-box;border-bottom:5px solid #DAA520";
-        div.innerHTML = "<div style='font-size:18px;margin-bottom:10px'>⚠ CRITICAL STARTUP FAILURE</div>" + 
-                        "<div style='font-size:12px;opacity:0.9;font-family:monospace'>" + msg + "</div>" +
-                        (detail ? "<div style='font-size:10px;margin-top:10px;opacity:0.7'>" + detail + "</div>" : "");
+        div.id = 'khaliya-diag';
+        div.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(142,28,28,0.98);color:#fff;padding:40px 20px;z-index:999999;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;backdrop-filter:blur(10px)";
+        div.innerHTML = "<div style='font-size:60px;margin-bottom:20px;color:#DAA520'>⚠</div>" + 
+                        "<div style='font-size:24px;margin-bottom:15px;font-weight:900;letter-spacing:1px'>SYSTEM INTERRUPTION</div>" + 
+                        "<div style='font-size:14px;max-width:500px;line-height:1.6;margin-bottom:30px;opacity:0.9'>" + msg + "<br><br><span id='khaliya-diag-detail' style='font-family:monospace;font-size:11px;opacity:0.7;display:block;max-height:150px;overflow:auto'>" + (detail || "") + "</span></div>" +
+                        "<div style='display:flex;gap:15px;flex-wrap:wrap;justify-content:center'>" +
+                          "<button onclick='window.location.reload(true)' style='background:#DAA520;color:#000;border:none;padding:15px 30px;border-radius:50px;font-weight:900;cursor:pointer;text-transform:uppercase'>Retry Load</button>" +
+                          "<button onclick='window.khaliyaNuclearReset()' style='background:transparent;color:#FFF;border:2px solid #FFF;padding:15px 30px;border-radius:50px;font-weight:900;cursor:pointer;text-transform:uppercase'>Factory Reset</button>" +
+                        "</div>";
         document.body ? document.body.appendChild(div) : document.documentElement.appendChild(div);
-      }
+      };
 
       // Capture runtime errors
-      window.onerror = function(m, u, l) { showDiag("JS Error: " + m, u + ":" + l); return false; };
+      window.onerror = function(m, u, l) { window.showKhaliyaDiag("JS Error: " + m, u + ":" + l); return false; };
       
       // Capture resource (404) errors
       window.addEventListener('error', function(e) {
         if (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK') {
-          showDiag("Resource Loading Error", e.target.src || e.target.href);
+          window.showKhaliyaDiag("Resource Loading Error", e.target.src || e.target.href);
         }
       }, true);
 
-      // 2. WATCHDOG: If #root is empty after 5 seconds, show "App Hung"
+      // 2. WATCHDOG: If #root is empty after 6 seconds, show "App Hung"
       window.addEventListener('load', function() {
+        console.log('🏁 [Watchdog] Page load complete. Waiting for React mount...');
         setTimeout(function() {
           var root = document.getElementById('root');
           if (root && root.innerHTML === "") {
-            showDiag("Application Hang detected", "The app failed to render the main interface. This usually means a dependency failed to initialize or a router error occurred.");
+            window.showKhaliyaDiag("Application Hang detected", "The app failed to render the main interface within 6 seconds. This usually means a critical dependency (like Framer Motion or AOS) failed to initialize, or a JavaScript error occurred during the early boot phase.");
+          } else {
+            console.log('✅ [Watchdog] React mount detected. Watchdog disarmed.');
           }
-        }, 5000);
+        }, 6000);
       });
 
-      // 3. NUCLEAR RESET: Clear ALL service workers and caches twice
-      if (!localStorage.getItem('nuclear_reset_v9')) {
-        console.log('☢ Final PWA Hardening Reset (v9) in progress...');
+      // 3. AUTO RESET: Only for major version bumps
+      if (!localStorage.getItem('nuclear_reset_v11')) {
+        localStorage.setItem('nuclear_reset_v11', 'true');
+        console.log('☢ [PWA] Nuclear Reset v11 in progress...');
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(rs) {
             for(let r of rs) r.unregister();
           });
         }
-        if ('caches' in window) {
-          caches.keys().then(function(ns) {
-            for(let n of ns) caches.delete(n);
-          });
-        }
-        localStorage.setItem('nuclear_reset_v9', 'true');
-        setTimeout(function() { window.location.reload(true); }, 2000);
       }
-      // 4. RUNTIME CONFIGURATION: Allow easy API URL overrides
-      window.KHALIYA_API_URL = ""; // SET YOUR RENDER URL HERE (e.g., "https://api.render.com")
+      window.KHALIYA_API_URL = ""; 
     })();
   </script>
 

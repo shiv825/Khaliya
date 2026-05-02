@@ -4,13 +4,13 @@
     --primary-color: #E63946; /* Vibrant Red */
     --secondary-color: #F4A261; /* Saffron */
     --accent-color: #2A9D8F; /* Teal accent */
-    --bg-body: #F8F9FA;
+    --bg-body: #FDFCFB; /* Warmer Ivory */
     --bg-surface: #FFFFFF;
     --text-dark: #1D3557;
     --text-muted: #6C757D;
-    --border-color: #E9ECEF;
-    --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
-    --shadow-md: 0 10px 25px rgba(0,0,0,0.08);
+    --border-color: #F1F3F5;
+    --shadow-sm: 0 4px 12px rgba(230, 57, 70, 0.08); /* Colorful Red shadow */
+    --shadow-md: 0 10px 25px rgba(244, 162, 97, 0.15); /* Colorful Saffron shadow */
     --font-heading: 'Playfair Display', serif;
 }
 
@@ -55,16 +55,16 @@
     max-width: 100% !important;
     height: calc(75px + env(safe-area-inset-bottom, 0px)); 
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: var(--bg-surface);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 2px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.85); /* Light glass */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-top: 1px solid rgba(230, 57, 70, 0.15);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 0 15px;
     z-index: 9999;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.03);
+    box-shadow: 0 -10px 30px rgba(230, 57, 70, 0.05);
 }
 
 .nav-tab {
@@ -404,13 +404,11 @@
 .native-input {
     width: 100%;
     padding: 15px;
-    background: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    color: white;
+    color: var(--text-dark);
     font-size: 1rem;
-    color-scheme: dark;
-    /* For native calendar/clock pickers */
     box-sizing: border-box;
 }
 
@@ -423,18 +421,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #1e1e1e;
+    background: var(--bg-surface);
     border-radius: 12px;
     padding: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
 }
 
 .stepper-btn {
     width: 45px;
     height: 45px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
+    background: rgba(230, 57, 70, 0.05);
+    color: var(--primary-color);
     border: none;
     font-size: 1.2rem;
     font-weight: bold;
@@ -456,13 +454,14 @@
 }
 
 .table-card {
-    background: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
     padding: 20px 10px;
     text-align: center;
     border-radius: 12px;
     font-weight: 600;
     font-size: 0.95rem;
+    color: var(--text-dark);
     transition: all 0.2s ease;
 }
 
@@ -514,10 +513,10 @@
 }
 
 .booking-summary {
-    background: #1e1e1e;
+    background: var(--bg-surface);
     border-radius: 16px;
     padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
 }
 
 .summary-row {
@@ -584,13 +583,14 @@
 }
 
 .loyalty-card-native {
-    background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     border-radius: 20px;
     padding: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: none;
     margin-bottom: 30px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 15px 35px rgba(230, 57, 70, 0.2);
 }
 
 .loyalty-card-native h3 {
@@ -629,10 +629,10 @@
 }
 
 .settings-list {
-    background: #1e1e1e;
+    background: var(--bg-surface);
     border-radius: 20px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
 }
 
 .settings-item {

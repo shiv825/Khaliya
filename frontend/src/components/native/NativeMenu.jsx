@@ -12,8 +12,9 @@ import masterMenu from '../../data/menu.json';
  * Optimized for mobile with Luxury "Gold & Charcoal" styling.
  */
 export default function NativeMenu() {
-    const { t, language } = useLanguage();
+    const { t, language = 'en' } = useLanguage();
     const { addToCart } = useCart();
+    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
     
     // Helper for multi-language fields
     const getLocalized = (field) => {
@@ -58,6 +59,7 @@ export default function NativeMenu() {
     const [loading, setLoading] = useState(true);
     const [showMatchmaker, setShowMatchmaker] = useState(false);
     const [visibleCount, setVisibleCount] = useState(12); // Speed: Start smaller
+    const [searchQuery, setSearchQuery] = useState('');
     const [isRenderReady, setIsRenderReady] = useState(false); 
 
     // Initial mount delay to let the UI thread breathe
@@ -81,15 +83,26 @@ export default function NativeMenu() {
     }, [API_URL]);
 
     const categories = useMemo(() => {
+        if (!Array.isArray(menuItems)) return ['All'];
         const backendCategories = [...new Set(menuItems.map(item => getLocalized(item.category)).filter(Boolean))];
         return ['All', ...backendCategories];
     }, [menuItems, language]);
 
     const filteredItems = useMemo(() => {
-        return activeCategory === 'All'
+        let items = activeCategory === 'All'
             ? menuItems
             : menuItems.filter(item => getLocalized(item.category) === activeCategory);
-    }, [menuItems, activeCategory, language]);
+        
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            items = items.filter(item => 
+                getLocalized(item.name).toLowerCase().includes(query) || 
+                getLocalized(item.description).toLowerCase().includes(query) ||
+                getLocalized(item.category).toLowerCase().includes(query)
+            );
+        }
+        return items;
+    }, [menuItems, activeCategory, language, searchQuery]);
 
     const visibleItems = useMemo(() => {
         return filteredItems.slice(0, visibleCount);
@@ -133,6 +146,8 @@ export default function NativeMenu() {
                     <input 
                         type="text" 
                         placeholder={t('menu.searchPlaceholder', 'Find your flavor...')} 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         style={{ background: 'transparent', border: 'none', color: 'var(--text-dark)', width: '100%', outline: 'none', fontWeight: '500' }}
                     />
                 </div>
@@ -173,7 +188,7 @@ export default function NativeMenu() {
                             >
                                 <div style={{ height: '150px', position: 'relative' }}>
                                     <img 
-                                        src={item.image?.startsWith('/') ? `.${item.image}` : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
+                                        src={item.image?.startsWith('/') ? item.image : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
                                         alt={getLocalized(item.name)} 
                                         onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop' }}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 

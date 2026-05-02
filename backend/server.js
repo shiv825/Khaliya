@@ -236,6 +236,26 @@ app.post('/api/reviews', (req, res) => {
     res.status(201).json({ message: 'Review created successfully', review: newReview });
 });
 
+// -- API: ORDERS (PWA NATIVE ORDERS) --
+app.get('/api/orders', (req, res) => {
+    res.json(readData('orders.json'));
+});
+
+app.post('/api/orders', (req, res) => {
+    const orders = readData('orders.json');
+    const newOrder = { 
+        id: `ORD-${Date.now()}`, 
+        timestamp: new Date().toLocaleString(), 
+        status: 'received', 
+        ...req.body 
+    };
+    orders.push(newOrder);
+    writeData('orders.json', orders);
+    
+    console.log(`🍟 [ORDER] New App Order: ${newOrder.id} - ${newOrder.items.length} items`);
+    res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
+});
+
 // Catch-all route to serve the frontend (for SPA routing)
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));

@@ -12,19 +12,24 @@ import masterMenu from '../../data/menu.json';
  */
 export default function NativeHome({ setActiveTab }) {
     const storedUserStr = localStorage.getItem('khaliya_native_user');
-    const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'Guest' };
-    const firstName = user.name ? user.name.split(' ')[0] : 'Guest';
-    const { t } = useLanguage();
+    let user = { name: 'Guest' };
+    try {
+        if (storedUserStr) user = JSON.parse(storedUserStr);
+    } catch (e) {
+        console.warn('⚠️ [NativeHome] User data corrupted, resetting to guest');
+    }
+    const firstName = (user && user.name) ? user.name.split(' ')[0] : 'Guest';
+    const { t, language = 'en' } = useLanguage();
     const { addToCart } = useCart();
 
     // Get popular items from Master Menu (Bestsellers / Featured)
-    const popularItems = masterMenu.slice(0, 8).map(item => ({
-        id: item.name.en,
-        name: item.name.en,
-        price: item.price.replace('₹', ''),
-        image: item.image?.startsWith('/') ? `.${item.image}` : item.image,
+    const popularItems = Array.isArray(masterMenu) ? masterMenu.slice(0, 8).map(item => ({
+        id: item.name?.en || Math.random().toString(),
+        name: item.name?.en || 'Menu Item',
+        price: item.price ? item.price.replace('₹', '') : '150',
+        image: item.image,
         tag: item.tags?.includes('spicy-2') ? "Bestseller" : "Must Try"
-    }));
+    })) : [];
 
 
     const offers = [

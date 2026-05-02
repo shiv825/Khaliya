@@ -6,12 +6,17 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-mo
 
 export default function NativeProfile() {
     const navigate = useNavigate();
-    const { t } = useLanguage();
+    const { t, language = 'en' } = useLanguage();
     const [showLangSelector, setShowLangSelector] = useState(false);
     const [activeModal, setActiveModal] = useState(null); // 'membership', 'feedback', 'about', 'settings'
     
     const storedUserStr = localStorage.getItem('khaliya_native_user');
-    const user = storedUserStr ? JSON.parse(storedUserStr) : { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
+    let user = { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
+    try {
+        if (storedUserStr) user = JSON.parse(storedUserStr);
+    } catch (e) {
+        console.warn('⚠️ [NativeProfile] User data corrupted');
+    }
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -193,8 +198,9 @@ export default function NativeProfile() {
                         style={{
                             position: 'fixed',
                             inset: 0,
-                            background: 'rgba(0,0,0,0.7)',
-                            backdropFilter: 'blur(10px)',
+                            background: 'rgba(255, 255, 255, 0.4)',
+                            backdropFilter: 'blur(30px)',
+                            WebkitBackdropFilter: 'blur(30px)',
                             zIndex: 2000,
                             display: 'flex',
                             alignItems: 'flex-end'

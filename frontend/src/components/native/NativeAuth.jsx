@@ -6,7 +6,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import Swal from 'sweetalert2';
 
 export default function NativeAuth({ onLoginSuccess }) {
-    const { language = 'en', t } = useLanguage();
+    const { language = 'en', t = (k, f) => f || k } = useLanguage() || {};
     const [step, setStep] = useState('landing'); // landing, otp, notification
     const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -58,9 +58,10 @@ export default function NativeAuth({ onLoginSuccess }) {
                     title: 'Sanctuary Offline',
                     text: `Entering Demo Mode. Use verification code: ${fallbackCode}`,
                     icon: 'info',
-                    background: '#011627',
-                    color: '#FFD700',
-                    confirmButtonColor: '#D4AF37'
+                    background: '#FFF',
+                    color: 'var(--text-dark)',
+                    confirmButtonColor: 'var(--primary-color)',
+                    confirmButtonText: 'Enter Code'
                 });
             }
         }
@@ -210,7 +211,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                     fontFamily: 'var(--font-heading)',
                     fontWeight: '700',
                     letterSpacing: '0.5px'
-                }}>Welcome to Khaliya</h2>
+                }}>Sign in to Khaliya</h2>
 
                 <form onSubmit={handlePhoneSubmit}>
                     <div className="phone-wrapper" style={{ marginBottom: '25px' }}>
@@ -293,25 +294,25 @@ export default function NativeAuth({ onLoginSuccess }) {
     );
 
     const renderOTP = () => (
-        <div className="otp-view luxury-dark-theme" style={{ 
+        <div className="otp-view" style={{ 
             height: '100vh', 
-            background: '#011627',
+            background: 'var(--bg-body)',
             padding: '40px 20px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center'
         }}>
             <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', marginBottom: '60px' }}>
-                <i className="fas fa-arrow-left" onClick={() => setStep('landing')} style={{ fontSize: '1.5rem', color: '#FFD700', padding: '10px' }}></i>
-                <h2 style={{ margin: '0 0 0 10px', fontSize: '1.6rem', color: '#FFF', fontFamily: 'var(--font-heading)' }}>Verification</h2>
+                <i className="fas fa-arrow-left" onClick={() => setStep('landing')} style={{ fontSize: '1.5rem', color: 'var(--primary-color)', padding: '10px' }}></i>
+                <h2 style={{ margin: '0 0 0 10px', fontSize: '1.6rem', color: 'var(--text-dark)', fontFamily: 'var(--font-heading)' }}>Verification</h2>
             </div>
 
             <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                <div style={{ width: '60px', height: '60px', background: 'rgba(255, 215, 0, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                    <i className="fas fa-lock" style={{ color: '#FFD700', fontSize: '1.5rem' }}></i>
+                <div style={{ width: '60px', height: '60px', background: 'rgba(230, 57, 70, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                    <i className="fas fa-lock" style={{ color: 'var(--primary-color)', fontSize: '1.5rem' }}></i>
                 </div>
-                <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '1.1rem' }}>Enter the 6-digit code sent to</p>
-                <p style={{ color: '#FFD700', fontSize: '1.6rem', fontWeight: '800', marginTop: '5px' }}>+91 {phone.replace(/(\d{5})(\d{5})/, '$1 $2')}</p>
+                <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>Enter the 6-digit code sent to</p>
+                <p style={{ color: 'var(--primary-color)', fontSize: '1.6rem', fontWeight: '800', marginTop: '5px' }}>+91 {phone.replace(/(\d{5})(\d{5})/, '$1 $2')}</p>
             </div>
 
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '50px' }}>
@@ -328,16 +329,16 @@ export default function NativeAuth({ onLoginSuccess }) {
                         style={{ 
                             width: '52px', 
                             height: '70px', 
-                            background: 'rgba(255, 255, 255, 0.04)', 
-                            border: '2px solid rgba(255, 215, 0, 0.2)',
+                            background: 'var(--bg-surface)', 
+                            border: `2px solid ${digit ? 'var(--primary-color)' : 'var(--border-color)'}`,
                             borderRadius: '16px',
-                            color: '#FFD700',
+                            color: 'var(--text-dark)',
                             fontSize: '2rem',
                             fontWeight: '900',
                             textAlign: 'center',
                             outline: 'none',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            boxShadow: digit ? '0 0 15px rgba(255, 215, 0, 0.3)' : 'none'
+                            boxShadow: digit ? 'var(--shadow-sm)' : 'none'
                         }}
                     />
                 ))}

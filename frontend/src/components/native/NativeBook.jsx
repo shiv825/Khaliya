@@ -6,7 +6,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import Swal from 'sweetalert2';
 
 export default function NativeBook() {
-    const { t } = useLanguage();
+    const { t, language = 'en' } = useLanguage();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ date: '', time: '', guests: 2, tableType: '', specialRequests: '' });
     const [availability, setAvailability] = useState({ bookedSlots: {}, maxCapacity: 4 });

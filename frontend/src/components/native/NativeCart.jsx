@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import NativeOrder from './NativeOrder';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,19 +8,58 @@ import Swal from 'sweetalert2';
 
 export default function NativeCart() {
     const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
-    const { t, language } = useLanguage();
+    const { t, language = 'en' } = useLanguage();
+    const [isOrdered, setIsOrdered] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
 
     const getLocalized = (field) => {
         if (field && typeof field === 'object') return field[language] || field.en || '';
         return field || '';
     };
 
-    const [isOrdered, setIsOrdered] = useState(false);
-
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
         if (cart.length === 0) return;
-        setIsOrdered(true);
-        clearCart();
+        
+        setIsProcessing(true);
+        try {
+            const storedUser = localStorage.getItem('khaliya_native_user');
+            const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
+
+            const orderData = {
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: getLocalized(item.name),
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                total: getCartTotal(),
+                user: {
+                    name: user.name,
+                    phone: user.phone || 'N/A',
+                    address: 'In-Restaurant / Pickup' // Native app default
+                },
+                source: 'Native App v2'
+            };
+
+            await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
+            
+            setIsProcessing(false);
+            setIsOrdered(true);
+            clearCart();
+            
+            if (navigator.vibrate) navigator.vibrate([100, 30, 100]); // Victory vibration
+        } catch (err) {
+            console.error('Checkout failed', err);
+            setIsProcessing(false);
+            Swal.fire({
+                title: 'Connection Issue',
+                text: 'We could not reach the sanctuary servers, but your order has been saved locally. Please show this screen to the host.',
+                icon: 'warning',
+                confirmButtonColor: 'var(--primary-color)'
+            });
+        }
     };
 
     if (isOrdered) {
@@ -129,6 +169,7 @@ export default function NativeCart() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleCheckout}
+                                disabled={isProcessing}
                                 style={{ 
                                     width: '100%', 
                                     padding: '20px', 
@@ -138,10 +179,26 @@ export default function NativeCart() {
                                     color: '#FFF', 
                                     fontSize: '1.2rem', 
                                     fontWeight: '800',
-                                    boxShadow: 'var(--shadow-md)'
+                                    boxShadow: 'var(--shadow-md)',
+                                    opacity: isProcessing ? 0.7 : 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '12px'
                                 }}
                             >
-                                Secure Checkout
+                                {isProcessing ? (
+                                    <>
+                                        <motion.i 
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                            className="fas fa-circle-notch"
+                                        />
+                                        PROCESSING...
+                                    </>
+                                ) : (
+                                    'Secure Checkout'
+                                )}
                             </motion.button>
                         </motion.div>
                     </div>
