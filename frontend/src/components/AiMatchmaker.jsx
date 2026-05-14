@@ -93,7 +93,7 @@ export default function AiMatchmaker({ onClose, onMatch }) {
                                     {moods.map(m => (
                                         <motion.button 
                                             key={m.id}
-                                            whileHover={{ scale: 1.05, borderColor: m.color }}
+                                            whileHover={{ filter: 'brightness(1.1)', borderColor: m.color }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => { setSelections({ ...selections, mood: m.id }); setStep(2); }}
                                             style={{
@@ -117,7 +117,7 @@ export default function AiMatchmaker({ onClose, onMatch }) {
                                     {drinks.map(d => (
                                         <motion.button 
                                             key={d.id}
-                                            whileHover={{ scale: 1.05, borderColor: 'var(--primary-color)' }}
+                                            whileHover={{ filter: 'brightness(1.1)', borderColor: 'var(--primary-color)' }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => { setSelections({ ...selections, drink: d.id }); setStep(3); }}
                                             style={{

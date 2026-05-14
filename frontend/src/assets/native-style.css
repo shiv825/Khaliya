@@ -1,17 +1,17 @@
 /* Native App Architecture Stylesheet - Saffron & Ivory Theme */
 
 :root {
-    --primary-color: #F59E0B; /* Radiant Gold */
-    --secondary-color: #6366F1; /* Royal Indigo */
-    --accent-color: #10B981; /* Emerald */
-    --bg-body: #0F172A; /* Deep Space Slate */
-    --bg-surface: #1E293B; /* Indigo Slate */
-    --text-dark: #F8FAFC; /* Alabaster */
-    --text-muted: #94A3B8;
-    --border-color: rgba(245, 158, 11, 0.15);
-    --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.6);
-    --font-heading: 'Outfit', sans-serif;
+    --primary-color: #9B1B30; /* Deep Burgundy */
+    --secondary-color: #C5A059; /* Muted Gold */
+    --accent-color: #2C3E50; /* Charcoal */
+    --bg-body: #F9F7F3; /* Warm Alabaster */
+    --bg-surface: #FFFFFF; /* Pure White */
+    --text-dark: #1A1A1A; /* Almost Black */
+    --text-muted: #8E8E8E;
+    --border-color: rgba(0, 0, 0, 0.08);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+    --font-heading: 'Playfair Display', serif;
 }
 
 .native-app-shell {
@@ -55,16 +55,16 @@
     max-width: 100% !important;
     height: calc(75px + env(safe-area-inset-bottom, 0px)); 
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: rgba(15, 23, 42, 0.9); /* Deep Indigo Glass */
+    background: rgba(255, 255, 255, 0.95); /* Bright Glass */
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border-top: 1px solid rgba(245, 158, 11, 0.2);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 0 15px;
     z-index: 9999;
-    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .nav-tab {
@@ -131,7 +131,7 @@
     background: var(--primary-color);
     border-color: var(--primary-color);
     color: white;
-    box-shadow: 0 8px 15px rgba(230, 57, 70, 0.2);
+    box-shadow: none;
 }
 
 /* Saffron & Ivory Auth Landing */
@@ -228,12 +228,17 @@
     color: white;
     border: none;
     padding: 18px;
-    border-radius: 15px;
+    border-radius: 12px;
     font-size: 1.15rem;
     font-weight: 800;
     margin-bottom: 30px;
     width: 100%;
-    box-shadow: var(--shadow-md);
+    box-shadow: none;
+    transition: var(--transition);
+}
+
+.zomato-btn-main:active {
+    background: var(--primary-dark, #7A1526);
 }
 
 /* Profile Elements */

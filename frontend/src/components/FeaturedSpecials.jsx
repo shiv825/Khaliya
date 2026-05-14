@@ -97,7 +97,7 @@ export default function FeaturedSpecials({ isNative = false }) {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 }}
-                        whileHover={{ y: -10, boxShadow: 'var(--shadow-lg)' }}
+                        whileHover={{ boxShadow: 'var(--shadow-lg)', filter: 'brightness(1.1)' }}
                         style={{
                             borderRadius: 'var(--radius-lg)',
                             overflow: 'hidden',

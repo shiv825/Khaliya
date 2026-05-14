@@ -41,7 +41,7 @@ export default function InteractiveFloorplan({ onSelectTable }) {
                         <motion.div
                             key={table.id}
                             onClick={() => handleSelect(table)}
-                            whileHover={table.isAvailable ? { scale: 1.05, y: -5 } : {}}
+                            whileHover={table.isAvailable ? { filter: 'brightness(1.1)' } : {}}
                             whileTap={table.isAvailable ? { scale: 0.95 } : {}}
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}

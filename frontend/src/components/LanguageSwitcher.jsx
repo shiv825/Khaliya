@@ -54,7 +54,7 @@ export default function LanguageSwitcher({ mode = 'dropdown' }) {
     return (
         <div className="language-dropdown-container" style={{ position: 'relative' }}>
             <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ filter: 'brightness(1.1)' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
                 style={{

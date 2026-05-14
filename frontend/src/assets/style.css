@@ -19,36 +19,36 @@
 }
 
 :root {
-    /* Majestic Imperial - High Contrast Luxury Palette */
-    --primary-color: #F59E0B; /* Radiant Gold */
-    --primary-dark: #D97706;
-    --secondary-color: #6366F1; /* Royal Indigo */
-    --accent-color: #10B981; /* Emerald Success */
-    --accent-glow: rgba(245, 158, 11, 0.25);
+    /* Culinary Elegance - Minimalist Michelin Star Palette */
+    --primary-color: #9B1B30; /* Deep Burgundy / Wine Red */
+    --primary-dark: #7A1526;
+    --secondary-color: #C5A059; /* Muted Elegant Gold */
+    --accent-color: #2C3E50; /* Charcoal Accent */
+    --accent-glow: rgba(155, 27, 48, 0.1);
     
-    --text-dark: #F8FAFC; /* Alabaster White */
-    --text-light: #CBD5E1;
-    --text-muted: #64748B;
-    --bg-body: #0F172A; /* Deep Space Slate */
-    --bg-surface: #1E293B; /* Deep Indigo Surface */
-    --bg-glass: rgba(15, 23, 42, 0.85);
-    --border-color: rgba(245, 158, 11, 0.2);
-    --border-light: rgba(255, 255, 255, 0.08);
+    --text-dark: #1A1A1A; /* Crisp Almost Black */
+    --text-light: #4A4A4A;
+    --text-muted: #8E8E8E;
+    --bg-body: #F9F7F3; /* Warm Alabaster */
+    --bg-surface: #FFFFFF; /* Pure White */
+    --bg-glass: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-light: rgba(0, 0, 0, 0.04);
 
-    --font-heading: 'Outfit', sans-serif;
-    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Outfit', sans-serif;
 
-    --shadow-sm: 0 8px 16px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 16px 32px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 32px 64px rgba(0, 0, 0, 0.7);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 
-    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --radius-md: 20px;
-    --radius-lg: 40px;
+    --transition: all 0.3s ease;
+    --radius-md: 12px;
+    --radius-lg: 16px;
 
-    --gold-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-    --indigo-gradient: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+    --gold-gradient: linear-gradient(135deg, #C5A059 0%, #B08D4C 100%);
+    --indigo-gradient: linear-gradient(135deg, #9B1B30 0%, #7A1526 100%);
 }
 
 /* --- Dynamic Theme Extensions --- */
@@ -176,49 +176,46 @@ a {
     transition: var(--transition);
 }
 
-/* Luxury Buttons - Updated for Vibrant Spice Theme */
+/* Luxury Buttons - Minimalist Highlights */
 .btn, button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.8rem;
-    padding: 16px 36px;
-    background: var(--bg-surface);
+    padding: 14px 28px;
+    background: transparent;
     color: var(--primary-color);
     font-weight: 700;
     font-family: var(--font-body);
-    border-radius: 50px;
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    box-shadow: none;
     transition: var(--transition);
     border: 1px solid var(--primary-color);
     cursor: pointer;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
     position: relative;
     overflow: hidden;
     z-index: 1;
 }
 
 .btn-primary, button.primary {
-    background: var(--gold-gradient);
-    color: #0F172A;
-    border: none;
-    box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
-    font-weight: 900;
+    background: var(--primary-color);
+    color: #FFFFFF;
+    border: 1px solid var(--primary-color);
+    box-shadow: none;
+    font-weight: 800;
 }
 
 .btn:hover, button:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-    background: var(--secondary-color);
-    color: #FFFFFF;
+    background: rgba(155, 27, 48, 0.05);
+    color: var(--primary-color);
 }
 
 .btn-primary:hover, button.primary:hover {
-    box-shadow: 0 15px 35px rgba(245, 158, 11, 0.5);
-    transform: translateY(-5px) scale(1.03);
-    filter: brightness(1.15);
+    background: var(--primary-dark);
+    color: #FFFFFF;
+    border-color: var(--primary-dark);
 }
 
 .hero-cta {
@@ -245,11 +242,10 @@ a {
     }
 }
 
-/* Luxury Card Hover Effects */
+/* Luxury Card Hover Effects - In place highlight */
 .testimonial-card:hover, .native-menu-card:hover, .reward-card:hover, .native-hero-card:hover {
-    transform: translateY(-8px) scale(1.01) !important;
     box-shadow: var(--shadow-lg) !important;
-    border-color: var(--accent-color) !important;
+    border-color: rgba(155, 27, 48, 0.2) !important;
 }
 
 /* Floating Navbar Fix */
@@ -354,13 +350,7 @@ nav a:hover::after {
     font-weight: 900;
     margin-bottom: 1.5rem;
     line-height: 1.1;
-    background: linear-gradient(135deg, #FFFFFF 0%, #F59E0B 50%, #D97706 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
-    /* Added text shadow as a fallback for some browsers */
-    text-shadow: 0 0 40px rgba(245, 158, 11, 0.1);
+    color: var(--primary-color);
 }
 
 .hero-sub {
@@ -401,13 +391,13 @@ nav a:hover::after {
 }
 
 .pulsate {
-    animation: pulsateGlow 3s infinite ease-in-out;
+    animation: pulsateGlow 4s infinite ease-in-out;
 }
 
 @keyframes pulsateGlow {
-    0% { transform: scale(1); box-shadow: 0 10px 30px rgba(218, 165, 32, 0.4); }
-    50% { transform: scale(1.05); box-shadow: 0 10px 50px rgba(218, 165, 32, 0.6); }
-    100% { transform: scale(1); box-shadow: 0 10px 30px rgba(218, 165, 32, 0.4); }
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.15); }
+    100% { filter: brightness(1); }
 }
 
 /* --- Section Polish --- */

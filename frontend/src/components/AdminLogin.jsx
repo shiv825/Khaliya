@@ -170,7 +170,7 @@ export default function AdminLogin({ onLogin }) {
                     </AnimatePresence>
 
                     <motion.button
-                        whileHover={{ scale: 1.02, boxShadow: '0 20px 25px -5px rgba(230, 57, 70, 0.3)' }}
+                        whileHover={{ filter: 'brightness(1.1)', boxShadow: '0 20px 25px -5px rgba(230, 57, 70, 0.3)' }}
                         whileTap={{ scale: 0.98 }}
                         type="submit"
                         style={{ 

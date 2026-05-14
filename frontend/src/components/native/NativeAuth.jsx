@@ -350,7 +350,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                     </p>
                 ) : (
                     <motion.button 
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={{ filter: 'brightness(1.1)' }}
                         whileTap={{ scale: 0.95 }}
                         onClick={handleEmailSubmit}
                         style={{ 

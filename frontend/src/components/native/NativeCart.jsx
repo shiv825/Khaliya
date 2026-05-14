@@ -166,7 +166,7 @@ export default function NativeCart() {
                             </div>
 
                             <motion.button
-                                whileHover={{ scale: 1.02 }}
+                                whileHover={{ filter: 'brightness(1.1)' }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleCheckout}
                                 disabled={isProcessing}

@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function NativeProfile() {
     const navigate = useNavigate();
     const { t, language = 'en' } = useLanguage();
     const [showLangSelector, setShowLangSelector] = useState(false);
     const [activeModal, setActiveModal] = useState(null); // 'membership', 'feedback', 'about', 'settings'
+    const [feedbackText, setFeedbackText] = useState('');
     
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     let user = { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
@@ -44,8 +47,26 @@ export default function NativeProfile() {
         }
     };
 
-    // Detect if running as standalone PWA
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+
+    const handleFeedbackSubmit = async () => {
+        if (!feedbackText.trim()) return;
+        try {
+            await axios.post(`${API_URL}/reviews`, {
+                name: user.name,
+                rating: 5,
+                text: feedbackText,
+                date: new Date().toISOString()
+            });
+            Swal.fire({ title: 'Thank you!', text: 'Your feedback matters.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            setActiveModal(null);
+            setFeedbackText('');
+        } catch (err) {
+            Swal.fire({ title: 'Error', text: 'Could not submit feedback.', icon: 'error', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+        }
+    };
 
     const baseMenuItems = [
         { icon: 'fas fa-globe', label: t('reviews.selectLanguage'), action: () => setShowLangSelector(true) },
@@ -77,11 +98,11 @@ export default function NativeProfile() {
             {/* Profile Card */}
             <div className="zomato-profile-card" style={{ marginBottom: '15px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
                 <div className="zomato-avatar" style={{ backgroundColor: 'var(--primary-color)', color: '#FFF', fontWeight: '800' }}>
-                    {user.name.charAt(0).toUpperCase()}
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'G'}
                 </div>
                 <div style={{ flex: 1 }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user.name}</h2>
-                    <p style={{ color: 'var(--text-light)', margin: '2px 0 5px 0', fontSize: '0.95rem', fontWeight: '600' }}>{user.email}</p>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user?.name || 'Guest User'}</h2>
+                    <p style={{ color: 'var(--text-light)', margin: '2px 0 5px 0', fontSize: '0.95rem', fontWeight: '600' }}>{user?.email || user?.phone || 'Welcome to Khaliya'}</p>
                     <span onClick={() => setActiveModal('membership')} style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer' }}>{t('reviews.memberSettings')} <i className="fas fa-caret-right"></i></span>
                 </div>
             </div>
@@ -136,7 +157,7 @@ export default function NativeProfile() {
                     </div>
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(30px)' }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: '900', letterSpacing: '1.5px', color: '#FFF' }}>{user.name.toUpperCase()}</div>
+                        <div style={{ fontSize: '1.1rem', fontWeight: '900', letterSpacing: '1.5px', color: '#FFF' }}>{user?.name ? user.name.toUpperCase() : 'GUEST'}</div>
                     </div>
                 </motion.div>
             </motion.div>
@@ -282,11 +303,13 @@ export default function NativeProfile() {
                             {activeModal === 'feedback' && (
                                 <div>
                                     <textarea 
+                                        value={feedbackText}
+                                        onChange={(e) => setFeedbackText(e.target.value)}
                                         placeholder="How was your experience at Khaliya?"
                                         style={{ width: '100%', height: '150px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '15px', outline: 'none', color: 'var(--text-dark)', fontWeight: '500' }}
                                     ></textarea>
                                     <button 
-                                        onClick={() => { Swal.fire({ title: 'Thank you!', text: 'Your feedback matters.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 }); setActiveModal(null); }}
+                                        onClick={handleFeedbackSubmit}
                                         style={{ width: '100%', background: 'var(--primary-color)', color: '#FFF', border: 'none', padding: '15px', borderRadius: '20px', fontWeight: '800', marginTop: '20px' }}
                                     >Submit Feedback</button>
                                 </div>
