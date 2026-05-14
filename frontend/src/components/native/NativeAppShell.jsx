@@ -112,14 +112,14 @@ export default function NativeAppShell() {
                             onClick={() => handleTabChange('home')}
                         >
                             <i className="fas fa-home"></i>
-                            <span>{t('nav.menu')}</span>
+                            <span>{t('nav.home')}</span>
                         </button>
                         <button
                             className={`nav-tab ${activeTab === 'menu' ? 'active' : ''}`}
                             onClick={() => handleTabChange('menu')}
                         >
                             <i className="fas fa-utensils"></i>
-                            <span>{t('nav.flavors')}</span>
+                            <span>{t('nav.menu')}</span>
                         </button>
                         <button
                             className={`nav-tab book-btn ${activeTab === 'book' ? 'active' : ''}`}

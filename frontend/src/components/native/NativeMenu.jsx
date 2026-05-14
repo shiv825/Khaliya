@@ -188,7 +188,7 @@ export default function NativeMenu({ setActiveTab }) {
                             >
                                 <div style={{ height: '150px', position: 'relative' }}>
                                     <img 
-                                        src={item.image?.startsWith('/') ? item.image : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
+                                        src={item.image?.startsWith('/') ? `.${item.image}` : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
                                         alt={getLocalized(item.name)} 
                                         onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop' }}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
@@ -198,7 +198,7 @@ export default function NativeMenu({ setActiveTab }) {
                                         backgroundColor: 'var(--primary-color)', color: '#FFFFFF',
                                         padding: '5px 12px', borderRadius: '12px', fontWeight: '900', fontSize: '0.9rem',
                                         boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                                    }}>₹{item.price}</div>
+                                    }}>{String(item.price).includes('₹') ? item.price : `₹${item.price}`}</div>
                                 </div>
                                 <div style={{ padding: '15px 12px 12px' }}>
                                     <h3 style={{ margin: '0 0 6px 0', fontSize: '1rem', fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontWeight: '800' }}>{getLocalized(item.name)}</h3>
