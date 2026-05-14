@@ -30,7 +30,7 @@ export function useAppMode() {
             return;
         }
 
-        if (hasModeParam || isStandalone || isMobileDevice) {
+        if (hasModeParam || isStandalone) {
             setIsAppMode(true);
             return;
         }
