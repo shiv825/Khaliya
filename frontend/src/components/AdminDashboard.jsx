@@ -117,7 +117,7 @@ export default function AdminDashboard({ onLogout }) {
     const fetchOrders = async (isInitial = false) => {
         try {
             const res = await axios.get(`${API_URL}/orders`);
-            const data = res.data || [];
+            const data = Array.isArray(res.data) ? res.data : [];
             
             if (!isInitial && data.length > 0) {
                 const newOrders = data.filter(o => !orderIdsRef.current.has(o.id));
