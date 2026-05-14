@@ -15,7 +15,7 @@ export default function AdminLogin({ onLogin }) {
         if (e) e.preventDefault();
         
         // Secure Admin Credentials
-        if (email === 'shivkumar.rdn7@gmail.com' && password === 'shiv2006') {
+        if (email === 'shivkumarrdn7@gmail.com' && password === 'shiv2006') {
             sessionStorage.setItem('adminLoggedIn', 'true');
             onLogin(true);
             navigate('/admin/dashboard');
@@ -26,7 +26,7 @@ export default function AdminLogin({ onLogin }) {
     };
 
     const handleDemoLogin = () => {
-        setEmail('shivkumar.rdn7@gmail.com');
+        setEmail('shivkumarrdn7@gmail.com');
         setPassword('shiv2006');
         setTimeout(() => handleLogin(), 100); // Small delay to show the values filling in
     };
@@ -92,7 +92,7 @@ export default function AdminLogin({ onLogin }) {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="shivkumar.rdn7@gmail.com"
+                                placeholder="shivkumarrdn7@gmail.com"
                                 style={{ 
                                     width: '100%', 
                                     padding: '16px 16px 16px 48px', 
