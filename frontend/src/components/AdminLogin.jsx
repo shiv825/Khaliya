@@ -25,12 +25,6 @@ export default function AdminLogin({ onLogin }) {
         }
     };
 
-    const handleDemoLogin = () => {
-        setEmail('shivkumarrdn7@gmail.com');
-        setPassword('shiv2006');
-        setTimeout(() => handleLogin(), 100); // Small delay to show the values filling in
-    };
-
     return (
         <div className="admin-portal-wrapper" style={{ 
             display: 'flex', 
@@ -196,29 +190,6 @@ export default function AdminLogin({ onLogin }) {
                         Access Dashboard
                     </motion.button>
                 </form>
-
-                <div style={{ textAlign: 'center' }}>
-                    <button 
-                        onClick={handleDemoLogin}
-                        style={{
-                            width: '100%',
-                            padding: '15px',
-                            borderRadius: '16px',
-                            background: '#f1f5f9',
-                            color: '#475569',
-                            border: '1px solid #e2e8f0',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            fontSize: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px'
-                        }}
-                    >
-                        <i className="fas fa-magic"></i> 1-Click Demo Login
-                    </button>
-                </div>
 
                 <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                     <button 
