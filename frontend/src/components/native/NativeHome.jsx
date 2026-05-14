@@ -33,8 +33,8 @@ export default function NativeHome({ setActiveTab }) {
 
 
     const offers = [
-        { id: 1, title: "20% OFF", desc: "First Order", code: "WELCOME20", bg: "rgba(218, 165, 32, 0.15)", color: "#DAA520" },
-        { id: 2, title: "FREE DESSERT", desc: "Above ₹1000", code: "SWEET", bg: "rgba(255, 215, 0, 0.1)", color: "#FFD700" }
+        { id: 1, title: "20% OFF", desc: "First Order", code: "WELCOME20", bg: "rgba(245, 158, 11, 0.1)", color: "var(--primary-color)" },
+        { id: 2, title: "FREE DESSERT", desc: "Above ₹1000", code: "SWEET", bg: "rgba(99, 102, 241, 0.1)", color: "var(--secondary-color)" }
     ];
 
     const reviews = [
@@ -52,9 +52,9 @@ export default function NativeHome({ setActiveTab }) {
                 transition={{ duration: 0.6 }}
                 style={{ 
                     padding: '40px 20px 30px', 
-                    background: 'linear-gradient(135deg, var(--primary-color) 0%, #D32F2F 100%)',
+                    background: 'var(--indigo-gradient)',
                     borderRadius: '0 0 35px 35px',
-                    boxShadow: 'var(--shadow-md)',
+                    boxShadow: '0 15px 30px rgba(0,0,0,0.3)',
                     marginBottom: '20px'
                 }}
             >

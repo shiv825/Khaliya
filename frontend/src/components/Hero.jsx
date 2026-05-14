@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Hero() {
     const { t } = useLanguage();
+    const [isInstallable, setIsInstallable] = useState(false);
+
+    useEffect(() => {
+        const handlePwaReady = (e) => {
+            setIsInstallable(e.detail);
+        };
+        window.addEventListener('khaliya-pwa-ready', handlePwaReady);
+        return () => window.removeEventListener('khaliya-pwa-ready', handlePwaReady);
+    }, []);
 
     return (
         <section id="home" className="hero">
@@ -94,9 +103,23 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 1 }}
+                    style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}
                 >
                     <a href="#reservations" className="btn btn-primary">{t('hero.makeReservation')}</a>
                     <a href="#menu" className="btn">{t('hero.seeMenu')}</a>
+                    {isInstallable && (
+                        <button 
+                            onClick={() => window.promptInstall && window.promptInstall()}
+                            className="btn btn-primary"
+                            style={{ 
+                                background: 'var(--indigo-gradient)', 
+                                border: 'none',
+                                color: '#FFF'
+                            }}
+                        >
+                            <i className="fas fa-download"></i> {t('pwa.installBtn') || 'Download App'}
+                        </button>
+                    )}
                 </motion.div>
             </motion.div>
         </section>

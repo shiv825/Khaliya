@@ -6,21 +6,29 @@ import '../assets/admin-style.css';
 
 export default function AdminLogin({ onLogin }) {
     const { t } = useLanguage();
-    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = (e) => {
-        e.preventDefault();
-        // Authorized Admin Number
-        if (phone === '8252731784') {
+        if (e) e.preventDefault();
+        
+        // Secure Admin Credentials
+        if (email === 'admin@khaliya.luxury' && password === 'sanctuary2026') {
             sessionStorage.setItem('adminLoggedIn', 'true');
             onLogin(true);
             navigate('/admin/dashboard');
         } else {
-            setError('❌ Access Denied. Unauthorized phone number.');
-            setPhone('');
+            setError('❌ Access Denied. Invalid credentials.');
+            setPassword('');
         }
+    };
+
+    const handleDemoLogin = () => {
+        setEmail('admin@khaliya.luxury');
+        setPassword('sanctuary2026');
+        setTimeout(() => handleLogin(), 100); // Small delay to show the values filling in
     };
 
     return (
@@ -76,15 +84,15 @@ export default function AdminLogin({ onLogin }) {
                 </div>
 
                 <form onSubmit={handleLogin}>
-                    <div style={{ marginBottom: '1.8rem' }}>
-                        <label style={{ display: 'block', marginBottom: '10px', color: '#334155', fontWeight: '700', fontSize: '0.9rem' }}>Access Key (Phone)</label>
+                    <div style={{ marginBottom: '1.2rem' }}>
+                        <label style={{ display: 'block', marginBottom: '10px', color: '#334155', fontWeight: '700', fontSize: '0.9rem' }}>Admin Email</label>
                         <div style={{ position: 'relative' }}>
-                            <i className="fas fa-phone-alt" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}></i>
+                            <i className="fas fa-envelope" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}></i>
                             <input
-                                type="tel"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                placeholder="8252731..."
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="admin@khaliya.luxury"
                                 style={{ 
                                     width: '100%', 
                                     padding: '16px 16px 16px 48px', 
@@ -106,7 +114,40 @@ export default function AdminLogin({ onLogin }) {
                                     e.target.style.background = 'rgba(255,255,255,0.5)';
                                     e.target.style.boxShadow = 'none';
                                 }}
-                                autoFocus
+                            />
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '1.8rem' }}>
+                        <label style={{ display: 'block', marginBottom: '10px', color: '#334155', fontWeight: '700', fontSize: '0.9rem' }}>Passcode</label>
+                        <div style={{ position: 'relative' }}>
+                            <i className="fas fa-lock" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}></i>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter secure passcode"
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '16px 16px 16px 48px', 
+                                    boxSizing: 'border-box', 
+                                    border: '2px solid #e2e8f0', 
+                                    borderRadius: '16px', 
+                                    fontSize: '1.1rem', 
+                                    transition: 'all 0.3s ease', 
+                                    outline: 'none',
+                                    background: 'rgba(255,255,255,0.5)'
+                                }}
+                                onFocus={e => {
+                                    e.target.style.borderColor = 'var(--admin-primary)';
+                                    e.target.style.background = '#fff';
+                                    e.target.style.boxShadow = '0 0 0 4px rgba(230, 57, 70, 0.1)';
+                                }}
+                                onBlur={e => {
+                                    e.target.style.borderColor = '#e2e8f0';
+                                    e.target.style.background = 'rgba(255,255,255,0.5)';
+                                    e.target.style.boxShadow = 'none';
+                                }}
                             />
                         </div>
                     </div>
@@ -148,12 +189,36 @@ export default function AdminLogin({ onLogin }) {
                             color: 'white',
                             border: 'none',
                             cursor: 'pointer',
-                            transition: 'all 0.3s ease'
+                            transition: 'all 0.3s ease',
+                            marginBottom: '1rem'
                         }}
                     >
                         Access Dashboard
                     </motion.button>
                 </form>
+
+                <div style={{ textAlign: 'center' }}>
+                    <button 
+                        onClick={handleDemoLogin}
+                        style={{
+                            width: '100%',
+                            padding: '15px',
+                            borderRadius: '16px',
+                            background: '#f1f5f9',
+                            color: '#475569',
+                            border: '1px solid #e2e8f0',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            fontSize: '1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px'
+                        }}
+                    >
+                        <i className="fas fa-magic"></i> 1-Click Demo Login
+                    </button>
+                </div>
 
                 <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                     <button 

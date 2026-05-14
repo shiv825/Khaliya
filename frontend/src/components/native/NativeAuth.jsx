@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 export default function NativeAuth({ onLoginSuccess }) {
     const { language = 'en', t = (k, f) => f || k } = useLanguage() || {};
     const [step, setStep] = useState('landing'); // landing, otp, notification
-    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
@@ -27,12 +27,12 @@ export default function NativeAuth({ onLoginSuccess }) {
         return () => clearInterval(interval);
     }, [step, timer]);
 
-    const handlePhoneSubmit = async (e) => {
+    const handleEmailSubmit = async (e) => {
         if (e) e.preventDefault();
-        if (phone.length === 10) {
+        if (email.includes('@') && email.length > 5) {
             setIsLoading(true);
             try {
-                const res = await axios.post(`${API_URL}/auth/request-otp`, { phone }, { timeout: 10000 });
+                const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email }, { timeout: 10000 });
                 setIsLoading(false);
                 setStep('otp');
                 setTimer(60); // Resend allowed after 60s
@@ -102,7 +102,7 @@ export default function NativeAuth({ onLoginSuccess }) {
         if (code.length !== 6) return;
         setIsLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/auth/verify-otp`, { phone, code }, { timeout: 10000 });
+            const res = await axios.post(`${API_URL}/auth/verify-email-otp`, { email, code }, { timeout: 10000 });
             if (res.data.success) {
                 setIsLoading(false);
                 if (navigator.vibrate) navigator.vibrate([30, 50]); // Success vibration
@@ -129,9 +129,9 @@ export default function NativeAuth({ onLoginSuccess }) {
 
     const finalizeLogin = () => {
         const userData = {
-            name: 'Shiv Kumar',
-            email: 'shiv@khaliya.luxury',
-            phone: phone,
+            name: 'Khaliya Member',
+            email: email,
+            phone: '',
             isLoggedIn: true,
             authMethod: 'Professional-OTP-v2'
         };
@@ -213,8 +213,8 @@ export default function NativeAuth({ onLoginSuccess }) {
                     letterSpacing: '0.5px'
                 }}>Sign in to Khaliya</h2>
 
-                <form onSubmit={handlePhoneSubmit}>
-                    <div className="phone-wrapper" style={{ marginBottom: '25px' }}>
+                <form onSubmit={handleEmailSubmit}>
+                    <div className="email-wrapper" style={{ marginBottom: '25px' }}>
                         <div style={{ 
                             display: 'flex', 
                             alignItems: 'center',
@@ -224,23 +224,22 @@ export default function NativeAuth({ onLoginSuccess }) {
                             padding: '18px 24px',
                             boxShadow: 'var(--shadow-sm)'
                         }}>
-                             <span style={{ color: '#D4AF37', fontWeight: '800', marginRight: '15px', fontSize: '1.2rem' }}>+91</span>
+                            <i className="fas fa-envelope" style={{ color: '#D4AF37', fontWeight: '800', marginRight: '15px', fontSize: '1.2rem' }}></i>
                             <input
-                                type="tel"
-                                placeholder="Mobile Number"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                                maxLength="10"
+                                type="email"
+                                placeholder="Email Address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value.toLowerCase())}
                                 required
                                 style={{ 
                                     background: 'transparent', 
                                     border: 'none', 
                                     color: 'var(--text-dark)', 
-                                    fontSize: '1.3rem', 
-                                    fontWeight: '700',
+                                    fontSize: '1.1rem', 
+                                    fontWeight: '600',
                                     outline: 'none',
                                     width: '100%',
-                                    letterSpacing: '3px'
+                                    letterSpacing: '1px'
                                 }}
                             />
                         </div>
@@ -249,7 +248,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                     <motion.button
                         whileTap={{ scale: 0.97 }}
                         type="submit"
-                        disabled={phone.length < 10 || isLoading}
+                        disabled={!email.includes('@') || email.length < 5 || isLoading}
                         style={{ 
                             width: '100%',
                             padding: '22px',
@@ -261,7 +260,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                             fontWeight: '800',
                             letterSpacing: '2px',
                             cursor: 'pointer',
-                            opacity: (phone.length < 10 || isLoading) ? 0.5 : 1,
+                            opacity: (!email.includes('@') || email.length < 5 || isLoading) ? 0.5 : 1,
                             boxShadow: '0 15px 35px rgba(184, 134, 11, 0.3)',
                             display: 'flex',
                             alignItems: 'center',
@@ -309,10 +308,10 @@ export default function NativeAuth({ onLoginSuccess }) {
 
             <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                 <div style={{ width: '60px', height: '60px', background: 'rgba(230, 57, 70, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                    <i className="fas fa-lock" style={{ color: 'var(--primary-color)', fontSize: '1.5rem' }}></i>
+                    <i className="fas fa-envelope-open-text" style={{ color: 'var(--primary-color)', fontSize: '1.5rem' }}></i>
                 </div>
                 <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>Enter the 6-digit code sent to</p>
-                <p style={{ color: 'var(--primary-color)', fontSize: '1.6rem', fontWeight: '800', marginTop: '5px' }}>+91 {phone.replace(/(\d{5})(\d{5})/, '$1 $2')}</p>
+                <p style={{ color: 'var(--primary-color)', fontSize: '1.1rem', fontWeight: '700', marginTop: '5px' }}>{email}</p>
             </div>
 
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '50px' }}>
@@ -353,7 +352,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                     <motion.button 
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={handlePhoneSubmit}
+                        onClick={handleEmailSubmit}
                         style={{ 
                             background: 'none', 
                             border: 'none', 

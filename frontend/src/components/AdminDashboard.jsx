@@ -49,14 +49,18 @@ export default function AdminDashboard({ onLogout }) {
     const [lastFetchCount, setLastFetchCount] = useState(0);
     const [isSyncing, setIsSyncing] = useState(false);
     const bookingIdsRef = useRef(new Set());
+    const [orders, setOrders] = useState([]);
+    const orderIdsRef = useRef(new Set());
 
     useEffect(() => {
         fetchBookings(true); // Initial fetch
+        fetchOrders(true);
         fetchMenu();
         
         // Start Phase 2: Super-Fast 2.5s Polling for "Instant" feel
         const pollInterval = setInterval(() => {
             fetchBookings(false);
+            fetchOrders(false);
         }, 2500); 
 
         if (window.innerWidth < 1024) setIsSidebarOpen(false);
@@ -107,6 +111,38 @@ export default function AdminDashboard({ onLogout }) {
             setMenu(res.data || []);
         } catch (err) {
             console.error('Failed to fetch menu', err);
+        }
+    };
+
+    const fetchOrders = async (isInitial = false) => {
+        try {
+            const res = await axios.get(`${API_URL}/orders`);
+            const data = res.data || [];
+            
+            if (!isInitial && data.length > 0) {
+                const newOrders = data.filter(o => !orderIdsRef.current.has(o.id));
+                if (newOrders.length > 0) {
+                    newOrders.forEach(no => {
+                        Swal.fire({
+                            title: 'New App Order!',
+                            text: `${no.user?.name || 'Guest'} just ordered ${no.items?.length || 0} items`,
+                            icon: 'info',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 4000,
+                            timerProgressBar: true,
+                            background: '#1D3557',
+                            color: '#fff'
+                        });
+                    });
+                }
+            }
+
+            data.forEach(o => orderIdsRef.current.add(o.id));
+            setOrders(data);
+        } catch (err) {
+            console.error('Failed to fetch orders', err);
         }
     };
 
@@ -358,6 +394,33 @@ export default function AdminDashboard({ onLogout }) {
         }
     };
 
+    // -- ORDERS LOGIC --
+    const updateOrderStatus = async (id, newStatus) => {
+        try {
+            await axios.put(`${API_URL}/orders/${id}`, { status: newStatus });
+            fetchOrders();
+            Swal.fire({ title: 'Order Updated!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+        } catch (err) { console.error(err); }
+    };
+
+    const deleteOrder = async (id) => {
+        const result = await Swal.fire({
+            title: 'Delete Order?',
+            text: "This will remove the order permanently.",
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`${API_URL}/orders/${id}`);
+                fetchOrders();
+                Swal.fire('Deleted!', 'Order has been deleted.', 'success');
+            } catch (err) { console.error(err); }
+        }
+    };
+
     return (
         <div className="admin-portal-wrapper admin-layout">
             
@@ -372,6 +435,7 @@ export default function AdminDashboard({ onLogout }) {
 
                 <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {[
+                        { id: 'orders', icon: 'fa-shopping-bag', label: 'App Orders' },
                         { id: 'bookings', icon: 'fa-calendar-check', label: 'Reservations' },
                         { id: 'menu', icon: 'fa-layer-group', label: 'Menu Manager' },
                         { id: 'stats', icon: 'fa-chart-pie', label: 'Analytics' }
@@ -428,7 +492,7 @@ export default function AdminDashboard({ onLogout }) {
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
-                                {activeTab === 'bookings' ? 'Reservations Control' : activeTab === 'menu' ? 'Menu Management' : 'Performance Insights'}
+                                {activeTab === 'orders' ? 'App Orders Command' : activeTab === 'bookings' ? 'Reservations Control' : activeTab === 'menu' ? 'Menu Management' : 'Performance Insights'}
                             </h2>
                             <div style={{ 
                                 display: 'flex', 
@@ -455,6 +519,98 @@ export default function AdminDashboard({ onLogout }) {
                 </header>
 
                 <AnimatePresence mode="wait">
+                    {activeTab === 'orders' && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} key="orders">
+                            <div className="admin-stats-grid">
+                                {[
+                                    { label: 'Active Orders', value: orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length, icon: 'fa-fire', color: '#E63946' },
+                                    { label: 'Total App Orders', value: orders.length, icon: 'fa-shopping-bag', color: '#457B9D' },
+                                    { label: 'Total Revenue', value: '₹' + orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0), icon: 'fa-coins', color: '#10b981' }
+                                ].map((stat, i) => (
+                                    <div key={i} className="stat-card">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                            <div style={{ width: '40px', height: '40px', background: `${stat.color}15`, color: stat.color, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <i className={`fas ${stat.icon}`}></i>
+                                            </div>
+                                        </div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontWeight: '600' }}>{stat.label}</div>
+                                        <div style={{ fontSize: '1.8rem', fontWeight: '800', marginTop: '5px' }}>{stat.value}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="admin-glass-card" style={{ padding: '2.5rem', background: '#fff' }}>
+                                <h3 style={{ margin: '0 0 2rem 0' }}>Live Kitchen Queue</h3>
+                                <div className="bookings-container">
+                                    {orders.length === 0 ? (
+                                        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--admin-text-muted)' }}>
+                                            <i className="fas fa-utensils" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.3 }}></i>
+                                            <p>No app orders yet.</p>
+                                        </div>
+                                    ) : [...orders].reverse().map((o) => (
+                                        <div key={o.id} className="booking-item futuristic-row" style={{
+                                            borderLeft: `6px solid ${o.status === 'delivered' ? '#22c55e' : o.status === 'preparing' ? '#FFB703' : o.status === 'ready' ? '#3b82f6' : '#ef4444'}`,
+                                            boxShadow: 'var(--shadow-sm)',
+                                            padding: '20px 25px'
+                                        }}>
+                                            <div style={{ display: 'flex', gap: '25px', alignItems: 'center', flex: 1 }}>
+                                                <div style={{ 
+                                                    width: '60px', 
+                                                    height: '60px', 
+                                                    borderRadius: '18px', 
+                                                    background: o.status === 'delivered' ? '#dcfce7' : o.status === 'preparing' ? '#fef3c7' : o.status === 'ready' ? '#dbeafe' : '#fee2e2',
+                                                    color: o.status === 'delivered' ? '#166534' : o.status === 'preparing' ? '#92400e' : o.status === 'ready' ? '#1e40af' : '#991b1b',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '1.4rem',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                                                }}>
+                                                    <i className={`fas ${o.status === 'delivered' ? 'fa-check-double' : o.status === 'ready' ? 'fa-box' : 'fa-fire'}`}></i>
+                                                </div>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                                                        <h3 style={{ margin: 0, fontWeight: '800', fontSize: '1.25rem', color: '#1e293b' }}>{o.user?.name || 'App Guest'}</h3>
+                                                        <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '600' }}>#{o.id}</span>
+                                                    </div>
+                                                    <div style={{ marginTop: '8px', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                                                        <span className="item-detail"><i className="far fa-clock"></i> {o.timestamp}</span>
+                                                        <span className="item-detail"><i className="fas fa-coins"></i> ₹{o.total}</span>
+                                                        <span className="item-detail"><i className="fas fa-phone"></i> {o.user?.phone || 'N/A'}</span>
+                                                        <span className="source-badge source-app" style={{ fontSize: '0.65rem', padding: '4px 10px' }}>
+                                                            <i className="fas fa-mobile-alt"></i> Native App
+                                                        </span>
+                                                    </div>
+                                                    <div style={{ marginTop: '12px', padding: '12px 15px', background: '#f8fafc', borderRadius: '10px', fontSize: '0.9rem', color: '#475569' }}>
+                                                        <strong>Items:</strong> {o.items?.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="actions" style={{ display: 'flex', gap: '10px', marginLeft: '20px' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <span className={`item-badge badge-${o.status}`} style={{ textAlign: 'center', fontSize: '0.65rem', background: o.status === 'delivered' ? '#dcfce7' : o.status === 'preparing' ? '#fef3c7' : o.status === 'ready' ? '#dbeafe' : '#fee2e2', color: o.status === 'delivered' ? '#166534' : o.status === 'preparing' ? '#92400e' : o.status === 'ready' ? '#1e40af' : '#991b1b' }}>{o.status.toUpperCase()}</span>
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        {o.status === 'received' && (
+                                                            <button onClick={() => updateOrderStatus(o.id, 'preparing')} className="admin-btn-warning-small" title="Mark Preparing" style={{ background: '#fef3c7', color: '#92400e', border: 'none', borderRadius: '10px', width: '36px', height: '36px', cursor: 'pointer' }}><i className="fas fa-fire"></i></button>
+                                                        )}
+                                                        {o.status === 'preparing' && (
+                                                            <button onClick={() => updateOrderStatus(o.id, 'ready')} className="admin-btn-info-small" title="Mark Ready" style={{ background: '#dbeafe', color: '#1e40af', border: 'none', borderRadius: '10px', width: '36px', height: '36px', cursor: 'pointer' }}><i className="fas fa-box"></i></button>
+                                                        )}
+                                                        {o.status === 'ready' && (
+                                                            <button onClick={() => updateOrderStatus(o.id, 'delivered')} className="admin-btn-success-small" title="Mark Delivered" style={{ background: '#dcfce7', color: '#166534', border: 'none', borderRadius: '10px', width: '36px', height: '36px', cursor: 'pointer' }}><i className="fas fa-check-double"></i></button>
+                                                        )}
+                                                        <button onClick={() => deleteOrder(o.id)} className="admin-btn-danger-small" title="Delete"><i className="far fa-trash-alt"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
                     {activeTab === 'bookings' && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} key="bookings">
                             

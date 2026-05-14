@@ -65,6 +65,9 @@ const PWAManager = {
             // Stash the event so it can be triggered later.
             PWAManager.deferredPrompt = e;
             
+            // Dispatch custom event for React components
+            window.dispatchEvent(new CustomEvent('khaliya-pwa-ready', { detail: true }));
+
             // Show banner immediately when prompt is ready, if not dismissed
             const isDismissed = sessionStorage.getItem('pwa_dismissed');
             console.log('🔍 [PWA] Checking dismissal state:', isDismissed);
@@ -78,6 +81,7 @@ const PWAManager = {
 
         window.addEventListener('appinstalled', (evt) => {
             console.log('🎉 [PWA] App successfully installed');
+            window.dispatchEvent(new CustomEvent('khaliya-pwa-ready', { detail: false }));
             PWAManager.closeInstallBanner();
         });
 

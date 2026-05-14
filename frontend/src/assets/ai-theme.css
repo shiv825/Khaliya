@@ -10,16 +10,16 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    background: var(--gold-gradient);
     border: none;
     cursor: pointer;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 24px;
-    color: white;
+    color: #0F172A;
     transition: transform 0.3s;
     animation: float 3s ease-in-out infinite;
 }
@@ -63,12 +63,13 @@
 }
 
 .khali-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--indigo-gradient);
     color: white;
-    padding: 1rem;
+    padding: 1.2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .khali-header .title {
@@ -116,11 +117,12 @@
 }
 
 .chat-bubble.user {
-    background: linear-gradient(135deg, var(--primary-color), #5c141b);
-    color: white;
+    background: var(--gold-gradient);
+    color: #0F172A;
     align-self: flex-end;
     border-bottom-right-radius: 4px;
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-sm);
+    font-weight: 700;
 }
 
 .chat-bubble a {

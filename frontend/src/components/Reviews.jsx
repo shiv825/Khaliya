@@ -72,7 +72,7 @@ export default function Reviews() {
                 <div style={{ marginTop: '4rem' }}>
                     <h3 style={{ margin: '0 0 2rem 0', textAlign: 'center', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>{t('reviews.myReviews')}</h3>
                     <div style={{ display: 'grid', gap: '1.5rem' }}>
-                        {reviews.length === 0 ? (
+                        {!Array.isArray(reviews) || reviews.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--bg-surface)', borderRadius: '25px', border: '1px dashed var(--border-color)' }}>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: '600' }}>{t('reviews.none')}</p>
                             </div>

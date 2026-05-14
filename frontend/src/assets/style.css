@@ -19,35 +19,36 @@
 }
 
 :root {
-    /* Vibrant Spice Harmony Palette */
-    --primary-color: #E63946; 
-    --secondary-color: #4361EE;
-    --accent-color: #FB8500;
-    --accent-light: #FFB703;
-    --spice-emerald: #06D6A0;
-    --spice-saffron: #FF9F1C;
-    --accent-glow: rgba(230, 57, 70, 0.2);
-
-    --text-dark: #023047;
-    --text-light: #219EBC;
-    --text-muted: #8ECAE6;
-    --bg-body: #FFFAF1;
-    --bg-surface: #FFFFFF;
-    --bg-glass: rgba(255, 255, 255, 0.96);
-    --border-color: rgba(230, 57, 70, 0.15);
-    --border-light: rgba(67, 97, 238, 0.1);
+    /* Majestic Imperial - High Contrast Luxury Palette */
+    --primary-color: #F59E0B; /* Radiant Gold */
+    --primary-dark: #D97706;
+    --secondary-color: #6366F1; /* Royal Indigo */
+    --accent-color: #10B981; /* Emerald Success */
+    --accent-glow: rgba(245, 158, 11, 0.25);
+    
+    --text-dark: #F8FAFC; /* Alabaster White */
+    --text-light: #CBD5E1;
+    --text-muted: #64748B;
+    --bg-body: #0F172A; /* Deep Space Slate */
+    --bg-surface: #1E293B; /* Deep Indigo Surface */
+    --bg-glass: rgba(15, 23, 42, 0.85);
+    --border-color: rgba(245, 158, 11, 0.2);
+    --border-light: rgba(255, 255, 255, 0.08);
 
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
 
-    --shadow-sm: 0 8px 16px rgba(2, 48, 71, 0.05);
-    --shadow-md: 0 16px 32px rgba(2, 48, 71, 0.1);
-    --shadow-lg: 0 32px 64px rgba(2, 48, 71, 0.15);
-    --glass-shadow: 0 8px 32px 0 rgba(67, 97, 238, 0.1);
+    --shadow-sm: 0 8px 16px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 16px 32px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 32px 64px rgba(0, 0, 0, 0.7);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
-    --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --radius-md: 16px;
-    --radius-lg: 32px;
+    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --radius-md: 20px;
+    --radius-lg: 40px;
+
+    --gold-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    --indigo-gradient: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
 }
 
 /* --- Dynamic Theme Extensions --- */
@@ -138,7 +139,9 @@ h2 {
     text-align: center;
     position: relative;
     width: 100%;
-    color: var(--primary-color);
+    color: #FFFFFF;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(245, 158, 11, 0.2);
+    letter-spacing: 2px;
 }
 
 h2::after {
@@ -147,9 +150,10 @@ h2::after {
     bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+    width: 100px;
+    height: 4px;
+    background: var(--gold-gradient);
+    border-radius: 4px;
 }
 
 p {
@@ -197,23 +201,24 @@ a {
 }
 
 .btn-primary, button.primary {
-    background: linear-gradient(135deg, var(--spice-saffron), var(--primary-color));
-    color: #FFFFFF;
+    background: var(--gold-gradient);
+    color: #0F172A;
     border: none;
-    box-shadow: 0 10px 20px rgba(211, 47, 47, 0.2);
+    box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+    font-weight: 900;
 }
 
 .btn:hover, button:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
-    background: var(--primary-color);
+    background: var(--secondary-color);
     color: #FFFFFF;
 }
 
 .btn-primary:hover, button.primary:hover {
-    box-shadow: 0 15px 30px rgba(211, 47, 47, 0.3);
-    transform: translateY(-5px) scale(1.02);
-    filter: brightness(1.1);
+    box-shadow: 0 15px 35px rgba(245, 158, 11, 0.5);
+    transform: translateY(-5px) scale(1.03);
+    filter: brightness(1.15);
 }
 
 .hero-cta {
@@ -346,14 +351,16 @@ nav a:hover::after {
 
 .hero-title {
     font-size: clamp(3.5rem, 8vw, 6.5rem);
-    font-weight: 800;
+    font-weight: 900;
     margin-bottom: 1.5rem;
-    line-height: 1;
-    background: linear-gradient(135deg, #FFF 0%, var(--accent-light) 100%);
+    line-height: 1.1;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F59E0B 50%, #D97706 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+    /* Added text shadow as a fallback for some browsers */
+    text-shadow: 0 0 40px rgba(245, 158, 11, 0.1);
 }
 
 .hero-sub {

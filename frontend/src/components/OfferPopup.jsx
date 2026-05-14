@@ -21,6 +21,23 @@ export default function OfferPopup() {
         localStorage.setItem('khaliya_offer_seen', 'true');
     };
 
+    const handleClaim = () => {
+        const code = 'ROYAL15-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        localStorage.setItem('khaliya_discount_code', code);
+        localStorage.setItem('khaliya_offer_seen', 'true');
+        
+        import('sweetalert2').then(Swal => {
+            Swal.default.fire({
+                title: 'Congratulations!',
+                text: `Your discount code ${code} is saved to your profile.`,
+                icon: 'success',
+                confirmButtonColor: 'var(--primary-color)'
+            });
+        });
+        
+        setIsVisible(false);
+    };
+
     return (
         <AnimatePresence>
             {isVisible && (
@@ -118,7 +135,7 @@ export default function OfferPopup() {
                                 />
                                 <button
                                     className="btn btn-primary"
-                                    onClick={handleClose}
+                                    onClick={handleClaim}
                                     style={{
                                         padding: '18px',
                                         borderRadius: '50px',

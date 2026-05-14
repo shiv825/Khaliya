@@ -11,7 +11,7 @@ import masterMenu from '../../data/menu.json';
  * NativeMenu Component
  * Optimized for mobile with Luxury "Gold & Charcoal" styling.
  */
-export default function NativeMenu() {
+export default function NativeMenu({ setActiveTab }) {
     const { t, language = 'en' } = useLanguage();
     const { addToCart } = useCart();
     const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
@@ -118,10 +118,10 @@ export default function NativeMenu() {
         <div className="native-menu-view">
             <div className="native-menu-header" style={{ 
                 padding: '40px 20px 30px', 
-                background: 'linear-gradient(135deg, var(--primary-color) 0%, #D32F2F 100%)',
+                background: 'var(--indigo-gradient)',
                 color: '#FFF',
                 borderRadius: '0 0 35px 35px',
-                boxShadow: 'var(--shadow-md)',
+                boxShadow: '0 15px 30px rgba(0,0,0,0.3)',
                 marginBottom: '20px'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -137,7 +137,7 @@ export default function NativeMenu() {
                         <i className="fas fa-magic"></i> Matchmaker
                     </motion.button>
                 </div>
-                {showMatchmaker && <AiMatchmaker onClose={() => setShowMatchmaker(false)} />}
+                {showMatchmaker && <AiMatchmaker onClose={() => setShowMatchmaker(false)} onMatch={setActiveTab} />}
                 <div className="search-bar futuristic-glass" style={{ 
                     display: 'flex', alignItems: 'center', padding: '15px 20px', 
                     borderRadius: '15px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)'

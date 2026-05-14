@@ -1,17 +1,17 @@
 /* Native App Architecture Stylesheet - Saffron & Ivory Theme */
 
 :root {
-    --primary-color: #E63946; /* Vibrant Red */
-    --secondary-color: #F4A261; /* Saffron */
-    --accent-color: #2A9D8F; /* Teal accent */
-    --bg-body: #FDFCFB; /* Warmer Ivory */
-    --bg-surface: #FFFFFF;
-    --text-dark: #1D3557;
-    --text-muted: #6C757D;
-    --border-color: #F1F3F5;
-    --shadow-sm: 0 4px 12px rgba(230, 57, 70, 0.08); /* Colorful Red shadow */
-    --shadow-md: 0 10px 25px rgba(244, 162, 97, 0.15); /* Colorful Saffron shadow */
-    --font-heading: 'Playfair Display', serif;
+    --primary-color: #F59E0B; /* Radiant Gold */
+    --secondary-color: #6366F1; /* Royal Indigo */
+    --accent-color: #10B981; /* Emerald */
+    --bg-body: #0F172A; /* Deep Space Slate */
+    --bg-surface: #1E293B; /* Indigo Slate */
+    --text-dark: #F8FAFC; /* Alabaster */
+    --text-muted: #94A3B8;
+    --border-color: rgba(245, 158, 11, 0.15);
+    --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.6);
+    --font-heading: 'Outfit', sans-serif;
 }
 
 .native-app-shell {
@@ -55,16 +55,16 @@
     max-width: 100% !important;
     height: calc(75px + env(safe-area-inset-bottom, 0px)); 
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: rgba(255, 255, 255, 0.85); /* Light glass */
+    background: rgba(15, 23, 42, 0.9); /* Deep Indigo Glass */
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border-top: 1px solid rgba(230, 57, 70, 0.15);
+    border-top: 1px solid rgba(245, 158, 11, 0.2);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 0 15px;
     z-index: 9999;
-    box-shadow: 0 -10px 30px rgba(230, 57, 70, 0.05);
+    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.5);
 }
 
 .nav-tab {
@@ -195,12 +195,13 @@
     background: var(--bg-surface);
     width: 100%;
     flex: 1;
-    border-radius: 35px 35px 0 0;
+    border-radius: 40px 40px 0 0;
     padding: 40px 25px;
     color: var(--text-dark);
     display: flex;
     flex-direction: column;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+    box-shadow: 0 -20px 50px rgba(0,0,0,0.4);
+    border-top: 2px solid var(--primary-color);
 }
 
 .login-title {
@@ -262,10 +263,11 @@
 
 /* Native Section Typography */
 .native-header .greeting h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.2rem;
     color: var(--primary-color);
-    font-weight: 800;
+    font-weight: 900;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
 .native-hero-card {

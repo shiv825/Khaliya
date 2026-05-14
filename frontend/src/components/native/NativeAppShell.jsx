@@ -49,7 +49,7 @@ export default function NativeAppShell() {
             case 'home':
                 return <NativeHome key="home" setActiveTab={handleTabChange} />;
             case 'menu':
-                return <NativeMenu key="menu" />;
+                return <NativeMenu key="menu" setActiveTab={handleTabChange} />;
             case 'cart':
                 return <NativeCart key="cart" />;
             case 'book':

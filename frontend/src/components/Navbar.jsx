@@ -15,14 +15,28 @@ export default function Navbar() {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    const [isInstallable, setIsInstallable] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
+        
+        const handlePwaReady = (e) => {
+            setIsInstallable(e.detail);
+        };
+
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('khaliya-pwa-ready', handlePwaReady);
+        
+        // Initial check in case it already fired
+        if (window.khaliya_pwa_prompt) setIsInstallable(true);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('khaliya-pwa-ready', handlePwaReady);
+        };
     }, []);
 
     const cartCount = getCartCount();
@@ -145,6 +159,31 @@ export default function Navbar() {
                         <a href="#menu" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
                         <a href="#loyalty" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
                         <a href="#reservations" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
+                        
+                        {isInstallable && (
+                            <button 
+                                onClick={() => {
+                                    if (window.promptInstall) window.promptInstall();
+                                    toggleMenu();
+                                }}
+                                style={{ 
+                                    fontSize: '1.5rem', 
+                                    fontWeight: '900', 
+                                    color: '#FFF', 
+                                    background: 'var(--gold-gradient)',
+                                    border: 'none',
+                                    padding: '15px 30px',
+                                    borderRadius: '50px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 10px 20px rgba(0,0,0,0.3)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '10px'
+                                }}
+                            >
+                                <i className="fas fa-download"></i> {t('pwa.installBtn') || 'Download App'}
+                            </button>
+                        )}
                         <div style={{
                             marginTop: 'auto',
                             paddingBottom: '2rem',

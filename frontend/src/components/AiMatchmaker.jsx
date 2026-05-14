@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 
-export default function AiMatchmaker({ onClose }) {
+export default function AiMatchmaker({ onClose, onMatch }) {
     const [step, setStep] = useState(1);
     const [selections, setSelections] = useState({ mood: '', drink: '' });
     const { addToCart } = useCart();
@@ -155,14 +155,16 @@ export default function AiMatchmaker({ onClose }) {
                                         onClick={() => {
                                             sessionStorage.setItem('khaliya_ai_match', match.name);
                                             onClose();
-                                            // Smooth scroll to reservations section
-                                            const resSection = document.getElementById('reservations');
-                                            if (resSection) {
-                                                resSection.scrollIntoView({ behavior: 'smooth' });
+                                            
+                                            // If onMatch callback exists (Native App), use it to switch tabs
+                                            if (typeof onMatch === 'function') {
+                                                onMatch('book');
                                             } else {
-                                                // If in PWA (Native) mode, we might need a different navigation
-                                                // But for now, simple redirection or notification works
-                                                window.location.hash = 'native-book'; 
+                                                // Web fallback: Smooth scroll to reservations section
+                                                const resSection = document.getElementById('reservations');
+                                                if (resSection) {
+                                                    resSection.scrollIntoView({ behavior: 'smooth' });
+                                                }
                                             }
                                         }} 
                                         style={{ flex: 2, padding: '18px', background: 'var(--primary-color)', border: 'none', color: '#FFF', borderRadius: '18px', fontWeight: '900', cursor: 'pointer', boxShadow: 'var(--shadow-md)' }}
