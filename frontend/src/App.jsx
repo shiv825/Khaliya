@@ -47,6 +47,8 @@ function App() {
                 <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
                 <Route path="/admin" element={<AdminLogin onLogin={setIsAdminAuth} />} />
                 <Route path="/admin/dashboard" element={isAdminAuth ? <AdminDashboard onLogout={setIsAdminAuth} /> : <AdminLogin onLogin={setIsAdminAuth} />} />
+                {/* Fallback for deep links or broken routes */}
+                <Route path="*" element={isAppMode ? <NativeAppShell /> : <Home />} />
               </Routes>
             </Router>
           )}

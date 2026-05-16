@@ -14,7 +14,7 @@ export default function NativeProfile() {
     const [feedbackText, setFeedbackText] = useState('');
     
     const storedUserStr = localStorage.getItem('khaliya_native_user');
-    let user = { name: 'shiv', email: 'shivkumarrdn7@gmail.com', phone: '8252731784' };
+    let user = { name: 'Guest', email: '', phone: '', spicePoints: 0 };
     try {
         if (storedUserStr) user = JSON.parse(storedUserStr);
     } catch (e) {
@@ -41,10 +41,22 @@ export default function NativeProfile() {
     };
 
     const handleAppLogout = () => {
-        if (window.confirm(t('reviews.signOutConfirm'))) {
-            localStorage.removeItem('khaliya_native_user');
-            window.location.reload();
-        }
+        Swal.fire({
+            title: t('reviews.signOut'),
+            text: t('reviews.signOutConfirm'),
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--primary-color)',
+            cancelButtonColor: 'var(--text-light)',
+            confirmButtonText: 'Yes, Sign Out',
+            background: 'var(--bg-surface)',
+            color: 'var(--text-dark)'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem('khaliya_native_user');
+                window.location.reload();
+            }
+        });
     };
 
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -152,7 +164,7 @@ export default function NativeProfile() {
                     </div>
 
                     <div style={{ transform: 'translateZ(60px)' }}>
-                        <div style={{ fontSize: '3.5rem', fontWeight: '900', letterSpacing: '2px', color: '#FFF' }}>750</div>
+                        <div style={{ fontSize: '3.5rem', fontWeight: '900', letterSpacing: '2px', color: '#FFF' }}>{user?.spicePoints || 0}</div>
                         <div style={{ fontSize: '1rem', fontWeight: '800', color: '#FFF', opacity: 0.9 }}>Available Spice Points</div>
                     </div>
                     
@@ -288,7 +300,7 @@ export default function NativeProfile() {
                                 <div style={{ textAlign: 'center' }}>
                                     <i className="fas fa-crown" style={{ fontSize: '4rem', color: 'var(--primary-color)', marginBottom: '20px' }}></i>
                                     <h3 style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--text-dark)' }}>Saffron Select</h3>
-                                    <p style={{ color: 'var(--text-light)', fontWeight: '600' }}>You have 750 Spice Points</p>
+                                    <p style={{ color: 'var(--text-light)', fontWeight: '600' }}>You have {user?.spicePoints || 0} Spice Points</p>
                                     <div style={{ marginTop: '30px', background: 'var(--bg-surface)', padding: '20px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
                                         <h4 style={{ color: 'var(--primary-color)', fontWeight: '800' }}>Member Perks</h4>
                                         <ul style={{ textAlign: 'left', listStyle: 'none', padding: 0, marginTop: '15px' }}>
@@ -336,6 +348,13 @@ export default function NativeProfile() {
                                     <div style={{ padding: '20px', background: 'var(--bg-surface)', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ fontWeight: '700' }}>Offline Mode</span>
                                         <div style={{ width: '40px', height: '20px', background: 'var(--border-color)', borderRadius: '10px' }}></div>
+                                    </div>
+                                    <div 
+                                        onClick={handleAppLogout}
+                                        style={{ padding: '20px', background: 'rgba(142, 28, 28, 0.05)', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', border: '1px solid var(--primary-color)', cursor: 'pointer' }}
+                                    >
+                                        <span style={{ fontWeight: '800', color: 'var(--primary-color)' }}>Sign Out of Account</span>
+                                        <i className="fas fa-power-off" style={{ color: 'var(--primary-color)' }}></i>
                                     </div>
                                 </div>
                             )}

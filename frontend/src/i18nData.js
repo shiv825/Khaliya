@@ -24,7 +24,7 @@ export const i18nData = {
             total: 'Total Amount',
             checkout: 'Finalize Selection',
             orderSummary: 'Order Summary',
-            orderConfirmed: 'Your selection has been finalized! (Demo)'
+            orderConfirmed: 'Your selection has been finalized! Our team will contact you shortly.'
         },
         header: { sub: 'Authentic Indian Cuisine • Est. 2020' },
         hero: {
@@ -226,7 +226,7 @@ export const i18nData = {
             total: 'कुल राशि',
             checkout: 'पसंद को अंतिम रूप दें',
             orderSummary: 'आदेश सारांश',
-            orderConfirmed: 'आपकी पसंद को अंतिम रूप दे दिया गया है! (डेमो)'
+            orderConfirmed: 'आपकी पसंद को अंतिम रूप दे दिया गया है! हमारी टीम जल्द ही आपसे संपर्क करेगी।'
         },
         header: { sub: 'प्रामाणिक भारतीय व्यंजन • स्था. 2020' },
         hero: {
@@ -428,7 +428,7 @@ export const i18nData = {
             total: 'المبلغ الإجمالي',
             checkout: 'إتمام الاختيار',
             orderSummary: 'ملخص الطلب',
-            orderConfirmed: 'تم تأكيد اختيارك! (تجريبي)'
+            orderConfirmed: 'تم تأكيد اختيارك بنجاح! سيتصل بك فريقنا قريباً.'
         },
         header: { sub: 'المأكولات الهندية الأصيلة • تأسس عام 2020' },
         hero: {

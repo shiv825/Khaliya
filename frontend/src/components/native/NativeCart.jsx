@@ -37,6 +37,7 @@ export default function NativeCart() {
                 total: getCartTotal(),
                 user: {
                     name: user.name,
+                    email: user.email || 'guest@khaliya.luxury',
                     phone: user.phone || 'N/A',
                     address: 'In-Restaurant / Pickup' // Native app default
                 },

@@ -160,6 +160,15 @@ export default function Navbar() {
                         <a href="#loyalty" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
                         <a href="#reservations" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
                         
+                        <a href="#profile" onClick={() => {
+                            // On the web version, #profile might not exist as a section, 
+                            // but in PWA mode it's a view. 
+                            // For now, let's just make it clear it's for the app.
+                            toggleMenu();
+                        }} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>
+                            <i className="fas fa-user-circle" style={{ marginRight: '10px' }}></i> {t('reviews.yourProfile') || 'My Account'}
+                        </a>
+                        
                         {isInstallable && (
                             <button 
                                 onClick={() => {

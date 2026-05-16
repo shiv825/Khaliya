@@ -25,6 +25,22 @@ export default function Reservations({ predefinedTable }) {
             sessionStorage.removeItem('khaliya_ai_match');
         }
 
+        // User profile pre-fill
+        const storedUserStr = localStorage.getItem('khaliya_native_user');
+        if (storedUserStr) {
+            try {
+                const user = JSON.parse(storedUserStr);
+                setFormData(prev => ({ 
+                    ...prev, 
+                    name: user.name !== 'Khaliya Member' && user.name !== 'Guest' ? user.name : prev.name, 
+                    email: user.email || prev.email,
+                    phone: user.phone || prev.phone
+                }));
+            } catch (e) {
+                console.warn('Failed to parse user for reservation pre-fill');
+            }
+        }
+
         if (predefinedTable) {
             setFormData(prev => ({ ...prev, tableType: predefinedTable }));
         }

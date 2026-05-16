@@ -96,7 +96,8 @@ export default function AdminLogin({ onLogin }) {
                                     fontSize: '1.1rem', 
                                     transition: 'all 0.3s ease', 
                                     outline: 'none',
-                                    background: 'rgba(255,255,255,0.5)'
+                                    background: 'rgba(255,255,255,0.5)',
+                                    color: '#0f172a'
                                 }}
                                 onFocus={e => {
                                     e.target.style.borderColor = 'var(--admin-primary)';
@@ -130,7 +131,8 @@ export default function AdminLogin({ onLogin }) {
                                     fontSize: '1.1rem', 
                                     transition: 'all 0.3s ease', 
                                     outline: 'none',
-                                    background: 'rgba(255,255,255,0.5)'
+                                    background: 'rgba(255,255,255,0.5)',
+                                    color: '#0f172a'
                                 }}
                                 onFocus={e => {
                                     e.target.style.borderColor = 'var(--admin-primary)';

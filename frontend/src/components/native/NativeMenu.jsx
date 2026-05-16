@@ -173,7 +173,7 @@ export default function NativeMenu({ setActiveTab }) {
             </div>
 
             <div className="native-menu-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                    {!isRenderReady || loading ? (
+                    {(!isRenderReady || (loading && menuItems.length === 0)) ? (
                         Array(8).fill(0).map((_, i) => <CardSkeleton key={i} />)
                     ) : (
                         visibleItems.map((item, index) => (

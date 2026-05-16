@@ -33,9 +33,17 @@ try {
                 pass: process.env.SMTP_PASS
             }
         });
-        console.log('✅ [AUTH] Nodemailer initialized successfully');
+        
+        // Verify connection configuration
+        emailTransporter.verify((error, success) => {
+            if (error) {
+                console.error('❌ [AUTH] SMTP Connection Error:', error.message);
+            } else {
+                console.log('✅ [AUTH] Nodemailer is ready to send emails');
+            }
+        });
     } else {
-        console.warn('⚠️ [AUTH] SMTP credentials missing. Email OTP will run in Simulated Mode (logs only).');
+        console.warn('⚠️ [AUTH] SMTP credentials missing. Real Email OTP is DISABLED.');
     }
 } catch (err) {
     console.error('❌ [AUTH] Failed to initialize Nodemailer:', err.message);
@@ -207,7 +215,6 @@ app.delete('/api/bookings/:id', (req, res) => {
 });
 
 // -- AUTH OTP LOGIC (PROFESSIONAL & SECURE) --
-let pendingOtps = {}; // { phone: { hashedOtp, expiry } }
 let pendingEmailOtps = {}; // { email: { hashedOtp, expiry } }
 
 app.post('/api/auth/request-email-otp', async (req, res) => {
@@ -240,26 +247,38 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
                     subject: 'Your Khaliya Login Code',
                     text: `Your Khaliya Sanctuary verification code is: ${otp}. Valid for 5 minutes.`,
                     html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-                            <h2 style="color: #D4AF37; text-align: center;">Khaliya Sanctuary</h2>
-                            <p style="font-size: 16px; color: #333;">Your verification code is:</p>
-                            <h1 style="font-size: 36px; color: #000; text-align: center; letter-spacing: 5px;">${otp}</h1>
-                            <p style="font-size: 14px; color: #666; text-align: center;">This code is valid for 5 minutes.</p>
+                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #e0e0e0; border-radius: 20px; background: #fff;">
+                            <h2 style="color: #D4AF37; text-align: center; font-size: 28px; letter-spacing: 2px;">KHALIYA SANCTUARY</h2>
+                            <div style="width: 50px; height: 2px; background: #D4AF37; margin: 20px auto;"></div>
+                            <p style="font-size: 16px; color: #555; text-align: center;">Welcome to the Sanctuary. Use the code below to verify your access.</p>
+                            <div style="background: #f9f9f9; padding: 30px; border-radius: 15px; margin: 30px 0; text-align: center;">
+                                <h1 style="font-size: 42px; color: #000; margin: 0; letter-spacing: 10px;">${otp}</h1>
+                            </div>
+                            <p style="font-size: 14px; color: #999; text-align: center;">This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+                            <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #bbb;">
+                                &copy; ${new Date().getFullYear()} Khaliya Luxury Dining. All rights reserved.
+                            </div>
                         </div>
                     `
                 });
-                console.log(`✅ [AUTH] Email sent to ${email}`);
-                return res.json({ message: 'Verification code sent successfully' });
+                console.log(`✅ [AUTH] Email sent successfully to ${email}`);
+                return res.json({ success: true, message: 'Verification code sent to your email.' });
             } catch (emailErr) {
-                console.error('❌ [AUTH] Email Error:', emailErr.message);
-                console.log(`⚠️ [AUTH] FALLBACK OTP (Email Failed): \x1b[32m${otp}\x1b[0m`);
-                return res.json({ message: 'Code generated (Simulated due to service error)', simulated: true });
+                console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Failed to send verification email. Please ensure your SMTP settings are correct.',
+                    error: emailErr.message 
+                });
             }
         }
 
-        // 5. Fallback for Local Testing (if no SMTP keys provided)
-        console.log(`ℹ️ [AUTH] Simulated Mode is ON. Email OTP: \x1b[32m${otp}\x1b[0m`);
-        res.json({ message: 'Verification code generated (Simulated)', simulated: true });
+        // 5. If not configured, do NOT return success. Return a clear configuration error.
+        console.error(`❌ [AUTH] Attempted OTP for ${email} but SMTP is not configured.`);
+        return res.status(503).json({ 
+            success: false, 
+            message: 'Email service is currently unconfigured. Please set up SMTP in the .env file.'
+        });
 
     } catch (err) {
         console.error('❌ [AUTH] Server Error:', err);
@@ -286,91 +305,36 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
 
     if (isMatch) {
         delete pendingEmailOtps[email.toLowerCase()];
-        res.json({ 
-            success: true, 
-            user: { name: 'Khaliya Member', email: email, isLoggedIn: true } 
-        });
-    } else {
-        res.status(400).json({ success: false, message: 'Invalid verification code' });
-    }
-});
-
-app.post('/api/auth/request-otp', async (req, res) => {
-    const { phone } = req.body;
-    if (!phone) return res.status(400).json({ message: 'Phone number is required' });
-
-    try {
-        // 1. Generate secure 6-digit OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiry = Date.now() + 5 * 60 * 1000; // 5 mins
-
-        // 2. Hash the OTP for secure storage
-        const salt = await bcrypt.genSalt(10);
-        const hashedOtp = await bcrypt.hash(otp, salt);
-
-        // 3. Store the record
-        pendingOtps[phone] = { hashedOtp, expiry };
-
-        console.log('\n' + '='.repeat(40));
-        console.log(`🚀 [AUTH] Secure OTP Generated for +91-${phone}`);
-        console.log(`🔒 [AUTH] Hashed OTP: ${hashedOtp.substring(0, 15)}...`);
-        console.log('='.repeat(40) + '\n');
-
-        // 4. Send via Twilio (if configured)
-        if (twilioClient) {
-            try {
-                await twilioClient.messages.create({
-                    body: `Your Khaliya Sanctuary verification code is: ${otp}. Valid for 5 minutes.`,
-                    from: process.env.TWILIO_PHONE_NUMBER,
-                    to: `+91${phone}`
-                });
-                console.log(`✅ [AUTH] SMS sent to +91${phone}`);
-                return res.json({ message: 'Verification code sent successfully' });
-            } catch (twilioErr) {
-                console.error('❌ [AUTH] Twilio Error:', twilioErr.message);
-                // Fallback to console if Twilio fails but we are in dev/not configured
-                console.log(`⚠️ [AUTH] FALLBACK OTP (SMS Failed): \x1b[32m${otp}\x1b[0m`);
-                return res.json({ message: 'Code generated (Simulated due to service error)', simulated: true });
-            }
+        
+        // Handle User Persistence (Proper Account System)
+        const users = readData('users.json');
+        let user = users.find(u => u.email === email.toLowerCase());
+        
+        if (!user) {
+            user = {
+                id: `USR-${Date.now()}`,
+                email: email.toLowerCase(),
+                name: 'Khaliya Member',
+                joinedAt: new Date().toISOString(),
+                spicePoints: 750, // Welcome points
+                role: 'customer'
+            };
+            users.push(user);
+            writeData('users.json', users);
+            console.log(`👤 [AUTH] New account created: ${email}`);
+        } else {
+            console.log(`👤 [AUTH] Returning member logged in: ${email}`);
         }
 
-        // 5. Fallback for Local Testing (if no Twilio keys provided)
-        console.log(`ℹ️ [AUTH] Simulated Mode is ON. OTP: \x1b[32m${otp}\x1b[0m`);
-        res.json({ message: 'Verification code generated (Simulated)', simulated: true });
-
-    } catch (err) {
-        console.error('❌ [AUTH] Server Error:', err);
-        res.status(500).json({ message: 'Internal server error during OTP generation' });
-    }
-});
-
-app.post('/api/auth/verify-otp', async (req, res) => {
-    const { phone, code } = req.body;
-    const record = pendingOtps[phone];
-
-    if (!record) {
-        return res.status(400).json({ success: false, message: 'No OTP requested for this number' });
-    }
-
-    // Check Expiry (5 Mins)
-    if (Date.now() > record.expiry) {
-        delete pendingOtps[phone];
-        return res.status(400).json({ success: false, message: 'Verification code has expired' });
-    }
-
-    // Compare Hashed OTP
-    const isMatch = await bcrypt.compare(code, record.hashedOtp);
-
-    if (isMatch) {
-        delete pendingOtps[phone];
         res.json({ 
             success: true, 
-            user: { name: 'Shiv Kumar', email: 'shiv@khaliya.luxury', phone } 
+            user: { ...user, isLoggedIn: true } 
         });
     } else {
         res.status(400).json({ success: false, message: 'Invalid verification code' });
     }
 });
+
 
 // API: Reviews
 app.get('/api/reviews', (req, res) => {

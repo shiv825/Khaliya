@@ -12,8 +12,6 @@ export default function NativeAuth({ onLoginSuccess }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
-    const [demoMode, setDemoMode] = useState(false);
-    const [localCode, setLocalCode] = useState(null);
 
     // Get API URL dynamically - Priority: Global Config -> Environment Var -> Relative /api
     const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api'; 
@@ -32,36 +30,30 @@ export default function NativeAuth({ onLoginSuccess }) {
         if (email.includes('@') && email.length > 5) {
             setIsLoading(true);
             try {
-                const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email }, { timeout: 10000 });
+                const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email }, { timeout: 12000 });
                 setIsLoading(false);
-                setStep('otp');
-                setTimer(60); // Resend allowed after 60s
-                setOtp(['', '', '', '', '', '']);
                 
-                if (res.data.simulated) {
-                    console.log('🧪 [AUTH] Running in Simulated mode. Check server console for OTP.');
+                if (res.data.success) {
+                    setStep('otp');
+                    setTimer(60); 
+                    setOtp(['', '', '', '', '', '']);
+                } else {
+                    throw new Error(res.data.message || 'Failed to send OTP');
                 }
             } catch (err) {
-                console.warn('⚠️ Server Unreachable. Entering Smart Fallback (Demo Mode)...');
+                console.error('❌ Authentication Error:', err);
                 setIsLoading(false);
                 
-                // GENERATE LOCAL OTP FOR DEMO
-                const fallbackCode = Math.floor(100000 + Math.random() * 900000).toString();
-                setLocalCode(fallbackCode);
-                setDemoMode(true);
-                setStep('otp');
-                setOtp(['', '', '', '', '', '']);
-                setTimer(60);
-
-                // Show the code to the user in a premium way
+                const errorMessage = err.response?.data?.message || err.message || 'The Sanctuary server is currently unreachable. Please check your connection.';
+                
                 Swal.fire({
-                    title: 'Sanctuary Offline',
-                    text: `Entering Demo Mode. Use verification code: ${fallbackCode}`,
-                    icon: 'info',
+                    title: 'Access Denied',
+                    text: errorMessage,
+                    icon: 'error',
                     background: '#FFF',
                     color: 'var(--text-dark)',
-                    confirmButtonColor: 'var(--primary-color)',
-                    confirmButtonText: 'Enter Code'
+                    confirmButtonColor: '#E63946',
+                    confirmButtonText: 'Try Again'
                 });
             }
         }
@@ -106,19 +98,12 @@ export default function NativeAuth({ onLoginSuccess }) {
             if (res.data.success) {
                 setIsLoading(false);
                 if (navigator.vibrate) navigator.vibrate([30, 50]); // Success vibration
+                finalizeLogin(res.data.user);
                 setStep('notification');
             }
         } catch (err) {
             console.error(err);
             setIsLoading(false);
-            
-            // CHECK FOR LOCAL VERIFICATION
-            if (demoMode && code === localCode) {
-                if (navigator.vibrate) navigator.vibrate([30, 50]);
-                setStep('notification');
-                return;
-            }
-
             const msg = err.response?.data?.message || 'Incorrect verification code. Please try again.';
             alert(`🔒 Security Alert: ${msg}`);
             setOtp(['', '', '', '', '', '']);
@@ -127,15 +112,15 @@ export default function NativeAuth({ onLoginSuccess }) {
         }
     };
 
-    const finalizeLogin = () => {
-        const userData = {
+    const finalizeLogin = (userData) => {
+        const profile = userData || {
             name: 'Khaliya Member',
             email: email,
             phone: '',
             isLoggedIn: true,
             authMethod: 'Professional-OTP-v2'
         };
-        localStorage.setItem('khaliya_native_user', JSON.stringify(userData));
+        localStorage.setItem('khaliya_native_user', JSON.stringify(profile));
         onLoginSuccess();
     };
 
@@ -273,20 +258,9 @@ export default function NativeAuth({ onLoginSuccess }) {
                 </form>
 
                 <div style={{ marginTop: '25px', textAlign: 'center' }}>
-                    <button 
-                        onClick={finalizeLogin}
-                        style={{ 
-                            background: 'none', 
-                            border: 'none', 
-                            color: 'rgba(255, 215, 0, 0.3)', 
-                            fontSize: '0.75rem', 
-                            cursor: 'pointer',
-                            textDecoration: 'underline',
-                            letterSpacing: '1px'
-                        }}
-                    >
-                        Emergency Bypass (Developer Mode)
-                    </button>
+                    <p style={{ color: 'rgba(0, 0, 0, 0.4)', fontSize: '0.8rem', letterSpacing: '1px' }}>
+                        Secured by Khaliya Sanctuary Auth v3
+                    </p>
                 </div>
             </motion.div>
         </div>

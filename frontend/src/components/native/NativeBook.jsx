@@ -59,19 +59,13 @@ export default function NativeBook() {
                         </div>
                         <div className="form-group-native" style={{ marginBottom: '30px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-light)', fontWeight: '700', fontSize: '0.9rem' }}>{t('res.time')}</label>
-                            <div className="time-slot-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                                {['11:00', '13:00', '18:00', '19:00', '20:00', '21:00'].map(slot => (
-                                    <button 
-                                        key={slot}
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, time: slot })}
-                                        className={`time-slot-btn ${formData.time === slot ? 'selected' : ''}`}
-                                        style={{ height: '60px' }}
-                                    >
-                                        {slot}
-                                    </button>
-                                ))}
-                            </div>
+                            <input 
+                                type="time" 
+                                value={formData.time} 
+                                onChange={e => setFormData({ ...formData, time: e.target.value })} 
+                                className="native-input"
+                                style={{ width: '100%', padding: '15px', borderRadius: '15px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'var(--text-dark)', fontWeight: '600' }}
+                            />
                             <small style={{ color: 'var(--text-muted)', marginTop: '8px', display: 'block' }}>Availability will be confirmed in the next step</small>
                         </div>
                         <motion.button 
