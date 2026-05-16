@@ -109,8 +109,21 @@ export default function NativeProfile() {
 
             {/* Profile Card */}
             <div className="zomato-profile-card" style={{ marginBottom: '15px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-                <div className="zomato-avatar" style={{ backgroundColor: 'var(--primary-color)', color: '#FFF', fontWeight: '800' }}>
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'G'}
+                <div className="zomato-avatar" style={{ 
+                    backgroundColor: 'var(--primary-color)', 
+                    color: '#FFF', 
+                    fontWeight: '900',
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.5rem',
+                    boxShadow: 'var(--shadow-sm)',
+                    aspectRatio: '1/1'
+                }}>
+                    {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'G'}
                 </div>
                 <div style={{ flex: 1 }}>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user?.name || 'Guest User'}</h2>
