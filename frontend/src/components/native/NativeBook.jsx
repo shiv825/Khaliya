@@ -106,8 +106,12 @@ export default function NativeBook() {
                             </div>
                         </div>
                         <div className="form-group-native table-types" style={{ marginTop: '20px' }}>
-                            <label style={{ marginBottom: '20px', display: 'block', fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: '800' }}>Select Seating Preference</label>
+                            <label style={{ marginBottom: '20px', display: 'block', fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: '800' }}>Select Your Table</label>
                             
+                            <div style={{ marginBottom: '40px' }}>
+                                <InteractiveFloorplan onSelectTable={(type) => setFormData({ ...formData, tableType: type })} />
+                            </div>
+
                             <div style={{ display: 'grid', gap: '15px' }}>
                                 {[
                                     { id: 'intimate', label: 'Intimate Table', sub: 'Perfect for couples', icon: '🥂' },
