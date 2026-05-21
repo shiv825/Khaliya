@@ -11,7 +11,7 @@ export const i18nData = {
         nav: {
             home: 'Home', menu: 'Menu', hours: 'Hours', track: 'Find Us',
             tables: '🪑 Tables', bookings: '📊 Bookings', menuManager: '📝 Menu Manager',
-            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reservations', loyalty: 'Spice Club',
+            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reserve', loyalty: 'Spice Club',
             profile: 'Profile', bag: 'Bag', flavors: 'Flavors'
         },
         gallery: {

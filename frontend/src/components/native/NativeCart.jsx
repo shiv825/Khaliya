@@ -24,7 +24,7 @@ export default function NativeCart() {
         
         setIsProcessing(true);
         try {
-            const storedUser = localStorage.getItem('khaliya_native_user');
+            const storedUser = sessionStorage.getItem('khaliya_native_user');
             const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
 
             const orderData = {

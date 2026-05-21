@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
@@ -11,7 +11,8 @@ import masterMenu from '../../data/menu.json';
  * Redesigned with "Gold & Charcoal" Luxury Theme for a premium PWA experience.
  */
 export default function NativeHome({ setActiveTab }) {
-    const storedUserStr = localStorage.getItem('khaliya_native_user');
+    const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
+    const storedUserStr = sessionStorage.getItem('khaliya_native_user');
     let user = { name: 'Guest' };
     try {
         if (storedUserStr) user = JSON.parse(storedUserStr);
@@ -69,12 +70,28 @@ export default function NativeHome({ setActiveTab }) {
                         className="user-avatar"
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setActiveTab('profile')}
-                        style={{ background: 'var(--bg-surface)', padding: '4px', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}
+                        style={{ 
+                            background: 'var(--bg-surface)', 
+                            padding: '4px', 
+                            borderRadius: '50%', 
+                            boxShadow: 'var(--shadow-sm)',
+                            width: '56px',
+                            height: '56px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                        }}
                     >
                         <img 
                             src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Guest')}&background=8E1C1C&color=ffffff`} 
                             alt="User" 
-                            style={{ width: '50px', height: '50px', borderRadius: '50%' }}
+                            style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                borderRadius: '50%',
+                                objectFit: 'cover'
+                            }}
                         />
                     </motion.div>
                 </div>
@@ -92,7 +109,13 @@ export default function NativeHome({ setActiveTab }) {
                         key={action.id}
                         className="action-circle" 
                         whileTap={{ scale: 0.95 }} 
-                        onClick={() => action.id !== 'location' && setActiveTab(action.id)}
+                        onClick={() => {
+                            if (action.id === 'location') {
+                                setIsVisitModalOpen(true);
+                            } else {
+                                setActiveTab(action.id);
+                            }
+                        }}
                         style={{ textAlign: 'center' }}
                     >
                         <div className="icon-wrapper futuristic-glass" style={{ 
@@ -225,6 +248,191 @@ export default function NativeHome({ setActiveTab }) {
             </div>
 
             <div style={{ height: '100px' }}></div>
+
+            {/* Visit Modal */}
+            <AnimatePresence>
+                {isVisitModalOpen && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        zIndex: 10000,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '20px'
+                    }}>
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                            style={{
+                                backgroundColor: 'var(--bg-surface)',
+                                borderRadius: '30px',
+                                width: '100%',
+                                maxWidth: '400px',
+                                padding: '30px 25px',
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                                border: '1px solid var(--border-color)',
+                                position: 'relative'
+                            }}
+                        >
+                            {/* Close button */}
+                            <button 
+                                onClick={() => setIsVisitModalOpen(false)}
+                                style={{
+                                    position: 'absolute',
+                                    top: '20px',
+                                    right: '20px',
+                                    background: 'rgba(0,0,0,0.05)',
+                                    border: 'none',
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    color: 'var(--text-dark)',
+                                    fontSize: '1.1rem',
+                                    transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.1)'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+
+                            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                <div style={{
+                                    width: '50px',
+                                    height: '50px',
+                                    borderRadius: '50%',
+                                    backgroundColor: 'rgba(155, 27, 48, 0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    margin: '0 auto 12px',
+                                    color: 'var(--primary-color)'
+                                }}>
+                                    <i className="fas fa-map-marked-alt" style={{ fontSize: '1.5rem' }}></i>
+                                </div>
+                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--text-dark)', margin: '0 0 5px 0' }}>
+                                    {language === 'hi' ? 'खालिया रेस्टोरेंट' : language === 'ar' ? 'مطعم خاليا' : 'Visit Khaliya'}
+                                </h3>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
+                                    {language === 'hi' ? 'हम आपका स्वागत करने के लिए उत्सुक हैं!' : language === 'ar' ? 'يسعدنا استضافتك في مطعمنا!' : 'We would love to host you!'}
+                                </p>
+                            </div>
+
+                            {/* Map iframe */}
+                            <div style={{ 
+                                borderRadius: '20px', 
+                                overflow: 'hidden', 
+                                height: '160px', 
+                                border: '1px solid var(--border-color)',
+                                marginBottom: '20px',
+                                position: 'relative'
+                            }}>
+                                <iframe
+                                    title="Khaliya Restaurant Location"
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.003975762078!2d88.3347072!3d22.6108169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a02798f090d80c9%3A0xe104332b4b47ea87!2sKhaliya%20Restaurant!5e0!3m2!1sen!2sin!4v1714902123955!5m2!1sen!2sin"
+                                    width="100%" 
+                                    height="100%" 
+                                    style={{ border: 0 }} 
+                                    allowFullScreen="" 
+                                    loading="lazy"
+                                ></iframe>
+                            </div>
+
+                            {/* Location Details */}
+                            <div style={{ marginBottom: '20px', fontSize: '0.9rem', color: 'var(--text-dark)' }}>
+                                <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                                    <i className="fas fa-map-marker-alt" style={{ color: 'var(--primary-color)', fontSize: '1.1rem', marginTop: '2px' }}></i>
+                                    <div>
+                                        <strong style={{ display: 'block', marginBottom: '2px' }}>{t('contact.addressLabel') || 'Address'}</strong>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.4' }}>{t('contact.addressContent')}</span>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                                    <i className="fas fa-clock" style={{ color: 'var(--primary-color)', fontSize: '1rem', marginTop: '2px' }}></i>
+                                    <div>
+                                        <strong style={{ display: 'block', marginBottom: '2px' }}>{t('hours.title') || 'Hours'}</strong>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                                            {t('contact.hoursContent')}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    <i className="fas fa-phone-alt" style={{ color: 'var(--primary-color)', fontSize: '1rem', marginTop: '2px' }}></i>
+                                    <div>
+                                        <strong style={{ display: 'block', marginBottom: '2px' }}>{t('contact.phoneLabel') || 'Phone'}</strong>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>+91 82527 31784</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Action buttons */}
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <a 
+                                    href="tel:+918252731784"
+                                    style={{
+                                        flex: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        padding: '12px',
+                                        borderRadius: '14px',
+                                        border: '1.5px solid var(--primary-color)',
+                                        color: 'var(--primary-color)',
+                                        textDecoration: 'none',
+                                        fontWeight: '800',
+                                        fontSize: '0.9rem',
+                                        textAlign: 'center',
+                                        transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(155, 27, 48, 0.05)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                >
+                                    <i className="fas fa-phone-alt"></i> {language === 'hi' ? 'कॉल करें' : language === 'ar' ? 'اتصل بنا' : 'Call Us'}
+                                </a>
+                                <a 
+                                    href="https://www.google.com/maps/dir/?api=1&destination=22.6108,88.3370" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        flex: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        padding: '12px',
+                                        borderRadius: '14px',
+                                        backgroundColor: 'var(--primary-color)',
+                                        color: '#FFF',
+                                        textDecoration: 'none',
+                                        fontWeight: '800',
+                                        fontSize: '0.9rem',
+                                        textAlign: 'center',
+                                        boxShadow: '0 4px 12px rgba(155, 27, 48, 0.2)'
+                                    }}
+                                >
+                                    <i className="fas fa-directions"></i> {language === 'hi' ? 'दिशा-निर्देश' : language === 'ar' ? 'الاتجاهات' : 'Directions'}
+                                </a>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

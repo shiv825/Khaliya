@@ -8,6 +8,7 @@ import NativeAuth from './NativeAuth';
 import NativeCart from './NativeCart';
 import OfferPopup from '../OfferPopup';
 import AiAssistant from '../AiAssistant';
+import AdminDashboard from '../AdminDashboard';
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
 import '../../assets/native-style.css';
@@ -20,7 +21,7 @@ export default function NativeAppShell() {
     const t = langContext ? langContext.t : (k, f) => f || k;
     const getCartCount = cartContext ? cartContext.getCartCount : () => 0;
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        const storedUser = localStorage.getItem('khaliya_native_user');
+        const storedUser = sessionStorage.getItem('khaliya_native_user');
         if (storedUser) {
             try {
                 return JSON.parse(storedUser).isLoggedIn;
@@ -31,6 +32,21 @@ export default function NativeAppShell() {
 
     const handleLoginSuccess = () => {
         setIsAuthenticated(true);
+    };
+
+    const storedUserStr = sessionStorage.getItem('khaliya_native_user');
+    let loggedInUser = null;
+    if (storedUserStr) {
+        try {
+            loggedInUser = JSON.parse(storedUserStr);
+        } catch (e) {}
+    }
+    const isAdmin = loggedInUser && loggedInUser.isLoggedIn && loggedInUser.email === 'shivkumarrdn7@gmail.com';
+
+    const handleAdminLogout = () => {
+        sessionStorage.removeItem('khaliya_native_user');
+        sessionStorage.removeItem('adminLoggedIn');
+        setIsAuthenticated(false);
     };
 
     // Smooth scroll to top when changing tabs
@@ -75,6 +91,10 @@ export default function NativeAppShell() {
                 >
                     <NativeAuth onLoginSuccess={handleLoginSuccess} />
                 </motion.div>
+            ) : isAdmin ? (
+                <div key="admin-dashboard" className="native-app-shell admin-mode" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+                    <AdminDashboard onLogout={handleAdminLogout} />
+                </div>
             ) : (
                 <motion.div
                     key="app"

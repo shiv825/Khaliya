@@ -219,7 +219,7 @@ export default function NativeBook() {
                                 whileTap={{ scale: 0.95 }} 
                                 className="zomato-btn-main" 
                                 onClick={() => {
-                                    const storedUser = localStorage.getItem('khaliya_native_user');
+                                    const storedUser = sessionStorage.getItem('khaliya_native_user');
                                     const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
                                     const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
                                     

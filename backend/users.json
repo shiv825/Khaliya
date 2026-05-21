@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "USR-1779364200442",
+    "email": "testuser@gmail.com",
+    "name": "Khaliya Member",
+    "joinedAt": "2026-05-21T11:50:00.442Z",
+    "spicePoints": 750,
+    "role": "customer"
+  },
+  {
+    "id": "USR-1779364364532",
+    "email": "shivkumarrdn7@gmail.com",
+    "name": "Khaliya Member",
+    "joinedAt": "2026-05-21T11:52:44.532Z",
+    "spicePoints": 750,
+    "role": "customer"
+  }
+]

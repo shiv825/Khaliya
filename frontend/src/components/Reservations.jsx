@@ -26,7 +26,7 @@ export default function Reservations({ predefinedTable }) {
         }
 
         // User profile pre-fill
-        const storedUserStr = localStorage.getItem('khaliya_native_user');
+        const storedUserStr = sessionStorage.getItem('khaliya_native_user');
         if (storedUserStr) {
             try {
                 const user = JSON.parse(storedUserStr);
