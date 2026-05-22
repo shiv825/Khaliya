@@ -23,14 +23,19 @@ try {
 // Initialize Nodemailer (Safely)
 let emailTransporter;
 try {
-    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const smtpUser = process.env.SMTP_USER || 'khaliyarestaurant@gmail.com';
+    const smtpPass = process.env.SMTP_PASS || 'ojusvrcpwdshdxoi';
+    const smtpPort = process.env.SMTP_PORT || 587;
+
+    if (smtpHost && smtpUser && smtpPass) {
         emailTransporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT || 587,
-            secure: process.env.SMTP_PORT == 465,
+            host: smtpHost,
+            port: smtpPort,
+            secure: smtpPort == 465,
             auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
+                user: smtpUser,
+                pass: smtpPass
             }
         });
         
