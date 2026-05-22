@@ -26,13 +26,16 @@ try {
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'khaliyarestaurant@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'ojusvrcpwdshdxoi';
-    const smtpPort = process.env.SMTP_PORT || 587;
+    const smtpPort = process.env.SMTP_PORT || 465;
 
     if (smtpHost && smtpUser && smtpPass) {
         emailTransporter = nodemailer.createTransport({
             host: smtpHost,
             port: smtpPort,
-            secure: smtpPort == 465,
+            secure: true, // Use SSL on 465
+            connectionTimeout: 8000,
+            greetingTimeout: 8000,
+            socketTimeout: 8000,
             auth: {
                 user: smtpUser,
                 pass: smtpPass
