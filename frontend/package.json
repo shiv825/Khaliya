@@ -18,7 +18,8 @@
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1",
-    "sweetalert2": "^11.26.21"
+    "sweetalert2": "^11.26.21",
+    "nodemailer": "^6.9.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

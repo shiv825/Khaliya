@@ -41,12 +41,24 @@ export default function NativeAuth({ onLoginSuccess }) {
                     setOtp(['', '', '', '', '', '']);
                     
                     if (res.data.simulatedOtp) {
-                        Swal.fire({
-                            title: 'Simulated Email Delivery',
-                            html: `Render server blocked the outgoing email.<br><br>Your OTP is: <strong style="font-size: 1.5rem; color: var(--primary-color);">${res.data.simulatedOtp}</strong>`,
-                            icon: 'info',
-                            confirmButtonColor: 'var(--primary-color)'
-                        });
+                        try {
+                            // Call the Vercel serverless function to actually send the email!
+                            // This bypasses the Render backend outbound email block.
+                            await axios.post('/api/send-otp', { 
+                                email, 
+                                otp: res.data.simulatedOtp 
+                            });
+                            console.log('✅ OTP sent successfully via Vercel Serverless Function');
+                        } catch (emailErr) {
+                            console.error('❌ Vercel Email Delivery Failed:', emailErr);
+                            // Fallback to popup if Vercel function fails (e.g. running locally without Vercel CLI)
+                            Swal.fire({
+                                title: 'Local Testing Mode',
+                                html: `Could not send email. Your OTP is: <strong style="font-size: 1.5rem; color: var(--primary-color);">${res.data.simulatedOtp}</strong>`,
+                                icon: 'info',
+                                confirmButtonColor: 'var(--primary-color)'
+                            });
+                        }
                     }
                 } else {
                     throw new Error(res.data.message || 'Failed to send OTP');
