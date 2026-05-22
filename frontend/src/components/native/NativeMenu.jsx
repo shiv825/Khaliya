@@ -14,7 +14,9 @@ import masterMenu from '../../data/menu.json';
 export default function NativeMenu({ setActiveTab }) {
     const { t, language = 'en' } = useLanguage();
     const { addToCart } = useCart();
-    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
     
     // Helper for multi-language fields
     const getLocalized = (field) => {

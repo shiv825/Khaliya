@@ -62,7 +62,9 @@ export default function NativeProfile() {
 
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
 
     const handleFeedbackSubmit = async () => {
         if (!feedbackText.trim()) return;

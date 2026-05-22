@@ -12,7 +12,9 @@ export default function NativeBook() {
     const [availability, setAvailability] = useState({ bookedSlots: {}, maxCapacity: 4 });
     const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
-    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
 
     const fetchAvailability = async (date, tableType) => {
         if (!date || !tableType) return;
@@ -221,7 +223,9 @@ export default function NativeBook() {
                                 onClick={() => {
                                     const storedUser = sessionStorage.getItem('khaliya_native_user');
                                     const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
-                                    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+                                    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+                                    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+                                    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
                                     
                                     const payload = {
                                         ...formData,
