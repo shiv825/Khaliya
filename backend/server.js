@@ -274,7 +274,8 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
                 console.warn(`🔑 [AUTH] Simulated OTP for ${email}: ${otp}`);
                 return res.json({ 
                     success: true, 
-                    message: 'Simulated Mode: SMTP send failed, check your server console for the login code.' 
+                    message: 'Simulated Mode: SMTP send failed, check your server console for the login code.',
+                    simulatedOtp: otp
                 });
             }
         }
@@ -284,7 +285,8 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
         console.warn(`🔑 [AUTH] Simulated OTP for ${email}: ${otp}`);
         return res.json({ 
             success: true, 
-            message: 'Running in Simulated Mode. Check your server console for the login code.' 
+            message: 'Running in Simulated Mode. Check your server console for the login code.',
+            simulatedOtp: otp
         });
 
     } catch (err) {
