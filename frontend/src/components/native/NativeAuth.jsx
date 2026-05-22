@@ -217,7 +217,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                         <div style={{ 
                             display: 'flex', 
                             alignItems: 'center',
-                            background: '#FFF',
+                            background: 'var(--bg-surface)',
                             border: '2px solid var(--border-color)',
                             borderRadius: '20px',
                             padding: '18px 24px',
