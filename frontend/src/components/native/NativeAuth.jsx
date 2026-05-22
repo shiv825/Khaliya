@@ -30,7 +30,7 @@ export default function NativeAuth({ onLoginSuccess }) {
         if (email.includes('@') && email.length > 5) {
             setIsLoading(true);
             try {
-                const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email }, { timeout: 12000 });
+                const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email }, { timeout: 60000 });
                 setIsLoading(false);
                 
                 if (res.data.success) {
@@ -41,24 +41,6 @@ export default function NativeAuth({ onLoginSuccess }) {
                     throw new Error(res.data.message || 'Failed to send OTP');
                 }
             } catch (err) {
-                // If it's a timeout or network error, activate Demo Mode
-                if (err.code === 'ECONNABORTED' || err.message.includes('timeout') || !err.response) {
-                    console.warn('Backend unreachable. Activating Offline Demo Mode');
-                    Swal.fire({
-                        title: 'Offline Demo Mode Active',
-                        text: 'The backend server is currently sleeping or unreachable. You can continue using the app in demo mode. Please use code 123456 to verify.',
-                        icon: 'info',
-                        background: '#FFF',
-                        color: 'var(--text-dark)',
-                        confirmButtonColor: '#D4AF37'
-                    });
-                    setIsLoading(false);
-                    setStep('otp');
-                    setTimer(60);
-                    setOtp(['', '', '', '', '', '']);
-                    return;
-                }
-
                 console.error('❌ Authentication Error:', err);
                 setIsLoading(false);
                 
@@ -112,7 +94,7 @@ export default function NativeAuth({ onLoginSuccess }) {
         if (code.length !== 6) return;
         setIsLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/auth/verify-email-otp`, { email, code }, { timeout: 10000 });
+            const res = await axios.post(`${API_URL}/auth/verify-email-otp`, { email, code }, { timeout: 60000 });
             if (res.data.success) {
                 setIsLoading(false);
                 if (navigator.vibrate) navigator.vibrate([30, 50]); // Success vibration
@@ -120,20 +102,6 @@ export default function NativeAuth({ onLoginSuccess }) {
                 setStep('notification');
             }
         } catch (err) {
-            // Check for Offline Demo Mode
-            if (err.code === 'ECONNABORTED' || err.message.includes('timeout') || !err.response) {
-                console.warn('Backend unreachable. Activating Offline Demo Mode for OTP Verify');
-                if (code === '123456') {
-                    setIsLoading(false);
-                    if (navigator.vibrate) navigator.vibrate([30, 50]);
-                    finalizeLogin(null); // Uses the default profile fallback in finalizeLogin
-                    setStep('notification');
-                    return;
-                } else {
-                    err.response = { data: { message: 'Offline Demo Mode Active: Please use code 123456' } };
-                }
-            }
-
             console.error(err);
             setIsLoading(false);
             const msg = err.response?.data?.message || 'Incorrect verification code. Please try again.';
