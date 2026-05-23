@@ -1,17 +1,21 @@
 /* Native App Architecture Stylesheet - Saffron & Ivory Theme */
 
 :root {
-    --primary-color: #9B1B30; /* Deep Burgundy */
-    --secondary-color: #C5A059; /* Muted Gold */
-    --accent-color: #2C3E50; /* Charcoal */
-    --bg-body: #F9F7F3; /* Warm Alabaster */
+    --primary-color: #E63946; /* Vibrant Premium Crimson Red */
+    --primary-light: #FF5A5F;
+    --secondary-color: #FFB703; /* Vibrant Golden Sunset */
+    --accent-color: #F4A261; /* Warm Peach */
+    --bg-body: #FDFBF7; /* Soft Delicious Ivory */
     --bg-surface: #FFFFFF; /* Pure White */
-    --text-dark: #1A1A1A; /* Almost Black */
-    --text-muted: #8E8E8E;
-    --border-color: rgba(0, 0, 0, 0.08);
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+    --bg-glass: rgba(255, 255, 255, 0.85); /* Frosty Glass */
+    --text-dark: #2B2D42; /* Deep Navy/Black for high contrast */
+    --text-muted: #8D99AE; /* Cool Grey */
+    --border-color: rgba(43, 45, 66, 0.08);
+    --shadow-sm: 0 4px 15px rgba(230, 57, 70, 0.08);
+    --shadow-md: 0 10px 30px rgba(230, 57, 70, 0.15);
+    --accent-glow: rgba(230, 57, 70, 0.1);
     --font-heading: 'Playfair Display', serif;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .native-app-shell {

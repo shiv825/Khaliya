@@ -11,6 +11,7 @@ export default function NativeCart() {
     const { t, language = 'en' } = useLanguage();
     const [isOrdered, setIsOrdered] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [tableNumber, setTableNumber] = useState('');
 
     const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
     const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
@@ -41,7 +42,7 @@ export default function NativeCart() {
                     name: user.name,
                     email: user.email || 'guest@khaliya.luxury',
                     phone: user.phone || 'N/A',
-                    address: 'In-Restaurant / Pickup' // Native app default
+                    address: `Table: ${tableNumber || 'Takeaway/Pickup'}`
                 },
                 source: 'Native App v2'
             };
@@ -163,6 +164,27 @@ export default function NativeCart() {
                                 <span style={{ color: '#10b981', fontWeight: '800' }}>COMPLIMENTARY</span>
                             </div>
                             <div style={{ height: '1px', background: 'var(--border-color)', marginBottom: '20px' }}></div>
+                            
+                            <div style={{ marginBottom: '25px' }}>
+                                <label style={{ display: 'block', color: 'var(--text-dark)', fontWeight: '700', marginBottom: '8px', fontSize: '1.1rem' }}>Dine-in Table Number (Optional)</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="e.g. 12 or VIP Lounge" 
+                                    value={tableNumber}
+                                    onChange={(e) => setTableNumber(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '15px 20px',
+                                        borderRadius: '15px',
+                                        border: '1px solid var(--border-color)',
+                                        background: 'var(--bg-body)',
+                                        color: 'var(--text-dark)',
+                                        fontSize: '1rem',
+                                        fontWeight: '600'
+                                    }}
+                                />
+                            </div>
+
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                                 <span style={{ fontSize: '1.3rem', fontWeight: '900', color: 'var(--text-dark)' }}>Total</span>
                                 <span style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-color)' }}>₹{getCartTotal()}</span>
