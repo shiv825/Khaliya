@@ -36,9 +36,10 @@ export default function AdminDashboard({ onLogout }) {
     const fetchData = async () => {
         setIsSyncing(true);
         try {
+            const timestamp = new Date().getTime(); // Cache buster
             const [bRes, oRes] = await Promise.all([
-                axios.get(`${API_URL}/bookings`),
-                axios.get(`${API_URL}/orders`)
+                axios.get(`${API_URL}/bookings?t=${timestamp}`),
+                axios.get(`${API_URL}/orders?t=${timestamp}`)
             ]);
 
             const newBookings = bRes.data || [];
@@ -115,8 +116,8 @@ export default function AdminDashboard({ onLogout }) {
 
     return (
         <div className="admin-portal-wrapper admin-layout">
-            <aside className="admin-sidebar" style={{ width: isSidebarOpen ? '280px' : '90px' }}>
-                <div style={{ marginBottom: '50px', display: 'flex', alignItems: 'center', justifyContent: isSidebarOpen ? 'space-between' : 'center' }}>
+            <aside className={`admin-sidebar ${!isSidebarOpen ? 'collapsed' : ''}`}>
+                <div className="sidebar-logo-container" style={{ display: 'flex', alignItems: 'center', justifyContent: isSidebarOpen ? 'space-between' : 'center' }}>
                     {isSidebarOpen && (
                         <h1 style={{ color: 'var(--admin-primary)', fontFamily: 'Playfair Display', fontSize: '2rem', margin: 0, fontWeight: '900' }}>
                             Khaliya<span style={{ color: 'var(--admin-accent)' }}>.</span>
@@ -129,7 +130,7 @@ export default function AdminDashboard({ onLogout }) {
                     )}
                 </div>
 
-                <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <nav style={{ flex: 1, display: 'flex', flexDirection: window.innerWidth <= 768 ? 'row' : 'column', gap: '5px' }}>
                     <button className={`nav-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
                         <i className="fas fa-fire-burner" style={{ fontSize: '1.2rem', width: '25px', textAlign: 'center' }}></i>
                         {isSidebarOpen && <span style={{ flex: 1, textAlign: 'left' }}>Live Kitchen</span>}
@@ -151,7 +152,7 @@ export default function AdminDashboard({ onLogout }) {
                     </button>
                 </nav>
 
-                <button className="nav-tab" onClick={handleLogout} style={{ color: 'var(--admin-danger)', marginTop: 'auto' }}>
+                <button className="nav-tab" onClick={handleLogout} style={{ color: 'var(--admin-danger)', marginTop: window.innerWidth <= 768 ? '0' : 'auto' }}>
                     <i className="fas fa-sign-out-alt" style={{ fontSize: '1.2rem', width: '25px', textAlign: 'center' }}></i>
                     {isSidebarOpen && <span>Sign Out</span>}
                 </button>
