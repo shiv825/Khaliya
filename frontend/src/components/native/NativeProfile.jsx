@@ -106,8 +106,8 @@ export default function NativeProfile() {
         <div style={{ background: 'var(--bg-body)', minHeight: '100vh', paddingBottom: '120px' }}>
             {/* Header / Back Arrow */}
             <div style={{ padding: '30px 20px', display: 'flex', alignItems: 'center' }}>
-                <i className="fas fa-arrow-left" style={{ fontSize: '1.4rem', color: 'var(--primary-color)' }}></i>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--primary-color)', margin: '0 0 0 20px' }}>{t('reviews.yourProfile')}</h2>
+                <i onClick={() => navigate(-1)} className="fas fa-arrow-left" style={{ fontSize: '1.4rem', color: 'var(--primary-color)', cursor: 'pointer', padding: '10px' }}></i>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--primary-color)', margin: '0 0 0 10px' }}>{t('reviews.yourProfile')}</h2>
             </div>
 
             {/* Profile Card */}
