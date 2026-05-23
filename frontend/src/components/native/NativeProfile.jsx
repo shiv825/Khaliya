@@ -265,7 +265,7 @@ export default function NativeProfile() {
                                 background: 'var(--bg-body)',
                                 borderTopLeftRadius: '30px',
                                 borderTopRightRadius: '30px',
-                                padding: '30px 20px 50px',
+                                padding: '30px 20px 100px', // Increased bottom padding to 100px
                                 position: 'relative'
                             }}
                         >

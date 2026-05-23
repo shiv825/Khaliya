@@ -75,7 +75,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 65px;
+    flex: 1;
     height: 100%;
     padding: 8px 0;
     transition: color 0.2s ease;
@@ -86,11 +86,13 @@
 }
 
 .nav-tab span {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     margin-top: 6px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: visible;
 }
 
 .nav-tab.active {
@@ -709,5 +711,5 @@
     .native-header .greeting h2 { font-size: 1.5rem; }
     .book-fab { width: 44px; height: 44px; font-size: 1.1rem; }
     .nav-tab.book-btn { top: -12px; }
-    .nav-tab span { font-size: 0.65rem; }
+    .nav-tab span { font-size: 0.55rem; }
 }

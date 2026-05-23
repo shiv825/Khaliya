@@ -25,26 +25,32 @@ export default function LanguageSwitcher({ mode = 'dropdown' }) {
                 {languages.map((lang) => (
                     <motion.div
                         key={lang.code}
-                        whileTap={{ scale: 0.98 }}
+                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ y: -2 }}
                         onClick={() => handleLanguageChange(lang.code)}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '15px',
-                            padding: '15px 20px',
-                            background: language === lang.code ? 'var(--accent-glow)' : 'var(--bg-surface)',
-                            borderRadius: '15px',
-                            border: `1px solid ${language === lang.code ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                            gap: '18px',
+                            padding: '20px 25px', // Increased padding for larger size
+                            background: language === lang.code ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%)' : 'var(--bg-surface)',
+                            borderRadius: '20px', // More modern rounding
+                            border: `2px solid ${language === lang.code ? 'var(--primary-color)' : 'transparent'}`, // Thicker border for selected
+                            boxShadow: language === lang.code ? '0 10px 25px rgba(212, 175, 55, 0.15)' : '0 4px 15px rgba(0,0,0,0.03)', // Modern shadows
                             cursor: 'pointer',
-                            transition: 'var(--transition)'
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
                     >
-                        <span style={{ fontSize: '1.5rem' }}>{lang.flag}</span>
+                        <span style={{ fontSize: '2rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }}>{lang.flag}</span>
                         <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: '800', color: 'var(--text-dark)', fontSize: '1rem' }}>{lang.localName}</div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{lang.name}</div>
+                            <div style={{ fontWeight: '900', color: language === lang.code ? 'var(--primary-color)' : 'var(--text-dark)', fontSize: '1.2rem', letterSpacing: '0.5px' }}>{lang.localName}</div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600', marginTop: '2px' }}>{lang.name}</div>
                         </div>
-                        {language === lang.code && <i className="fas fa-check-circle" style={{ color: 'var(--primary-color)' }}></i>}
+                        {language === lang.code && (
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ background: 'var(--primary-color)', color: '#FFF', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(212, 175, 55, 0.4)' }}>
+                                <i className="fas fa-check" style={{ fontSize: '0.9rem' }}></i>
+                            </motion.div>
+                        )}
                     </motion.div>
                 ))}
             </div>
