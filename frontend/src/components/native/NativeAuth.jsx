@@ -44,7 +44,7 @@ export default function NativeAuth({ onLoginSuccess }) {
                         try {
                             // Call the Vercel serverless function to actually send the email!
                             // This bypasses the Render backend outbound email block.
-                            await axios.post('/api/send-otp', { 
+                            await axios.post('https://khaliya-restaurant.vercel.app/api/send-otp', { 
                                 email, 
                                 otp: res.data.simulatedOtp 
                             });
