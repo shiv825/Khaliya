@@ -153,7 +153,7 @@ export default function AiMatchmaker({ onClose, onMatch }) {
                                     <motion.button 
                                         whileTap={{ scale: 0.95 }}
                                         onClick={() => {
-                                            sessionStorage.setItem('khaliya_ai_match', match.name);
+                                            localStorage.setItem('khaliya_ai_match', match.name);
                                             onClose();
                                             
                                             // If onMatch callback exists (Native App), use it to switch tabs

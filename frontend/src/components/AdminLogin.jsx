@@ -16,7 +16,7 @@ export default function AdminLogin({ onLogin }) {
         
         // Secure Admin Credentials
         if (email === 'shivkumarrdn7@gmail.com' && password === 'shiv2006') {
-            sessionStorage.setItem('adminLoggedIn', 'true');
+            localStorage.setItem('adminLoggedIn', 'true');
             onLogin(true);
             navigate('/admin/dashboard');
         } else {

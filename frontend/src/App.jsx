@@ -20,7 +20,7 @@ function App() {
   const theme = useDynamicTheme();
 
   const [isAdminAuth, setIsAdminAuth] = React.useState(
-    sessionStorage.getItem('adminLoggedIn') === 'true'
+    localStorage.getItem('adminLoggedIn') === 'true'
   );
 
   useEffect(() => {

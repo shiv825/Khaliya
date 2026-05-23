@@ -19,14 +19,14 @@ export default function Reservations({ predefinedTable }) {
 
     useEffect(() => {
         // AI Suggestion pre-fill
-        const aiMatch = sessionStorage.getItem('khaliya_ai_match');
+        const aiMatch = localStorage.getItem('khaliya_ai_match');
         if (aiMatch) {
             setFormData(prev => ({ ...prev, specialRequests: `AI Suggestion: ${aiMatch}` }));
-            sessionStorage.removeItem('khaliya_ai_match');
+            localStorage.removeItem('khaliya_ai_match');
         }
 
         // User profile pre-fill
-        const storedUserStr = sessionStorage.getItem('khaliya_native_user');
+        const storedUserStr = localStorage.getItem('khaliya_native_user');
         if (storedUserStr) {
             try {
                 const user = JSON.parse(storedUserStr);

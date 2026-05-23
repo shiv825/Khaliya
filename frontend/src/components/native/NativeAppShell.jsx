@@ -21,7 +21,7 @@ export default function NativeAppShell() {
     const t = langContext ? langContext.t : (k, f) => f || k;
     const getCartCount = cartContext ? cartContext.getCartCount : () => 0;
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        const storedUser = sessionStorage.getItem('khaliya_native_user');
+        const storedUser = localStorage.getItem('khaliya_native_user');
         if (storedUser) {
             try {
                 return JSON.parse(storedUser).isLoggedIn;
@@ -34,7 +34,7 @@ export default function NativeAppShell() {
         setIsAuthenticated(true);
     };
 
-    const storedUserStr = sessionStorage.getItem('khaliya_native_user');
+    const storedUserStr = localStorage.getItem('khaliya_native_user');
     let loggedInUser = null;
     if (storedUserStr) {
         try {
@@ -44,8 +44,8 @@ export default function NativeAppShell() {
     const isAdmin = loggedInUser && loggedInUser.isLoggedIn && loggedInUser.email === 'shivkumarrdn7@gmail.com';
 
     const handleAdminLogout = () => {
-        sessionStorage.removeItem('khaliya_native_user');
-        sessionStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('khaliya_native_user');
+        localStorage.removeItem('adminLoggedIn');
         setIsAuthenticated(false);
     };
 

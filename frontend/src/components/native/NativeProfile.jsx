@@ -13,7 +13,7 @@ export default function NativeProfile() {
     const [activeModal, setActiveModal] = useState(null); // 'membership', 'feedback', 'about', 'settings'
     const [feedbackText, setFeedbackText] = useState('');
     
-    const storedUserStr = sessionStorage.getItem('khaliya_native_user');
+    const storedUserStr = localStorage.getItem('khaliya_native_user');
     let user = { name: 'Guest', email: '', phone: '', spicePoints: 0 };
     try {
         if (storedUserStr) user = JSON.parse(storedUserStr);
@@ -53,8 +53,8 @@ export default function NativeProfile() {
             color: 'var(--text-dark)'
         }).then((result) => {
             if (result.isConfirmed) {
-                sessionStorage.removeItem('khaliya_native_user');
-                sessionStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('khaliya_native_user');
+                localStorage.removeItem('adminLoggedIn');
                 window.location.reload();
             }
         });

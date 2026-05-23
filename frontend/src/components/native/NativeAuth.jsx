@@ -143,9 +143,9 @@ export default function NativeAuth({ onLoginSuccess }) {
             isLoggedIn: true,
             authMethod: 'Professional-OTP-v2'
         };
-        sessionStorage.setItem('khaliya_native_user', JSON.stringify(profile));
+        localStorage.setItem('khaliya_native_user', JSON.stringify(profile));
         if (email.toLowerCase() === 'shivkumarrdn7@gmail.com') {
-            sessionStorage.setItem('adminLoggedIn', 'true');
+            localStorage.setItem('adminLoggedIn', 'true');
         }
         onLoginSuccess();
     };

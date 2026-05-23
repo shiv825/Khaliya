@@ -69,7 +69,7 @@ export default function AdminDashboard({ onLogout }) {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('adminLoggedIn');
         onLogout(false);
         navigate('/');
     };

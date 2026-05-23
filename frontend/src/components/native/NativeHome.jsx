@@ -12,7 +12,7 @@ import masterMenu from '../../data/menu.json';
  */
 export default function NativeHome({ setActiveTab }) {
     const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
-    const storedUserStr = sessionStorage.getItem('khaliya_native_user');
+    const storedUserStr = localStorage.getItem('khaliya_native_user');
     let user = { name: 'Guest' };
     try {
         if (storedUserStr) user = JSON.parse(storedUserStr);
