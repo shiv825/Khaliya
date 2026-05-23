@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         const emailTransporter = nodemailer.createTransport({
             host: smtpHost,
             port: smtpPort,
-            secure: true, // Use SSL
+            secure: Number(smtpPort) === 465, // true for 465, false for 587
             auth: {
                 user: smtpUser,
                 pass: smtpPass
