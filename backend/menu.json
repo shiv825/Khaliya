@@ -450,5 +450,373 @@
             "veg"
         ],
         "image": "/menu-images/mango-lassi.jpg"
+    },
+    {
+        "category": "Appetizer",
+        "name": {
+            "en": "Veg Spring Rolls (4 pcs)",
+            "hi": "वेज स्प्रिंग रोल (4 पीसी)",
+            "ar": "لفائف الربيع الخضار (4 قطع)"
+        },
+        "description": {
+            "en": "Crispy golden wrappers filled with seasoned crunchy vegetables.",
+            "hi": "सीजंड कुरकुरी सब्जियों से भरे कुरकुरे सुनहरे रैपर।",
+            "ar": "أغلفة ذهبية مقرمشة محشوة بالخضار المقرمشة المتبلة."
+        },
+        "price": "₹180",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&fit=crop"
+    },
+    {
+        "category": "Appetizer",
+        "name": {
+            "en": "Onion Bhaji (6 pcs)",
+            "hi": "प्याज भाजी (6 पीसी)",
+            "ar": "بصل باجي (6 قطع)"
+        },
+        "description": {
+            "en": "Deep fried sliced onion patties with chickpea flour and spices.",
+            "hi": "चने के आटे और मसालों के साथ गहरे तले हुए कटे हुए प्याज के पकोड़े।",
+            "ar": "فطائر البصل المقطعة والمقلية مع دقيق الحمص والبهارات."
+        },
+        "price": "₹160",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+    },
+    {
+        "category": "Appetizer",
+        "name": {
+            "en": "Paneer Seekh Kebab (4 pcs)",
+            "hi": "पनीर सीख कबाब (4 पीसी)",
+            "ar": "بانيير سيخ كباب (4 قطع)"
+        },
+        "description": {
+            "en": "Minced cottage cheese and vegetables skewers grilled in tandoor.",
+            "hi": "तंदूर में ग्रिल किए हुए कीमा बनाया हुआ पनीर और सब्जियों के सीख कबाब।",
+            "ar": "سيخ من جبنة القريش والخضار المفرومة والمشوية في التنور."
+        },
+        "price": "₹340",
+        "tags": [
+            "veg",
+            "spicy-1"
+        ],
+        "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop"
+    },
+    {
+        "category": "Appetizer",
+        "name": {
+            "en": "Mutton Seekh Kebab (4 pcs)",
+            "hi": "मटन सीख कबाब (4 पीसी)",
+            "ar": "لحم مفروم سيخ كباب (4 قطع)"
+        },
+        "description": {
+            "en": "Minced mutton skewers seasoned with herbs and grilled in clay oven.",
+            "hi": "जड़ी-बूटियों के साथ अनुभवी और मिट्टी के ओवन में ग्रिल किए गए कीमा मटन सीख कबाब।",
+            "ar": "أسياخ لحم الضأن المفروم المتبل بالأعشاب والمشوي في فرن الطين."
+        },
+        "price": "₹450",
+        "tags": [
+            "non-veg",
+            "spicy-2"
+        ],
+        "image": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&fit=crop"
+    },
+    {
+        "category": "Appetizer",
+        "name": {
+            "en": "Gobi Manchurian Dry",
+            "hi": "गोभी मंचूरियन ड्राई",
+            "ar": "غوبي منشوريا الجافة"
+        },
+        "description": {
+            "en": "Crispy cauliflower florets tossed in tangy Indo-Chinese sauce.",
+            "hi": "तीखे इंडो-चाइनीज सॉस में लिपटे कुरकुरे फूलगोभी के टुकड़े।",
+            "ar": "زهور القرنبيط المقرمشة المغمسة في صلصة الهند والصين اللاذعة."
+        },
+        "price": "₹240",
+        "tags": [
+            "veg",
+            "spicy-2"
+        ],
+        "image": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Mutton Biryani",
+            "hi": "मटन बिरयानी",
+            "ar": "لحم الغنم برياني"
+        },
+        "description": {
+            "en": "Aromatic basmati rice cooked with tender mutton pieces and spices in clay pot.",
+            "hi": "मिट्टी के बर्तन में मटकी मटन के टुकड़ों और मसालों के साथ पकाए गए सुगंधित बासमती चावल।",
+            "ar": "أرز بسمتي عطري مطبوخ مع قطع لحم الضأن الطرية والبهارات في وعاء طيني."
+        },
+        "price": "₹520",
+        "tags": [
+            "non-veg",
+            "spicy-2"
+        ],
+        "image": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Mutter Paneer",
+            "hi": "मटर पनीर",
+            "ar": "بازلاء بانيير"
+        },
+        "description": {
+            "en": "Classic green peas and cottage cheese curry in rich spiced tomato sauce.",
+            "hi": "समृद्ध मसालेदार टमाटर सॉस में क्लासिक हरी मटर और पनीर करी।",
+            "ar": "كاري البازلاء الخضراء الكلاسيكية وجبنة القريش في صلصة الطماطم الغنية بالبهارات."
+        },
+        "price": "₹310",
+        "tags": [
+            "veg",
+            "spicy-1"
+        ],
+        "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Kadai Paneer",
+            "hi": "कढ़ाई पनीर",
+            "ar": "كاداي بانيير"
+        },
+        "description": {
+            "en": "Cottage cheese cooked with bell peppers, onions, and freshly ground spices.",
+            "hi": "शिमला मिर्च, प्याज और ताजे पिसे हुए मसालों के साथ पकाया गया पनीर।",
+            "ar": "جبنة قريش مطبوخة مع الفلفل الرومي والبصل والبهارات الطازجة المطحونة."
+        },
+        "price": "₹330",
+        "tags": [
+            "veg",
+            "spicy-2"
+        ],
+        "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Aloo Gobi Masala",
+            "hi": "आलू गोभी मसाला",
+            "ar": "آلو جوبي ماسالا"
+        },
+        "description": {
+            "en": "Fresh cauliflower florets and potatoes cooked with ginger and cumin seeds.",
+            "hi": "अदरक और जीरे के साथ पकाई गई ताजी फूलगोभी और आलू।",
+            "ar": "زهور القرنبيط الطازجة والبطاطس المطبوخة مع الزنجبيل وبذور الكمون."
+        },
+        "price": "₹250",
+        "tags": [
+            "veg",
+            "spicy-1"
+        ],
+        "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Chicken Korma",
+            "hi": "चिकन कोरमा",
+            "ar": "دجاج كورما"
+        },
+        "description": {
+            "en": "Rich chicken curry cooked in creamy cashew and almond nut sauce.",
+            "hi": "मलाईदार काजू और बादाम की चटनी में पकाई गई समृद्ध चिकन करी।",
+            "ar": "كاري الدجاج الغني المطبوخ في صلصة الكاجو واللوز الكريمية."
+        },
+        "price": "₹410",
+        "tags": [
+            "non-veg",
+            "spicy-1"
+        ],
+        "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&fit=crop"
+    },
+    {
+        "category": "Main Course",
+        "name": {
+            "en": "Shahi Paneer",
+            "hi": "शाही पनीर",
+            "ar": "شاهي بانيير"
+        },
+        "description": {
+            "en": "Royal cottage cheese in thick creamy gravy of almonds and saffron.",
+            "hi": "बादाम और केसर की गाढ़ी मलाईदार ग्रेवी में शाही पनीर।",
+            "ar": "جبنة قريش ملكية في مرق كريمي كثيف من اللوز والزعفران."
+        },
+        "price": "₹340",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&fit=crop"
+    },
+    {
+        "category": "Bread",
+        "name": {
+            "en": "Butter Naan",
+            "hi": "बटर नान",
+            "ar": "نان بالزبدة"
+        },
+        "description": {
+            "en": "Soft refined flour bread baked in tandoor and layered with fresh butter.",
+            "hi": "तंदूर में पकी हुई और ताजे मक्खन के साथ परतदार नरम मैदा की रोटी।",
+            "ar": "خبز دقيق ناعم طري مخبوز في التنور ومغطى بالزبدة الطازجة."
+        },
+        "price": "₹70",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop"
+    },
+    {
+        "category": "Bread",
+        "name": {
+            "en": "Tandoori Roti",
+            "hi": "तंदूरी रोटी",
+            "ar": "تندوري روتي"
+        },
+        "description": {
+            "en": "Traditional whole wheat bread baked in clay tandoor.",
+            "hi": "मिट्टी के तंदूर में पकी हुई पारंपरिक साबुत गेहूं की रोटी।",
+            "ar": "خبز القمح الكامل التقليدي المخبوز في تنور طيني."
+        },
+        "price": "₹40",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop"
+    },
+    {
+        "category": "Bread",
+        "name": {
+            "en": "Lachha Paratha",
+            "hi": "लच्छा पराठा",
+            "ar": "لتشا باراتا"
+        },
+        "description": {
+            "en": "Layered whole wheat crispy flatbread baked in clay oven.",
+            "hi": "मिट्टी के ओवन में बेक की हुई परतदार साबुत गेहूं की कुरकुरी रोटी।",
+            "ar": "خبز مسطح مقرمش من القمح الكامل مخبوز في فرن طيني."
+        },
+        "price": "₹90",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop"
+    },
+    {
+        "category": "Bread",
+        "name": {
+            "en": "Aloo Paratha",
+            "hi": "आलू पराठा",
+            "ar": "آلو باراتا"
+        },
+        "description": {
+            "en": "Whole wheat bread stuffed with seasoned potatoes, cooked on griddle with ghee.",
+            "hi": "मसालेदार आलू से भरी गेहूं की रोटी, तवे पर घी के साथ पकाई गई।",
+            "ar": "خبز القمح الكامل المحشو بالبطاطس المتبلة والمطهو على الصاج مع السمن."
+        },
+        "price": "₹100",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+    },
+    {
+        "category": "Dessert",
+        "name": {
+            "en": "Rasgulla (2 pcs)",
+            "hi": "रसगुल्ला (2 पीसी)",
+            "ar": "راسغولا (قطعتان)"
+        },
+        "description": {
+            "en": "Spongy cottage cheese balls soaked in sweet light sugar syrup.",
+            "hi": "मीठी हल्की चीनी की चाशनी में भिगोए हुए स्पंजी पनीर के गोले।",
+            "ar": "كرات جبنة القريش الإسفنجية المنقوعة في شراب السكر الخفيف الحلو."
+        },
+        "price": "₹100",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&fit=crop"
+    },
+    {
+        "category": "Dessert",
+        "name": {
+            "en": "Rice Kheer",
+            "hi": "चावल की खीर",
+            "ar": "أرز خير"
+        },
+        "description": {
+            "en": "Slow-cooked rice pudding made with whole milk, saffron, and nuts.",
+            "hi": "साबुत दूध, केसर और मेवों से बनी धीमी आंच पर पकाई गई चावल की खीर।",
+            "ar": "بودنغ الأرز المطبوخ ببطء والمصنوع من الحليب الكامل والزعفران والمكسرات."
+        },
+        "price": "₹140",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1574969899363-ee6121f3080a?w=500&fit=crop"
+    },
+    {
+        "category": "Beverage",
+        "name": {
+            "en": "Masala Chai",
+            "hi": "मसाला चाय",
+            "ar": "شاي ماسالا"
+        },
+        "description": {
+            "en": "Traditional Indian milk tea brewed with cardamom, ginger, and spices.",
+            "hi": "इलायची, अदरक और मसालों के साथ बनाई गई पारंपरिक भारतीय दूध की चाय।",
+            "ar": "شاي الحليب الهندي التقليدي المخمر مع الهيل والزنجبيل والبهارات."
+        },
+        "price": "₹80",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&fit=crop"
+    },
+    {
+        "category": "Beverage",
+        "name": {
+            "en": "Rose Lassi",
+            "hi": "गुलाब लस्सी",
+            "ar": "روز لاسي"
+        },
+        "description": {
+            "en": "Sweet yogurt drink infused with fragrant rose syrup and cardamom.",
+            "hi": "सुगंधित गुलाब के सिरप और इलायची के साथ मीठा दही का पेय।",
+            "ar": "مشروب زبادي حلو غني بشراب الورد العطر والهيل."
+        },
+        "price": "₹160",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1571006682869-f54244517307?w=500&fit=crop"
+    },
+    {
+        "category": "Beverage",
+        "name": {
+            "en": "Fresh Lime Soda",
+            "hi": "फ्रेश लाइम सोडा",
+            "ar": "صودا الليمون الطازج"
+        },
+        "description": {
+            "en": "Sweet and salty refreshing carbonated drink with fresh lime juice.",
+            "hi": "ताजे नींबू के रस के साथ मीठा और नमकीन ताज़ा कार्बोनेटेड पेय।",
+            "ar": "مشروب غازي منعش حلو ومالح مع عصير الليمون الطازج."
+        },
+        "price": "₹110",
+        "tags": [
+            "veg"
+        ],
+        "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&fit=crop"
     }
 ]
