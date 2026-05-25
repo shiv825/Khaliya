@@ -343,10 +343,29 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
                 role: 'customer'
             };
             users.push(user);
-            writeData('users.json', users);
             console.log(`👤 [AUTH] New account created: ${email}`);
         } else {
             console.log(`👤 [AUTH] Returning member logged in: ${email}`);
+        }
+
+        // Generate dynamic customer session ID for single-device restriction
+        const isCustomer = user.email.toLowerCase() !== 'shivkumarrdn7@gmail.com';
+        if (isCustomer) {
+            const newSessionId = `SESS-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+            user.currentSessionId = newSessionId;
+            
+            const userIndex = users.findIndex(u => u.email === user.email);
+            if (userIndex !== -1) {
+                users[userIndex] = user;
+            }
+            writeData('users.json', users);
+            
+            // Broadcast the invalidation event to other devices
+            setTimeout(() => {
+                sendUpdateToAll('customer-session-invalidate', { email: user.email.toLowerCase(), newSessionId });
+            }, 100);
+        } else {
+            writeData('users.json', users);
         }
 
         res.json({ 
@@ -356,6 +375,27 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
     } else {
         res.status(400).json({ success: false, message: 'Invalid verification code' });
     }
+});
+
+app.post('/api/auth/check-session', (req, res) => {
+    const { email, sessionId } = req.body;
+    if (!email || !sessionId) {
+        return res.status(400).json({ success: false, message: 'Email and Session ID are required' });
+    }
+    
+    const users = readData('users.json');
+    const user = users.find(u => u.email === email.toLowerCase());
+    
+    if (!user) {
+        return res.json({ success: true, valid: false, message: 'User not found' });
+    }
+    
+    if (email.toLowerCase() === 'shivkumarrdn7@gmail.com') {
+        return res.json({ success: true, valid: true });
+    }
+    
+    const isValid = user.currentSessionId === sessionId;
+    res.json({ success: true, valid: isValid });
 });
 
 

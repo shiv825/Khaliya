@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 import NativeHome from './NativeHome';
 import NativeMenu from './NativeMenu';
 import NativeBook from './NativeBook';
@@ -20,6 +22,12 @@ export default function NativeAppShell() {
     
     const t = langContext ? langContext.t : (k, f) => f || k;
     const getCartCount = cartContext ? cartContext.getCartCount : () => 0;
+    
+    // Get API URL dynamically
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         const storedUser = localStorage.getItem('khaliya_native_user');
         if (storedUser) {
@@ -29,6 +37,73 @@ export default function NativeAppShell() {
         }
         return false;
     });
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        
+        const storedUser = localStorage.getItem('khaliya_native_user');
+        if (!storedUser) return;
+        
+        let currentUser = null;
+        try {
+            currentUser = JSON.parse(storedUser);
+        } catch (e) { return; }
+        
+        if (!currentUser || !currentUser.email || currentUser.email === 'shivkumarrdn7@gmail.com') return;
+
+        // 1. Initial Session Check (on mount/focus)
+        axios.post(`${API_URL}/auth/check-session`, {
+            email: currentUser.email,
+            sessionId: currentUser.currentSessionId || ''
+        }).then(res => {
+            if (res.data.success && !res.data.valid) {
+                localStorage.removeItem('khaliya_native_user');
+                setIsAuthenticated(false);
+                Swal.fire({
+                    title: 'Session Expired',
+                    text: 'Your account was logged in on another device. You have been logged out.',
+                    icon: 'warning',
+                    background: '#FFF',
+                    color: 'var(--text-dark)',
+                    confirmButtonColor: '#E63946',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }).catch(err => console.error('Session check failed:', err));
+
+        // 2. Real-time Session Check via SSE (EventSource)
+        const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
+        const eventSource = new EventSource(sseUrl);
+        
+        eventSource.onmessage = (event) => {
+            try {
+                const update = JSON.parse(event.data);
+                if (update.type === 'customer-session-invalidate') {
+                    const data = update.data;
+                    if (data.email === currentUser.email && data.newSessionId !== currentUser.currentSessionId) {
+                        eventSource.close();
+                        localStorage.removeItem('khaliya_native_user');
+                        setIsAuthenticated(false);
+                        Swal.fire({
+                            title: 'Logged Out',
+                            text: 'You have been logged out because your account was logged in on another device.',
+                            icon: 'warning',
+                            background: '#FFF',
+                            color: 'var(--text-dark)',
+                            confirmButtonColor: '#E63946',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to parse SSE event:', e);
+            }
+        };
+
+        return () => {
+            eventSource.close();
+        };
+    }, [isAuthenticated, API_URL]);
 
     const handleLoginSuccess = () => {
         setIsAuthenticated(true);
