@@ -76,9 +76,9 @@
       });
 
       // 3. AUTO RESET: Only for major version bumps
-      if (!localStorage.getItem('nuclear_reset_v12')) {
-        localStorage.setItem('nuclear_reset_v12', 'true');
-        console.log('☢ [PWA] Nuclear Reset v12 in progress...');
+      if (!localStorage.getItem('nuclear_reset_v13')) {
+        localStorage.setItem('nuclear_reset_v13', 'true');
+        console.log('☢ [PWA] Nuclear Reset v13 in progress...');
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(rs) {
             for(let r of rs) r.unregister();

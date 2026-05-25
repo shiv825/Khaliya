@@ -47,7 +47,11 @@ export default function NativeCart() {
                 source: 'Native App v2'
             };
 
-            await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
+            const res = await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
+            
+            if (typeof res.data === 'string' && res.data.toLowerCase().includes('<html')) {
+                throw new Error("Received HTML instead of JSON. Backend is likely misconfigured or down.");
+            }
             
             setIsProcessing(false);
             setIsOrdered(true);

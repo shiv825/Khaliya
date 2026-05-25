@@ -92,7 +92,11 @@ export default function NativeAppShell() {
                     <NativeAuth onLoginSuccess={handleLoginSuccess} />
                 </motion.div>
             ) : isAdmin ? (
-                <div key="admin-dashboard" className="native-app-shell admin-mode" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+                <div key="admin-dashboard" className="native-app-shell admin-mode" style={{ 
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+                    overflowY: 'auto', WebkitOverflowScrolling: 'touch',
+                    paddingTop: 'env(safe-area-inset-top, 20px)'
+                }}>
                     <AdminDashboard onLogout={handleAdminLogout} />
                 </div>
             ) : (

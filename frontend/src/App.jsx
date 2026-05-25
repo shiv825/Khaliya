@@ -24,6 +24,15 @@ function App() {
   );
 
   useEffect(() => {
+    // Log visit
+    const source = isAppMode ? 'App' : 'Website';
+    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+    fetch(`${API_URL}/visits`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source })
+    }).catch(err => console.log('Visit logging failed', err));
+
     AOS.init({
       duration: 800,
       once: true,

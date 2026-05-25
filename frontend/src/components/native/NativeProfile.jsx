@@ -209,27 +209,30 @@ export default function NativeProfile() {
                     </motion.div>
                 ))}
 
-                <motion.div
-                    className="zomato-menu-item profile-logout"
-                    whileTap={{ background: '#FFF5F5' }}
-                    onClick={handleAppLogout}
-                    style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-color)', padding: '20px', display: 'flex', alignItems: 'center', gap: '15px' }}
-                >
-                    <i className="fas fa-power-off" style={{ color: 'var(--primary-color)', width: '25px' }}></i>
-                    <span style={{ color: 'var(--primary-color)', fontWeight: '800', flex: 1 }}>{t('reviews.signOut')}</span>
-                    <i className="fas fa-chevron-right" style={{ color: 'var(--primary-color)', opacity: 0.3 }}></i>
-                </motion.div>
+                <div style={{ padding: '20px', marginTop: '10px' }}>
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleAppLogout}
+                        style={{ 
+                            width: '100%', 
+                            padding: '18px', 
+                            background: 'var(--bg-surface)', 
+                            border: '2px solid var(--primary-color)', 
+                            borderRadius: '15px', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            gap: '10px',
+                            boxShadow: 'var(--shadow-sm)',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <i className="fas fa-sign-out-alt" style={{ color: 'var(--primary-color)', fontSize: '1.2rem' }}></i>
+                        <span style={{ color: 'var(--primary-color)', fontWeight: '900', fontSize: '1.1rem', letterSpacing: '1px' }}>{t('reviews.signOut')}</span>
+                    </motion.button>
+                </div>
 
-                <motion.div
-                    className="zomato-menu-item"
-                    whileTap={{ background: '#fef2f2' }}
-                    onClick={() => navigate('/admin')}
-                    style={{ marginTop: '20px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-surface)', padding: '20px' }}
-                >
-                    <i className="fas fa-shield-alt" style={{ color: 'var(--primary-color)' }}></i>
-                    <span style={{ fontWeight: '900', color: 'var(--text-dark)' }}>Admin Command Center</span>
-                    <i className="fas fa-external-link-alt" style={{ color: 'var(--primary-color)', fontSize: '0.9rem' }}></i>
-                </motion.div>
+                {/* Admin Command Center removed as per request */}
             </div>
 
             <div style={{ padding: '40px', textAlign: 'center' }}>

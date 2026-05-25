@@ -94,7 +94,8 @@ const PWAManager = {
     promptInstall: () => {
         if (!PWAManager.deferredPrompt) {
             console.error('❌ [PWA] Install prompt not available. User clicked Install too early or browser blocked it.');
-            return;
+            alert("To install the app, please look for the install icon in your browser's address bar, or use the 'Add to Home Screen' option in your browser menu.");
+            return false;
         }
 
         PWAManager.deferredPrompt.prompt();
@@ -107,6 +108,7 @@ const PWAManager = {
             PWAManager.deferredPrompt = null;
             PWAManager.closeInstallBanner();
         });
+        return true;
     },
 
     showInstallBanner: () => {

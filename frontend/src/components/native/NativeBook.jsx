@@ -236,7 +236,10 @@ export default function NativeBook() {
                                     };
 
                                     axios.post(`${API_URL}/bookings`, payload)
-                                        .then(() => {
+                                        .then((res) => {
+                                            if (typeof res.data === 'string' && res.data.toLowerCase().includes('<html')) {
+                                                throw new Error("Received HTML instead of JSON. Backend is likely misconfigured or down.");
+                                            }
                                             Swal.fire({ title: 'Reserved!', text: 'Your royal table awaits.', icon: 'success', confirmButtonColor: '#8E1C1C' });
                                             setStep(1);
                                             setFormData({ date: '', time: '', guests: 2, tableType: '' });

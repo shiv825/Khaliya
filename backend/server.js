@@ -110,9 +110,23 @@ const readData = (fileName) => {
     return JSON.parse(data);
 };
 
+// SSE Live Updates
+let sseClients = [];
+const sendUpdateToAll = (type, data) => {
+    sseClients.forEach(client => {
+        try {
+            client.res.write(`data: ${JSON.stringify({ type, data })}\n\n`);
+        } catch (e) {
+            console.error('SSE Write Error:', e);
+        }
+    });
+};
+
 const writeData = (fileName, data) => {
     const filePath = getFilePath(fileName);
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    const type = fileName.replace('.json', '');
+    sendUpdateToAll(type, data);
 };
 
 // API: Menu
@@ -400,6 +414,124 @@ app.delete('/api/orders/:id', (req, res) => {
     } else {
         res.status(404).json({ success: false, message: 'Order not found' });
     }
+});
+
+// API: Analytics & Visits
+app.post('/api/visits', (req, res) => {
+    const visits = readData('visits.json');
+    const source = req.body.source || 'Unknown';
+    visits.push({
+        id: Date.now(),
+        date: new Date().toISOString(),
+        source: source // 'Website' or 'App'
+    });
+    writeData('visits.json', visits);
+    res.json({ success: true });
+});
+
+app.get('/api/analytics', (req, res) => {
+    const orders = readData('orders.json');
+    const visits = readData('visits.json');
+    
+    const validOrders = orders.filter(o => o.status !== 'cancelled');
+    
+    let totalRevenue = 0;
+    let weeklyRevenue = 0;
+    let monthlyRevenue = 0;
+    let todayRevenue = 0;
+    
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    
+    const todayStr = now.toLocaleDateString();
+    let todayOrdersCount = 0;
+    
+    let itemCounts = {};
+    let hourlyCounts = Array(24).fill(0);
+    
+    let activeOrdersCount = orders.filter(o => o.status === 'received' || o.status === 'preparing').length;
+
+    validOrders.forEach(order => {
+        const orderDateObj = new Date(order.timestamp || order.date || Date.now());
+        const total = parseFloat(order.total) || 0;
+        
+        totalRevenue += total;
+        if (orderDateObj >= oneWeekAgo) weeklyRevenue += total;
+        if (orderDateObj >= oneMonthAgo) monthlyRevenue += total;
+        
+        if (orderDateObj.toLocaleDateString() === todayStr) {
+            todayRevenue += total;
+            todayOrdersCount++;
+            hourlyCounts[orderDateObj.getHours()]++;
+            
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    itemCounts[item.name] = (itemCounts[item.name] || 0) + (item.quantity || 1);
+                });
+            }
+        }
+    });
+    
+    let topItem = 'None yet';
+    let maxCount = 0;
+    for (const [name, count] of Object.entries(itemCounts)) {
+        if (count > maxCount) {
+            maxCount = count;
+            topItem = name;
+        }
+    }
+
+    let appVisits = 0;
+    let webVisits = 0;
+    let newCustomersToday = 0;
+    
+    visits.forEach(v => {
+        if (v.source.toLowerCase().includes('app') || v.source.toLowerCase().includes('native')) appVisits++;
+        else webVisits++;
+        
+        const visitDateObj = new Date(v.date || Date.now());
+        if (visitDateObj.toLocaleDateString() === todayStr) {
+            newCustomersToday++;
+        }
+    });
+    
+    const hourlyRush = hourlyCounts.map((count, hour) => {
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour % 12 || 12;
+        return { time: `${displayHour} ${ampm}`, orders: count };
+    });
+
+    res.json({
+        revenue: { total: totalRevenue, weekly: weeklyRevenue, monthly: monthlyRevenue, today: todayRevenue },
+        visitors: { total: visits.length, app: appVisits, website: webVisits, today: newCustomersToday },
+        activeOrders: activeOrdersCount,
+        topItem: { name: topItem, sold: maxCount },
+        hourlyRush: hourlyRush
+    });
+});
+
+app.get('/api/settings', (req, res) => {
+    res.json(readData('settings.json'));
+});
+
+app.post('/api/settings', (req, res) => {
+    writeData('settings.json', req.body);
+    res.json({ success: true, settings: req.body });
+});
+
+app.get('/api/live-updates', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const client = { id: Date.now(), res };
+    sseClients.push(client);
+
+    req.on('close', () => {
+        sseClients = sseClients.filter(c => c.id !== client.id);
+    });
 });
 
 // Catch-all route to serve the frontend (for SPA routing)
