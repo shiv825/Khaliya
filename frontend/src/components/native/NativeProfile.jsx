@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import LanguageSwitcher from '../LanguageSwitcher';
@@ -9,9 +9,11 @@ import Swal from 'sweetalert2';
 export default function NativeProfile() {
     const navigate = useNavigate();
     const { t, language = 'en' } = useLanguage();
-    const [showLangSelector, setShowLangSelector] = useState(false);
+     const [showLangSelector, setShowLangSelector] = useState(false);
     const [activeModal, setActiveModal] = useState(null); // 'membership', 'feedback', 'about', 'settings'
     const [feedbackText, setFeedbackText] = useState('');
+    const [orders, setOrders] = useState([]);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
     
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     let user = { name: 'Guest', email: '', phone: '', spicePoints: 0 };
@@ -21,10 +23,59 @@ export default function NativeProfile() {
         console.warn('⚠️ [NativeProfile] User data corrupted');
     }
 
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
+    useEffect(() => {
+        if (!user || !user.email) return;
+
+        const fetchOrders = async () => {
+            setIsLoadingOrders(true);
+            try {
+                const res = await axios.get(`${API_URL}/orders`);
+                setOrders(res.data);
+            } catch (err) {
+                console.error('Failed to fetch orders:', err);
+            } finally {
+                setIsLoadingOrders(false);
+            }
+        };
+
+        fetchOrders();
+
+        // Establish real-time SSE listener
+        const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
+        const eventSource = new EventSource(sseUrl);
+
+        eventSource.onmessage = (event) => {
+            try {
+                const update = JSON.parse(event.data);
+                if (update.type === 'orders') {
+                    setOrders(update.data);
+                }
+            } catch (err) {
+                console.error('Error parsing SSE orders update:', err);
+            }
+        };
+
+        return () => {
+            eventSource.close();
+        };
+    }, [user.email]);
+
+
     const x = useMotionValue(0);
     const y = useMotionValue(0);
     const rotateX = useTransform(y, [-100, 100], [15, -15]);
     const rotateY = useTransform(x, [-100, 100], [-15, 15]);
+
+    const activeOrders = orders.filter(o => {
+        const orderEmail = o.user?.email || o.email;
+        return orderEmail?.toLowerCase() === user.email?.toLowerCase() &&
+               o.status !== 'delivered' &&
+               o.status !== 'cancelled';
+    });
 
     const handleTouchMove = (e) => {
         const touch = e.touches[0];
@@ -62,9 +113,7 @@ export default function NativeProfile() {
 
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
-    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
-    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
 
     const handleFeedbackSubmit = async () => {
         if (!feedbackText.trim()) return;
@@ -189,7 +238,171 @@ export default function NativeProfile() {
                     </div>
                 </motion.div>
             </motion.div>
-            <style>{`@keyframes shimmer { 0% { left: -100% } 50% { left: 200% } 100% { left: 200% } }`}</style>
+
+            {/* Rewards Progress Wallet */}
+            {user?.email && (
+                <div style={{ padding: '0 20px 25px 20px' }}>
+                    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '25px', padding: '20px', boxShadow: 'var(--shadow-sm)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                            <span style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-dark)' }}>Next Reward Progress</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--primary-color)' }}>
+                                {user?.spicePoints || 0} / {
+                                    (user?.spicePoints || 0) < 1000 ? 1000 : (user?.spicePoints || 0) < 2500 ? 2500 : 5000
+                                } PTS
+                            </span>
+                        </div>
+
+                        {/* Progress Bar Container */}
+                        <div style={{ height: '10px', background: 'var(--bg-body)', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative', marginBottom: '12px' }}>
+                            <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ 
+                                    width: `${Math.min(100, ((user?.spicePoints || 0) / ((user?.spicePoints || 0) < 1000 ? 1000 : (user?.spicePoints || 0) < 2500 ? 2500 : 5000)) * 100)}%` 
+                                }}
+                                transition={{ duration: 1, ease: 'easeOut' }}
+                                style={{ height: '100%', background: 'linear-gradient(90deg, #FF8F00 0%, #FFD54F 100%)', borderRadius: '10px' }}
+                            />
+                        </div>
+
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-light)', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <i className="fas fa-gift" style={{ color: 'var(--primary-color)' }}></i>
+                            {(user?.spicePoints || 0) < 1000 ? (
+                                `Earn ${1000 - (user?.spicePoints || 0)} more points to unlock a Complimentary Saffron Dessert! 🍧`
+                            ) : (user?.spicePoints || 0) < 2500 ? (
+                                `Earn ${2500 - (user?.spicePoints || 0)} more points to unlock a VIP Gold Member Tasting! 🥂`
+                            ) : (
+                                `Earn ${5000 - (user?.spicePoints || 0)} more points to unlock a Royal Feast Box! 🎁`
+                            )}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Active Orders Tracker */}
+            {activeOrders.length > 0 && (
+                <div style={{ padding: '0 20px 25px 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+                        <div className="pulse-dot" style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px #10B981' }}></div>
+                        <h3 style={{ margin: 0, fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontSize: '1.2rem' }}>Live Order Status</h3>
+                    </div>
+
+                    {activeOrders.map(order => {
+                        const steps = ['received', 'preparing', 'ready', 'delivered'];
+                        const currentStepIndex = steps.indexOf(order.status);
+                        
+                        return (
+                            <div key={order.id} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '25px', padding: '20px', marginBottom: '15px', boxShadow: 'var(--shadow-sm)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+                                    <div>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-light)' }}>ORDER ID</span>
+                                        <div style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--text-dark)' }}>{order.id}</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-light)' }}>TOTAL</span>
+                                        <div style={{ fontSize: '1.1rem', fontWeight: '900', color: 'var(--primary-color)' }}>₹{order.total}</div>
+                                    </div>
+                                </div>
+
+                                {/* Order Stepper */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', padding: '10px 0' }}>
+                                    {/* Connecting Line */}
+                                    <div style={{ position: 'absolute', left: '20px', right: '20px', top: '50%', height: '4px', background: 'var(--border-color)', zIndex: 1, transform: 'translateY(-50%)' }}>
+                                        <div style={{ 
+                                            height: '100%', 
+                                            width: `${(currentStepIndex / (steps.length - 1)) * 100}%`, 
+                                            background: 'var(--primary-color)', 
+                                            transition: 'width 0.5s ease-in-out' 
+                                        }}></div>
+                                    </div>
+
+                                    {/* Step Dots */}
+                                    {steps.map((step, idx) => {
+                                        const isCompleted = idx <= currentStepIndex;
+                                        const isActive = idx === currentStepIndex;
+                                        
+                                        let icon = 'fa-check';
+                                        let label = 'Received';
+                                        if (step === 'preparing') {
+                                            icon = 'fa-fire';
+                                            label = 'Cooking';
+                                        } else if (step === 'ready') {
+                                            icon = 'fa-bell';
+                                            label = 'Ready';
+                                        } else if (step === 'delivered') {
+                                            icon = 'fa-motorcycle';
+                                            label = 'Done';
+                                        }
+
+                                        return (
+                                            <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2, position: 'relative', width: '60px' }}>
+                                                <div 
+                                                    className={isActive ? 'pulsing-step' : ''}
+                                                    style={{ 
+                                                        width: '40px', 
+                                                        height: '40px', 
+                                                        borderRadius: '50%', 
+                                                        background: isCompleted ? 'var(--primary-color)' : 'var(--bg-body)', 
+                                                        border: `2px solid ${isCompleted ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                                        color: isCompleted ? '#FFF' : 'var(--text-light)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '1rem',
+                                                        boxShadow: isCompleted ? '0 4px 10px rgba(142, 28, 28, 0.25)' : 'none',
+                                                        transition: 'all 0.4s ease'
+                                                    }}
+                                                >
+                                                    {isActive && step === 'preparing' ? (
+                                                        <i className="fas fa-cookie-bite chef-pulse" style={{ fontSize: '1.1rem' }}></i>
+                                                    ) : (
+                                                        <i className={`fas ${icon}`}></i>
+                                                    )}
+                                                </div>
+                                                <span style={{ 
+                                                    fontSize: '0.75rem', 
+                                                    fontWeight: '800', 
+                                                    color: isCompleted ? 'var(--text-dark)' : 'var(--text-muted)', 
+                                                    marginTop: '8px', 
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px' 
+                                                }}>{label}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            <style>{`
+                @keyframes shimmer { 0% { left: -100% } 50% { left: 200% } 100% { left: 200% } }
+                @keyframes chefPulse {
+                    0% { transform: scale(1); opacity: 0.8; }
+                    50% { transform: scale(1.25); opacity: 1; color: #F4A261; }
+                    100% { transform: scale(1); opacity: 0.8; }
+                }
+                .chef-pulse {
+                    animation: chefPulse 1.5s infinite ease-in-out;
+                }
+                @keyframes stepPulse {
+                    0% { box-shadow: 0 0 0 0 rgba(142, 28, 28, 0.4); }
+                    70% { box-shadow: 0 0 0 8px rgba(142, 28, 28, 0); }
+                    100% { box-shadow: 0 0 0 0 rgba(142, 28, 28, 0); }
+                }
+                .pulsing-step {
+                    animation: stepPulse 1.8s infinite ease-in-out;
+                }
+                @keyframes dotPulse {
+                    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+                    70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+                    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+                }
+                .pulse-dot {
+                    animation: dotPulse 2s infinite ease-in-out;
+                }
+            `}</style>
 
             {/* More Section */}
             <div className="more-section-title" style={{ background: 'var(--bg-body)', color: 'var(--text-light)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', padding: '20px 20px 10px' }}>Account Settings</div>

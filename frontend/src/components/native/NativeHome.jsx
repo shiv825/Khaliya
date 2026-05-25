@@ -44,7 +44,44 @@ export default function NativeHome({ setActiveTab }) {
     ];
 
     return (
-        <div className="native-home">
+        <div className="native-home" style={{ position: 'relative', overflow: 'hidden' }}>
+            {/* Ambient Floating Spices */}
+            <div className="ambient-particles" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+                <span className="particle" style={{ left: '10%', animationDelay: '0s', animationDuration: '25s', fontSize: '1.2rem' }}>🌿</span>
+                <span className="particle" style={{ left: '30%', animationDelay: '4s', animationDuration: '32s', fontSize: '1.4rem' }}>🌶️</span>
+                <span className="particle" style={{ left: '50%', animationDelay: '8s', animationDuration: '28s', fontSize: '1rem' }}>✨</span>
+                <span className="particle" style={{ left: '75%', animationDelay: '2s', animationDuration: '35s', fontSize: '1.3rem' }}>🍃</span>
+                <span className="particle" style={{ left: '20%', animationDelay: '12s', animationDuration: '38s', fontSize: '0.9rem' }}>✨</span>
+                <span className="particle" style={{ left: '65%', animationDelay: '6s', animationDuration: '26s', fontSize: '1.1rem' }}>🌿</span>
+                <span className="particle" style={{ left: '85%', animationDelay: '15s', animationDuration: '30s', fontSize: '1.2rem' }}>🌶️</span>
+            </div>
+            
+            <style>{`
+                .particle {
+                    position: absolute;
+                    bottom: -50px;
+                    opacity: 0;
+                    animation: floatParticle linear infinite;
+                    filter: blur(0.5px);
+                }
+                @keyframes floatParticle {
+                    0% {
+                        transform: translateY(0) translateX(0) rotate(0deg);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 0.12;
+                    }
+                    90% {
+                        opacity: 0.12;
+                    }
+                    100% {
+                        transform: translateY(-110vh) translateX(60px) rotate(360deg);
+                        opacity: 0;
+                    }
+                }
+            `}</style>
+
             {/* Header Section */}
             <motion.div
                 className="native-header"
