@@ -16,7 +16,29 @@ import { useLanguage } from '../../context/LanguageContext';
 import '../../assets/native-style.css';
 
 export default function NativeAppShell() {
-    const [activeTab, setActiveTab] = useState('home');
+    const [activeTab, setActiveTab] = useState(() => {
+        return window.history.state?.tab || 'home';
+    });
+
+    useEffect(() => {
+        // Initialize history state with 'home' if no state exists yet
+        if (!window.history.state) {
+            window.history.replaceState({ tab: 'home' }, '');
+        }
+
+        const handlePopState = (e) => {
+            if (e.state && e.state.tab) {
+                setActiveTab(e.state.tab);
+                window.scrollTo(0, 0);
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, []);
+
     const langContext = useLanguage();
     const cartContext = useCart();
     
@@ -126,12 +148,18 @@ export default function NativeAppShell() {
 
     // Smooth scroll to top when changing tabs
     const handleTabChange = (id) => {
+        if (id === activeTab) return;
         // Haptic feedback for tab change
         if ("vibrate" in navigator) {
             navigator.vibrate(10);
         }
         setActiveTab(id);
         window.scrollTo(0, 0);
+        
+        // Push state to browser history
+        if (!window.history.state || window.history.state.tab !== id) {
+            window.history.pushState({ tab: id }, '');
+        }
     };
 
     // Component map for easy rendering
