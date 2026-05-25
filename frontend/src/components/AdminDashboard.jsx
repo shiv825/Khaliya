@@ -213,56 +213,68 @@ export default function AdminDashboard({ onLogout }) {
 
     return (
         <div className="admin-portal-wrapper admin-layout">
-            <aside className={`admin-sidebar ${!isSidebarOpen ? 'collapsed' : ''}`}>
-                <div className="sidebar-logo-container">
+            {isSidebarOpen && (
+                <div className="sidebar-backdrop" onClick={() => setIsSidebarOpen(false)}></div>
+            )}
+            
+            <aside className={`admin-sidebar ${!isSidebarOpen ? 'collapsed' : 'mobile-open'}`}>
+                <div className="sidebar-logo-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                     <h1 style={{ color: 'var(--admin-text)', fontFamily: 'var(--font-heading)', fontSize: isSidebarOpen ? '1.8rem' : '1.2rem', margin: '0 0 20px 0', fontWeight: '900' }}>
                         {isSidebarOpen ? 'Khaliya' : 'K'}
                         <span style={{ color: 'var(--admin-primary)' }}>.</span>
                     </h1>
+                    <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}>
+                        <i className="fas fa-times"></i>
+                    </button>
                 </div>
 
                 <nav className="admin-nav">
-                    <button className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+                    <button className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
                         <i className="fas fa-th-large"></i>
-                        {isSidebarOpen && <span className="nav-label">Dashboard</span>}
+                        <span className="nav-label">Dashboard</span>
                     </button>
-                    <button className={`nav-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+                    <button className={`nav-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => { setActiveTab('orders'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
                         <i className="fas fa-fire-burner"></i>
-                        {isSidebarOpen && <span className="nav-label">Live Orders</span>}
-                        {isSidebarOpen && pendingOrdersCount > 0 && <span className="nav-badge">{pendingOrdersCount}</span>}
+                        <span className="nav-label">Live Orders</span>
+                        {pendingOrdersCount > 0 && <span className="nav-badge">{pendingOrdersCount}</span>}
                     </button>
-                    <button className={`nav-tab ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>
+                    <button className={`nav-tab ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => { setActiveTab('menu'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
                         <i className="fas fa-hamburger"></i>
-                        {isSidebarOpen && <span className="nav-label">Menu Setup</span>}
+                        <span className="nav-label">Menu Setup</span>
                     </button>
-                    <button className={`nav-tab ${activeTab === 'bookings' ? 'active' : ''}`} onClick={() => setActiveTab('bookings')}>
+                    <button className={`nav-tab ${activeTab === 'bookings' ? 'active' : ''}`} onClick={() => { setActiveTab('bookings'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
                         <i className="fas fa-calendar-check"></i>
-                        {isSidebarOpen && <span className="nav-label">Reservations</span>}
+                        <span className="nav-label">Reservations</span>
                     </button>
-                    <button className={`nav-tab ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>
+                    <button className={`nav-tab ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => { setActiveTab('reviews'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
                         <i className="fas fa-star"></i>
-                        {isSidebarOpen && <span className="nav-label">Feedback</span>}
+                        <span className="nav-label">Feedback</span>
                     </button>
                 </nav>
 
                 <button className="nav-tab" onClick={handleLogout} style={{ color: 'var(--admin-danger)', marginTop: 'auto' }}>
                     <i className="fas fa-sign-out-alt"></i>
-                    {isSidebarOpen && <span>Sign Out</span>}
+                    <span className="nav-label">Sign Out</span>
                 </button>
             </aside>
 
-            <main className="admin-main-content" style={{ padding: 0 }}>
+            <main className={`admin-main-content ${!isSidebarOpen ? 'expanded' : ''}`} style={{ padding: 0 }}>
                 {/* SAAS TOP HEADER */}
                 <div className="saas-top-header">
-                    <div className="saas-search-bar">
-                        <i className="fas fa-search" style={{ color: 'var(--admin-text-muted)' }}></i>
-                        <input type="text" placeholder="Search orders, customers..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                    <div className="saas-top-header-left">
+                        <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(true)}>
+                            <i className="fas fa-bars"></i>
+                        </button>
+                        <div className="saas-search-bar">
+                            <i className="fas fa-search" style={{ color: 'var(--admin-text-muted)' }}></i>
+                            <input type="text" placeholder="Search orders, customers..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                        </div>
                     </div>
                     
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <div className="saas-top-header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                         <div className={`saas-status-toggle ${settings.isOpen ? 'open' : 'closed'}`} onClick={toggleStoreStatus}>
                             <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'currentColor' }}></div>
-                            {settings.isOpen ? 'Accepting Orders' : 'Store Closed'}
+                            <span>{settings.isOpen ? 'Accepting Orders' : 'Store Closed'}</span>
                         </div>
                         <div style={{ position: 'relative', cursor: 'pointer' }}>
                             <i className="fas fa-bell" style={{ fontSize: '1.2rem', color: 'var(--admin-text-muted)' }}></i>
