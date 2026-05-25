@@ -17,18 +17,18 @@ const PWAManager = {
         PWAManager.setupLaterButton();
         PWAManager.listenForLanguageChanges();
     },
-
     registerServiceWorker: () => {
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
+            const register = () => {
+                const isGithubPages = window.location.pathname.startsWith('/Khaliya-Restaurant');
+                const swPath = isGithubPages ? '/Khaliya-Restaurant/service-worker.js' : '/service-worker.js';
+                
+                console.log('🔍 [PWA] Registering Service Worker at:', swPath);
+                navigator.serviceWorker.register(swPath)
                     .then(reg => {
                         console.log('✅ [PWA] Service Worker registered:', reg.scope);
-                        
-                        // Force check for updates immediately on load
                         reg.update();
-
-                        // Listener for when a new service worker is found
+                        
                         reg.addEventListener('updatefound', () => {
                             const newWorker = reg.installing;
                             newWorker.addEventListener('statechange', () => {
@@ -41,9 +41,14 @@ const PWAManager = {
                     })
                     .catch(err => {
                         console.error('❌ [PWA] SW Registration failed:', err);
-                        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
                     });
-            });
+            };
+
+            if (document.readyState === 'complete') {
+                register();
+            } else {
+                window.addEventListener('load', register);
+            }
 
             // Handle the case where the service worker has already updated but needs a refresh
             let refreshing = false;
@@ -56,7 +61,6 @@ const PWAManager = {
             });
         }
     },
-
     setupInstallPrompt: () => {
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('📥 [PWA] beforeinstallprompt event fired');
