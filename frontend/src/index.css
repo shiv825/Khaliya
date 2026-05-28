@@ -115,3 +115,8 @@ button:focus-visible {
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 }
+
+/* Ensure SweetAlert2 overlays correctly on top of all modals/bottom sheets */
+.swal2-container {
+  z-index: 10000 !important;
+}

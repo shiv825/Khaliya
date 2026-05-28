@@ -1,6 +1,6 @@
 const fs = require('fs');
-const pathJSON = 'c:\\Users\\SHIV KUMAR\\OneDrive\\Desktop\\Khaliya-React-Node-Migrated\\backend\\menu.json';
-const pathJSX = 'c:\\Users\\SHIV KUMAR\\OneDrive\\Desktop\\Khaliya-React-Node-Migrated\\frontend\\src\\components\\Menu.jsx';
+const pathJSON = './backend/menu.json';
+const pathJSX = './frontend/src/components/Menu.jsx';
 
 const menuArray = JSON.parse(fs.readFileSync(pathJSON, 'utf8'));
 const replacementStr = 'const getFallbackMenu = () => ' + JSON.stringify(menuArray, null, 8) + ';';

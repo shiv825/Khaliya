@@ -12,6 +12,7 @@ export default function NativeCart() {
     const [isOrdered, setIsOrdered] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [tableNumber, setTableNumber] = useState('');
+    const [latestOrderId, setLatestOrderId] = useState(null);
 
     const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
     const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
@@ -24,6 +25,16 @@ export default function NativeCart() {
 
     const handleCheckout = async () => {
         if (cart.length === 0) return;
+        
+        if (!tableNumber || tableNumber.trim() === '') {
+            Swal.fire({
+                title: 'Table Number Required',
+                text: 'Please enter your table number to proceed with the order.',
+                icon: 'warning',
+                confirmButtonColor: 'var(--primary-color)'
+            });
+            return;
+        }
         
         setIsProcessing(true);
         try {
@@ -42,7 +53,7 @@ export default function NativeCart() {
                     name: user.name,
                     email: user.email || 'guest@khaliya.luxury',
                     phone: user.phone || 'N/A',
-                    address: `Table: ${tableNumber || 'Takeaway/Pickup'}`
+                    address: `Table: ${tableNumber}`
                 },
                 source: 'Native App v2'
             };
@@ -54,6 +65,7 @@ export default function NativeCart() {
             }
             
             setIsProcessing(false);
+            setLatestOrderId(res.data.order.id);
             setIsOrdered(true);
             clearCart();
             
@@ -71,7 +83,7 @@ export default function NativeCart() {
     };
 
     if (isOrdered) {
-        return <NativeOrder onClose={() => setIsOrdered(false)} />;
+        return <NativeOrder onClose={() => setIsOrdered(false)} orderId={latestOrderId} />;
     }
 
     return (
@@ -170,10 +182,10 @@ export default function NativeCart() {
                             <div style={{ height: '1px', background: 'var(--border-color)', marginBottom: '20px' }}></div>
                             
                             <div style={{ marginBottom: '25px' }}>
-                                <label style={{ display: 'block', color: 'var(--text-dark)', fontWeight: '700', marginBottom: '8px', fontSize: '1.1rem' }}>Dine-in Table Number (Optional)</label>
+                                <label style={{ display: 'block', color: 'var(--text-dark)', fontWeight: '700', marginBottom: '8px', fontSize: '1.1rem' }}>Table Number *</label>
                                 <input 
                                     type="text" 
-                                    placeholder="e.g. 12 or VIP Lounge" 
+                                    placeholder="e.g. 12" 
                                     value={tableNumber}
                                     onChange={(e) => setTableNumber(e.target.value)}
                                     style={{
@@ -226,7 +238,7 @@ export default function NativeCart() {
                                         PROCESSING...
                                     </>
                                 ) : (
-                                    'Secure Checkout'
+                                    'Place Order'
                                 )}
                             </motion.button>
                         </motion.div>

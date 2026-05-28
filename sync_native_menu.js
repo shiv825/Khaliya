@@ -1,10 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const menuPath = 'c:\\Users\\SHIV KUMAR\\OneDrive\\Desktop\\Khaliya-React-Node-Migrated\\frontend\\src\\components\\Menu.jsx';
-const nativeMenuPath = 'c:\\Users\\SHIV KUMAR\\OneDrive\\Desktop\\Khaliya-React-Node-Migrated\\frontend\\src\\components\\native\\NativeMenu.jsx';
-
-const syncNativeMenuPath = 'c:\\Users\\SHIV KUMAR\\khaliya reactjs,node js\\frontend\\src\\components\\native\\NativeMenu.jsx';
+const menuPath = './frontend/src/components/Menu.jsx';
+const nativeMenuPath = './frontend/src/components/native/NativeMenu.jsx';
+const syncNativeMenuPath = './frontend/src/components/native/NativeMenu.jsx';
 
 let menuContent = fs.readFileSync(menuPath, 'utf8');
 let nativeContent = fs.readFileSync(nativeMenuPath, 'utf8');

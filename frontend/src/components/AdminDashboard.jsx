@@ -41,7 +41,9 @@ export default function AdminDashboard({ onLogout }) {
     
     const navigate = useNavigate();
 
-    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
     const lastBookingId = useRef(null);
     const lastOrderId = useRef(null);
 
@@ -155,11 +157,60 @@ export default function AdminDashboard({ onLogout }) {
 
     const updateStatus = async (type, id, status) => {
         try {
-            await axios.put(`${API_URL}/${type}/${id}`, { status });
+            let estimatedTime = null;
+            if (type === 'orders' && status === 'preparing') {
+                const order = orders.find(o => o.id === id);
+                let maxPrepTime = 15; // default 15 min
+                
+                if (order && order.items) {
+                    order.items.forEach(item => {
+                        const menuItem = menu.find(m => 
+                            m.name === item.name || 
+                            (m.name && m.name.en === item.name)
+                        );
+                        let itemTime = 15;
+                        if (menuItem) {
+                            const cat = (menuItem.category || '').toLowerCase();
+                            if (cat.includes('main')) itemTime = 25;
+                            else if (cat.includes('appetizer') || cat.includes('starter')) itemTime = 15;
+                            else if (cat.includes('bread')) itemTime = 10;
+                            else if (cat.includes('dessert')) itemTime = 10;
+                            else if (cat.includes('beverage')) itemTime = 5;
+                        } else {
+                            const n = (item.name || '').toLowerCase();
+                            if (n.includes('chicken') || n.includes('mutton') || n.includes('paneer') || n.includes('biryani') || n.includes('masala')) itemTime = 25;
+                            else if (n.includes('naan') || n.includes('roti') || n.includes('paratha')) itemTime = 10;
+                        }
+                        if (itemTime > maxPrepTime) maxPrepTime = itemTime;
+                    });
+                    if (order.items.length > 3) maxPrepTime += 5; // buffer for large orders
+                }
+
+                const { value: timeStr } = await Swal.fire({
+                    title: 'Preparation Time',
+                    input: 'number',
+                    inputLabel: 'Estimated minutes for these dishes',
+                    inputValue: maxPrepTime,
+                    showCancelButton: true,
+                    inputValidator: (value) => {
+                        if (!value) return 'Please enter the estimated time!';
+                    }
+                });
+                
+                if (!timeStr) return; // cancelled
+                estimatedTime = parseInt(timeStr, 10);
+            }
+
+            const payload = { status };
+            if (estimatedTime) {
+                payload.estimatedTime = estimatedTime;
+            }
+
+            await axios.put(`${API_URL}/${type}/${id}`, payload);
             if (type === 'bookings') {
-                setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+                setBookings(prev => prev.map(b => b.id === id ? { ...b, ...payload } : b));
             } else {
-                setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+                setOrders(prev => prev.map(o => o.id === id ? { ...o, ...payload } : o));
             }
         } catch (err) {
             Swal.fire('Error', 'Update failed', 'error');

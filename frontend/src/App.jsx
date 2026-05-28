@@ -26,7 +26,9 @@ function App() {
   useEffect(() => {
     // Log visit
     const source = isAppMode ? 'App' : 'Website';
-    const API_URL = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '/api';
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
     fetch(`${API_URL}/visits`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

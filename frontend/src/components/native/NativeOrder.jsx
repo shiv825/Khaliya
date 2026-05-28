@@ -1,22 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
-export default function NativeOrder({ onClose }) {
+export default function NativeOrder({ onClose, orderId }) {
     const [step, setStep] = useState(1);
+    const [estimatedTime, setEstimatedTime] = useState(null);
     
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
     useEffect(() => {
-        // Simulate order progression
-        const t1 = setTimeout(() => setStep(2), 3000); // Kitchen prepping
-        const t2 = setTimeout(() => setStep(3), 7000); // Out for delivery
-        const t3 = setTimeout(() => setStep(4), 12000); // Delivered
-        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-    }, []);
+        if (!orderId) return;
+
+        const fetchStatus = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/orders`);
+                const order = res.data.find(o => o.id === orderId);
+                if (order) {
+                    if (order.status === 'received') setStep(1);
+                    else if (order.status === 'preparing') setStep(2);
+                    else if (order.status === 'ready') setStep(3);
+                    else if (order.status === 'delivered') setStep(4);
+                    
+                    if (order.estimatedTime) {
+                        setEstimatedTime(order.estimatedTime);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch live order status");
+            }
+        };
+
+        fetchStatus();
+        const interval = setInterval(fetchStatus, 3000);
+        return () => clearInterval(interval);
+    }, [orderId, API_URL]);
 
     const steps = [
         { id: 1, title: 'Order Confirmed', icon: 'fa-check-circle', color: 'var(--spice-emerald)' },
         { id: 2, title: 'Preparing in Kitchen', icon: 'fa-fire-burner', color: 'var(--spice-saffron)' },
-        { id: 3, title: 'Out for Delivery', icon: 'fa-motorcycle', color: '#3F51B5' },
-        { id: 4, title: 'Delivered', icon: 'fa-box-open', color: 'var(--primary-color)' }
+        { id: 3, title: 'Dish has arrived at your table', icon: 'fa-concierge-bell', color: '#3F51B5' },
+        { id: 4, title: 'Delivered', icon: 'fa-check-double', color: 'var(--primary-color)' }
     ];
 
     return (
@@ -43,7 +68,7 @@ export default function NativeOrder({ onClose }) {
                     <div style={{ textAlign: 'center', marginBottom: '45px' }}>
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '800' }}>{step === 4 ? 'DELIVERY COMPLETED' : 'EXPECTED ARRIVAL'}</div>
                         <div style={{ fontSize: '3.4rem', fontWeight: '900', color: steps[step-1].color, marginTop: '12px', fontFamily: 'var(--font-heading)' }}>
-                            {step === 4 ? 'Arrived!' : '25-30 min'}
+                            {step === 4 ? 'Arrived!' : (estimatedTime ? `${estimatedTime} min` : 'Pending...')}
                         </div>
                     </div>
 

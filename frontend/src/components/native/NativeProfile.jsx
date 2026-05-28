@@ -14,6 +14,128 @@ export default function NativeProfile() {
     const [feedbackText, setFeedbackText] = useState('');
     const [orders, setOrders] = useState([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+
+    // Dynamic states for Push Notifications and Offline Mode
+    const [pushEnabled, setPushEnabled] = useState(() => {
+        if ('Notification' in window) {
+            return Notification.permission === 'granted';
+        }
+        return localStorage.getItem('khaliya_push_notifications') === 'true';
+    });
+
+    const [offlineMode, setOfflineMode] = useState(() => {
+        return localStorage.getItem('khaliya_offline_mode') === 'true' || !navigator.onLine;
+    });
+
+    // Monitor browser online/offline status
+    useEffect(() => {
+        const handleOnline = () => {
+            if (localStorage.getItem('khaliya_offline_mode') !== 'true') {
+                setOfflineMode(false);
+            }
+        };
+        const handleOffline = () => {
+            setOfflineMode(true);
+        };
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
+
+    // Toggle Push Notifications
+    const handleTogglePush = async () => {
+        if (!('Notification' in window)) {
+            Swal.fire({
+                title: 'Not Supported',
+                text: 'Push notifications are not supported on this browser/device.',
+                icon: 'info',
+                confirmButtonColor: 'var(--primary-color)'
+            });
+            return;
+        }
+
+        if (pushEnabled) {
+            setPushEnabled(false);
+            localStorage.setItem('khaliya_push_notifications', 'false');
+            Swal.fire({
+                title: 'Notifications Disabled',
+                text: 'You have disabled push notifications for this session.',
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        } else {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                setPushEnabled(true);
+                localStorage.setItem('khaliya_push_notifications', 'true');
+                
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.showNotification("Khaliya Restaurant", {
+                            body: "Notifications enabled! You will now receive royal updates. 🔔",
+                            icon: "/pwa-icon-192.png",
+                            badge: "/pwa-icon-192.png"
+                        });
+                    }).catch(() => {
+                        new Notification("Khaliya Restaurant", {
+                            body: "Notifications enabled! You will now receive royal updates. 🔔",
+                            icon: "/pwa-icon-192.png"
+                        });
+                    });
+                } else {
+                    new Notification("Khaliya Restaurant", {
+                        body: "Notifications enabled! You will now receive royal updates. 🔔"
+                    });
+                }
+            } else {
+                Swal.fire({
+                    title: 'Permission Denied',
+                    text: 'Please enable notification permissions in your browser settings to receive updates.',
+                    icon: 'warning',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+            }
+        }
+    };
+
+    // Toggle Offline Mode
+    const handleToggleOffline = () => {
+        const nextState = !offlineMode;
+        setOfflineMode(nextState);
+        localStorage.setItem('khaliya_offline_mode', String(nextState));
+
+        if (nextState) {
+            Swal.fire({
+                title: 'Offline Mode Activated',
+                text: 'The app will now operate in offline mode, prioritizing cached data.',
+                icon: 'info',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            window.dispatchEvent(new CustomEvent('khaliya-offline-change', { detail: { offline: true } }));
+        } else {
+            Swal.fire({
+                title: 'Online Mode Restored',
+                text: 'The app is now synced with the live servers.',
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            window.dispatchEvent(new CustomEvent('khaliya-offline-change', { detail: { offline: false } }));
+        }
+    };
     
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     let user = { name: 'Guest', email: '', phone: '', spicePoints: 0 };
@@ -93,8 +215,8 @@ export default function NativeProfile() {
 
     const handleAppLogout = () => {
         Swal.fire({
-            title: t('reviews.signOut'),
-            text: t('reviews.signOutConfirm'),
+            title: t('reviews.signOut', 'Sign Out'),
+            text: t('reviews.signOutConfirm', 'Are you sure you want to sign out?'),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: 'var(--primary-color)',
@@ -573,14 +695,68 @@ export default function NativeProfile() {
 
                             {activeModal === 'settings' && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                    {/* Push Notifications Toggle */}
                                     <div style={{ padding: '20px', background: 'var(--bg-surface)', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontWeight: '700' }}>Push Notifications</span>
-                                        <div style={{ width: '40px', height: '20px', background: 'var(--primary-color)', borderRadius: '10px' }}></div>
+                                        <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>Push Notifications</span>
+                                        <div 
+                                            onClick={handleTogglePush}
+                                            style={{ 
+                                                width: '45px', 
+                                                height: '24px', 
+                                                background: pushEnabled ? 'var(--primary-color)' : '#D1D5DB', 
+                                                borderRadius: '12px', 
+                                                padding: '2px', 
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: pushEnabled ? 'flex-end' : 'flex-start',
+                                                cursor: 'pointer',
+                                                transition: 'background-color 0.3s ease'
+                                            }}
+                                        >
+                                            <motion.div 
+                                                layout 
+                                                style={{ 
+                                                    width: '20px', 
+                                                    height: '20px', 
+                                                    background: '#FFFFFF', 
+                                                    borderRadius: '50%',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                                }} 
+                                            />
+                                        </div>
                                     </div>
+
+                                    {/* Offline Mode Toggle */}
                                     <div style={{ padding: '20px', background: 'var(--bg-surface)', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontWeight: '700' }}>Offline Mode</span>
-                                        <div style={{ width: '40px', height: '20px', background: 'var(--border-color)', borderRadius: '10px' }}></div>
+                                        <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>Offline Mode</span>
+                                        <div 
+                                            onClick={handleToggleOffline}
+                                            style={{ 
+                                                width: '45px', 
+                                                height: '24px', 
+                                                background: offlineMode ? 'var(--primary-color)' : '#D1D5DB', 
+                                                borderRadius: '12px', 
+                                                padding: '2px', 
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: offlineMode ? 'flex-end' : 'flex-start',
+                                                cursor: 'pointer',
+                                                transition: 'background-color 0.3s ease'
+                                            }}
+                                        >
+                                            <motion.div 
+                                                layout 
+                                                style={{ 
+                                                    width: '20px', 
+                                                    height: '20px', 
+                                                    background: '#FFFFFF', 
+                                                    borderRadius: '50%',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                                }} 
+                                            />
+                                        </div>
                                     </div>
+
                                     <div 
                                         onClick={handleAppLogout}
                                         style={{ padding: '20px', background: 'rgba(142, 28, 28, 0.05)', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', border: '1px solid var(--primary-color)', cursor: 'pointer' }}

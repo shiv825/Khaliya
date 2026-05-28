@@ -431,7 +431,7 @@
         "tags": [
             "veg"
         ],
-        "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&fit=crop"
+        "image": "https://images.unsplash.com/photo-1512149177596-f817c7ef5d4c?w=500&fit=crop"
     },
     {
         "category": "Beverage",
@@ -542,7 +542,7 @@
             "veg",
             "spicy-2"
         ],
-        "image": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=500&fit=crop"
+        "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&fit=crop"
     },
     {
         "category": "Main Course",
@@ -618,7 +618,7 @@
             "veg",
             "spicy-1"
         ],
-        "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+        "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&fit=crop"
     },
     {
         "category": "Main Course",
@@ -655,7 +655,7 @@
         "tags": [
             "veg"
         ],
-        "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&fit=crop"
+        "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&fit=crop"
     },
     {
         "category": "Bread",
@@ -673,7 +673,7 @@
         "tags": [
             "veg"
         ],
-        "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop"
+        "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
     },
     {
         "category": "Bread",
@@ -727,7 +727,7 @@
         "tags": [
             "veg"
         ],
-        "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+        "image": "https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=500&fit=crop"
     },
     {
         "category": "Dessert",

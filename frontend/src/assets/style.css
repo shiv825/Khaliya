@@ -874,3 +874,8 @@ footer .copyright span {
 [dir="rtl"] .route-btn i {
     transform: rotate(180deg);
 }
+
+/* Force SweetAlert2 on top of PWA sliding sheets and modals */
+.swal2-container {
+    z-index: 99999 !important;
+}

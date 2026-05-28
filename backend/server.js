@@ -380,18 +380,30 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
 app.post('/api/auth/check-session', (req, res) => {
     const { email, sessionId } = req.body;
     if (!email || !sessionId) {
-        return res.status(400).json({ success: false, message: 'Email and Session ID are required' });
-    }
-    
-    const users = readData('users.json');
-    const user = users.find(u => u.email === email.toLowerCase());
-    
-    if (!user) {
-        return res.json({ success: true, valid: false, message: 'User not found' });
+        return res.json({ success: true, valid: false, message: 'Email and Session ID are required' });
     }
     
     if (email.toLowerCase() === 'shivkumarrdn7@gmail.com') {
         return res.json({ success: true, valid: true });
+    }
+    
+    const users = readData('users.json');
+    let user = users.find(u => u.email === email.toLowerCase());
+    
+    if (!user) {
+        // Ephemeral storage fallback: restore user session if they don't exist
+        user = {
+            id: `USR-${Date.now()}`,
+            email: email.toLowerCase(),
+            name: 'Khaliya Member',
+            joinedAt: new Date().toISOString(),
+            spicePoints: 750,
+            role: 'customer',
+            currentSessionId: sessionId
+        };
+        users.push(user);
+        writeData('users.json', users);
+        return res.json({ success: true, valid: true, message: 'User restored' });
     }
     
     const isValid = user.currentSessionId === sessionId;
