@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Swal from 'sweetalert2';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import '../assets/admin-style.css';
 
 const playDing = () => {
@@ -38,6 +38,7 @@ export default function AdminDashboard({ onLogout }) {
     
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
+    const [modalLang, setModalLang] = useState('en');
     
     const navigate = useNavigate();
 
@@ -262,6 +263,19 @@ export default function AdminDashboard({ onLogout }) {
 
     const filteredOrders = orders.filter(o => o.id.includes(searchQuery) || (o.user?.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
 
+    const pieColors = ['#E63946', '#FF9F1C', '#2A9D8F', '#264653', '#E9C46A'];
+    const categorySales = {};
+    orders.forEach(o => {
+        if(o.status !== 'cancelled') {
+            o.items?.forEach(i => {
+                const menuItem = menu.find(m => m.name === i.name || (m.name && m.name.en === i.name));
+                const cat = menuItem?.category || 'Other';
+                categorySales[cat] = (categorySales[cat] || 0) + i.quantity;
+            });
+        }
+    });
+    const pieData = Object.keys(categorySales).map(key => ({ name: key, value: categorySales[key] })).filter(d => d.value > 0);
+
     return (
         <div className="admin-portal-wrapper admin-layout">
             {isSidebarOpen && (
@@ -363,12 +377,12 @@ export default function AdminDashboard({ onLogout }) {
                                     </div>
                                     <div className="hero-card">
                                         <div className="hero-card-title">Top Selling Item</div>
-                                        <div className="hero-card-value" style={{ fontSize: '1.2rem', marginTop: '10px' }}>{analytics?.topItem?.name || 'Loading...'}</div>
+                                        <div className="hero-card-value" style={{ fontSize: '1.2rem', marginTop: '10px' }}>{typeof analytics?.topItem?.name === 'object' ? analytics.topItem.name.en : (analytics?.topItem?.name || 'Loading...')}</div>
                                         <div className="hero-card-trend" style={{ color: 'var(--admin-primary)' }}>🔥 {analytics?.topItem?.sold || 0} sold today</div>
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+                                <div className="admin-charts-grid">
                                     <div className="hero-card" style={{ height: '400px' }}>
                                         <h3 style={{ margin: '0 0 20px 0' }}>Hourly Rush (Orders Today)</h3>
                                         {analytics?.hourlyRush && analytics.hourlyRush.length > 0 ? (
@@ -386,27 +400,29 @@ export default function AdminDashboard({ onLogout }) {
                                         )}
                                     </div>
                                     <div className="hero-card" style={{ height: '400px' }}>
-                                        <h3 style={{ margin: '0 0 20px 0' }}>Platform Overview</h3>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                            <div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                                    <span style={{ fontWeight: 600 }}><i className="fas fa-mobile-alt"></i> App Visitors</span>
-                                                    <span>{analytics?.visitors?.app || 0}</span>
-                                                </div>
-                                                <div style={{ width: '100%', height: 8, background: '#eee', borderRadius: 4 }}>
-                                                    <div style={{ width: '60%', height: '100%', background: 'var(--admin-accent)', borderRadius: 4 }}></div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                                    <span style={{ fontWeight: 600 }}><i className="fas fa-globe"></i> Web Visitors</span>
-                                                    <span>{analytics?.visitors?.website || 0}</span>
-                                                </div>
-                                                <div style={{ width: '100%', height: 8, background: '#eee', borderRadius: 4 }}>
-                                                    <div style={{ width: '40%', height: '100%', background: 'var(--admin-primary)', borderRadius: 4 }}></div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <h3 style={{ margin: '0 0 20px 0' }}>Sales by Category</h3>
+                                        {pieData.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={pieData}
+                                                        cx="50%"
+                                                        cy="50%"
+                                                        innerRadius={60}
+                                                        outerRadius={80}
+                                                        paddingAngle={5}
+                                                        dataKey="value"
+                                                    >
+                                                        {pieData.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                                                        ))}
+                                                    </Pie>
+                                                    <Tooltip />
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--admin-text-muted)' }}>Not enough data for chart</div>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>
@@ -415,30 +431,64 @@ export default function AdminDashboard({ onLogout }) {
                         {/* LIVE ORDERS SPLIT SCREEN */}
                         {activeTab === 'orders' && (
                             <motion.div key="orders" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="split-screen">
-                                <div className="split-left">
-                                    <h2 style={{ marginTop: 0, marginBottom: 20 }}>Order Tracker</h2>
-                                    <div className="kanban-board">
-                                        {filteredOrders.length === 0 ? <p>No orders found.</p> : filteredOrders.map(o => (
-                                            <div key={o.id} className={`kanban-card status-${o.status}`}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                    <h3 style={{ margin: 0 }}>{o.user?.name || 'Guest'} <span style={{ fontSize: '0.8rem', color: '#666' }}>#{o.id.substring(0,6)}</span></h3>
-                                                    <span className={`item-badge badge-${o.status === 'received' ? 'pending' : 'confirmed'}`}>{o.status.toUpperCase()}</span>
-                                                </div>
-                                                <div style={{ fontSize: '0.9rem', color: '#555' }}>
-                                                    {o.items?.map((i, idx) => (
-                                                        <div key={idx}><b>{i.quantity}x</b> {i.name}</div>
-                                                    ))}
-                                                </div>
-                                                <div style={{ display: 'flex', gap: '10px', marginTop: 10 }}>
-                                                    {o.status === 'received' && <button onClick={() => updateStatus('orders', o.id, 'preparing')} className="action-btn btn-primary" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Start Cooking</button>}
-                                                    {o.status === 'preparing' && <button onClick={() => updateStatus('orders', o.id, 'ready')} className="action-btn btn-confirm" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Mark Ready</button>}
-                                                    {o.status === 'ready' && <button onClick={() => updateStatus('orders', o.id, 'delivered')} className="action-btn" style={{ padding: '8px 15px', fontSize: '0.8rem', background: '#333', color: '#FFF' }}>Complete</button>}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <div className="split-left kanban-grid">
+                                    {['received', 'preparing', 'ready'].map(status => (
+                                        <div 
+                                            key={status} 
+                                            className="kanban-column" 
+                                            style={{ display: 'flex', flexDirection: 'column', gap: '15px', padding: '10px', borderRadius: '15px', background: 'rgba(0,0,0,0.02)' }}
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                const orderId = e.dataTransfer.getData('orderId');
+                                                if (orderId) updateStatus('orders', orderId, status);
+                                            }}
+                                        >
+                                            <h2 style={{ marginTop: 0, marginBottom: 10, fontSize: '1.2rem', textTransform: 'capitalize' }}>
+                                                {status === 'received' ? 'New Orders' : status}
+                                            </h2>
+                                            {filteredOrders.filter(o => o.status === status).length === 0 ? (
+                                                <p style={{ color: 'var(--admin-text-muted)' }}>No orders</p>
+                                            ) : (
+                                                filteredOrders.filter(o => o.status === status).map(o => (
+                                                    <div 
+                                                        key={o.id} 
+                                                        className={`kanban-card status-${o.status}`}
+                                                        draggable
+                                                        onDragStart={(e) => e.dataTransfer.setData('orderId', o.id)}
+                                                        style={{ cursor: 'grab' }}
+                                                    >
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                            <h3 style={{ margin: 0 }}>{o.user?.name || 'Guest'} <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>#{o.id.substring(0,6)}</span></h3>
+                                                            <span className={`item-badge badge-${o.status === 'received' ? 'pending' : 'confirmed'}`}>{o.status.toUpperCase()}</span>
+                                                        </div>
+                                                        <div style={{ fontSize: '0.95rem', color: 'var(--admin-text)', marginTop: '10px' }}>
+                                                            {o.items?.map((i, idx) => {
+                                                                const isVeg = menu.find(m => m.name?.en === i.name || m.name === i.name)?.tags?.includes('veg');
+                                                                const isNonVeg = menu.find(m => m.name?.en === i.name || m.name === i.name)?.tags?.includes('non-veg');
+                                                                return (
+                                                                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0', borderBottom: '1px dashed var(--admin-border)' }}>
+                                                                        <span style={{ fontWeight: '800', color: 'var(--admin-primary)', minWidth: '24px' }}>{i.quantity}x</span> 
+                                                                        <span style={{ flex: 1 }}>{typeof i.name === 'object' ? i.name.en : i.name}</span>
+                                                                        {isVeg && <span title="Vegetarian" style={{ fontSize: '0.8rem', filter: 'drop-shadow(0 0 3px rgba(0,255,0,0.4))' }}>🌱</span>}
+                                                                        {isNonVeg && <span title="Non-Vegetarian" style={{ fontSize: '0.8rem', filter: 'drop-shadow(0 0 3px rgba(255,0,0,0.4))' }}>🍖</span>}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                        <div style={{ display: 'flex', gap: '10px', marginTop: 10, flexWrap: 'wrap' }}>
+                                                            {o.status === 'received' && <button onClick={() => updateStatus('orders', o.id, 'preparing')} className="action-btn btn-primary" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Start Cooking</button>}
+                                                            {o.status === 'preparing' && <button onClick={() => updateStatus('orders', o.id, 'ready')} className="action-btn btn-confirm" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Mark Ready</button>}
+                                                            {o.status === 'ready' && <button onClick={() => updateStatus('orders', o.id, 'delivered')} className="action-btn" style={{ padding: '8px 15px', fontSize: '0.8rem', background: 'var(--admin-bg)', color: '#FFF' }}>Complete</button>}
+                                                            {(o.status === 'received' || o.status === 'preparing') && <button onClick={() => updateStatus('orders', o.id, 'cancelled')} className="action-btn btn-cancel" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Cancel</button>}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="split-right">
+                                <div className="split-right" style={{ flex: 2 }}>
                                     <h3 style={{ marginTop: 0 }}>Kitchen Load</h3>
                                     <div style={{ width: '100%', height: 10, background: '#eee', borderRadius: 5, marginBottom: 5 }}>
                                         <div style={{ width: `${kitchenLoad}%`, height: '100%', background: kitchenLoad > 80 ? 'var(--admin-danger)' : 'var(--admin-accent)', borderRadius: 5, transition: 'width 0.5s' }}></div>
@@ -448,7 +498,7 @@ export default function AdminDashboard({ onLogout }) {
                                     <h3>Stock Alerts</h3>
                                     {outOfStockItems.length === 0 ? <p style={{ fontSize: '0.9rem', color: '#666' }}>All items in stock.</p> : (
                                         <ul style={{ paddingLeft: 20, margin: 0, color: 'var(--admin-danger)', fontSize: '0.9rem' }}>
-                                            {outOfStockItems.map(m => <li key={m.id}>{m.name}</li>)}
+                                            {outOfStockItems.map(m => <li key={m.id}>{typeof m.name === 'object' ? m.name.en : m.name}</li>)}
                                         </ul>
                                     )}
                                 </div>
@@ -460,7 +510,18 @@ export default function AdminDashboard({ onLogout }) {
                             <motion.div key="menu" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
                                     <h2 style={{ margin: 0 }}>Menu Catalog</h2>
-                                    <button onClick={() => { setEditingItem({ name: '', price: '', category: 'Starters', description: '', available: true, image: '' }); setIsModalOpen(true); }} className="action-btn btn-primary">
+                                    <button onClick={() => { 
+                                        setEditingItem({ 
+                                            name: { en: '', hi: '', ar: '' }, 
+                                            description: { en: '', hi: '', ar: '' }, 
+                                            price: '', 
+                                            category: 'Starters', 
+                                            available: true, 
+                                            image: '' 
+                                        }); 
+                                        setModalLang('en');
+                                        setIsModalOpen(true); 
+                                    }} className="action-btn btn-primary">
                                         + Add Item
                                     </button>
                                 </div>
@@ -470,7 +531,7 @@ export default function AdminDashboard({ onLogout }) {
                                             <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
                                                 {item.image ? <img src={item.image} className="menu-list-image" alt="dish" /> : <div className="menu-list-image" style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-image" style={{ color: '#ccc' }}></i></div>}
                                                 <div>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{item.name}</div>
+                                                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{typeof item.name === 'object' ? item.name.en : item.name}</div>
                                                     <div style={{ color: 'var(--admin-primary)', fontWeight: 'bold' }}>₹{item.price}</div>
                                                 </div>
                                             </div>
@@ -479,7 +540,15 @@ export default function AdminDashboard({ onLogout }) {
                                                     <span style={{ fontSize: '0.85rem', color: '#666', width: 60, textAlign: 'right' }}>{item.available ? 'In Stock' : 'Out'}</span>
                                                     <div className={`toggle-switch ${item.available ? 'on' : ''}`} onClick={() => toggleMenuItem(item)}></div>
                                                 </div>
-                                                <button onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--admin-accent)' }}><i className="fas fa-edit"></i></button>
+                                                <button onClick={() => { 
+                                                    setEditingItem({
+                                                        ...item,
+                                                        name: typeof item.name === 'string' ? { en: item.name, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.name || {}) },
+                                                        description: typeof item.description === 'string' ? { en: item.description, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.description || {}) }
+                                                    }); 
+                                                    setModalLang('en');
+                                                    setIsModalOpen(true); 
+                                                }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--admin-accent)' }}><i className="fas fa-edit"></i></button>
                                                 <button onClick={() => handleDeleteMenu(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--admin-danger)' }}><i className="fas fa-trash"></i></button>
                                             </div>
                                         </div>
@@ -528,7 +597,7 @@ export default function AdminDashboard({ onLogout }) {
                                             <h3 style={{ margin: 0 }}>{r.name || 'Guest'}</h3>
                                             <span style={{ color: '#888' }}>{new Date(r.date || r.id).toLocaleDateString()}</span>
                                         </div>
-                                        <p style={{ margin: 0, fontStyle: 'italic', background: '#F9FAFB', padding: 15, borderRadius: 8 }}>"{r.text}"</p>
+                                        <p style={{ margin: 0, fontStyle: 'italic', background: 'rgba(255,255,255,0.02)', padding: 15, borderRadius: 8 }}>"{r.text}"</p>
                                     </div>
                                 ))}
                             </motion.div>
@@ -545,11 +614,20 @@ export default function AdminDashboard({ onLogout }) {
                         <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="admin-modal-content">
                             <h3 style={{ margin: '0 0 20px 0', fontSize: '1.5rem', color: 'var(--admin-text)' }}>{editingItem.id ? 'Edit Item' : 'New Item'}</h3>
                             <form onSubmit={handleSaveMenu}>
-                                <div className="admin-form-group">
-                                    <label>Item Name</label>
-                                    <input type="text" className="admin-input" required value={editingItem.name} onChange={e => setEditingItem({...editingItem, name: e.target.value})} />
+                                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                                    <button type="button" onClick={() => setModalLang('en')} className={`action-btn ${modalLang === 'en' ? 'btn-primary' : ''}`} style={{ flex: 1, padding: '8px', border: modalLang !== 'en' ? '1px solid var(--admin-border)' : 'none' }}>English</button>
+                                    <button type="button" onClick={() => setModalLang('hi')} className={`action-btn ${modalLang === 'hi' ? 'btn-primary' : ''}`} style={{ flex: 1, padding: '8px', border: modalLang !== 'hi' ? '1px solid var(--admin-border)' : 'none' }}>Hindi</button>
+                                    <button type="button" onClick={() => setModalLang('ar')} className={`action-btn ${modalLang === 'ar' ? 'btn-primary' : ''}`} style={{ flex: 1, padding: '8px', border: modalLang !== 'ar' ? '1px solid var(--admin-border)' : 'none' }}>Arabic</button>
                                 </div>
-                                <div style={{ display: 'flex', gap: '15px' }}>
+                                <div className="admin-form-group">
+                                    <label>Item Name ({modalLang.toUpperCase()})</label>
+                                    <input type="text" className="admin-input" required={modalLang === 'en'} value={editingItem.name?.[modalLang] || ''} onChange={e => setEditingItem({...editingItem, name: {...editingItem.name, [modalLang]: e.target.value}})} />
+                                </div>
+                                <div className="admin-form-group">
+                                    <label>Description ({modalLang.toUpperCase()})</label>
+                                    <textarea className="admin-textarea" value={editingItem.description?.[modalLang] || ''} onChange={e => setEditingItem({...editingItem, description: {...editingItem.description, [modalLang]: e.target.value}})}></textarea>
+                                </div>
+                                <div className="admin-form-row">
                                     <div className="admin-form-group" style={{ flex: 1 }}>
                                         <label>Price (₹)</label>
                                         <input type="number" className="admin-input" required value={editingItem.price} onChange={e => setEditingItem({...editingItem, price: Number(e.target.value)})} />
@@ -565,7 +643,18 @@ export default function AdminDashboard({ onLogout }) {
                                         </select>
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
+                                <div className="admin-form-group" style={{ marginTop: '15px' }}>
+                                    <label>Image URL</label>
+                                    <div className="modal-image-row">
+                                        <input type="text" className="admin-input" style={{ flex: 1 }} placeholder="https://example.com/image.jpg" value={editingItem.image || ''} onChange={e => setEditingItem({...editingItem, image: e.target.value})} />
+                                        {editingItem.image && (
+                                            <div style={{ width: '60px', height: '60px', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--admin-border)', flexShrink: 0 }}>
+                                                <img src={editingItem.image} alt="Preview" onError={(e) => e.target.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="admin-form-row modal-actions-row">
                                     <button type="button" onClick={() => setIsModalOpen(false)} className="action-btn btn-cancel" style={{ flex: 1 }}>Cancel</button>
                                     <button type="submit" className="action-btn btn-primary" style={{ flex: 2 }}>Save</button>
                                 </div>

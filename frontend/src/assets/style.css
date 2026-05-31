@@ -24,6 +24,8 @@
     --primary-dark: #7A1526;
     --secondary-color: #C5A059; /* Muted Elegant Gold */
     --accent-color: #2C3E50; /* Charcoal Accent */
+    --accent-light: #FFD700; /* Gold/Yellow for highlights */
+    --spice-saffron: #F57C00; /* Saffron orange */
     --accent-glow: rgba(155, 27, 48, 0.1);
     
     --text-dark: #1A1A1A; /* Crisp Almost Black */
@@ -378,6 +380,7 @@ nav a:hover::after {
 @media (max-width: 480px) {
     .hero-title { font-size: 2.5rem; }
     .hero-content { padding: 1rem; }
+    #menu-container, .grid-luxury { grid-template-columns: 1fr; }
 }
 
 /* --- Luxury Animations & Reveals --- */

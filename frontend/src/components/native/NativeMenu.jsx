@@ -970,23 +970,28 @@ export default function NativeMenu({ setActiveTab }) {
                 ))}
             </div>
 
-            <div className="native-menu-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div className="native-menu-grid-responsive">
                     {(!isRenderReady || (loading && menuItems.length === 0)) ? (
                         Array(8).fill(0).map((_, i) => <CardSkeleton key={i} />)
                     ) : (
                         visibleItems.map((item, index) => (
-                            <div
+                            <motion.div
                                 key={item.id || index}
                                 className="native-menu-card futuristic-glass"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.4, delay: index * 0.05 }}
+                                whileHover={{ y: -5, boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}
                                 style={{ 
                                     background: '#FFFFFF', borderRadius: '25px', 
                                     border: '1px solid var(--border-color)', overflow: 'hidden',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
+                                    transition: 'box-shadow 0.3s ease'
                                 }}
                             >
                                 <div style={{ height: '150px', position: 'relative' }}>
                                     <img 
-                                        src={item.image?.startsWith('/') ? `.${item.image}` : (item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop')} 
+                                        src={item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop'} 
                                         alt={getLocalized(item.name)} 
                                         onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&fit=crop' }}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
@@ -1003,7 +1008,9 @@ export default function NativeMenu({ setActiveTab }) {
                                     <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', lineHeight: '1.4', marginBottom: '15px', height: '4.2em', overflow: 'hidden', fontWeight: '500' }}>
                                         {getLocalized(item.description)}
                                     </p>
-                                    <button
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
                                         onClick={() => {
                                             addToCart(item);
                                             Swal.fire({ title: 'Added!', text: `${getLocalized(item.name)} added`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
@@ -1015,9 +1022,9 @@ export default function NativeMenu({ setActiveTab }) {
                                         }}
                                     >
                                         <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i> {t('common.add', 'Order Now')}
-                                    </button>
+                                    </motion.button>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))
                     )}
             </div>

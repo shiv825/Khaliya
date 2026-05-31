@@ -25,22 +25,57 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('khaliya_cart', JSON.stringify(cart));
     }, [cart]);
 
+    const getProductId = (item) => {
+        if (!item) return Math.random().toString();
+        
+        // 1. If it has a real database ID, use it
+        if (item.id !== undefined && item.id !== null) {
+            return String(item.id);
+        }
+        
+        // 2. Fallback to slug
+        if (item.slug) return String(item.slug);
+        
+        // 3. Fallback to name object (en, hi, ar)
+        if (item.name && typeof item.name === 'object') {
+            const nameStr = item.name.en || item.name.hi || item.name.ar;
+            if (nameStr) return String(nameStr).trim();
+            return JSON.stringify(item.name);
+        }
+        
+        // 4. Fallback to direct name string
+        if (item.name && typeof item.name === 'string') {
+            return item.name.trim();
+        }
+        
+        // 5. Absolute fallback (should never merge items incorrectly)
+        return JSON.stringify(item) + Math.random().toString();
+    };
+
     const addToCart = (product) => {
         setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.id === product.id || item.slug === product.slug);
-            if (existingItem) {
-                return prevCart.map(item =>
-                    (item.id === product.id || item.slug === product.slug)
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
+            const pId = getProductId(product);
+            
+            // Check if product exists based on ID
+            const existingItemIndex = prevCart.findIndex(item => getProductId(item) === pId);
+            
+            if (existingItemIndex >= 0) {
+                // Create a new array to ensure immutability
+                const newCart = [...prevCart];
+                newCart[existingItemIndex] = { 
+                    ...newCart[existingItemIndex], 
+                    quantity: (newCart[existingItemIndex].quantity || 1) + 1 
+                };
+                return newCart;
             }
-            return [...prevCart, { ...product, quantity: 1 }];
+            
+            // If completely new item
+            return [...prevCart, { ...product, quantity: 1, cartItemId: pId }];
         });
     };
 
     const removeFromCart = (productId) => {
-        setCart(prevCart => prevCart.filter(item => item.id !== productId && item.slug !== productId));
+        setCart(prevCart => prevCart.filter(item => getProductId(item) !== String(productId)));
     };
 
     const updateQuantity = (productId, quantity) => {
@@ -49,11 +84,7 @@ export const CartProvider = ({ children }) => {
             return;
         }
         setCart(prevCart =>
-            prevCart.map(item =>
-                (item.id === productId || item.slug === productId)
-                    ? { ...item, quantity }
-                    : item
-            )
+            prevCart.map(item => getProductId(item) === String(productId) ? { ...item, quantity } : item)
         );
     };
 
@@ -63,7 +94,12 @@ export const CartProvider = ({ children }) => {
 
     const getCartTotal = () => {
         return cart.reduce((total, item) => {
-            const price = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
+            let price = 0;
+            if (typeof item.price === 'number') {
+                price = item.price;
+            } else if (typeof item.price === 'string') {
+                price = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
+            }
             return total + (price * item.quantity);
         }, 0);
     };

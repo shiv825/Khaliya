@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import Swal from 'sweetalert2';
 import AiMatchmaker from './AiMatchmaker';
+import { motion } from 'framer-motion';
 
 export default function Menu() {
     const { t, language } = useLanguage();
@@ -999,20 +1000,27 @@ export default function Menu() {
                 ) : (
                     displayedMenu.length > 0 ? (
                         displayedMenu.map((item, index) => (
-                            <div key={item.id || index} className="menu-item" style={{ 
-                                background: 'var(--bg-surface)', 
-                                border: '1px solid var(--border-color)', 
-                                borderRadius: 'var(--radius-lg)',
-                                padding: '2rem',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                height: '100%',
-                                transition: 'var(--transition)',
-                                boxShadow: 'var(--shadow-sm)'
-                            }}>
+                            <motion.div 
+                                key={item.id || index} 
+                                className="menu-item" 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.4, delay: index * 0.05 }}
+                                whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                                style={{ 
+                                    background: 'var(--bg-surface)', 
+                                    border: '1px solid var(--border-color)', 
+                                    borderRadius: 'var(--radius-lg)',
+                                    padding: '2rem',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    height: '100%',
+                                    transition: 'box-shadow 0.3s ease',
+                                    boxShadow: 'var(--shadow-sm)'
+                                }}>
                                 {item.image && (
                                     <div className="menu-item-image" style={{ width: '100%', height: '220px', overflow: 'hidden', borderRadius: '15px', marginBottom: '1.5rem', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)', background: '#eee' }}>
-                                        <img loading="lazy" src={item.image?.startsWith('/') ? `.${item.image}` : item.image} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                                        <img loading="lazy" src={item.image} alt={getLocalized(item.name)} onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop'} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
                                     </div>
                                 )}
                                 <div className="menu-item-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -1032,8 +1040,10 @@ export default function Menu() {
                                 <p style={{ fontSize: '0.95rem', color: 'var(--text-light)', marginBottom: '1.5rem', lineHeight: '1.6', flex: 1 }}>{getLocalized(item.description)}</p>
                                 <div className="menu-item-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
                                     <div className="price" style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '1.4rem' }}>{item.price}</div>
-                                    <button 
+                                    <motion.button 
                                         className="btn btn-primary" 
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
                                         style={{ padding: '8px 20px', fontSize: '0.8rem', borderRadius: '30px' }}
                                         onClick={() => {
                                             if (item) {
@@ -1054,9 +1064,9 @@ export default function Menu() {
                                         }}
                                     >
                                         <i className="fas fa-plus"></i> {t('common.add', 'Add')}
-                                    </button>
+                                    </motion.button>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))
                     ) : (
                         <div style={{ textAlign: 'center', width: '100%', padding: '4rem', color: 'var(--text-muted)' }}>

@@ -178,29 +178,15 @@ export default function Reservations({ predefinedTable }) {
                         </label>
                         <label style={{ display: 'block' }}>
                             <strong style={{ fontSize: '0.9rem', color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('form.time')}</strong>
-                            <div className="time-slot-grid">
-                                {['11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'].map(slot => {
-                                    const bookedCount = availability.bookedSlots[slot] || 0;
-                                    const isFull = bookedCount >= availability.maxCapacity;
-                                    const isSelected = formData.time === slot;
-                                    
-                                    return (
-                                        <button 
-                                            key={slot}
-                                            type="button"
-                                            disabled={isFull || !formData.date || !formData.tableType}
-                                            onClick={() => setFormData({ ...formData, time: slot })}
-                                            className={`time-slot-btn ${isSelected ? 'selected' : ''}`}
-                                        >
-                                            {slot}
-                                            <span className="slot-status">
-                                                {isFull ? 'Full' : `${availability.maxCapacity - bookedCount} Left`}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            {(!formData.date || !formData.tableType) && <small style={{ color: 'var(--primary-color)', marginTop: '8px', display: 'block' }}>Please select Date and Table Type first</small>}
+                            <input 
+                                name="time" 
+                                type="time" 
+                                value={formData.time} 
+                                onChange={handleChange} 
+                                required 
+                                style={{ width: '100%', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', marginTop: '0.5rem', background: 'var(--bg-body)', color: 'var(--text-dark)' }} 
+                            />
+                            <small style={{ color: 'var(--text-muted)', marginTop: '0.5rem', display: 'block', fontSize: '0.75rem' }}>Availability will be confirmed upon reservation</small>
                         </label>
                     </div>
 

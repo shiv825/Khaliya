@@ -108,9 +108,9 @@ export default function NativeCart() {
                     </motion.div>
                 ) : (
                     <div className="cart-list">
-                        {cart.map((item) => (
+                        {cart.map((item, index) => (
                             <motion.div
-                                key={item.id}
+                                key={item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name) || index}
                                 layout
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -129,7 +129,7 @@ export default function NativeCart() {
                                 }}
                             >
                                 <div style={{ width: '80px', height: '80px', borderRadius: '18px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-                                    <img src={item.image || 'https://via.placeholder.com/150'} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img src={item.image || 'https://via.placeholder.com/150'} alt={getLocalized(item.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop'} />
                                 </div>
                                 
                                 <div style={{ flex: 1 }}>
@@ -139,18 +139,18 @@ export default function NativeCart() {
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'var(--bg-body)', padding: '8px 15px', borderRadius: '15px', border: '1px solid var(--border-color)' }}>
                                     <button 
-                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                        onClick={() => updateQuantity(item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name), item.quantity - 1)}
                                         style={{ border: 'none', background: 'none', color: 'var(--primary-color)', fontSize: '1.2rem', fontWeight: '900', cursor: 'pointer' }}
                                     >—</button>
                                     <span style={{ fontWeight: '900', minWidth: '20px', textAlign: 'center', color: 'var(--text-dark)' }}>{item.quantity}</span>
                                     <button 
-                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                        onClick={() => updateQuantity(item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name), item.quantity + 1)}
                                         style={{ border: 'none', background: 'none', color: 'var(--primary-color)', fontSize: '1.2rem', fontWeight: '900', cursor: 'pointer' }}
                                     >+</button>
                                 </div>
 
                                 <button 
-                                    onClick={() => removeFromCart(item.id)}
+                                    onClick={() => removeFromCart(item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name))}
                                     style={{ border: 'none', background: 'rgba(142, 28, 28, 0.05)', color: 'var(--primary-color)', width: '45px', height: '45px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                 >
                                     <i className="far fa-trash-alt"></i>

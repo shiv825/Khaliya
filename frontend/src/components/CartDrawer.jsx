@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 export default function CartDrawer({ isOpen, onClose }) {
     const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
@@ -13,16 +14,85 @@ export default function CartDrawer({ isOpen, onClose }) {
         return field || '';
     };
 
-    const handleCheckout = () => {
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
+    const handleCheckout = async () => {
         if (cart.length === 0) return;
-        Swal.fire({
-            title: t('cart.orderSummary'),
-            text: t('cart.orderConfirmed'),
-            icon: 'success',
-            confirmButtonColor: '#E63946'
+        
+        const { value: formValues } = await Swal.fire({
+            title: t('cart.checkout') || 'Complete Order',
+            html: `
+                <input id="swal-name" class="swal2-input" placeholder="Your Name" style="width: 85%; margin-bottom: 10px;">
+                <input id="swal-phone" class="swal2-input" placeholder="Phone Number" style="width: 85%; margin-bottom: 10px;">
+                <textarea id="swal-address" class="swal2-textarea" placeholder="Delivery Address / Table No" style="width: 85%;"></textarea>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: t('common.orderNow') || 'Place Order',
+            confirmButtonColor: 'var(--primary-color)',
+            preConfirm: () => {
+                const name = document.getElementById('swal-name').value;
+                const phone = document.getElementById('swal-phone').value;
+                const address = document.getElementById('swal-address').value;
+                if (!name || !phone || !address) {
+                    Swal.showValidationMessage('Please fill all fields to proceed.');
+                    return false;
+                }
+                return { name, phone, address };
+            }
         });
-        clearCart();
-        onClose();
+
+        if (formValues) {
+            Swal.fire({
+                title: 'Processing Order...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const orderData = {
+                    items: cart.map(item => ({
+                        id: item.id || item.slug || item.name.en,
+                        name: getLocalized(item.name),
+                        quantity: item.quantity,
+                        price: item.price
+                    })),
+                    total: getCartTotal(),
+                    user: {
+                        name: formValues.name,
+                        email: 'guest@khaliya.web',
+                        phone: formValues.phone,
+                        address: formValues.address
+                    },
+                    source: 'Web App'
+                };
+
+                await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
+                
+                Swal.fire({
+                    title: t('cart.orderSummary') || 'Order Confirmed!',
+                    text: t('cart.orderConfirmed') || 'Your delicious meal is being prepared.',
+                    icon: 'success',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+                clearCart();
+                onClose();
+            } catch (err) {
+                console.error('Checkout failed', err);
+                Swal.fire({
+                    title: 'Offline Order',
+                    text: 'We could not reach the server, but your order was saved locally. Please show this to our staff.',
+                    icon: 'warning',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+                clearCart();
+                onClose();
+            }
+        }
     };
 
     return (
@@ -98,23 +168,23 @@ export default function CartDrawer({ isOpen, onClose }) {
                                     <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: '600' }}>{t('cart.empty')}</p>
                                 </div>
                             ) : (
-                                cart.map(item => (
-                                    <div key={item.id} style={{ display: 'flex', gap: '20px', marginBottom: '25px', borderBottom: '1px solid var(--border-light)', paddingBottom: '25px', alignItems: 'center' }}>
+                                cart.map((item, index) => (
+                                    <div key={item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name) || index} style={{ display: 'flex', gap: '20px', marginBottom: '25px', borderBottom: '1px solid var(--border-light)', paddingBottom: '25px', alignItems: 'center' }}>
                                         <div style={{ position: 'relative' }}>
-                                            <img src={item.image} style={{ width: '85px', height: '85px', borderRadius: '18px', objectFit: 'cover', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }} alt="" />
+                                            <img src={item.image} style={{ width: '85px', height: '85px', borderRadius: '18px', objectFit: 'cover', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }} alt="" onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop'} />
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <h4 style={{ margin: '0 0 10px 0', fontSize: '1.15rem', fontWeight: '800', color: 'var(--primary-color)' }}>{getLocalized(item.name)}</h4>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <span style={{ fontWeight: '800', color: 'var(--primary-color)', fontSize: '1.3rem' }}>{item.price}</span>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'var(--bg-body)', padding: '8px 16px', borderRadius: '25px', border: '1px solid var(--border-color)' }}>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-dark)', fontSize: '1.1rem', fontWeight: '800' }}>-</button>
+                                                    <button onClick={() => updateQuantity(item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name), item.quantity - 1)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-dark)', fontSize: '1.1rem', fontWeight: '800' }}>-</button>
                                                     <span style={{ fontWeight: '800', minWidth: '20px', textAlign: 'center', color: 'var(--primary-color)' }}>{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-dark)', fontSize: '1.1rem', fontWeight: '800' }}>+</button>
+                                                    <button onClick={() => updateQuantity(item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name), item.quantity + 1)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-dark)', fontSize: '1.1rem', fontWeight: '800' }}>+</button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={() => removeFromCart(item.id)} style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', transition: 'var(--transition)', fontSize: '1.1rem' }} onMouseEnter={e => e.currentTarget.style.color = 'var(--primary-color)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
+                                        <button onClick={() => removeFromCart(item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name))} style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', transition: 'var(--transition)', fontSize: '1.1rem' }} onMouseEnter={e => e.currentTarget.style.color = 'var(--primary-color)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
                                             <i className="far fa-trash-alt"></i>
                                         </button>
                                     </div>

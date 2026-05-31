@@ -10,6 +10,7 @@ export default function Navbar() {
     const { getCartCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth > 992);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -29,6 +30,8 @@ export default function Navbar() {
 
         window.addEventListener('scroll', handleScroll);
         window.addEventListener('khaliya-pwa-ready', handlePwaReady);
+        const handleResize = () => setIsDesktop(window.innerWidth > 992);
+        window.addEventListener('resize', handleResize);
         
         // Initial check in case it already fired
         if (window.khaliya_pwa_prompt) setIsInstallable(true);
@@ -36,6 +39,7 @@ export default function Navbar() {
         return () => {
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('khaliya-pwa-ready', handlePwaReady);
+            window.removeEventListener('resize', handleResize);
         };
     }, []);
 
@@ -119,26 +123,32 @@ export default function Navbar() {
 
                         <LanguageSwitcher />
                         
-                        <button 
-                            className={`hamburger ${isMenuOpen ? 'active' : ''}`} 
-                            onClick={toggleMenu} 
-                            aria-label="Toggle menu"
-                            style={{ 
-                                background: 'none', 
-                                border: 'none', 
-                                cursor: 'pointer',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '5px'
-                            }}
-                        >
-                             <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}></span>
-                            <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', opacity: isMenuOpen ? 0 : 1 }}></span>
-                            <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }}></span>
-                        </button>
+                        {!isDesktop && (
+                            <button 
+                                className={`hamburger ${isMenuOpen ? 'active' : ''}`} 
+                                onClick={toggleMenu} 
+                                aria-label="Toggle menu"
+                                style={{ 
+                                    background: 'none', 
+                                    border: 'none', 
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '5px'
+                                }}
+                            >
+                                 <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}></span>
+                                <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', opacity: isMenuOpen ? 0 : 1 }}></span>
+                                <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }}></span>
+                            </button>
+                        )}
                     </div>
 
-                    <div className={`nav-links ${isMenuOpen ? 'open' : ''}`} style={{
+                    <div className={`nav-links ${isMenuOpen ? 'open' : ''}`} style={isDesktop ? {
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2rem'
+                    } : {
                         position: 'fixed',
                         top: 0,
                         right: 0,
@@ -155,18 +165,18 @@ export default function Navbar() {
                         overflow: 'hidden',
                         zIndex: 999
                     }}>
-                        <a href="#home" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.home')}</a>
-                        <a href="#menu" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
-                        <a href="#loyalty" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
-                        <a href="#reservations" onClick={toggleMenu} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
+                        <a href="#home" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.home')}</a>
+                        <a href="#menu" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
+                        <a href="#loyalty" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
+                        <a href="#reservations" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
                         
                         <a href="#profile" onClick={() => {
                             // On the web version, #profile might not exist as a section, 
                             // but in PWA mode it's a view. 
                             // For now, let's just make it clear it's for the app.
                             toggleMenu();
-                        }} style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>
-                            <i className="fas fa-user-circle" style={{ marginRight: '10px' }}></i> {t('reviews.yourProfile') || 'My Account'}
+                        }} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>
+                            <i className="fas fa-user-circle" style={isDesktop ? { marginRight: '5px' } : { marginRight: '10px' }}></i> {t('reviews.yourProfile') || 'My Account'}
                         </a>
                         
                         {isInstallable && (
@@ -175,7 +185,20 @@ export default function Navbar() {
                                     if (window.promptInstall) window.promptInstall();
                                     toggleMenu();
                                 }}
-                                style={{ 
+                                style={isDesktop ? {
+                                    fontSize: '0.85rem', 
+                                    fontWeight: '800', 
+                                    color: '#FFF', 
+                                    background: 'var(--gold-gradient)',
+                                    border: 'none',
+                                    padding: '8px 20px',
+                                    borderRadius: '50px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px'
+                                } : { 
                                     fontSize: '1.5rem', 
                                     fontWeight: '900', 
                                     color: '#FFF', 
@@ -193,16 +216,18 @@ export default function Navbar() {
                                 <i className="fas fa-download"></i> {t('pwa.installBtn') || 'Download App'}
                             </button>
                         )}
-                        <div style={{
-                            marginTop: 'auto',
-                            paddingBottom: '2rem',
-                            opacity: 0.3,
-                            fontSize: '0.8rem',
-                            color: 'var(--primary-color)',
-                            fontFamily: 'monospace'
-                        }}>
-                            v15.0.4-HARDENED
-                        </div>
+                        {!isDesktop && (
+                            <div style={{
+                                marginTop: 'auto',
+                                paddingBottom: '2rem',
+                                opacity: 0.3,
+                                fontSize: '0.8rem',
+                                color: 'var(--primary-color)',
+                                fontFamily: 'monospace'
+                            }}>
+                                v15.0.4-HARDENED
+                            </div>
+                        )}
                     </div>
                 </div>
             </motion.nav>

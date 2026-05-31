@@ -1,22 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap');
 
 :root {
-  --admin-bg: #F8F9FA; /* Off-white SaaS background */
-  --admin-surface: #FFFFFF;
-  --admin-primary: #E63946; /* Crimson Red */
-  --admin-primary-light: #FF5A5F;
-  --admin-accent: #FF9F1C; /* Warm Amber */
+  --admin-bg: #0B0E14; /* Deep luxury dark background */
+  --admin-surface: #151A22; /* Slightly lighter surface */
+  --admin-primary: #D4AF37; /* Luxury Gold */
+  --admin-primary-light: #F3E5AB;
+  --admin-accent: #E63946; /* Crimson Accent */
   --admin-success: #2A9D8F;
   --admin-success-light: rgba(42, 157, 143, 0.15);
   --admin-danger: #E63946;
   --admin-danger-light: rgba(230, 57, 70, 0.15);
   --admin-warning: #E9C46A;
   --admin-warning-light: rgba(233, 196, 106, 0.15);
-  --admin-text: #264653;
-  --admin-text-muted: #6C757D;
-  --admin-border: #E9ECEF;
-  --admin-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
-  --admin-card-hover: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.03);
+  --admin-text: #F8F9FA; /* Off-white text */
+  --admin-text-muted: #8E9BAE; /* Cool gray for muted text */
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --admin-card-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .admin-portal-wrapper {
@@ -135,9 +135,9 @@
 
 /* Premium Glass Cards for Orders/Bookings */
 .futuristic-row {
-  background: #FFFFFF;
+  background: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 24px;
+  border-radius: 20px;
   padding: 25px 30px;
   margin-bottom: 20px;
   display: flex;
@@ -223,11 +223,11 @@
 .btn-confirm { background: var(--admin-success); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
 .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
 
-.btn-cancel { background: #FFF0F0; color: var(--admin-danger); border: 1px solid var(--admin-danger-light); }
-.btn-cancel:hover { background: var(--admin-danger); color: white; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3); transform: translateY(-2px); }
+.btn-cancel { background: transparent; color: var(--admin-danger); border: 1px solid var(--admin-danger-light); }
+.btn-cancel:hover { background: var(--admin-danger-light); color: var(--admin-danger); box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3); transform: translateY(-2px); }
 
-.btn-primary { background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-light)); color: white; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4); filter: brightness(1.1); }
+.btn-primary { background: linear-gradient(135deg, var(--admin-primary), #B8860B); color: #111; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4); filter: brightness(1.1); }
 
 /* Customer & Order Details Highlight */
 .order-items-box {
@@ -296,15 +296,16 @@
   font-family: inherit;
   font-size: 1rem;
   transition: all 0.3s;
-  background: #F9FAFB;
+  background: rgba(255,255,255,0.02);
+  color: var(--admin-text);
   box-sizing: border-box;
 }
 
 .admin-input:focus, .admin-select:focus, .admin-textarea:focus {
   border-color: var(--admin-primary);
   outline: none;
-  background: #FFF;
-  box-shadow: 0 0 0 4px var(--admin-danger-light);
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
 }
 
 .admin-textarea {
@@ -435,13 +436,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--admin-surface);
+  background: rgba(21, 26, 34, 0.8);
+  backdrop-filter: blur(10px);
   padding: 15px 30px;
   border-bottom: 1px solid var(--admin-border);
   position: sticky;
   top: 0;
   z-index: 90;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 .saas-search-bar {
   display: flex;
@@ -600,5 +602,81 @@
 }
 .toggle-switch.on::after {
   transform: translateX(18px);
+}
+
+/* NEW: Responsive Grid Classes for Admin */
+.admin-charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.kanban-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  flex: 8;
+}
+
+.admin-form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.modal-image-row {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.modal-actions-row {
+  margin-top: 20px;
+}
+
+/* Deep Mobile Optimization */
+@media (max-width: 768px) {
+  .admin-charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .kanban-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .modal-image-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .menu-list-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .menu-list-row > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .admin-modal-content {
+    padding: 20px;
+    margin: 15px;
+    width: auto;
+  }
+  
+  .saas-top-header {
+    padding: 15px !important;
+  }
+  
+  .split-left {
+    flex: none !important;
+  }
 }
 

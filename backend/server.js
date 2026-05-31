@@ -259,39 +259,39 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
 
         // 4. Send via Nodemailer (if configured)
         if (emailTransporter) {
-            try {
-                await emailTransporter.sendMail({
-                    from: `"Khaliya Sanctuary" <${process.env.SMTP_USER}>`,
-                    to: email,
-                    subject: 'Your Khaliya Login Code',
-                    text: `Your Khaliya Sanctuary verification code is: ${otp}. Valid for 5 minutes.`,
-                    html: `
-                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #e0e0e0; border-radius: 20px; background: #fff;">
-                            <h2 style="color: #D4AF37; text-align: center; font-size: 28px; letter-spacing: 2px;">KHALIYA SANCTUARY</h2>
-                            <div style="width: 50px; height: 2px; background: #D4AF37; margin: 20px auto;"></div>
-                            <p style="font-size: 16px; color: #555; text-align: center;">Welcome to the Sanctuary. Use the code below to verify your access.</p>
-                            <div style="background: #f9f9f9; padding: 30px; border-radius: 15px; margin: 30px 0; text-align: center;">
-                                <h1 style="font-size: 42px; color: #000; margin: 0; letter-spacing: 10px;">${otp}</h1>
-                            </div>
-                            <p style="font-size: 14px; color: #999; text-align: center;">This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
-                            <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #bbb;">
-                                &copy; ${new Date().getFullYear()} Khaliya Luxury Dining. All rights reserved.
-                            </div>
+            // Send email in the background to prevent blocking the UI (fixes the 8-second delay)
+            emailTransporter.sendMail({
+                from: `"Khaliya Sanctuary" <${process.env.SMTP_USER}>`,
+                to: email,
+                subject: 'Your Khaliya Login Code',
+                text: `Your Khaliya Sanctuary verification code is: ${otp}. Valid for 5 minutes.`,
+                html: `
+                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #e0e0e0; border-radius: 20px; background: #fff;">
+                        <h2 style="color: #D4AF37; text-align: center; font-size: 28px; letter-spacing: 2px;">KHALIYA SANCTUARY</h2>
+                        <div style="width: 50px; height: 2px; background: #D4AF37; margin: 20px auto;"></div>
+                        <p style="font-size: 16px; color: #555; text-align: center;">Welcome to the Sanctuary. Use the code below to verify your access.</p>
+                        <div style="background: #f9f9f9; padding: 30px; border-radius: 15px; margin: 30px 0; text-align: center;">
+                            <h1 style="font-size: 42px; color: #000; margin: 0; letter-spacing: 10px;">${otp}</h1>
                         </div>
-                    `
-                });
+                        <p style="font-size: 14px; color: #999; text-align: center;">This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+                        <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #bbb;">
+                            &copy; ${new Date().getFullYear()} Khaliya Luxury Dining. All rights reserved.
+                        </div>
+                    </div>
+                `
+            }).then(() => {
                 console.log(`✅ [AUTH] Email sent successfully to ${email}`);
-                return res.json({ success: true, message: 'Verification code sent to your email.' });
-            } catch (emailErr) {
+            }).catch((emailErr) => {
                 console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
-                console.warn(`⚠️ [AUTH] Falling back to Simulated Mode for testing.`);
-                console.warn(`🔑 [AUTH] Simulated OTP for ${email}: ${otp}`);
-                return res.json({ 
-                    success: true, 
-                    message: 'Simulated Mode: SMTP send failed, check your server console for the login code.',
-                    simulatedOtp: otp
-                });
-            }
+                console.warn(`⚠️ [AUTH] Simulated OTP for ${email}: ${otp}`);
+            });
+            
+            // Return immediately so the client UI receives the simulated OTP fallback instantly
+            return res.json({ 
+                success: true, 
+                message: 'Verification code sent. If email fails, use the simulated OTP.',
+                simulatedOtp: otp
+            });
         }
 
         // 5. If not configured, fall back to simulated mode

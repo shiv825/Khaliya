@@ -711,6 +711,12 @@
     animation: shimmer 1.5s infinite;
 }
 
+.native-menu-grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 15px;
+}
+
 @media (max-width: 380px) {
     .native-header .greeting h2 { font-size: 1.5rem; }
     .book-fab { width: 44px; height: 44px; font-size: 1.1rem; }
