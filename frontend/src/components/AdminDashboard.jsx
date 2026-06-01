@@ -39,6 +39,7 @@ export default function AdminDashboard({ onLogout }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [modalLang, setModalLang] = useState('en');
+    const [isUploading, setIsUploading] = useState(false);
     
     const navigate = useNavigate();
 
@@ -224,6 +225,29 @@ export default function AdminDashboard({ onLogout }) {
             await axios.put(`${API_URL}/menu/${item.id}`, updatedItem);
             setMenu(prev => prev.map(m => m.id === item.id ? updatedItem : m));
         } catch (err) {}
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('image', file);
+        try {
+            const res = await axios.post(`${API_URL}/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            const baseUrl = API_URL.replace(/\/api$/, '');
+            const fullUrl = `${baseUrl}${res.data.imageUrl}`;
+            setEditingItem({ ...editingItem, image: fullUrl });
+        } catch (err) {
+            console.error('Upload failed', err);
+            Swal.fire('Error', 'Image upload failed', 'error');
+        } finally {
+            setIsUploading(false);
+            // Reset input so same file can be selected again if needed
+            e.target.value = '';
+        }
     };
 
     const handleSaveMenu = async (e) => {
@@ -644,18 +668,28 @@ export default function AdminDashboard({ onLogout }) {
                                     </div>
                                 </div>
                                 <div className="admin-form-group" style={{ marginTop: '15px' }}>
-                                    <label>Image URL</label>
-                                    <div className="modal-image-row">
-                                        <input type="text" className="admin-input" style={{ flex: 1 }} placeholder="https://example.com/image.jpg" value={editingItem.image || ''} onChange={e => setEditingItem({...editingItem, image: e.target.value})} />
+                                    <label>Image URL or Upload</label>
+                                    <div className="modal-image-row" style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
+                                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <input type="text" className="admin-input" placeholder="https://example.com/image.jpg" value={editingItem.image || ''} onChange={e => setEditingItem({...editingItem, image: e.target.value})} />
+                                            <div style={{ position: 'relative', border: '2px dashed var(--admin-border)', borderRadius: '10px', padding: '15px', textAlign: 'center', background: 'rgba(0,0,0,0.02)', cursor: 'pointer', transition: 'var(--transition)' }}>
+                                                <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
+                                                {isUploading ? (
+                                                    <span style={{ color: 'var(--admin-primary)', fontWeight: 'bold' }}><i className="fas fa-spinner fa-spin"></i> Uploading...</span>
+                                                ) : (
+                                                    <span style={{ color: 'var(--admin-text-muted)' }}><i className="fas fa-cloud-upload-alt"></i> Drag & Drop or Click to Upload</span>
+                                                )}
+                                            </div>
+                                        </div>
                                         {editingItem.image && (
-                                            <div style={{ width: '60px', height: '60px', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--admin-border)', flexShrink: 0, position: 'relative' }}>
+                                            <div style={{ width: '90px', height: '90px', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--admin-border)', flexShrink: 0, position: 'relative' }}>
                                                 <img 
                                                     key={editingItem.image}
                                                     src={editingItem.image} 
                                                     alt="Preview" 
                                                     onError={(e) => {
-                                                        e.target.onerror = null; // Prevent infinite loop
-                                                        e.target.src = 'https://via.placeholder.com/60/ffebee/d32f2f?text=Broken';
+                                                        e.target.onerror = null;
+                                                        e.target.src = 'https://via.placeholder.com/90/ffebee/d32f2f?text=Broken';
                                                     }} 
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                                 />
