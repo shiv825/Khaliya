@@ -648,8 +648,17 @@ export default function AdminDashboard({ onLogout }) {
                                     <div className="modal-image-row">
                                         <input type="text" className="admin-input" style={{ flex: 1 }} placeholder="https://example.com/image.jpg" value={editingItem.image || ''} onChange={e => setEditingItem({...editingItem, image: e.target.value})} />
                                         {editingItem.image && (
-                                            <div style={{ width: '60px', height: '60px', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--admin-border)', flexShrink: 0 }}>
-                                                <img src={editingItem.image} alt="Preview" onError={(e) => e.target.src='https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <div style={{ width: '60px', height: '60px', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--admin-border)', flexShrink: 0, position: 'relative' }}>
+                                                <img 
+                                                    key={editingItem.image}
+                                                    src={editingItem.image} 
+                                                    alt="Preview" 
+                                                    onError={(e) => {
+                                                        e.target.onerror = null; // Prevent infinite loop
+                                                        e.target.src = 'https://via.placeholder.com/60/ffebee/d32f2f?text=Broken';
+                                                    }} 
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                                />
                                             </div>
                                         )}
                                     </div>
