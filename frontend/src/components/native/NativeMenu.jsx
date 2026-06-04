@@ -41,7 +41,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/samosa.jpg"
+                "image": "./menu-images/samosa.jpg",
+                "id": 1780141133327
         },
         {
                 "category": "Appetizer",
@@ -60,7 +61,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/paneer-tikka.jpg"
+                "image": "./menu-images/paneer-tikka.jpg",
+                "id": 1780141131494
         },
         {
                 "category": "Appetizer",
@@ -79,7 +81,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "/menu-images/tandoori-chicken.jpg"
+                "image": "./menu-images/tandoori-chicken.jpg",
+                "id": 1780141134688
         },
         {
                 "category": "Appetizer",
@@ -98,7 +101,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/hara-bhara.jpg"
+                "image": "./menu-images/hara-bhara.jpg",
+                "id": 1780141128405
         },
         {
                 "category": "Appetizer",
@@ -117,7 +121,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "/menu-images/fish-amritsari.jpg"
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fried_fish_pieces.jpg/960px-Fried_fish_pieces.jpg",
+                "id": 1780141133487
         },
         {
                 "category": "Appetizer",
@@ -136,7 +141,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "/menu-images/chili-paneer.jpg"
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Chilli_Paneer.jpg/960px-Chilli_Paneer.jpg",
+                "id": 1780141134364
         },
         {
                 "category": "Appetizer",
@@ -155,7 +161,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-3"
                 ],
-                "image": "/menu-images/chicken-65.jpg"
+                "image": "./menu-images/chicken-65.jpg",
+                "id": 1780141129487
         },
         {
                 "category": "Main Course",
@@ -174,7 +181,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "/menu-images/chicken-biryani.jpg"
+                "image": "./menu-images/chicken-biryani.jpg",
+                "id": 1780141127512
         },
         {
                 "category": "Main Course",
@@ -193,7 +201,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/butter-chicken.jpg"
+                "image": "./menu-images/butter-chicken.jpg",
+                "id": 1780141132061
         },
         {
                 "category": "Main Course",
@@ -212,7 +221,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "/menu-images/tikka-masala.jpg"
+                "image": "./menu-images/tikka-masala.jpg",
+                "id": 1780141129390
         },
         {
                 "category": "Main Course",
@@ -231,7 +241,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/paneer-butter.jpg"
+                "image": "./menu-images/paneer-butter.jpg",
+                "id": 1780141135395
         },
         {
                 "category": "Main Course",
@@ -250,7 +261,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/dal-makhani.jpg"
+                "image": "./menu-images/dal-makhani.jpg",
+                "id": 1780141131257
         },
         {
                 "category": "Main Course",
@@ -269,7 +281,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-3"
                 ],
-                "image": "/menu-images/lamb-rogan.jpg"
+                "image": "./menu-images/lamb-rogan.jpg",
+                "id": 1780141136038
         },
         {
                 "category": "Main Course",
@@ -288,7 +301,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/malai-kofta.jpg"
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Malai_Kofta_-_A_North_Indian_Dish.jpg/960px-Malai_Kofta_-_A_North_Indian_Dish.jpg",
+                "id": 1780141133779
         },
         {
                 "category": "Main Course",
@@ -307,7 +321,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "/menu-images/palak-paneer.jpg"
+                "image": "./menu-images/palak-paneer.jpg",
+                "id": 1780141128487
         },
         {
                 "category": "Main Course",
@@ -326,7 +341,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-3"
                 ],
-                "image": "/menu-images/kadai-chicken.jpg"
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Karahi_Chicken.jpg/960px-Karahi_Chicken.jpg",
+                "id": 1780141127149
         },
         {
                 "category": "Main Course",
@@ -345,7 +361,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "/menu-images/goan-fish.jpg"
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Goan_Fish_Curry.jpg/960px-Goan_Fish_Curry.jpg",
+                "id": 1780141135912
         },
         {
                 "category": "Main Course",
@@ -364,7 +381,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "/menu-images/chana-masala.jpg"
+                "image": "./menu-images/chana-masala.jpg",
+                "id": 1780141135131
         },
         {
                 "category": "Bread",
@@ -382,7 +400,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "/menu-images/garlic-naan.jpg"
+                "image": "./menu-images/garlic-naan.jpg",
+                "id": 1780141129908
         },
         {
                 "category": "Dessert",
@@ -400,7 +419,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "/menu-images/gulab-jamun.jpg"
+                "image": "./menu-images/gulab-jamun.jpg",
+                "id": 1780141126850
         },
         {
                 "category": "Appetizer",
@@ -419,7 +439,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop",
+                "id": 1780141127210
         },
         {
                 "category": "Main Course",
@@ -438,7 +459,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop",
+                "id": 1780141135552
         },
         {
                 "category": "Main Course",
@@ -456,7 +478,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1512149177596-f817c7ef5d4c?w=500&fit=crop",
+                "id": 1780141132771
         },
         {
                 "category": "Beverage",
@@ -474,7 +497,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "/menu-images/mango-lassi.jpg"
+                "image": "./menu-images/mango-lassi.jpg",
+                "id": 1780141135332
         },
         {
                 "category": "Appetizer",
@@ -492,7 +516,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&fit=crop",
+                "id": 1780141126903
         },
         {
                 "category": "Appetizer",
@@ -510,7 +535,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop",
+                "id": 1780141135927
         },
         {
                 "category": "Appetizer",
@@ -529,7 +555,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop",
+                "id": 1780141130153
         },
         {
                 "category": "Appetizer",
@@ -548,7 +575,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&fit=crop",
+                "id": 1780141129437
         },
         {
                 "category": "Appetizer",
@@ -567,7 +595,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&fit=crop",
+                "id": 1780141128421
         },
         {
                 "category": "Main Course",
@@ -586,7 +615,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&fit=crop",
+                "id": 1780141133031
         },
         {
                 "category": "Main Course",
@@ -605,7 +635,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&fit=crop",
+                "id": 1780141134913
         },
         {
                 "category": "Main Course",
@@ -624,7 +655,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&fit=crop",
+                "id": 1780141136020
         },
         {
                 "category": "Main Course",
@@ -643,7 +675,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&fit=crop",
+                "id": 1780141131297
         },
         {
                 "category": "Main Course",
@@ -662,7 +695,8 @@ export default function NativeMenu({ setActiveTab }) {
                         "non-veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&fit=crop",
+                "id": 1780141131740
         },
         {
                 "category": "Main Course",
@@ -680,7 +714,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&fit=crop",
+                "id": 1780141129332
         },
         {
                 "category": "Bread",
@@ -698,7 +733,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop",
+                "id": 1780141131193
         },
         {
                 "category": "Bread",
@@ -716,7 +752,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop",
+                "id": 1780141127138
         },
         {
                 "category": "Bread",
@@ -734,7 +771,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop",
+                "id": 1780141136167
         },
         {
                 "category": "Bread",
@@ -752,7 +790,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=500&fit=crop",
+                "id": 1780141131627
         },
         {
                 "category": "Dessert",
@@ -770,7 +809,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&fit=crop",
+                "id": 1780141127274
         },
         {
                 "category": "Dessert",
@@ -788,7 +828,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1574969899363-ee6121f3080a?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1574969899363-ee6121f3080a?w=500&fit=crop",
+                "id": 1780141126548
         },
         {
                 "category": "Beverage",
@@ -806,7 +847,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&fit=crop",
+                "id": 1780141127028
         },
         {
                 "category": "Beverage",
@@ -824,7 +866,8 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1571006682869-f54244517307?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1571006682869-f54244517307?w=500&fit=crop",
+                "id": 1780141135558
         },
         {
                 "category": "Beverage",
@@ -842,12 +885,13 @@ export default function NativeMenu({ setActiveTab }) {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&fit=crop"
+                "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&fit=crop",
+                "id": 1780141127666
         }
 ];
 
     const [activeCategory, setActiveCategory] = useState('All');
-    const [menuItems, setMenuItems] = useState(masterMenu);
+    const [menuItems, setMenuItems] = useState([]);
     
     // Reset visible count when category changes for speed
     useEffect(() => {
@@ -869,14 +913,37 @@ export default function NativeMenu({ setActiveTab }) {
         return () => clearTimeout(timer);
     }, []);
 
+    // Real-time updates via SSE
     useEffect(() => {
-        axios.get(`${API_URL}/menu`, { timeout: 5000 })
+        const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
+        const evtSource = new EventSource(sseUrl);
+        
+        evtSource.onmessage = (e) => {
+            try {
+                const update = JSON.parse(e.data);
+                if (update.type === 'menu') {
+                    setMenuItems(update.data);
+                }
+            } catch (err) {
+                console.error("SSE parsing error", err);
+            }
+        };
+        
+        return () => evtSource.close();
+    }, [API_URL]);
+
+    useEffect(() => {
+        axios.get(`${API_URL}/menu?t=${Date.now()}`, { timeout: 5000 })
             .then(res => {
-                if (Array.isArray(res.data) && res.data.length > 0) {
+                if (Array.isArray(res.data)) {
                     setMenuItems(res.data);
                 }
             })
-            .catch(err => console.error('API Error, using fallback:', err))
+            .catch(err => {
+                console.error('API Error, using fallback:', err);
+                setMenuItems(masterMenu);
+                setMenuItems(masterMenu);
+            })
             .finally(() => setLoading(false));
     }, [API_URL]);
 

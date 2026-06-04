@@ -1,4 +1,4 @@
-const CACHE_NAME = 'khaliya-restaurant-v16';
+const CACHE_NAME = 'khaliya-restaurant-v19';
 const STATIC_ASSETS = [
     './',
     './index.html',
@@ -44,6 +44,22 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
     if (!event.request.url.startsWith(self.location.origin)) return;
+
+    // Network-First strategy for API requests to always get the latest data (e.g. menu photos)
+    if (event.request.url.includes('/api/')) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    const resClone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(event.request);
+                })
+        );
+        return;
+    }
 
     if (event.request.mode === 'navigate') {
         event.respondWith(

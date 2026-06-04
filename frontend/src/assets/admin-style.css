@@ -362,6 +362,7 @@
   }
   
   .sidebar-backdrop {
+    display: block;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
@@ -429,6 +430,14 @@
   .hero-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+.mobile-menu-btn {
+  display: none;
+}
+
+.sidebar-backdrop {
+  display: none;
 }
 
 /* NEW SAAS UTILITIES */

@@ -654,7 +654,7 @@ export default function AdminDashboard({ onLogout }) {
                                 <div className="admin-form-row">
                                     <div className="admin-form-group" style={{ flex: 1 }}>
                                         <label>Price (₹)</label>
-                                        <input type="number" className="admin-input" required value={editingItem.price} onChange={e => setEditingItem({...editingItem, price: Number(e.target.value)})} />
+                                        <input type="number" className="admin-input" required value={editingItem.price ?? ''} onChange={e => setEditingItem({...editingItem, price: e.target.value})} />
                                     </div>
                                     <div className="admin-form-group" style={{ flex: 1 }}>
                                         <label>Category</label>
