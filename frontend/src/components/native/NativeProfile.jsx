@@ -282,7 +282,16 @@ export default function NativeProfile() {
             </div>
 
             {/* Profile Card */}
-            <div className="zomato-profile-card" style={{ marginBottom: '15px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+            <div className="zomato-profile-card" style={{ 
+                margin: '0 20px 15px 20px', 
+                background: 'var(--bg-surface)', 
+                border: '1px solid var(--border-color)', 
+                boxShadow: 'var(--shadow-sm)',
+                padding: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px'
+            }}>
                 <div className="zomato-avatar" style={{ 
                     backgroundColor: 'var(--primary-color)', 
                     color: '#FFF', 
@@ -299,23 +308,49 @@ export default function NativeProfile() {
                 }}>
                     {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'G'}
                 </div>
-                <div style={{ flex: 1 }}>
-                    <h2 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user?.name || 'Guest User'}</h2>
-                    <p style={{ color: 'var(--text-light)', margin: '4px 0 6px 0', fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {user?.email ? (
-                            <>
-                                <i className="far fa-envelope" style={{ color: 'var(--primary-color)', fontSize: '0.95rem' }}></i>
-                                <span>{user.email}</span>
-                            </>
-                        ) : user?.phone ? (
-                            <>
-                                <i className="fas fa-phone-alt" style={{ color: 'var(--primary-color)', fontSize: '0.95rem' }}></i>
-                                <span>{user.phone}</span>
-                            </>
-                        ) : (
-                            <span>Welcome to Khaliya</span>
-                        )}
-                    </p>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+                    <h2 style={{ fontSize: '1.3rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{user?.name || 'Guest User'}</h2>
+                    {user?.email ? (
+                        <div style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '6px', 
+                            background: 'var(--bg-body)', 
+                            padding: '4px 10px', 
+                            borderRadius: '8px', 
+                            border: '1px solid var(--border-color)', 
+                            color: 'var(--text-light)', 
+                            fontSize: '0.85rem', 
+                            fontWeight: '600', 
+                            margin: '6px 0',
+                            wordBreak: 'break-all',
+                            maxWidth: '100%'
+                        }}>
+                            <i className="far fa-envelope" style={{ color: 'var(--primary-color)', fontSize: '0.85rem' }}></i>
+                            <span>{user.email}</span>
+                        </div>
+                    ) : user?.phone ? (
+                        <div style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '6px', 
+                            background: 'var(--bg-body)', 
+                            padding: '4px 10px', 
+                            borderRadius: '8px', 
+                            border: '1px solid var(--border-color)', 
+                            color: 'var(--text-light)', 
+                            fontSize: '0.85rem', 
+                            fontWeight: '600', 
+                            margin: '6px 0'
+                        }}>
+                            <i className="fas fa-phone-alt" style={{ color: 'var(--primary-color)', fontSize: '0.85rem' }}></i>
+                            <span>{user.phone}</span>
+                        </div>
+                    ) : (
+                        <p style={{ color: 'var(--text-light)', margin: '4px 0 6px 0', fontSize: '0.85rem', fontWeight: '600' }}>
+                            Welcome to Khaliya
+                        </p>
+                    )}
                     <span onClick={() => setActiveModal('membership')} style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>{t('reviews.memberSettings')} <i className="fas fa-chevron-right" style={{ fontSize: '0.75rem' }}></i></span>
                 </div>
             </div>
