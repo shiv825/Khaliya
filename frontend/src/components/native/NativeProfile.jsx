@@ -300,9 +300,23 @@ export default function NativeProfile() {
                     {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'G'}
                 </div>
                 <div style={{ flex: 1 }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user?.name || 'Guest User'}</h2>
-                    <p style={{ color: 'var(--text-light)', margin: '2px 0 5px 0', fontSize: '0.95rem', fontWeight: '600' }}>{user?.email || user?.phone || 'Welcome to Khaliya'}</p>
-                    <span onClick={() => setActiveModal('membership')} style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer' }}>{t('reviews.memberSettings')} <i className="fas fa-caret-right"></i></span>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>{user?.name || 'Guest User'}</h2>
+                    <p style={{ color: 'var(--text-light)', margin: '4px 0 6px 0', fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {user?.email ? (
+                            <>
+                                <i className="far fa-envelope" style={{ color: 'var(--primary-color)', fontSize: '0.95rem' }}></i>
+                                <span>{user.email}</span>
+                            </>
+                        ) : user?.phone ? (
+                            <>
+                                <i className="fas fa-phone-alt" style={{ color: 'var(--primary-color)', fontSize: '0.95rem' }}></i>
+                                <span>{user.phone}</span>
+                            </>
+                        ) : (
+                            <span>Welcome to Khaliya</span>
+                        )}
+                    </p>
+                    <span onClick={() => setActiveModal('membership')} style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>{t('reviews.memberSettings')} <i className="fas fa-chevron-right" style={{ fontSize: '0.75rem' }}></i></span>
                 </div>
             </div>
 
@@ -312,7 +326,7 @@ export default function NativeProfile() {
                 onTouchEnd={handleTouchEnd}
                 style={{ 
                     perspective: 1200, 
-                    padding: '10px 15px',
+                    padding: '5px 15px',
                     marginBottom: '20px'
                 }}
             >
@@ -321,12 +335,12 @@ export default function NativeProfile() {
                         rotateX,
                         rotateY,
                         width: '100%',
-                        height: '240px',
+                        height: '205px',
                         background: 'linear-gradient(135deg, #FF8F00 0%, #FFB300 30%, #FFD54F 100%)',
-                        borderRadius: '30px',
-                        padding: '30px',
+                        borderRadius: '25px',
+                        padding: '20px',
                         color: '#FFF',
-                        boxShadow: '0 40px 80px rgba(255, 143, 0, 0.25), inset 0 0 20px rgba(255,255,255,0.4)',
+                        boxShadow: '0 25px 50px rgba(255, 143, 0, 0.25), inset 0 0 15px rgba(255,255,255,0.3)',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
@@ -342,21 +356,24 @@ export default function NativeProfile() {
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(40px)' }}>
                         <div>
-                            <div style={{ fontSize: '0.8rem', letterSpacing: '2.5px', fontWeight: '900', color: '#FFF', opacity: 0.8 }}>PREMIUM CLUB</div>
-                            <div style={{ fontSize: '1.4rem', fontFamily: 'var(--font-heading)', marginTop: '4px', color: '#FFF', fontWeight: '900' }}>Saffron Select</div>
+                            <div style={{ fontSize: '0.75rem', letterSpacing: '2px', fontWeight: '900', color: '#FFF', opacity: 0.85 }}>PREMIUM CLUB</div>
+                            <div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-heading)', marginTop: '2px', color: '#FFF', fontWeight: '900' }}>Saffron Select</div>
                         </div>
-                        <div style={{ width: '50px', height: '50px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(5px)', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <i className="fas fa-crown" style={{ fontSize: '1.6rem', color: '#FFF' }}></i>
+                        <div style={{ width: '42px', height: '42px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(5px)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-crown" style={{ fontSize: '1.3rem', color: '#FFF' }}></i>
                         </div>
                     </div>
 
-                    <div style={{ transform: 'translateZ(60px)' }}>
-                        <div style={{ fontSize: '3.5rem', fontWeight: '900', letterSpacing: '2px', color: '#FFF' }}>{user?.spicePoints || 0}</div>
-                        <div style={{ fontSize: '1rem', fontWeight: '800', color: '#FFF', opacity: 0.9 }}>Available Spice Points</div>
+                    <div style={{ transform: 'translateZ(55px)', marginTop: '-5px' }}>
+                        <div style={{ fontSize: '2.8rem', fontWeight: '900', letterSpacing: '1px', color: '#FFF', lineHeight: '1.1' }}>{user?.spicePoints || 0}</div>
+                        <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#FFF', opacity: 0.9 }}>Available Spice Points</div>
                     </div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(30px)' }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: '900', letterSpacing: '1.5px', color: '#FFF' }}>{user?.name ? user.name.toUpperCase() : 'GUEST'}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(35px)', width: '100%' }}>
+                        <div style={{ fontSize: '0.95rem', fontWeight: '900', letterSpacing: '1px', color: '#FFF', textTransform: 'uppercase' }}>{user?.name || 'GUEST'}</div>
+                        {user?.email && (
+                            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#FFF', opacity: 0.8, textTransform: 'lowercase', letterSpacing: '0.5px' }}>{user.email}</div>
+                        )}
                     </div>
                 </motion.div>
             </motion.div>

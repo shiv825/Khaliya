@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
 import FeaturedSpecials from '../FeaturedSpecials';
 import masterMenu from '../../data/menu.json';
+import axios from 'axios';
 
 /**
  * NativeHome Component
@@ -12,6 +13,57 @@ import masterMenu from '../../data/menu.json';
  */
 export default function NativeHome({ setActiveTab }) {
     const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
+    const [locationState, setLocationState] = useState({
+        lat: null, lng: null, distance: null, travelTime: null, error: null
+    });
+
+    const RESTAURANT_COORD = { lat: 22.6108, lng: 88.3370 }; // Khaliya Howrah coord
+
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // Earth radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
+
+    const trackLocation = () => {
+        if (!navigator.geolocation) {
+            setLocationState(prev => ({ ...prev, error: "Geolocation not supported" }));
+            return;
+        }
+
+        setLocationState(prev => ({ ...prev, error: "Locating..." }));
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const currentLat = position.coords.latitude;
+                const currentLng = position.coords.longitude;
+
+                const distKm = calculateDistance(currentLat, currentLng, RESTAURANT_COORD.lat, RESTAURANT_COORD.lng);
+                const timeMinutes = Math.round((distKm / 30) * 60);
+
+                let timeStr = "";
+                if (timeMinutes < 60) timeStr = `${timeMinutes} mins`;
+                else timeStr = `${Math.floor(timeMinutes / 60)} hr ${timeMinutes % 60} mins`;
+
+                setLocationState({
+                    lat: currentLat.toFixed(4),
+                    lng: currentLng.toFixed(4),
+                    distance: distKm.toFixed(1),
+                    travelTime: timeStr,
+                    error: null
+                });
+            },
+            () => {
+                setLocationState(prev => ({ ...prev, error: "Unable to retrieve location" }));
+            }
+        );
+    };
+
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     let user = { name: 'Guest' };
     try {
@@ -23,13 +75,57 @@ export default function NativeHome({ setActiveTab }) {
     const { t, language = 'en' } = useLanguage();
     const { addToCart } = useCart();
 
+    const [liveMenu, setLiveMenu] = useState(masterMenu);
+
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
+    useEffect(() => {
+        let isMounted = true;
+        
+        const fetchMenu = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/menu?t=${Date.now()}`);
+                if (isMounted && Array.isArray(res.data)) {
+                    setLiveMenu(res.data);
+                }
+            } catch (err) {
+                console.warn('Failed to fetch native home menu:', err.message);
+            }
+        };
+
+        fetchMenu();
+
+        // Listen to SSE
+        const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
+        const evtSource = new EventSource(sseUrl);
+        
+        evtSource.onmessage = (e) => {
+            try {
+                const update = JSON.parse(e.data);
+                if (update.type === 'menu' && isMounted) {
+                    setLiveMenu(update.data);
+                }
+            } catch (err) {
+                console.error("SSE menu parsing error in native home:", err);
+            }
+        };
+
+        return () => {
+            isMounted = false;
+            evtSource.close();
+        };
+    }, [API_URL]);
+
     // Get popular items from Master Menu (Bestsellers / Featured)
-    const popularItems = Array.isArray(masterMenu) ? masterMenu.slice(0, 8).map(item => ({
-        id: item.name?.en || Math.random().toString(),
-        name: item.name?.en || 'Menu Item',
-        price: item.price ? item.price.replace('₹', '') : '150',
+    const popularItems = Array.isArray(liveMenu) ? liveMenu.slice(0, 8).map(item => ({
+        id: item.id || item.name?.en || Math.random().toString(),
+        name: typeof item.name === 'object' ? item.name.en : item.name || 'Menu Item',
+        price: item.price ? String(item.price).replace('₹', '') : '150',
         image: item.image,
-        tag: item.tags?.includes('spicy-2') ? "Bestseller" : "Must Try"
+        tag: item.tags?.includes('spicy-2') ? "Bestseller" : "Must Try",
+        originalItem: item
     })) : [];
 
 
@@ -262,7 +358,7 @@ export default function NativeHome({ setActiveTab }) {
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                 />
                                 <div className="add-btn" onClick={() => {
-                                    addToCart({ ...item, price: `₹${item.price}` });
+                                    addToCart(item.originalItem || { ...item, price: `₹${item.price}` });
                                     Swal.fire({ title: 'Added!', text: `${item.name} added`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
                                 }} style={{ 
                                     position: 'absolute', bottom: '-18px', right: '15px', 
@@ -386,6 +482,141 @@ export default function NativeHome({ setActiveTab }) {
                                     allowFullScreen="" 
                                     loading="lazy"
                                 ></iframe>
+                            </div>
+
+                            {/* Geolocation Section */}
+                            <div style={{
+                                background: 'rgba(142, 28, 28, 0.03)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '20px',
+                                padding: '15px',
+                                marginBottom: '20px',
+                                textAlign: 'center'
+                            }}>
+                                {!locationState.lat ? (
+                                     <>
+                                         <p style={{ margin: '0 0 10px 0', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600', lineHeight: '1.4' }}>
+                                             {t('track.sub') || 'Find out how far you are from our restaurant and get travel times.'}
+                                         </p>
+                                         {locationState.error && locationState.error !== 'Locating...' && (
+                                             <div style={{ fontSize: '0.8rem', color: '#ff9800', marginBottom: '8px', fontWeight: '700' }}>
+                                                 {locationState.error}
+                                             </div>
+                                         )}
+                                         <button 
+                                             onClick={trackLocation}
+                                             disabled={locationState.error === 'Locating...'}
+                                             style={{
+                                                 background: 'var(--primary-color)',
+                                                 color: '#FFFFFF',
+                                                 border: 'none',
+                                                 padding: '10px 20px',
+                                                 borderRadius: '30px',
+                                                 fontWeight: '800',
+                                                 fontSize: '0.8rem',
+                                                 cursor: 'pointer',
+                                                 boxShadow: 'var(--shadow-sm)',
+                                                 display: 'inline-flex',
+                                                 alignItems: 'center',
+                                                 gap: '8px',
+                                                 transition: 'background-color 0.2s'
+                                             }}
+                                         >
+                                             {locationState.error === 'Locating...' ? (
+                                                 <>
+                                                     <i className="fas fa-spinner fa-spin"></i>
+                                                     <span>{language === 'hi' ? 'खोज रहे हैं...' : 'Locating...'}</span>
+                                                 </>
+                                             ) : (
+                                                 <>
+                                                     <i className="fas fa-location-arrow"></i>
+                                                     <span>{t('track.button') || 'Track Distance'}</span>
+                                                 </>
+                                             )}
+                                         </button>
+                                     </>
+                                ) : (
+                                     <div>
+                                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+                                             <span style={{ fontSize: '2.2rem', fontWeight: '900', color: 'var(--primary-color)', lineHeight: '1' }}>{locationState.distance}</span>
+                                             <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '700' }}>{t('track.kmAway') || 'km away'}</span>
+                                         </div>
+                                         <div style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '15px', fontWeight: '600' }}>
+                                             <i className="fas fa-clock" style={{ color: 'var(--primary-color)', marginRight: '6px' }}></i>
+                                             {t('track.travelTimeLabel') || 'Est. Time:'} <strong>{locationState.travelTime}</strong>
+                                         </div>
+                                         
+                                         {/* Route buttons */}
+                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                                             <a 
+                                                 href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=driving`} 
+                                                 target="_blank" 
+                                                 rel="noreferrer"
+                                                 style={{
+                                                     display: 'flex',
+                                                     flexDirection: 'column',
+                                                     alignItems: 'center',
+                                                     gap: '5px',
+                                                     padding: '8px 5px',
+                                                     borderRadius: '12px',
+                                                     background: 'var(--bg-surface)',
+                                                     border: '1px solid var(--border-color)',
+                                                     textDecoration: 'none',
+                                                     fontSize: '0.75rem',
+                                                     fontWeight: '800',
+                                                     color: 'var(--text-dark)'
+                                                 }}
+                                             >
+                                                 <i className="fas fa-car" style={{ color: 'var(--primary-color)', fontSize: '1rem' }}></i>
+                                                 <span>Drive</span>
+                                             </a>
+                                             <a 
+                                                 href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=two-wheeler`} 
+                                                 target="_blank" 
+                                                 rel="noreferrer"
+                                                 style={{
+                                                     display: 'flex',
+                                                     flexDirection: 'column',
+                                                     alignItems: 'center',
+                                                     gap: '5px',
+                                                     padding: '8px 5px',
+                                                     borderRadius: '12px',
+                                                     background: 'var(--bg-surface)',
+                                                     border: '1px solid var(--border-color)',
+                                                     textDecoration: 'none',
+                                                     fontSize: '0.75rem',
+                                                     fontWeight: '800',
+                                                     color: 'var(--text-dark)'
+                                                 }}
+                                             >
+                                                 <i className="fas fa-motorcycle" style={{ color: 'var(--primary-color)', fontSize: '1rem' }}></i>
+                                                 <span>Ride</span>
+                                             </a>
+                                             <a 
+                                                 href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=walking`} 
+                                                 target="_blank" 
+                                                 rel="noreferrer"
+                                                 style={{
+                                                     display: 'flex',
+                                                     flexDirection: 'column',
+                                                     alignItems: 'center',
+                                                     gap: '5px',
+                                                     padding: '8px 5px',
+                                                     borderRadius: '12px',
+                                                     background: 'var(--bg-surface)',
+                                                     border: '1px solid var(--border-color)',
+                                                     textDecoration: 'none',
+                                                     fontSize: '0.75rem',
+                                                     fontWeight: '800',
+                                                     color: 'var(--text-dark)'
+                                                 }}
+                                             >
+                                                 <i className="fas fa-walking" style={{ color: 'var(--primary-color)', fontSize: '1rem' }}></i>
+                                                 <span>Walk</span>
+                                             </a>
+                                         </div>
+                                     </div>
+                                 )}
                             </div>
 
                             {/* Location Details */}

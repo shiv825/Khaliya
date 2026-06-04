@@ -1,14 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 export default function FeaturedSpecials({ isNative = false }) {
     const { t, language } = useLanguage();
     const { addToCart } = useCart();
+    const [liveMenu, setLiveMenu] = useState([]);
 
-    const specials = [
+    const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+    const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
+    useEffect(() => {
+        let isMounted = true;
+        
+        const fetchMenu = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/menu?t=${Date.now()}`);
+                if (isMounted && Array.isArray(res.data)) {
+                    setLiveMenu(res.data);
+                }
+            } catch (err) {
+                console.warn('Failed to fetch specials menu:', err.message);
+            }
+        };
+
+        fetchMenu();
+
+        const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
+        const evtSource = new EventSource(sseUrl);
+        
+        evtSource.onmessage = (e) => {
+            try {
+                const update = JSON.parse(e.data);
+                if (update.type === 'menu' && isMounted) {
+                    setLiveMenu(update.data);
+                }
+            } catch (err) {
+                console.error("SSE menu parsing error in specials:", err);
+            }
+        };
+
+        return () => {
+            isMounted = false;
+            evtSource.close();
+        };
+    }, [API_URL]);
+
+    const baseSpecials = [
         {
             id: 'spec-1',
             name: {
@@ -58,6 +100,32 @@ export default function FeaturedSpecials({ isNative = false }) {
             badge: "Chef's Pick"
         }
     ];
+
+    const specials = baseSpecials.map(special => {
+        let searchKeyword = "";
+        if (special.id === 'spec-1') searchKeyword = "Butter Chicken";
+        else if (special.id === 'spec-2') searchKeyword = "Rogan Josh";
+        else if (special.id === 'spec-3') searchKeyword = "Paneer";
+
+        const matchedItem = liveMenu.find(item => {
+            const itemName = (typeof item.name === 'object' ? item.name.en : item.name || '').toLowerCase();
+            return itemName.includes(searchKeyword.toLowerCase());
+        });
+
+        if (matchedItem) {
+            return {
+                ...special,
+                id: matchedItem.id || special.id,
+                name: typeof matchedItem.name === 'object' ? matchedItem.name : { en: matchedItem.name },
+                description: typeof matchedItem.description === 'object' ? matchedItem.description : { en: matchedItem.description },
+                price: String(matchedItem.price).includes('₹') ? matchedItem.price : `₹${matchedItem.price}`,
+                image: matchedItem.image || special.image,
+                available: matchedItem.available !== false,
+                tags: matchedItem.tags
+            };
+        }
+        return special;
+    });
 
     const getLocalized = (field) => {
         if (field && typeof field === 'object') {
@@ -136,8 +204,15 @@ export default function FeaturedSpecials({ isNative = false }) {
                                 <span style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{item.price}</span>
                                 <button 
                                     className="btn btn-primary" 
-                                    style={{ padding: '10px 24px', fontSize: '0.85rem' }}
+                                    style={{ 
+                                        padding: '10px 24px', 
+                                        fontSize: '0.85rem',
+                                        opacity: item.available === false ? 0.5 : 1,
+                                        cursor: item.available === false ? 'not-allowed' : 'pointer'
+                                    }}
+                                    disabled={item.available === false}
                                     onClick={() => {
+                                        if (item.available === false) return;
                                         addToCart(item);
                                         Swal.fire({
                                             title: 'Royal Selection!',
@@ -153,7 +228,7 @@ export default function FeaturedSpecials({ isNative = false }) {
                                         });
                                     }}
                                 >
-                                    <i className="fas fa-plus"></i> {t('common.orderNow', 'Add to Selection')}
+                                    <i className="fas fa-plus"></i> {item.available === false ? t('common.outOfStock', 'Out of Stock') : t('common.orderNow', 'Add to Selection')}
                                 </button>
                             </div>
                         </div>

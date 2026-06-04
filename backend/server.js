@@ -153,6 +153,35 @@ const sendUpdateToAll = (type, data) => {
 const writeData = (fileName, data) => {
     const filePath = getFilePath(fileName);
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+
+    // Sync menu.json to frontend data folder and fallback JSX menus
+    if (fileName === 'menu.json') {
+        try {
+            const frontendMenuPath = path.join(__dirname, '../frontend/src/data/menu.json');
+            fs.writeFileSync(frontendMenuPath, JSON.stringify(data, null, 2), 'utf-8');
+            
+            // Execute fallback syncing
+            const menuJSXPath = path.join(__dirname, '../frontend/src/components/Menu.jsx');
+            const nativeMenuJSXPath = path.join(__dirname, '../frontend/src/components/native/NativeMenu.jsx');
+            
+            const replacementStr = 'const getFallbackMenu = () => ' + JSON.stringify(data, null, 8) + ';';
+            
+            if (fs.existsSync(menuJSXPath)) {
+                let jsx = fs.readFileSync(menuJSXPath, 'utf8');
+                jsx = jsx.replace(/const getFallbackMenu = \(\) => \[[\s\S]*?\];/, replacementStr);
+                fs.writeFileSync(menuJSXPath, jsx);
+            }
+            if (fs.existsSync(nativeMenuJSXPath)) {
+                let jsx = fs.readFileSync(nativeMenuJSXPath, 'utf8');
+                jsx = jsx.replace(/const getFallbackMenu = \(\) => \[[\s\S]*?\];/, replacementStr);
+                fs.writeFileSync(nativeMenuJSXPath, jsx);
+            }
+            console.log('✅ Synchronized menu changes to frontend static JSON and JSX fallbacks');
+        } catch (err) {
+            console.error('❌ Failed to sync menu changes to frontend files:', err.message);
+        }
+    }
+
     const type = fileName.replace('.json', '');
     sendUpdateToAll(type, data);
 };

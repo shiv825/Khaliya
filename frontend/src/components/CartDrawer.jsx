@@ -9,6 +9,7 @@ export default function CartDrawer({ isOpen, onClose }) {
     const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
     const { t, language } = useLanguage();
     const [tableNumber, setTableNumber] = React.useState('');
+    const [storeSettings, setStoreSettings] = React.useState({ isOpen: true });
 
     const getLocalized = (field) => {
         if (field && typeof field === 'object') return field[language] || field.en || '';
@@ -19,8 +20,55 @@ export default function CartDrawer({ isOpen, onClose }) {
     const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
     const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
 
+    React.useEffect(() => {
+        let isMounted = true;
+        const fetchSettings = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/settings?t=${Date.now()}`);
+                if (isMounted && res.data) {
+                    setStoreSettings(res.data);
+                }
+            } catch (err) {
+                console.warn('Failed to fetch settings in CartDrawer:', err.message);
+            }
+        };
+
+        if (isOpen) {
+            fetchSettings();
+        }
+
+        const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
+        const evtSource = new EventSource(sseUrl);
+        
+        evtSource.onmessage = (e) => {
+            try {
+                const update = JSON.parse(e.data);
+                if (update.type === 'settings' && isMounted) {
+                    setStoreSettings(update.data);
+                }
+            } catch (err) {
+                console.error("SSE settings parsing error in CartDrawer:", err);
+            }
+        };
+
+        return () => {
+            isMounted = false;
+            evtSource.close();
+        };
+    }, [isOpen, API_URL]);
+
     const handleCheckout = async () => {
         if (cart.length === 0) return;
+
+        if (storeSettings.isOpen === false) {
+            Swal.fire({
+                title: 'Ordering Temporarily Closed',
+                text: 'We are not accepting online orders at the moment. Please contact our staff.',
+                icon: 'warning',
+                confirmButtonColor: 'var(--primary-color)'
+            });
+            return;
+        }
         
         if (!tableNumber || tableNumber.trim() === '') {
             Swal.fire({
@@ -209,12 +257,38 @@ export default function CartDrawer({ isOpen, onClose }) {
                                         }}
                                     />
                                 </div>
+                                {storeSettings.isOpen === false && (
+                                    <div style={{
+                                        background: 'rgba(239, 68, 68, 0.1)',
+                                        color: '#ef4444',
+                                        padding: '15px',
+                                        borderRadius: '15px',
+                                        marginBottom: '20px',
+                                        fontWeight: '700',
+                                        fontSize: '0.9rem',
+                                        textAlign: 'center',
+                                        border: '1px solid rgba(239, 68, 68, 0.2)'
+                                    }}>
+                                        <i className="fas fa-exclamation-triangle" style={{ marginRight: '8px' }}></i>
+                                        Ordering closed temporarily
+                                    </div>
+                                )}
                                 <button 
                                     onClick={handleCheckout}
                                     className="btn btn-primary" 
-                                    style={{ width: '100%', padding: '20px', borderRadius: '40px', fontWeight: '800', letterSpacing: '1.5px', fontSize: '1.1rem' }}
+                                    disabled={storeSettings.isOpen === false}
+                                    style={{ 
+                                        width: '100%', 
+                                        padding: '20px', 
+                                        borderRadius: '40px', 
+                                        fontWeight: '800', 
+                                        letterSpacing: '1.5px', 
+                                        fontSize: '1.1rem',
+                                        opacity: storeSettings.isOpen === false ? 0.5 : 1,
+                                        cursor: storeSettings.isOpen === false ? 'not-allowed' : 'pointer'
+                                    }}
                                 >
-                                    {t('cart.checkout')}
+                                    {storeSettings.isOpen === false ? 'Ordering Closed' : t('cart.checkout')}
                                 </button>
                             </div>
                         )}

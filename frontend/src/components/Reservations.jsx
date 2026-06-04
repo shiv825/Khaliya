@@ -19,6 +19,16 @@ export default function Reservations({ predefinedTable }) {
     const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
     const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
 
+    const mapTableType = (type) => {
+        if (!type) return '';
+        const t = type.toLowerCase();
+        if (t.includes('window')) return 'window';
+        if (t.includes('family')) return 'family';
+        if (t.includes('vip') || t.includes('intimate')) return 'intimate';
+        if (t.includes('party')) return 'party';
+        return 'group'; // default for dining, regular, patio, group
+    };
+
     useEffect(() => {
         // AI Suggestion pre-fill
         const aiMatch = localStorage.getItem('khaliya_ai_match');
@@ -44,7 +54,38 @@ export default function Reservations({ predefinedTable }) {
         }
 
         if (predefinedTable) {
-            setFormData(prev => ({ ...prev, tableType: predefinedTable }));
+            const mapped = mapTableType(predefinedTable);
+            const guestsMap = {
+                'Window 2-Seater': '2',
+                'Main Dining 4-Seater': '4',
+                'VIP Booth': '2',
+                'Large Family Table': '7-10',
+                'Outdoor Patio': '4',
+                'window': '2',
+                'family': '5-6',
+                'intimate': '2',
+                'group': '7-10',
+                'party': '10+',
+                'regular': '4'
+            };
+            setFormData(prev => ({ 
+                ...prev, 
+                tableType: mapped,
+                guests: guestsMap[predefinedTable] || guestsMap[mapped] || prev.guests 
+            }));
+
+            // If it's a visual floorplan table name, display selection alert
+            const labels = ['Window 2-Seater', 'Main Dining 4-Seater', 'VIP Booth', 'Large Family Table', 'Outdoor Patio'];
+            if (labels.includes(predefinedTable)) {
+                const idMap = {
+                    'Window 2-Seater': 'T1',
+                    'Main Dining 4-Seater': 'T2',
+                    'VIP Booth': 'T3',
+                    'Large Family Table': 'T4',
+                    'Outdoor Patio': 'T5'
+                };
+                setSelectedTableInfo({ id: idMap[predefinedTable], type: predefinedTable });
+            }
         }
     }, [predefinedTable]);
 

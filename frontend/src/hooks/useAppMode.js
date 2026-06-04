@@ -10,30 +10,24 @@ export function useAppMode() {
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search);
         
-        // 1. Explicit query param (Strongest signal from manifest.json start_url)
-        const hasModeParam = searchParams.has('mode') && searchParams.get('mode') === 'pwa';
+        // 1. Explicit display mode check (Standalone PWA installed app)
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         
-        // 2. Forced website override
-        const isForcedWebsite = searchParams.has('mode') && searchParams.get('mode') === 'website';
+        // 2. Explicit query params
+        const hasPwaParam = searchParams.get('mode') === 'pwa';
+        const hasWebsiteParam = searchParams.get('mode') === 'website';
 
-        if (isForcedWebsite) {
-            sessionStorage.removeItem('khaliya_app_mode');
+        if (hasWebsiteParam) {
             setIsAppMode(false);
             return;
         }
 
-        if (hasModeParam) {
-            sessionStorage.setItem('khaliya_app_mode', 'true');
+        if (isStandalone || hasPwaParam) {
             setIsAppMode(true);
             return;
         }
 
-        if (sessionStorage.getItem('khaliya_app_mode') === 'true') {
-            setIsAppMode(true);
-            return;
-        }
-
-        // Default to false (Website mode)
+        // Default to false (Website mode in standard browser tab)
         setIsAppMode(false);
 
     }, []);

@@ -111,7 +111,26 @@ export default function NativeBook() {
                             <label style={{ marginBottom: '20px', display: 'block', fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: '800' }}>Select Your Table</label>
                             
                             <div style={{ marginBottom: '40px' }}>
-                                <InteractiveFloorplan onSelectTable={(type) => setFormData({ ...formData, tableType: type })} />
+                                <InteractiveFloorplan onSelectTable={(type) => {
+                                    const mappedType = type.toLowerCase().includes('window') ? 'window' :
+                                                       type.toLowerCase().includes('family') ? 'family' :
+                                                       type.toLowerCase().includes('vip') ? 'intimate' :
+                                                       type.toLowerCase().includes('party') ? 'party' : 'group';
+                                    
+                                    const guestsMap = {
+                                        'Window 2-Seater': 2,
+                                        'Main Dining 4-Seater': 4,
+                                        'VIP Booth': 2,
+                                        'Large Family Table': 8,
+                                        'Outdoor Patio': 4
+                                    };
+                                    
+                                    setFormData({ 
+                                        ...formData, 
+                                        tableType: mappedType,
+                                        guests: guestsMap[type] || formData.guests 
+                                    });
+                                }} />
                             </div>
 
                             <div style={{ display: 'grid', gap: '15px' }}>
