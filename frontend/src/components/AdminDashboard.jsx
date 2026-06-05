@@ -481,11 +481,11 @@ export default function AdminDashboard({ onLogout }) {
                                                                 );
                                                             })}
                                                         </div>
-                                                        <div style={{ display: 'flex', gap: '10px', marginTop: 10, flexWrap: 'wrap' }}>
-                                                            {o.status === 'received' && <button onClick={() => updateStatus('orders', o.id, 'preparing')} className="action-btn btn-primary" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Start Cooking</button>}
-                                                            {o.status === 'preparing' && <button onClick={() => updateStatus('orders', o.id, 'ready')} className="action-btn btn-confirm" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Mark Ready</button>}
-                                                            {o.status === 'ready' && <button onClick={() => updateStatus('orders', o.id, 'delivered')} className="action-btn" style={{ padding: '8px 15px', fontSize: '0.8rem', background: 'var(--admin-bg)', color: '#FFF' }}>Complete</button>}
-                                                            {(o.status === 'received' || o.status === 'preparing') && <button onClick={() => updateStatus('orders', o.id, 'cancelled')} className="action-btn btn-cancel" style={{ padding: '8px 15px', fontSize: '0.8rem' }}>Cancel</button>}
+                                                        <div className="order-card-actions">
+                                                            {o.status === 'received' && <button onClick={() => updateStatus('orders', o.id, 'preparing')} className="action-btn btn-primary">Start Cooking</button>}
+                                                            {o.status === 'preparing' && <button onClick={() => updateStatus('orders', o.id, 'ready')} className="action-btn btn-confirm">Mark Ready</button>}
+                                                            {o.status === 'ready' && <button onClick={() => updateStatus('orders', o.id, 'delivered')} className="action-btn btn-complete">Complete</button>}
+                                                            {(o.status === 'received' || o.status === 'preparing') && <button onClick={() => updateStatus('orders', o.id, 'cancelled')} className="action-btn btn-cancel">Cancel</button>}
                                                         </div>
                                                     </div>
                                                 ))
