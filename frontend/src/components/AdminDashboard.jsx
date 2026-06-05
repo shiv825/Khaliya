@@ -229,10 +229,14 @@ export default function AdminDashboard({ onLogout }) {
 
     const toggleMenuItem = async (item) => {
         const updatedItem = { ...item, available: !item.available };
+        // Optimistically update frontend state
+        setMenu(prev => prev.map(m => m.id === item.id ? updatedItem : m));
         try {
             await axios.put(`${API_URL}/menu/${item.id}`, updatedItem);
-            setMenu(prev => prev.map(m => m.id === item.id ? updatedItem : m));
-        } catch (err) {}
+        } catch (err) {
+            Swal.fire('Error', 'Failed to update availability. Re-syncing.', 'error');
+            fetchData();
+        }
     };
 
     const handleImageUpload = async (e) => {
@@ -266,17 +270,25 @@ export default function AdminDashboard({ onLogout }) {
                 savedItem.price = `₹${savedItem.price}`;
             }
 
+            // Close modal immediately for smooth transitions
+            setIsModalOpen(false);
+
             if (savedItem.id) {
+                // Optimistically update frontend state for existing item
+                setMenu(prev => prev.map(m => m.id === savedItem.id ? savedItem : m));
                 await axios.put(`${API_URL}/menu/${savedItem.id}`, savedItem);
                 Swal.fire({ title: 'Updated!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             } else {
-                await axios.post(`${API_URL}/menu`, savedItem);
+                // Make the call and push the response item once it resolves
+                const res = await axios.post(`${API_URL}/menu`, savedItem);
+                if (res.data) {
+                    setMenu(prev => [...prev, res.data]);
+                }
                 Swal.fire({ title: 'Added!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             }
-            setIsModalOpen(false);
-            fetchData();
         } catch (err) {
-            Swal.fire('Error', 'Failed to save', 'error');
+            Swal.fire('Error', 'Failed to save. Re-syncing.', 'error');
+            fetchData();
         }
     };
 
@@ -286,10 +298,12 @@ export default function AdminDashboard({ onLogout }) {
         });
         if (result.isConfirmed) {
             try {
+                // Optimistically update frontend state
+                setMenu(prev => prev.filter(m => m.id !== id));
                 await axios.delete(`${API_URL}/menu/${id}`);
-                fetchData();
             } catch (err) {
-                Swal.fire('Error', 'Failed to delete', 'error');
+                Swal.fire('Error', 'Failed to delete. Re-syncing.', 'error');
+                fetchData();
             }
         }
     };
