@@ -208,14 +208,22 @@ export default function AdminDashboard({ onLogout }) {
                 payload.estimatedTime = estimatedTime;
             }
 
-            await axios.put(`${API_URL}/${type}/${id}`, payload);
+            // Optimistic UI update for instantaneous button responsiveness
             if (type === 'bookings') {
                 setBookings(prev => prev.map(b => b.id === id ? { ...b, ...payload } : b));
             } else {
                 setOrders(prev => prev.map(o => o.id === id ? { ...o, ...payload } : o));
             }
+
+            await axios.put(`${API_URL}/${type}/${id}`, payload);
         } catch (err) {
-            Swal.fire('Error', 'Update failed', 'error');
+            Swal.fire('Error', 'Update failed. Re-syncing database.', 'error');
+            // Re-fetch data on failure to restore correct server state
+            const timestamp = Date.now();
+            axios.get(`${API_URL}/${type}?t=${timestamp}`).then(res => {
+                if (type === 'bookings') setBookings(res.data);
+                else setOrders(res.data);
+            }).catch(e => console.error(e));
         }
     };
 

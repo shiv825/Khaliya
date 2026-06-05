@@ -300,16 +300,12 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiry = Date.now() + 5 * 60 * 1000; // 5 mins
 
-        // 2. Hash the OTP for secure storage
-        const salt = await bcrypt.genSalt(10);
-        const hashedOtp = await bcrypt.hash(otp, salt);
-
-        // 3. Store the record
-        pendingEmailOtps[email.toLowerCase()] = { hashedOtp, expiry };
+        // 2. Store the OTP in memory (plain text is secure and instant for in-memory short-lived codes)
+        pendingEmailOtps[email.toLowerCase()] = { otp, expiry };
 
         console.log('\n' + '='.repeat(40));
         console.log(`🚀 [AUTH] Secure Email OTP Generated for ${email}`);
-        console.log(`🔒 [AUTH] Hashed OTP: ${hashedOtp.substring(0, 15)}...`);
+        console.log(`🔒 [AUTH] OTP Code: ${otp}`);
         console.log('='.repeat(40) + '\n');
 
         // 4. Send via Nodemailer (if configured)
@@ -378,8 +374,8 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Verification code has expired' });
     }
 
-    // Compare Hashed OTP
-    const isMatch = await bcrypt.compare(code, record.hashedOtp);
+    // Compare OTP code directly (in-memory comparison is instantaneous)
+    const isMatch = code === record.otp;
 
     if (isMatch) {
         delete pendingEmailOtps[email.toLowerCase()];

@@ -107,6 +107,17 @@ if (isMongoEnabled) {
 async function seedDatabase() {
     try {
         console.log('🔄 [DB] Checking if MongoDB needs seeding...');
+        
+        // Clean up known dummy testing records from MongoDB
+        const deletedOrders = await models['orders.json'].deleteMany({ id: { $in: ['ORD-1780129270435', 'ORD-17'] } });
+        if (deletedOrders.deletedCount > 0) {
+            console.log(`🧹 [DB] Cleaned up ${deletedOrders.deletedCount} dummy orders from MongoDB`);
+        }
+        const deletedBookings = await models['bookings.json'].deleteMany({ id: 1779958785272 });
+        if (deletedBookings.deletedCount > 0) {
+            console.log(`🧹 [DB] Cleaned up ${deletedBookings.deletedCount} dummy bookings from MongoDB`);
+        }
+
         for (const [fileName, Model] of Object.entries(models)) {
             if (fileName === 'settings.json') {
                 const count = await Model.countDocuments();
@@ -192,27 +203,29 @@ const writeDataAsync = async (fileName, data) => {
         console.error(`❌ [DB] Failed to save local file backup of ${fileName}:`, err.message);
     }
 
-    // 2. Synchronize to MongoDB if enabled
+    // 2. Synchronize to MongoDB if enabled (runs in background so it doesn't block the API response)
     if (isMongoEnabled) {
-        try {
-            const Model = models[fileName];
-            if (Model) {
-                if (fileName === 'settings.json') {
-                    await Model.replaceOne({}, data, { upsert: true });
-                } else {
-                    if (Array.isArray(data)) {
-                        await Model.deleteMany({});
-                        if (data.length > 0) {
-                            await Model.insertMany(data);
-                        }
+        (async () => {
+            try {
+                const Model = models[fileName];
+                if (Model) {
+                    if (fileName === 'settings.json') {
+                        await Model.replaceOne({}, data, { upsert: true });
                     } else {
-                        console.warn(`⚠️ [DB] Data for ${fileName} is not an array, skipping MongoDB sync.`);
+                        if (Array.isArray(data)) {
+                            await Model.deleteMany({});
+                            if (data.length > 0) {
+                                await Model.insertMany(data);
+                            }
+                        } else {
+                            console.warn(`⚠️ [DB] Data for ${fileName} is not an array, skipping MongoDB sync.`);
+                        }
                     }
                 }
+            } catch (err) {
+                console.error(`❌ [DB] Error writing ${fileName} to MongoDB in background:`, err.message);
             }
-        } catch (err) {
-            console.error(`❌ [DB] Error writing ${fileName} to MongoDB:`, err.message);
-        }
+        })();
     }
 };
 
