@@ -126,16 +126,11 @@ const CAPACITY_MAP = {
     'window': 5
 };
 
-// Helper logic for JSON files (acting as simple DB)
-const getFilePath = (fileName) => path.join(__dirname, fileName);
+// Database and Helper logic (Hybrid MongoDB + Local JSON)
+const { readDataAsync, writeDataAsync, isMongoEnabled } = require('./db');
 
-const readData = (fileName) => {
-    const filePath = getFilePath(fileName);
-    if (!fs.existsSync(filePath)) {
-        return [];
-    }
-    const data = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(data);
+const readData = async (fileName) => {
+    return await readDataAsync(fileName);
 };
 
 // SSE Live Updates
@@ -150,15 +145,18 @@ const sendUpdateToAll = (type, data) => {
     });
 };
 
-const writeData = (fileName, data) => {
-    const filePath = getFilePath(fileName);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+const writeData = async (fileName, data) => {
+    // Write to MongoDB and local disk backup
+    await writeDataAsync(fileName, data);
 
     // Sync menu.json to frontend data folder and fallback JSX menus
     if (fileName === 'menu.json') {
         try {
             const frontendMenuPath = path.join(__dirname, '../frontend/src/data/menu.json');
-            fs.writeFileSync(frontendMenuPath, JSON.stringify(data, null, 2), 'utf-8');
+            const frontendDir = path.dirname(frontendMenuPath);
+            if (fs.existsSync(frontendDir)) {
+                fs.writeFileSync(frontendMenuPath, JSON.stringify(data, null, 2), 'utf-8');
+            }
             
             // Execute fallback syncing
             const menuJSXPath = path.join(__dirname, '../frontend/src/components/Menu.jsx');
@@ -187,36 +185,36 @@ const writeData = (fileName, data) => {
 };
 
 // API: Menu
-app.get('/api/menu', (req, res) => {
-    const menu = readData('menu.json');
+app.get('/api/menu', async (req, res) => {
+    const menu = await readData('menu.json');
     res.json(menu);
 });
 
-app.post('/api/menu', (req, res) => {
-    const menu = readData('menu.json');
+app.post('/api/menu', async (req, res) => {
+    const menu = await readData('menu.json');
     const newItem = { id: Date.now(), ...req.body };
     menu.push(newItem);
-    writeData('menu.json', menu);
+    await writeData('menu.json', menu);
     res.status(201).json(newItem);
 });
 
-app.put('/api/menu/:id', (req, res) => {
-    const menu = readData('menu.json');
+app.put('/api/menu/:id', async (req, res) => {
+    const menu = await readData('menu.json');
     const index = menu.findIndex(m => m.id == req.params.id || m.name == req.params.id);
     if (index !== -1) {
         menu[index] = { ...menu[index], ...req.body };
-        writeData('menu.json', menu);
+        await writeData('menu.json', menu);
         res.json(menu[index]);
     } else {
         res.status(404).json({ message: 'Item not found' });
     }
 });
 
-app.delete('/api/menu/:id', (req, res) => {
-    const menu = readData('menu.json');
+app.delete('/api/menu/:id', async (req, res) => {
+    const menu = await readData('menu.json');
     const filtered = menu.filter(m => m.id != req.params.id && m.name != req.params.id);
     if (filtered.length !== menu.length) {
-        writeData('menu.json', filtered);
+        await writeData('menu.json', filtered);
         res.json({ message: 'Item deleted' });
     } else {
         res.status(404).json({ message: 'Item not found' });
@@ -224,16 +222,16 @@ app.delete('/api/menu/:id', (req, res) => {
 });
 
 // API: Bookings
-app.get('/api/bookings', (req, res) => {
-    const bookings = readData('bookings.json');
+app.get('/api/bookings', async (req, res) => {
+    const bookings = await readData('bookings.json');
     res.json(bookings);
 });
 
-app.get('/api/bookings/availability', (req, res) => {
+app.get('/api/bookings/availability', async (req, res) => {
     const { date, tableType } = req.query;
     if (!date || !tableType) return res.status(400).json({ message: 'Date and Table Type are required' });
 
-    const bookings = readData('bookings.json');
+    const bookings = await readData('bookings.json');
     const filtered = bookings.filter(b => b.date === date && b.tableType === tableType);
     
     // Count bookings per time slot
@@ -252,8 +250,8 @@ app.get('/api/bookings/availability', (req, res) => {
     });
 });
 
-app.post('/api/bookings', (req, res) => {
-    const bookings = readData('bookings.json');
+app.post('/api/bookings', async (req, res) => {
+    const bookings = await readData('bookings.json');
     const newBooking = { 
         id: Date.now(), 
         timestamp: new Date().toLocaleString(), 
@@ -263,27 +261,27 @@ app.post('/api/bookings', (req, res) => {
         ...req.body 
     };
     bookings.push(newBooking);
-    writeData('bookings.json', bookings);
+    await writeData('bookings.json', bookings);
     res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
 });
 
-app.put('/api/bookings/:id', (req, res) => {
-    const bookings = readData('bookings.json');
+app.put('/api/bookings/:id', async (req, res) => {
+    const bookings = await readData('bookings.json');
     const index = bookings.findIndex(b => b.id == req.params.id);
     if (index !== -1) {
         bookings[index] = { ...bookings[index], ...req.body };
-        writeData('bookings.json', bookings);
+        await writeData('bookings.json', bookings);
         res.json({ message: 'Booking updated', booking: bookings[index] });
     } else {
         res.status(404).json({ message: 'Booking not found' });
     }
 });
 
-app.delete('/api/bookings/:id', (req, res) => {
-    const bookings = readData('bookings.json');
+app.delete('/api/bookings/:id', async (req, res) => {
+    const bookings = await readData('bookings.json');
     const filtered = bookings.filter(b => b.id != req.params.id);
     if (filtered.length !== bookings.length) {
-        writeData('bookings.json', filtered);
+        await writeData('bookings.json', filtered);
         res.json({ message: 'Booking deleted' });
     } else {
         res.status(404).json({ message: 'Booking not found' });
@@ -387,7 +385,7 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
         delete pendingEmailOtps[email.toLowerCase()];
         
         // Handle User Persistence (Proper Account System)
-        const users = readData('users.json');
+        const users = await readData('users.json');
         let user = users.find(u => u.email === email.toLowerCase());
         
         if (!user) {
@@ -415,14 +413,14 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
             if (userIndex !== -1) {
                 users[userIndex] = user;
             }
-            writeData('users.json', users);
+            await writeData('users.json', users);
             
             // Broadcast the invalidation event to other devices
             setTimeout(() => {
                 sendUpdateToAll('customer-session-invalidate', { email: user.email.toLowerCase(), newSessionId });
             }, 100);
         } else {
-            writeData('users.json', users);
+            await writeData('users.json', users);
         }
 
         res.json({ 
@@ -434,7 +432,7 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
     }
 });
 
-app.post('/api/auth/check-session', (req, res) => {
+app.post('/api/auth/check-session', async (req, res) => {
     const { email, sessionId } = req.body;
     if (!email || !sessionId) {
         return res.json({ success: true, valid: false, message: 'Email and Session ID are required' });
@@ -444,7 +442,7 @@ app.post('/api/auth/check-session', (req, res) => {
         return res.json({ success: true, valid: true });
     }
     
-    const users = readData('users.json');
+    const users = await readData('users.json');
     let user = users.find(u => u.email === email.toLowerCase());
     
     if (!user) {
@@ -459,7 +457,7 @@ app.post('/api/auth/check-session', (req, res) => {
             currentSessionId: sessionId
         };
         users.push(user);
-        writeData('users.json', users);
+        await writeData('users.json', users);
         return res.json({ success: true, valid: true, message: 'User restored' });
     }
     
@@ -469,26 +467,26 @@ app.post('/api/auth/check-session', (req, res) => {
 
 
 // API: Reviews
-app.get('/api/reviews', (req, res) => {
-    const reviews = readData('reviews.json');
+app.get('/api/reviews', async (req, res) => {
+    const reviews = await readData('reviews.json');
     res.json(reviews);
 });
 
-app.post('/api/reviews', (req, res) => {
-    const reviews = readData('reviews.json');
+app.post('/api/reviews', async (req, res) => {
+    const reviews = await readData('reviews.json');
     const newReview = { id: Date.now(), date: new Date().toLocaleDateString(), ...req.body };
     reviews.push(newReview);
-    writeData('reviews.json', reviews);
+    await writeData('reviews.json', reviews);
     res.status(201).json({ message: 'Review created successfully', review: newReview });
 });
 
 // -- API: ORDERS (PWA NATIVE ORDERS) --
-app.get('/api/orders', (req, res) => {
-    res.json(readData('orders.json'));
+app.get('/api/orders', async (req, res) => {
+    res.json(await readData('orders.json'));
 });
 
-app.post('/api/orders', (req, res) => {
-    const orders = readData('orders.json');
+app.post('/api/orders', async (req, res) => {
+    const orders = await readData('orders.json');
     const newOrder = { 
         id: `ORD-${Date.now()}`, 
         timestamp: new Date().toLocaleString(), 
@@ -496,29 +494,29 @@ app.post('/api/orders', (req, res) => {
         ...req.body 
     };
     orders.push(newOrder);
-    writeData('orders.json', orders);
+    await writeData('orders.json', orders);
     
     console.log(`🍟 [ORDER] New App Order: ${newOrder.id} - ${newOrder.items.length} items`);
     res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
 });
 
-app.put('/api/orders/:id', (req, res) => {
-    const orders = readData('orders.json');
+app.put('/api/orders/:id', async (req, res) => {
+    const orders = await readData('orders.json');
     const index = orders.findIndex(o => o.id === req.params.id);
     if (index !== -1) {
         orders[index] = { ...orders[index], ...req.body };
-        writeData('orders.json', orders);
+        await writeData('orders.json', orders);
         res.json({ success: true, message: 'Order updated', order: orders[index] });
     } else {
         res.status(404).json({ success: false, message: 'Order not found' });
     }
 });
 
-app.delete('/api/orders/:id', (req, res) => {
-    const orders = readData('orders.json');
+app.delete('/api/orders/:id', async (req, res) => {
+    const orders = await readData('orders.json');
     const filtered = orders.filter(o => o.id !== req.params.id);
     if (filtered.length !== orders.length) {
-        writeData('orders.json', filtered);
+        await writeData('orders.json', filtered);
         res.json({ success: true, message: 'Order deleted' });
     } else {
         res.status(404).json({ success: false, message: 'Order not found' });
@@ -526,21 +524,21 @@ app.delete('/api/orders/:id', (req, res) => {
 });
 
 // API: Analytics & Visits
-app.post('/api/visits', (req, res) => {
-    const visits = readData('visits.json');
+app.post('/api/visits', async (req, res) => {
+    const visits = await readData('visits.json');
     const source = req.body.source || 'Unknown';
     visits.push({
         id: Date.now(),
         date: new Date().toISOString(),
         source: source // 'Website' or 'App'
     });
-    writeData('visits.json', visits);
+    await writeData('visits.json', visits);
     res.json({ success: true });
 });
 
-app.get('/api/analytics', (req, res) => {
-    const orders = readData('orders.json');
-    const visits = readData('visits.json');
+app.get('/api/analytics', async (req, res) => {
+    const orders = await readData('orders.json');
+    const visits = await readData('visits.json');
     
     const validOrders = orders.filter(o => o.status !== 'cancelled');
     
@@ -620,12 +618,12 @@ app.get('/api/analytics', (req, res) => {
     });
 });
 
-app.get('/api/settings', (req, res) => {
-    res.json(readData('settings.json'));
+app.get('/api/settings', async (req, res) => {
+    res.json(await readData('settings.json'));
 });
 
-app.post('/api/settings', (req, res) => {
-    writeData('settings.json', req.body);
+app.post('/api/settings', async (req, res) => {
+    await writeData('settings.json', req.body);
     res.json({ success: true, settings: req.body });
 });
 
