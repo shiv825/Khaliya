@@ -306,82 +306,58 @@ export default function AdminDashboard({ onLogout }) {
     const pieData = Object.keys(categorySales).map(key => ({ name: key, value: categorySales[key] })).filter(d => d.value > 0);
 
     return (
-        <div className="admin-portal-wrapper admin-layout">
-            {isSidebarOpen && (
-                <div className="sidebar-backdrop" onClick={() => setIsSidebarOpen(false)}></div>
-            )}
-            
-            <aside className={`admin-sidebar ${!isSidebarOpen ? 'collapsed' : 'mobile-open'}`}>
-                <div className="sidebar-logo-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <h1 style={{ color: 'var(--admin-text)', fontFamily: 'var(--font-heading)', fontSize: isSidebarOpen ? '1.8rem' : '1.2rem', margin: '0 0 20px 0', fontWeight: '900' }}>
-                        {isSidebarOpen ? 'Khaliya' : 'K'}
-                        <span style={{ color: 'var(--admin-primary)' }}>.</span>
+        <div className="admin-portal-wrapper">
+            {/* Horizontal Header Navbar */}
+            <header className="admin-header-nav">
+                <div className="admin-header-left">
+                    <h1 className="admin-header-logo">
+                        Khaliya<span style={{ color: 'var(--admin-primary)' }}>.</span>
                     </h1>
-                    <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}>
-                        <i className="fas fa-times"></i>
-                    </button>
                 </div>
 
-                <nav className="admin-nav">
-                    <button className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
-                        <i className="fas fa-th-large"></i>
-                        <span className="nav-label">Dashboard</span>
-                    </button>
-                    <button className={`nav-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => { setActiveTab('orders'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
-                        <i className="fas fa-fire-burner"></i>
-                        <span className="nav-label">Live Orders</span>
-                        {pendingOrdersCount > 0 && <span className="nav-badge">{pendingOrdersCount}</span>}
-                    </button>
-                    <button className={`nav-tab ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => { setActiveTab('menu'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
-                        <i className="fas fa-hamburger"></i>
-                        <span className="nav-label">Menu Setup</span>
-                    </button>
-                    <button className={`nav-tab ${activeTab === 'bookings' ? 'active' : ''}`} onClick={() => { setActiveTab('bookings'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
-                        <i className="fas fa-calendar-check"></i>
-                        <span className="nav-label">Reservations</span>
-                    </button>
-                    <button className={`nav-tab ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => { setActiveTab('reviews'); if(window.innerWidth <= 768) setIsSidebarOpen(false); }}>
-                        <i className="fas fa-star"></i>
-                        <span className="nav-label">Feedback</span>
-                    </button>
-                </nav>
-
-                <button className="nav-tab" onClick={handleLogout} style={{ color: 'var(--admin-danger)', marginTop: 'auto' }}>
-                    <i className="fas fa-sign-out-alt"></i>
-                    <span className="nav-label">Sign Out</span>
-                </button>
-            </aside>
-
-            <main className={`admin-main-content ${!isSidebarOpen ? 'expanded' : ''}`} style={{ padding: 0 }}>
-                {/* SAAS TOP HEADER */}
-                <div className="saas-top-header">
-                    <div className="saas-top-header-left">
-                        <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(true)}>
-                            <i className="fas fa-bars"></i>
+                <div className="admin-header-center">
+                    <nav className="admin-horizontal-nav">
+                        <button className={`nav-tab-h ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+                            <i className="fas fa-th-large"></i>
+                            <span className="nav-label-h">Dashboard</span>
                         </button>
-                        <div className="saas-search-bar">
-                            <i className="fas fa-search" style={{ color: 'var(--admin-text-muted)' }}></i>
-                            <input type="text" placeholder="Search orders, customers..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-                        </div>
-                    </div>
-                    
-                    <div className="saas-top-header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                        <div className={`saas-status-toggle ${settings.isOpen ? 'open' : 'closed'}`} onClick={toggleStoreStatus}>
-                            <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'currentColor' }}></div>
-                            <span>{settings.isOpen ? 'Accepting Orders' : 'Store Closed'}</span>
-                        </div>
-                        <div style={{ position: 'relative', cursor: 'pointer' }}>
-                            <i className="fas fa-bell" style={{ fontSize: '1.2rem', color: 'var(--admin-text-muted)' }}></i>
-                            {pendingOrdersCount > 0 && (
-                                <span style={{ position: 'absolute', top: -5, right: -5, background: 'var(--admin-primary)', color: '#FFF', fontSize: '0.6rem', padding: '2px 5px', borderRadius: '10px', fontWeight: 'bold' }}>
-                                    {pendingOrdersCount}
-                                </span>
-                            )}
-                        </div>
-                        <div style={{ width: 35, height: 35, borderRadius: '50%', background: 'var(--admin-primary)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>A</div>
-                    </div>
+                        <button className={`nav-tab-h ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+                            <i className="fas fa-fire-burner"></i>
+                            <span className="nav-label-h">Live Orders</span>
+                            {pendingOrdersCount > 0 && <span className="nav-badge-h">{pendingOrdersCount}</span>}
+                        </button>
+                        <button className={`nav-tab-h ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>
+                            <i className="fas fa-hamburger"></i>
+                            <span className="nav-label-h">Menu Setup</span>
+                        </button>
+                        <button className={`nav-tab-h ${activeTab === 'bookings' ? 'active' : ''}`} onClick={() => setActiveTab('bookings')}>
+                            <i className="fas fa-calendar-check"></i>
+                            <span className="nav-label-h">Reservations</span>
+                        </button>
+                        <button className={`nav-tab-h ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>
+                            <i className="fas fa-star"></i>
+                            <span className="nav-label-h">Feedback</span>
+                        </button>
+                    </nav>
                 </div>
 
+                <div className="admin-header-right">
+                    <div className="saas-search-bar" style={{ width: '180px', margin: 0 }}>
+                        <i className="fas fa-search" style={{ color: 'var(--admin-text-muted)' }}></i>
+                        <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                    </div>
+                    <div className={`saas-status-toggle ${settings.isOpen ? 'open' : 'closed'}`} onClick={toggleStoreStatus} style={{ margin: 0, padding: '8px 12px' }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }}></div>
+                        <span className="status-toggle-label" style={{ fontSize: '0.85rem' }}>{settings.isOpen ? 'Accepting' : 'Closed'}</span>
+                    </div>
+                    <button className="action-btn btn-cancel" onClick={handleLogout} style={{ padding: '8px 12px', fontSize: '0.8rem', textTransform: 'none', height: '36px', border: '1px solid var(--admin-danger)' }}>
+                        <i className="fas fa-sign-out-alt"></i>
+                        <span className="logout-label">Sign Out</span>
+                    </button>
+                </div>
+            </header>
+
+            <main className="admin-main-full">
                 <div style={{ padding: '30px' }}>
                     <AnimatePresence mode="wait">
                         
