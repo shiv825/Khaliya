@@ -251,7 +251,7 @@ a {
 }
 
 /* Floating Navbar Fix */
-nav {
+.main-nav {
     display: flex;
     justify-content: center;
     background: var(--bg-glass);
@@ -277,7 +277,7 @@ nav {
     margin: 0 auto;
 }
 
-nav a {
+.main-nav a {
     color: var(--text-dark);
     font-weight: 700;
     font-size: 0.85rem;
@@ -288,7 +288,7 @@ nav a {
     font-family: var(--font-body);
 }
 
-nav a::after {
+.main-nav a::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -299,11 +299,11 @@ nav a::after {
     transition: width 0.3s ease;
 }
 
-nav a:hover {
+.main-nav a:hover {
     color: var(--primary-color);
 }
 
-nav a:hover::after {
+.main-nav a:hover::after {
     width: 100%;
 }
 
@@ -367,7 +367,7 @@ nav a:hover::after {
 /* Responsive Overrides & Mobile Optimization */
 @media (max-width: 992px) {
     .hero-title { font-size: 4rem; }
-    nav { padding: 1rem; }
+    .main-nav { padding: 1rem; }
 }
 
 @media (max-width: 768px) {
