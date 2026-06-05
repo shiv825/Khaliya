@@ -253,11 +253,16 @@ export default function AdminDashboard({ onLogout }) {
     const handleSaveMenu = async (e) => {
         e.preventDefault();
         try {
-            if (editingItem.id) {
-                await axios.put(`${API_URL}/menu/${editingItem.id}`, editingItem);
+            const savedItem = { ...editingItem };
+            if (savedItem.price && !String(savedItem.price).startsWith('₹')) {
+                savedItem.price = `₹${savedItem.price}`;
+            }
+
+            if (savedItem.id) {
+                await axios.put(`${API_URL}/menu/${savedItem.id}`, savedItem);
                 Swal.fire({ title: 'Updated!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             } else {
-                await axios.post(`${API_URL}/menu`, editingItem);
+                await axios.post(`${API_URL}/menu`, savedItem);
                 Swal.fire({ title: 'Added!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             }
             setIsModalOpen(false);
@@ -565,8 +570,10 @@ export default function AdminDashboard({ onLogout }) {
                                                     <div className={`toggle-switch ${item.available ? 'on' : ''}`} onClick={() => toggleMenuItem(item)}></div>
                                                 </div>
                                                 <button onClick={() => { 
+                                                    const priceClean = item.price ? String(item.price).replace(/[^\d]/g, '') : '';
                                                     setEditingItem({
                                                         ...item,
+                                                        price: priceClean,
                                                         name: typeof item.name === 'string' ? { en: item.name, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.name || {}) },
                                                         description: typeof item.description === 'string' ? { en: item.description, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.description || {}) }
                                                     }); 
