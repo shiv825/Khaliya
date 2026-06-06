@@ -45,7 +45,7 @@
     --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 
-    --transition: all 0.3s ease;
+    --transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
     --radius-md: 12px;
     --radius-lg: 16px;
 
@@ -93,19 +93,7 @@
     --shadow-lg: 0 40px 100px rgba(0, 0, 0, 0.9);
 }
 
-/* Film Grain Overlay for Evening Mode */
-.app-theme-evening::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.03;
-    background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
-}
+/* Film Grain Overlay disabled to prevent scroll paint delays and ensure smooth 60fps rendering */
 
 html {
     scroll-behavior: smooth;
@@ -881,4 +869,43 @@ footer .copyright span {
 /* Force SweetAlert2 on top of PWA sliding sheets and modals */
 .swal2-container {
     z-index: 99999 !important;
+}
+
+/* ==========================================================================
+   Michelin-Grade Performance & Rendering Optimizations (60fps Scroll)
+   ========================================================================== */
+
+/* 1. Offscreen Content Visibility rendering optimization (only paint when visible) */
+#featured-specials,
+#movements,
+#testimonials,
+#menu,
+#reviews,
+#hours,
+#tables,
+#loyalty,
+#reservations {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+}
+
+/* 2. Hardware (GPU) Acceleration for transitions & hovers */
+.menu-item,
+.btn,
+button,
+.hero-card,
+.testimonial-card,
+.table-type-card,
+.social-card,
+.khali-trigger,
+.khali-window {
+    will-change: transform, opacity, box-shadow;
+    transform: translateZ(0); /* Promotes elements to their own composite layer */
+    backface-visibility: hidden;
+}
+
+/* 3. Debounce scroll paints on the body */
+body {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
