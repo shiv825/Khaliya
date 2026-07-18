@@ -6,12 +6,12 @@ export const i18nData = {
             orderNow: 'Add Item'
         },
         COMMON: { ADD: 'Add Item' },
-        loyalty: { title: 'Spice Club Rewards', sub: 'Join our exclusive loyalty program. Earn points, tier up, and unlock secret menu items!' },
+        loyalty: { title: 'Loyalty', sub: 'The premium club experience is no longer available.' },
         seasonal: { text: 'Flash Deal: 20% OFF on all Starters!' },
         nav: {
             home: 'Home', menu: 'Menu', hours: 'Hours', track: 'Find Us',
             tables: '🪑 Tables', bookings: '📊 Bookings', menuManager: '📝 Menu Manager',
-            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reserve', loyalty: 'Spice Club',
+            settings: '⚙️ Settings', logout: '🚪 Logout', contact: 'Contact', reservations: 'Reserve', loyalty: 'Loyalty',
             profile: 'Profile', bag: 'Bag', flavors: 'Flavors'
         },
         gallery: {
@@ -208,12 +208,12 @@ export const i18nData = {
             orderNow: 'आइटम जोड़ें'
         },
         COMMON: { ADD: 'आइटम जोड़ें' },
-        loyalty: { title: 'स्पाइस क्लब रिवार्ड्स', sub: 'हमारे विशेष लॉयल्टी कार्यक्रम में शामिल हों। अंक अर्जित करें, टियर अप करें और गुप्त मेनू आइटम अनलॉक करें!' },
+        loyalty: { title: 'लॉयल्टी', sub: 'प्रीमियम क्लब अनुभव अब उपलब्ध नहीं है।' },
         seasonal: { text: 'फ्लैश डील: सभी स्टार्टर्स पर 20% की छूट!' },
         nav: {
             home: 'होम', menu: 'मेनू', hours: 'घंटे', track: 'हम कहाँ हैं',
             tables: '🪑 टेबल', bookings: '📊 बुकिंग्स', menuManager: '📝 मेनू प्रबंधक',
-            settings: '⚙️ सेटिंग्स', logout: '🚪 लॉगआउट', contact: 'संपर्क', reservations: 'आरक्षण', loyalty: 'रिवार्ड्स',
+            settings: '⚙️ सेटिंग्स', logout: '🚪 लॉगआउट', contact: 'संपर्क', reservations: 'आरक्षण', loyalty: 'लॉयल्टी',
             profile: 'प्रोफ़ाइल', bag: 'थैला', flavors: 'फ्लेवर'
         },
         gallery: {
@@ -410,12 +410,12 @@ export const i18nData = {
             orderNow: 'إضافة عنصر'
         },
         COMMON: { ADD: 'إضافة عنصر' },
-        loyalty: { title: 'مكافآت نادي سبايس', sub: 'انضم إلى برنامج الولاء الحصري الخاص بنا. اكسب النقاط، وارتقِ في المستويات، وافتح عناصر القائمة السرية!' },
+        loyalty: { title: 'الولاء', sub: 'لم يعد هناك تجربة نادي مميزة متاحة.' },
         seasonal: { text: 'عرض فلاش: خصم 20% على جميع المقبلات!' },
         nav: {
             home: 'الصفحة الرئيسية', menu: 'القائمة', hours: 'ساعات العمل', track: 'اعثر علينا',
             tables: '🪑 الطاولات', bookings: '📊 الحجوزات', menuManager: '📝 مدير القائمة',
-            settings: '⚙️ الإعدادات', logout: '🚪 تسجيل الخروج', contact: 'اتصل بنا', reservations: 'الحجوزات', loyalty: 'مكافآت',
+            settings: '⚙️ الإعدادات', logout: '🚪 تسجيل الخروج', contact: 'اتصل بنا', reservations: 'الحجوزات', loyalty: 'الولاء',
             profile: 'الملف الشخصي', bag: 'الحقيبة', flavors: 'النكهات'
         },
         gallery: {

@@ -1,14 +1,39 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import InteractiveFloorplan from '../InteractiveFloorplan';
 import { useLanguage } from '../../context/LanguageContext';
 import Swal from 'sweetalert2';
 
 export default function NativeBook() {
     const { t, language = 'en' } = useLanguage();
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ date: '', time: '', guests: 2, tableType: '', specialRequests: '' });
+    const [formData, setFormData] = useState(() => {
+        const storedUser = localStorage.getItem('khaliya_native_user');
+        let name = '';
+        let phone = '';
+        if (storedUser) {
+            try {
+                const parsed = JSON.parse(storedUser);
+                if (parsed.name && parsed.name !== 'Khaliya Member' && parsed.name !== 'Guest') {
+                    name = parsed.name;
+                }
+                if (parsed.phone) {
+                    phone = parsed.phone;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        return {
+            date: '',
+            time: '',
+            guests: 2,
+            tableType: '',
+            specialRequests: '',
+            name: name,
+            phone: phone
+        };
+    });
     const [availability, setAvailability] = useState({ bookedSlots: {}, maxCapacity: 4 });
     const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
@@ -31,8 +56,17 @@ export default function NativeBook() {
         }
     };
 
+    const isSlotFull = () => {
+        if (!formData.time || !availability.bookedSlots) return false;
+        const currentBookings = availability.bookedSlots[formData.time] || 0;
+        return currentBookings >= availability.maxCapacity;
+    };
+
+    const hasValidName = () => (formData.name || '').trim().length > 0;
+    const hasValidPhone = () => (formData.phone || '').trim().length > 0;
+
     const handleNext = () => {
-        if (step === 1 && formData.date && formData.tableType) {
+        if (formData.date && formData.tableType) {
             fetchAvailability(formData.date, formData.tableType);
         }
         setStep(prev => Math.min(prev + 1, 3));
@@ -110,28 +144,7 @@ export default function NativeBook() {
                         <div className="form-group-native table-types" style={{ marginTop: '20px' }}>
                             <label style={{ marginBottom: '20px', display: 'block', fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: '800' }}>Select Your Table</label>
                             
-                            <div style={{ marginBottom: '40px' }}>
-                                <InteractiveFloorplan onSelectTable={(type) => {
-                                    const mappedType = type.toLowerCase().includes('window') ? 'window' :
-                                                       type.toLowerCase().includes('family') ? 'family' :
-                                                       type.toLowerCase().includes('vip') ? 'intimate' :
-                                                       type.toLowerCase().includes('party') ? 'party' : 'group';
-                                    
-                                    const guestsMap = {
-                                        'Window 2-Seater': 2,
-                                        'Main Dining 4-Seater': 4,
-                                        'VIP Booth': 2,
-                                        'Large Family Table': 8,
-                                        'Outdoor Patio': 4
-                                    };
-                                    
-                                    setFormData({ 
-                                        ...formData, 
-                                        tableType: mappedType,
-                                        guests: guestsMap[type] || formData.guests 
-                                    });
-                                }} />
-                            </div>
+
 
                             <div style={{ display: 'grid', gap: '15px' }}>
                                 {[
@@ -144,7 +157,13 @@ export default function NativeBook() {
                                     <motion.div
                                         key={type.id}
                                         whileTap={{ scale: 0.98 }}
-                                        onClick={() => setFormData({ ...formData, tableType: type.id })}
+                                        onClick={() => {
+                                            setFormData(prev => {
+                                                const next = { ...prev, tableType: type.id };
+                                                fetchAvailability(next.date, next.tableType);
+                                                return next;
+                                            });
+                                        }}
                                         style={{
                                             padding: '18px',
                                             borderRadius: '20px',
@@ -219,6 +238,28 @@ export default function NativeBook() {
                                 <span style={{ color: 'var(--text-light)', fontWeight: '600' }}><i className="fas fa-chair" style={{ marginRight: '8px' }}></i> Seating</span>
                                 <strong style={{ color: 'var(--primary-color)', fontWeight: '900' }}>{formData.tableType}</strong>
                             </div>
+                            <div className="summary-row" style={{ padding: '15px 0', borderBottom: '1px solid var(--border-color)' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-light)', fontSize: '0.85rem', fontWeight: '700' }}>Contact Name</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter your name..."
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-body)', color: 'var(--text-dark)', fontWeight: '600' }}
+                                    required
+                                />
+                            </div>
+                            <div className="summary-row" style={{ padding: '15px 0', borderBottom: '1px solid var(--border-color)' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-light)', fontSize: '0.85rem', fontWeight: '700' }}>Contact Phone</label>
+                                <input 
+                                    type="tel" 
+                                    placeholder="Enter phone number..."
+                                    value={formData.phone}
+                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-body)', color: 'var(--text-dark)', fontWeight: '600' }}
+                                    required
+                                />
+                            </div>
                             <div className="summary-row" style={{ padding: '15px 0' }}>
                                 <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-light)', fontSize: '0.85rem' }}>Special Requests</label>
                                 <textarea 
@@ -228,6 +269,11 @@ export default function NativeBook() {
                                     style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-body)', minHeight: '80px' }}
                                 />
                             </div>
+                            {isSlotFull() && (
+                                <div style={{ color: '#ff9800', textAlign: 'center', marginTop: '15px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                                    ⚠️ The selected slot ({formData.time}) for {formData.tableType} is fully booked.
+                                </div>
+                            )}
                         </div>
                         <div className="wizard-actions" style={{ display: 'flex', gap: '15px' }}>
                             <motion.button 
@@ -239,6 +285,7 @@ export default function NativeBook() {
                             <motion.button 
                                 whileTap={{ scale: 0.95 }} 
                                 className="zomato-btn-main" 
+                                disabled={isSlotFull() || !hasValidName() || !hasValidPhone()}
                                 onClick={() => {
                                     const storedUser = localStorage.getItem('khaliya_native_user');
                                     const user = storedUser ? JSON.parse(storedUser) : { name: 'PWA Guest' };
@@ -246,10 +293,24 @@ export default function NativeBook() {
                                     const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
                                     const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
                                     
+                                    if (isSlotFull()) {
+                                        return Swal.fire('Fully Booked', 'Please select a different slot.', 'warning');
+                                    }
+                                    if (!hasValidName()) {
+                                        return Swal.fire('Missing Name', 'Please enter a contact name for your reservation.', 'warning');
+                                    }
+                                    if (!hasValidPhone()) {
+                                        return Swal.fire('Missing Phone', 'Please enter a contact phone number.', 'warning');
+                                    }
+                                    const phonePattern = /^\+?[0-9\s\-()]{7,15}$/;
+                                    if (!phonePattern.test(formData.phone.trim())) {
+                                        return Swal.fire('Invalid Phone', 'Please enter a valid contact phone number (7 to 15 digits).', 'warning');
+                                    }
+
                                     const payload = {
                                         ...formData,
-                                        name: user.name,
-                                        phone: user.phone || '9999999999',
+                                        name: formData.name.trim(),
+                                        phone: formData.phone.trim(),
                                         email: user.email || 'guest@khaliya.pwa',
                                         source: 'App'
                                     };
@@ -259,18 +320,43 @@ export default function NativeBook() {
                                             if (typeof res.data === 'string' && res.data.toLowerCase().includes('<html')) {
                                                 throw new Error("Received HTML instead of JSON. Backend is likely misconfigured or down.");
                                             }
+
+                                            // Update local storage user profile
+                                            const updatedUser = {
+                                                ...user,
+                                                name: payload.name,
+                                                phone: payload.phone
+                                            };
+                                            localStorage.setItem('khaliya_native_user', JSON.stringify(updatedUser));
+
+                                            // Update user profile details asynchronously on backend
+                                            axios.post(`${API_URL}/users/profile`, {
+                                                email: payload.email,
+                                                name: payload.name,
+                                                phone: payload.phone
+                                            }).catch(err => console.error("Failed to update remote user profile:", err));
+
                                             Swal.fire({ title: 'Reserved!', text: 'Your royal table awaits.', icon: 'success', confirmButtonColor: '#8E1C1C' });
                                             setStep(1);
-                                            setFormData({ date: '', time: '', guests: 2, tableType: '' });
+                                            setFormData({ 
+                                                date: '', 
+                                                time: '', 
+                                                guests: 2, 
+                                                tableType: '', 
+                                                specialRequests: '', 
+                                                name: payload.name, 
+                                                phone: payload.phone 
+                                            });
                                         })
                                         .catch(err => {
                                             console.error(err);
-                                            Swal.fire('Error', 'Failed to connect. Please try again.', 'error');
+                                            const errMsg = err.response?.data?.message || 'Failed to connect. Please try again.';
+                                            Swal.fire('Error', errMsg, 'error');
                                         });
                                 }}
-                                style={{ flex: 2, margin: 0 }}
+                                style={{ flex: 2, margin: 0, opacity: (isSlotFull() || !hasValidName() || !hasValidPhone()) ? 0.5 : 1 }}
                             >
-                                Confirm Table
+                                {isSlotFull() ? 'Fully Booked' : 'Confirm Table'}
                             </motion.button>
                         </div>
                     </motion.div>
@@ -283,7 +369,8 @@ export default function NativeBook() {
     return (
         <div className="native-book-view" id="native-book" style={{ padding: '20px', paddingBottom: '120px' }}>
             <div className="native-book-header" style={{ marginBottom: '35px' }}>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', color: 'var(--primary-color)', margin: '0 0 20px 0' }}>{t('nav.reservations')}</h2>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', color: 'var(--primary-color)', margin: '0 0 10px 0' }}>{t('nav.reservations')}</h2>
+                <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', fontWeight: '600', marginTop: '-5px', marginBottom: '20px' }}>Secure one of our 20 exclusive tables</p>
                 <div className="progress-bar-container" style={{ height: '8px', background: 'var(--bg-surface)', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-color)', marginBottom: '15px' }}>
                     <div className="progress-fill" style={{ width: `${(step / 3) * 100}%`, height: '100%', background: 'var(--primary-color)', transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)' }}></div>
                 </div>

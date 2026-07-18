@@ -14,5 +14,15 @@
     "joinedAt": "2026-05-21T11:52:44.532Z",
     "spicePoints": 750,
     "role": "customer"
+  },
+  {
+    "id": "USR-1784206551148",
+    "email": "customer@khaliya.com",
+    "name": "John Doe",
+    "joinedAt": "2026-07-16T12:55:51.148Z",
+    "spicePoints": 750,
+    "role": "customer",
+    "currentSessionId": "SESS-1784206551148-p5e3clrip",
+    "phone": "9876543210"
   }
 ]

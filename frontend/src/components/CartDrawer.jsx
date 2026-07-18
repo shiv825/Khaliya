@@ -38,22 +38,31 @@ export default function CartDrawer({ isOpen, onClose }) {
         }
 
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const evtSource = new EventSource(sseUrl);
-        
-        evtSource.onmessage = (e) => {
-            try {
-                const update = JSON.parse(e.data);
-                if (update.type === 'settings' && isMounted) {
-                    setStoreSettings(update.data);
+        let evtSource = null;
+        try {
+            evtSource = new EventSource(sseUrl);
+            evtSource.onmessage = (e) => {
+                try {
+                    const update = JSON.parse(e.data);
+                    if (update.type === 'settings' && isMounted) {
+                        setStoreSettings(update.data);
+                    }
+                } catch (err) {
+                    console.error("SSE settings parsing error in CartDrawer:", err);
                 }
-            } catch (err) {
-                console.error("SSE settings parsing error in CartDrawer:", err);
-            }
-        };
+            };
+            evtSource.onerror = () => {
+                if (evtSource) {
+                    evtSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in CartDrawer:', err.message);
+        }
 
         return () => {
             isMounted = false;
-            evtSource.close();
+            if (evtSource) evtSource.close();
         };
     }, [isOpen, API_URL]);
 
@@ -239,10 +248,8 @@ export default function CartDrawer({ isOpen, onClose }) {
                                 </div>
                                 
                                 <div style={{ marginBottom: '25px' }}>
-                                    <label style={{ display: 'block', color: 'var(--text-dark)', fontWeight: '700', marginBottom: '8px', fontSize: '1.1rem' }}>Table Number *</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="e.g. 12" 
+                                    <label style={{ display: 'block', color: 'var(--text-dark)', fontWeight: '700', marginBottom: '8px', fontSize: '1.1rem' }}>Table Number (1 - 20) *</label>
+                                    <select 
                                         value={tableNumber}
                                         onChange={(e) => setTableNumber(e.target.value)}
                                         style={{
@@ -255,7 +262,12 @@ export default function CartDrawer({ isOpen, onClose }) {
                                             fontSize: '1rem',
                                             fontWeight: '600'
                                         }}
-                                    />
+                                    >
+                                        <option value="">Select your table (20 available)</option>
+                                        {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+                                            <option key={num} value={num}>Table {num}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 {storeSettings.isOpen === false && (
                                     <div style={{

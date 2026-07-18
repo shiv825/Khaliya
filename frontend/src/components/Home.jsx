@@ -8,11 +8,9 @@ import Menu from './Menu';
 import Reviews from './Reviews';
 import HoursAndLocation from './HoursAndLocation';
 import Tables from './Tables';
-import Loyalty from './Loyalty';
 import Reservations from './Reservations';
 import Footer from './Footer';
 import AiAssistant from './AiAssistant';
-import OfferPopup from './OfferPopup';
 
 export default function Home() {
     const [selectedTableType, setSelectedTableType] = useState('');
@@ -34,7 +32,6 @@ export default function Home() {
                 <Reviews />
                 <HoursAndLocation />
                 <Tables onSelectTable={handleTableSelect} />
-                <Loyalty />
 
                 {/* Pass down the selected table from the Tables component to auto-fill the form if needed */}
                 <Reservations predefinedTable={selectedTableType} />
@@ -42,7 +39,6 @@ export default function Home() {
 
             <Footer />
             <AiAssistant />
-            <OfferPopup />
         </>
     );
 }

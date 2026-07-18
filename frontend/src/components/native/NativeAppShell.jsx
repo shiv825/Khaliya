@@ -8,7 +8,7 @@ import NativeBook from './NativeBook';
 import NativeProfile from './NativeProfile';
 import NativeAuth from './NativeAuth';
 import NativeCart from './NativeCart';
-import OfferPopup from '../OfferPopup';
+import NativeVisit from './NativeVisit';
 import AiAssistant from '../AiAssistant';
 import AdminDashboard from '../AdminDashboard';
 import { useCart } from '../../context/CartContext';
@@ -95,35 +95,44 @@ export default function NativeAppShell() {
 
         // 2. Real-time Session Check via SSE (EventSource)
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const eventSource = new EventSource(sseUrl);
-        
-        eventSource.onmessage = (event) => {
-            try {
-                const update = JSON.parse(event.data);
-                if (update.type === 'customer-session-invalidate') {
-                    const data = update.data;
-                    if (data.email === currentUser.email && data.newSessionId !== currentUser.currentSessionId) {
-                        eventSource.close();
-                        localStorage.removeItem('khaliya_native_user');
-                        setIsAuthenticated(false);
-                        Swal.fire({
-                            title: 'Logged Out',
-                            text: 'You have been logged out because your account was logged in on another device.',
-                            icon: 'warning',
-                            background: '#FFF',
-                            color: 'var(--text-dark)',
-                            confirmButtonColor: '#E63946',
-                            confirmButtonText: 'OK'
-                        });
+        let eventSource = null;
+        try {
+            eventSource = new EventSource(sseUrl);
+            eventSource.onmessage = (event) => {
+                try {
+                    const update = JSON.parse(event.data);
+                    if (update.type === 'customer-session-invalidate') {
+                        const data = update.data;
+                        if (data.email === currentUser.email && data.newSessionId !== currentUser.currentSessionId) {
+                            if (eventSource) eventSource.close();
+                            localStorage.removeItem('khaliya_native_user');
+                            setIsAuthenticated(false);
+                            Swal.fire({
+                                title: 'Logged Out',
+                                text: 'You have been logged out because your account was logged in on another device.',
+                                icon: 'warning',
+                                background: '#FFF',
+                                color: 'var(--text-dark)',
+                                confirmButtonColor: '#E63946',
+                                confirmButtonText: 'OK'
+                            });
+                        }
                     }
+                } catch (e) {
+                    console.error('Failed to parse SSE event:', e);
                 }
-            } catch (e) {
-                console.error('Failed to parse SSE event:', e);
-            }
-        };
+            };
+            eventSource.onerror = () => {
+                if (eventSource) {
+                    eventSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in NativeAppShell:', err.message);
+        }
 
         return () => {
-            eventSource.close();
+            if (eventSource) eventSource.close();
         };
     }, [isAuthenticated, API_URL]);
 
@@ -175,6 +184,8 @@ export default function NativeAppShell() {
                 return <NativeBook key="book" />;
             case 'profile':
                 return <NativeProfile key="profile" />;
+            case 'visit':
+                return <NativeVisit key="visit" setActiveTab={handleTabChange} />;
             default:
                 return <NativeHome key="home" setActiveTab={handleTabChange} />;
         }
@@ -292,7 +303,6 @@ export default function NativeAppShell() {
                         </button>
                     </div>
                     <AiAssistant />
-                    <OfferPopup />
                 </motion.div>
             )}
         </AnimatePresence>

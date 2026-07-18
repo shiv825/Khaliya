@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import InteractiveFloorplan from './InteractiveFloorplan';
 
 export default function Tables({ onSelectTable }) {
     const { t } = useLanguage();
@@ -107,14 +106,7 @@ export default function Tables({ onSelectTable }) {
                 </div>
             </div>
 
-            {/* Visual Map SVG placeholder logic (Optional, since CSS grid is there) */}
-            <div style={{ margin: '3rem 0' }}>
-                <InteractiveFloorplan onSelectTable={(type) => { 
-                    setFilterType(type.toLowerCase().includes('window') ? 'window' : type.toLowerCase().includes('family') ? 'family' : 'regular'); 
-                    if (onSelectTable) onSelectTable(type);
-                    document.getElementById('reservations')?.scrollIntoView({ behavior: 'smooth' });
-                }} />
-            </div>
+
 
             {/* Table Grid */}
             <div id="tableGrid" className="table-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>

@@ -184,13 +184,85 @@ const writeData = async (fileName, data) => {
     sendUpdateToAll(type, data);
 };
 
+// -- ADMIN AUTHENTICATION SECURITY --
+let activeAdminSessions = {}; // { token: { email, expires } }
+
+const verifyAdminToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ success: false, message: 'Access Denied: No token provided' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    const session = activeAdminSessions[token];
+    
+    if (!session) {
+        return res.status(401).json({ success: false, message: 'Access Denied: Invalid token' });
+    }
+    
+    if (Date.now() > session.expires) {
+        delete activeAdminSessions[token];
+        return res.status(401).json({ success: false, message: 'Access Denied: Token expired' });
+    }
+    
+    req.adminEmail = session.email;
+    next();
+};
+
+app.post('/api/auth/admin-login', async (req, res) => {
+    const { email, password } = req.body;
+    const adminEmail = process.env.ADMIN_EMAIL || 'shivkumarrdn7@gmail.com';
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || '$2b$10$fIrKc0IaFB2IqGbMT6YoLuNxzLP.FAGC3mkZ7u9PB8dkp7W6k.E7y';
+    
+    if (!email || !password) {
+        return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+    
+    if (email.toLowerCase() !== adminEmail.toLowerCase()) {
+        return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+    }
+    
+    try {
+        const isMatch = await bcrypt.compare(password, adminPasswordHash);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+        }
+        
+        const token = require('crypto').randomBytes(32).toString('hex');
+        const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+        
+        activeAdminSessions[token] = {
+            email: adminEmail,
+            expires
+        };
+        
+        res.json({ success: true, token, email: adminEmail });
+    } catch (err) {
+        console.error('Admin login error:', err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+app.get('/api/auth/verify-admin-token', (req, res) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.json({ success: false });
+    }
+    const token = authHeader.split(' ')[1];
+    const session = activeAdminSessions[token];
+    if (session && Date.now() <= session.expires) {
+        return res.json({ success: true, email: session.email });
+    }
+    return res.json({ success: false });
+});
+
 // API: Menu
 app.get('/api/menu', async (req, res) => {
     const menu = await readData('menu.json');
     res.json(menu);
 });
 
-app.post('/api/menu', async (req, res) => {
+app.post('/api/menu', verifyAdminToken, async (req, res) => {
     const menu = await readData('menu.json');
     const newItem = { id: Date.now(), ...req.body };
     menu.push(newItem);
@@ -198,7 +270,7 @@ app.post('/api/menu', async (req, res) => {
     res.status(201).json(newItem);
 });
 
-app.put('/api/menu/:id', async (req, res) => {
+app.put('/api/menu/:id', verifyAdminToken, async (req, res) => {
     const menu = await readData('menu.json');
     const index = menu.findIndex(m => m.id == req.params.id || m.name == req.params.id);
     if (index !== -1) {
@@ -210,7 +282,7 @@ app.put('/api/menu/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/menu/:id', async (req, res) => {
+app.delete('/api/menu/:id', verifyAdminToken, async (req, res) => {
     const menu = await readData('menu.json');
     const filtered = menu.filter(m => m.id != req.params.id && m.name != req.params.id);
     if (filtered.length !== menu.length) {
@@ -251,14 +323,60 @@ app.get('/api/bookings/availability', async (req, res) => {
 });
 
 app.post('/api/bookings', async (req, res) => {
+    const { date, time, tableType, name, phone, email, source, specialRequests } = req.body || {};
+    const trimmedName = (name || '').toString().trim();
+    const trimmedPhone = (phone || '').toString().trim();
+    const trimmedEmail = (email || '').toString().trim();
+    const trimmedTableType = (tableType || '').toString().trim();
+
+    if (!date || !time || !trimmedTableType) {
+        return res.status(400).json({ message: 'Date, Time, and Table Type are required' });
+    }
+
+    if (!trimmedName) {
+        return res.status(400).json({ message: 'A contact name is required for every reservation.' });
+    }
+
+    if (!trimmedPhone) {
+        return res.status(400).json({ message: 'A contact phone number is required for every reservation.' });
+    }
+
+    const phonePattern = /^\+?[0-9\s\-()]{7,15}$/;
+    if (!phonePattern.test(trimmedPhone)) {
+        return res.status(400).json({ message: 'Please enter a valid contact phone number.' });
+    }
+
     const bookings = await readData('bookings.json');
-    const newBooking = { 
-        id: Date.now(), 
-        timestamp: new Date().toLocaleString(), 
-        status: 'pending', 
-        source: 'Website', // Default source
-        specialRequests: '', // Default request
-        ...req.body 
+    
+    // Enforce seating capacity checks
+    const activeBookings = bookings.filter(b => 
+        b.date === date && 
+        b.tableType && b.tableType.toLowerCase() === trimmedTableType.toLowerCase() && 
+        b.time === time && 
+        b.status !== 'cancelled'
+    );
+    
+    const maxCapacity = CAPACITY_MAP[trimmedTableType.toLowerCase()] || 4;
+    
+    if (activeBookings.length >= maxCapacity) {
+        return res.status(400).json({ 
+            message: `Reservation failed: The selected slot (${time}) for ${trimmedTableType} is fully booked.` 
+        });
+    }
+
+    const newBooking = {
+        id: Date.now(),
+        timestamp: new Date().toLocaleString(),
+        status: 'pending',
+        ...req.body,
+        date,
+        time,
+        tableType: trimmedTableType,
+        name: trimmedName,
+        phone: trimmedPhone,
+        email: trimmedEmail,
+        source: source || 'Website',
+        specialRequests: specialRequests || ''
     };
     bookings.push(newBooking);
     await writeData('bookings.json', bookings);
@@ -310,39 +428,42 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
 
         // 4. Send via Nodemailer (if configured)
         if (emailTransporter) {
-            // Send email in the background to prevent blocking the UI (fixes the 8-second delay)
-            emailTransporter.sendMail({
-                from: `"Khaliya Sanctuary" <${process.env.SMTP_USER}>`,
-                to: email,
-                subject: 'Your Khaliya Login Code',
-                text: `Your Khaliya Sanctuary verification code is: ${otp}. Valid for 5 minutes.`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #e0e0e0; border-radius: 20px; background: #fff;">
-                        <h2 style="color: #D4AF37; text-align: center; font-size: 28px; letter-spacing: 2px;">KHALIYA SANCTUARY</h2>
-                        <div style="width: 50px; height: 2px; background: #D4AF37; margin: 20px auto;"></div>
-                        <p style="font-size: 16px; color: #555; text-align: center;">Welcome to the Sanctuary. Use the code below to verify your access.</p>
-                        <div style="background: #f9f9f9; padding: 30px; border-radius: 15px; margin: 30px 0; text-align: center;">
-                            <h1 style="font-size: 42px; color: #000; margin: 0; letter-spacing: 10px;">${otp}</h1>
+            try {
+                // Wait for email sending to complete so we know if it succeeded
+                await emailTransporter.sendMail({
+                    from: `"Khaliya Sanctuary" <${process.env.SMTP_USER}>`,
+                    to: email,
+                    subject: 'Your Khaliya Login Code',
+                    text: `Your Khaliya Sanctuary verification code is: ${otp}. Valid for 5 minutes.`,
+                    html: `
+                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #e0e0e0; border-radius: 20px; background: #fff;">
+                            <h2 style="color: #D4AF37; text-align: center; font-size: 28px; letter-spacing: 2px;">KHALIYA SANCTUARY</h2>
+                            <div style="width: 50px; height: 2px; background: #D4AF37; margin: 20px auto;"></div>
+                            <p style="font-size: 16px; color: #555; text-align: center;">Welcome to the Sanctuary. Use the code below to verify your access.</p>
+                            <div style="background: #f9f9f9; padding: 30px; border-radius: 15px; margin: 30px 0; text-align: center;">
+                                <h1 style="font-size: 42px; color: #000; margin: 0; letter-spacing: 10px;">${otp}</h1>
+                            </div>
+                            <p style="font-size: 14px; color: #999; text-align: center;">This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+                            <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #bbb;">
+                                &copy; ${new Date().getFullYear()} Khaliya Luxury Dining. All rights reserved.
+                            </div>
                         </div>
-                        <p style="font-size: 14px; color: #999; text-align: center;">This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
-                        <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #bbb;">
-                            &copy; ${new Date().getFullYear()} Khaliya Luxury Dining. All rights reserved.
-                        </div>
-                    </div>
-                `
-            }).then(() => {
+                    `
+                });
                 console.log(`✅ [AUTH] Email sent successfully to ${email}`);
-            }).catch((emailErr) => {
+                return res.json({ 
+                    success: true, 
+                    message: 'Verification code sent to your email.'
+                });
+            } catch (emailErr) {
                 console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
-                console.warn(`⚠️ [AUTH] Simulated OTP for ${email}: ${otp}`);
-            });
-            
-            // Return immediately so the client UI receives the simulated OTP fallback instantly
-            return res.json({ 
-                success: true, 
-                message: 'Verification code sent. If email fails, use the simulated OTP.',
-                simulatedOtp: otp
-            });
+                console.warn(`⚠️ [AUTH] Falling back to simulated mode. OTP for ${email}: ${otp}`);
+                return res.json({ 
+                    success: true, 
+                    message: 'Failed to send email. Running in Simulated Mode.',
+                    simulatedOtp: otp
+                });
+            }
         }
 
         // 5. If not configured, fall back to simulated mode
@@ -459,6 +580,28 @@ app.post('/api/auth/check-session', async (req, res) => {
     
     const isValid = user.currentSessionId === sessionId;
     res.json({ success: true, valid: isValid });
+});
+
+app.post('/api/users/profile', async (req, res) => {
+    const { email, name, phone } = req.body;
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+    try {
+        const users = await readData('users.json');
+        const userIndex = users.findIndex(u => u.email === email.toLowerCase());
+        if (userIndex !== -1) {
+            users[userIndex].name = name || users[userIndex].name;
+            users[userIndex].phone = phone || users[userIndex].phone;
+            await writeData('users.json', users);
+            return res.json({ success: true, user: users[userIndex] });
+        } else {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+    } catch (err) {
+        console.error('❌ Error updating user profile:', err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
 });
 
 
@@ -618,22 +761,38 @@ app.get('/api/settings', async (req, res) => {
     res.json(await readData('settings.json'));
 });
 
-app.post('/api/settings', async (req, res) => {
+app.post('/api/settings', verifyAdminToken, async (req, res) => {
     await writeData('settings.json', req.body);
     res.json({ success: true, settings: req.body });
 });
 
 app.get('/api/live-updates', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
     const client = { id: Date.now(), res };
     sseClients.push(client);
+    console.log(`🔌 [SSE] Admin/Client connected: ${client.id}`);
+
+    // Send initial ping to verify connection
+    res.write(`data: ${JSON.stringify({ type: 'ping', message: 'connected' })}\n\n`);
+
+    // Keep connection alive with 15-second heartbeat ping
+    const pingInterval = setInterval(() => {
+        try {
+            res.write(`data: ${JSON.stringify({ type: 'ping' })}\n\n`);
+        } catch (e) {
+            console.error(`⚠️ [SSE] Error writing ping to client ${client.id}:`, e.message);
+        }
+    }, 15000);
 
     req.on('close', () => {
+        clearInterval(pingInterval);
         sseClients = sseClients.filter(c => c.id !== client.id);
+        console.log(`🔌 [SSE] Admin/Client disconnected: ${client.id}`);
     });
 });
 

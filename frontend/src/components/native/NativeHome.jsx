@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
@@ -12,58 +12,6 @@ import axios from 'axios';
  * Redesigned with "Gold & Charcoal" Luxury Theme for a premium PWA experience.
  */
 export default function NativeHome({ setActiveTab }) {
-    const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
-    const [locationState, setLocationState] = useState({
-        lat: null, lng: null, distance: null, travelTime: null, error: null
-    });
-
-    const RESTAURANT_COORD = { lat: 22.6108, lng: 88.3370 }; // Khaliya Howrah coord
-
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; // Earth radius in km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    };
-
-    const trackLocation = () => {
-        if (!navigator.geolocation) {
-            setLocationState(prev => ({ ...prev, error: "Geolocation not supported" }));
-            return;
-        }
-
-        setLocationState(prev => ({ ...prev, error: "Locating..." }));
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const currentLat = position.coords.latitude;
-                const currentLng = position.coords.longitude;
-
-                const distKm = calculateDistance(currentLat, currentLng, RESTAURANT_COORD.lat, RESTAURANT_COORD.lng);
-                const timeMinutes = Math.round((distKm / 30) * 60);
-
-                let timeStr = "";
-                if (timeMinutes < 60) timeStr = `${timeMinutes} mins`;
-                else timeStr = `${Math.floor(timeMinutes / 60)} hr ${timeMinutes % 60} mins`;
-
-                setLocationState({
-                    lat: currentLat.toFixed(4),
-                    lng: currentLng.toFixed(4),
-                    distance: distKm.toFixed(1),
-                    travelTime: timeStr,
-                    error: null
-                });
-            },
-            () => {
-                setLocationState(prev => ({ ...prev, error: "Unable to retrieve location" }));
-            }
-        );
-    };
-
     const storedUserStr = localStorage.getItem('khaliya_native_user');
     let user = { name: 'Guest' };
     try {
@@ -99,22 +47,31 @@ export default function NativeHome({ setActiveTab }) {
 
         // Listen to SSE
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const evtSource = new EventSource(sseUrl);
-        
-        evtSource.onmessage = (e) => {
-            try {
-                const update = JSON.parse(e.data);
-                if (update.type === 'menu' && isMounted) {
-                    setLiveMenu(update.data);
+        let evtSource = null;
+        try {
+            evtSource = new EventSource(sseUrl);
+            evtSource.onmessage = (e) => {
+                try {
+                    const update = JSON.parse(e.data);
+                    if (update.type === 'menu' && isMounted) {
+                        setLiveMenu(update.data);
+                    }
+                } catch (err) {
+                    console.error("SSE menu parsing error in native home:", err);
                 }
-            } catch (err) {
-                console.error("SSE menu parsing error in native home:", err);
-            }
-        };
+            };
+            evtSource.onerror = () => {
+                if (evtSource) {
+                    evtSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in NativeHome:', err.message);
+        }
 
         return () => {
             isMounted = false;
-            evtSource.close();
+            if (evtSource) evtSource.close();
         };
     }, [API_URL]);
 
@@ -129,10 +86,6 @@ export default function NativeHome({ setActiveTab }) {
     })) : [];
 
 
-    const offers = [
-        { id: 1, title: "20% OFF", desc: "First Order", code: "WELCOME20", bg: "rgba(245, 158, 11, 0.1)", color: "var(--primary-color)" },
-        { id: 2, title: "FREE DESSERT", desc: "Above ₹1000", code: "SWEET", bg: "rgba(99, 102, 241, 0.1)", color: "var(--secondary-color)" }
-    ];
 
     const reviews = [
         { id: 1, name: "Rahul S.", rating: 5, text: "Best Butter Chicken in town! Totally recommend it." },
@@ -235,7 +188,7 @@ export default function NativeHome({ setActiveTab }) {
                 {[
                     { id: 'menu', icon: 'fa-utensils', label: 'Menu' },
                     { id: 'book', icon: 'fa-calendar-alt', label: 'Reserve' },
-                    { id: 'profile', icon: 'fa-crown', label: 'Loyalty' },
+                    { id: 'profile', icon: 'fa-user', label: 'Profile' },
                     { id: 'location', icon: 'fa-map-pin', label: 'Visit' }
                 ].map((action) => (
                     <motion.div 
@@ -244,7 +197,7 @@ export default function NativeHome({ setActiveTab }) {
                         whileTap={{ scale: 0.95 }} 
                         onClick={() => {
                             if (action.id === 'location') {
-                                setIsVisitModalOpen(true);
+                                setActiveTab('visit');
                             } else {
                                 setActiveTab(action.id);
                             }
@@ -300,42 +253,6 @@ export default function NativeHome({ setActiveTab }) {
                 <FeaturedSpecials isNative={true} />
             </div>
 
-            {/* Offers Slider - Luxury Voucher Aesthetic */}
-            <div className="native-section" style={{ marginBottom: '40px' }}>
-                <div className="section-header" style={{ marginBottom: '20px' }}>
-                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--primary-color)' }}>Elite Perks</h3>
-                </div>
-                <div className="horizontal-scroll" style={{ display: 'flex', gap: '20px', overflowX: 'auto', paddingBottom: '15px' }}>
-                    {offers.map((offer, idx) => (
-                        <motion.div 
-                            key={offer.id} 
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: idx * 0.1 }}
-                            style={{ 
-                                minWidth: '280px', padding: '30px', borderRadius: '30px', 
-                                background: `linear-gradient(135deg, var(--bg-surface) 0%, ${offer.bg} 100%)`, 
-                                border: `1px solid ${offer.color}33`,
-                                position: 'relative', boxShadow: 'var(--shadow-md)',
-                                overflow: 'hidden'
-                            }}
-                        >
-                            <div style={{ position: 'absolute', top: '50%', right: '-20px', width: '40px', height: '40px', background: 'var(--bg-body)', borderRadius: '50%', transform: 'translateY(-50%)' }}></div>
-                            <div style={{ position: 'absolute', top: '50%', left: '-20px', width: '40px', height: '40px', background: 'var(--bg-body)', borderRadius: '50%', transform: 'translateY(-50%)' }}></div>
-                            
-                            <h3 style={{ margin: 0, color: offer.color, fontSize: '1.8rem', fontWeight: '900', fontFamily: 'var(--font-heading)' }}>{offer.title}</h3>
-                            <p style={{ margin: '8px 0 20px 0', fontSize: '1.1rem', color: 'var(--text-dark)', fontWeight: '700' }}>{offer.desc}</p>
-                            <button style={{ 
-                                background: offer.color, color: '#FFF', border: 'none', 
-                                padding: '10px 20px', borderRadius: '50px', fontWeight: '800', 
-                                fontSize: '0.8rem', textTransform: 'uppercase' 
-                            }}>
-                                {offer.code}
-                            </button>
-                        </motion.div>
-                    ))}
-                </div>
-            </div>
 
             {/* Popular Items */}
             <div className="native-section" style={{ marginBottom: '40px' }}>
@@ -381,326 +298,6 @@ export default function NativeHome({ setActiveTab }) {
             </div>
 
             <div style={{ height: '100px' }}></div>
-
-            {/* Visit Modal */}
-            <AnimatePresence>
-                {isVisitModalOpen && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                        zIndex: 10000,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '20px'
-                    }}>
-                        <motion.div 
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                            style={{
-                                backgroundColor: 'var(--bg-surface)',
-                                borderRadius: '30px',
-                                width: '100%',
-                                maxWidth: '400px',
-                                padding: '30px 25px',
-                                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-                                border: '1px solid var(--border-color)',
-                                position: 'relative'
-                            }}
-                        >
-                            {/* Close button */}
-                            <button 
-                                onClick={() => setIsVisitModalOpen(false)}
-                                style={{
-                                    position: 'absolute',
-                                    top: '20px',
-                                    right: '20px',
-                                    background: 'rgba(0,0,0,0.05)',
-                                    border: 'none',
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    color: 'var(--text-dark)',
-                                    fontSize: '1.1rem',
-                                    transition: 'background-color 0.2s'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.1)'}
-                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
-                            >
-                                <i className="fas fa-times"></i>
-                            </button>
-
-                            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                                <div style={{
-                                    width: '50px',
-                                    height: '50px',
-                                    borderRadius: '50%',
-                                    backgroundColor: 'rgba(155, 27, 48, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 12px',
-                                    color: 'var(--primary-color)'
-                                }}>
-                                    <i className="fas fa-map-marked-alt" style={{ fontSize: '1.5rem' }}></i>
-                                </div>
-                                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--text-dark)', margin: '0 0 5px 0' }}>
-                                    {language === 'hi' ? 'खालिया रेस्टोरेंट' : language === 'ar' ? 'مطعم خاليا' : 'Visit Khaliya'}
-                                </h3>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-                                    {language === 'hi' ? 'हम आपका स्वागत करने के लिए उत्सुक हैं!' : language === 'ar' ? 'يسعدنا استضافتك في مطعمنا!' : 'We would love to host you!'}
-                                </p>
-                            </div>
-
-                            {/* Map iframe */}
-                            <div style={{ 
-                                borderRadius: '20px', 
-                                overflow: 'hidden', 
-                                height: '160px', 
-                                border: '1px solid var(--border-color)',
-                                marginBottom: '20px',
-                                position: 'relative'
-                            }}>
-                                <iframe
-                                    title="Khaliya Restaurant Location"
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.003975762078!2d88.3347072!3d22.6108169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a02798f090d80c9%3A0xe104332b4b47ea87!2sKhaliya%20Restaurant!5e0!3m2!1sen!2sin!4v1714902123955!5m2!1sen!2sin"
-                                    width="100%" 
-                                    height="100%" 
-                                    style={{ border: 0 }} 
-                                    allowFullScreen="" 
-                                    loading="lazy"
-                                ></iframe>
-                            </div>
-
-                            {/* Geolocation Section */}
-                            <div style={{
-                                background: 'rgba(142, 28, 28, 0.03)',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '20px',
-                                padding: '15px',
-                                marginBottom: '20px',
-                                textAlign: 'center'
-                            }}>
-                                {!locationState.lat ? (
-                                     <>
-                                         <p style={{ margin: '0 0 10px 0', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600', lineHeight: '1.4' }}>
-                                             {t('track.sub') || 'Find out how far you are from our restaurant and get travel times.'}
-                                         </p>
-                                         {locationState.error && locationState.error !== 'Locating...' && (
-                                             <div style={{ fontSize: '0.8rem', color: '#ff9800', marginBottom: '8px', fontWeight: '700' }}>
-                                                 {locationState.error}
-                                             </div>
-                                         )}
-                                         <button 
-                                             onClick={trackLocation}
-                                             disabled={locationState.error === 'Locating...'}
-                                             style={{
-                                                 background: 'var(--primary-color)',
-                                                 color: '#FFFFFF',
-                                                 border: 'none',
-                                                 padding: '10px 20px',
-                                                 borderRadius: '30px',
-                                                 fontWeight: '800',
-                                                 fontSize: '0.8rem',
-                                                 cursor: 'pointer',
-                                                 boxShadow: 'var(--shadow-sm)',
-                                                 display: 'inline-flex',
-                                                 alignItems: 'center',
-                                                 gap: '8px',
-                                                 transition: 'background-color 0.2s'
-                                             }}
-                                         >
-                                             {locationState.error === 'Locating...' ? (
-                                                 <>
-                                                     <i className="fas fa-spinner fa-spin"></i>
-                                                     <span>{language === 'hi' ? 'खोज रहे हैं...' : 'Locating...'}</span>
-                                                 </>
-                                             ) : (
-                                                 <>
-                                                     <i className="fas fa-location-arrow"></i>
-                                                     <span>{t('track.button') || 'Track Distance'}</span>
-                                                 </>
-                                             )}
-                                         </button>
-                                     </>
-                                ) : (
-                                     <div>
-                                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-                                             <span style={{ fontSize: '2.2rem', fontWeight: '900', color: 'var(--primary-color)', lineHeight: '1' }}>{locationState.distance}</span>
-                                             <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '700' }}>{t('track.kmAway') || 'km away'}</span>
-                                         </div>
-                                         <div style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '15px', fontWeight: '600' }}>
-                                             <i className="fas fa-clock" style={{ color: 'var(--primary-color)', marginRight: '6px' }}></i>
-                                             {t('track.travelTimeLabel') || 'Est. Time:'} <strong>{locationState.travelTime}</strong>
-                                         </div>
-                                         
-                                         {/* Route buttons */}
-                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                                             <a 
-                                                 href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=driving`} 
-                                                 target="_blank" 
-                                                 rel="noreferrer"
-                                                 style={{
-                                                     display: 'flex',
-                                                     flexDirection: 'column',
-                                                     alignItems: 'center',
-                                                     gap: '5px',
-                                                     padding: '8px 5px',
-                                                     borderRadius: '12px',
-                                                     background: 'var(--bg-surface)',
-                                                     border: '1px solid var(--border-color)',
-                                                     textDecoration: 'none',
-                                                     fontSize: '0.75rem',
-                                                     fontWeight: '800',
-                                                     color: 'var(--text-dark)'
-                                                 }}
-                                             >
-                                                 <i className="fas fa-car" style={{ color: 'var(--primary-color)', fontSize: '1rem' }}></i>
-                                                 <span>Drive</span>
-                                             </a>
-                                             <a 
-                                                 href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=two-wheeler`} 
-                                                 target="_blank" 
-                                                 rel="noreferrer"
-                                                 style={{
-                                                     display: 'flex',
-                                                     flexDirection: 'column',
-                                                     alignItems: 'center',
-                                                     gap: '5px',
-                                                     padding: '8px 5px',
-                                                     borderRadius: '12px',
-                                                     background: 'var(--bg-surface)',
-                                                     border: '1px solid var(--border-color)',
-                                                     textDecoration: 'none',
-                                                     fontSize: '0.75rem',
-                                                     fontWeight: '800',
-                                                     color: 'var(--text-dark)'
-                                                 }}
-                                             >
-                                                 <i className="fas fa-motorcycle" style={{ color: 'var(--primary-color)', fontSize: '1rem' }}></i>
-                                                 <span>Ride</span>
-                                             </a>
-                                             <a 
-                                                 href={`https://www.google.com/maps/dir/?api=1&origin=${locationState.lat},${locationState.lng}&destination=${RESTAURANT_COORD.lat},${RESTAURANT_COORD.lng}&travelmode=walking`} 
-                                                 target="_blank" 
-                                                 rel="noreferrer"
-                                                 style={{
-                                                     display: 'flex',
-                                                     flexDirection: 'column',
-                                                     alignItems: 'center',
-                                                     gap: '5px',
-                                                     padding: '8px 5px',
-                                                     borderRadius: '12px',
-                                                     background: 'var(--bg-surface)',
-                                                     border: '1px solid var(--border-color)',
-                                                     textDecoration: 'none',
-                                                     fontSize: '0.75rem',
-                                                     fontWeight: '800',
-                                                     color: 'var(--text-dark)'
-                                                 }}
-                                             >
-                                                 <i className="fas fa-walking" style={{ color: 'var(--primary-color)', fontSize: '1rem' }}></i>
-                                                 <span>Walk</span>
-                                             </a>
-                                         </div>
-                                     </div>
-                                 )}
-                            </div>
-
-                            {/* Location Details */}
-                            <div style={{ marginBottom: '20px', fontSize: '0.9rem', color: 'var(--text-dark)' }}>
-                                <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                                    <i className="fas fa-map-marker-alt" style={{ color: 'var(--primary-color)', fontSize: '1.1rem', marginTop: '2px' }}></i>
-                                    <div>
-                                        <strong style={{ display: 'block', marginBottom: '2px' }}>{t('contact.addressLabel') || 'Address'}</strong>
-                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.4' }}>{t('contact.addressContent')}</span>
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                                    <i className="fas fa-clock" style={{ color: 'var(--primary-color)', fontSize: '1rem', marginTop: '2px' }}></i>
-                                    <div>
-                                        <strong style={{ display: 'block', marginBottom: '2px' }}>{t('hours.title') || 'Hours'}</strong>
-                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.4' }}>
-                                            {t('contact.hoursContent')}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '12px' }}>
-                                    <i className="fas fa-phone-alt" style={{ color: 'var(--primary-color)', fontSize: '1rem', marginTop: '2px' }}></i>
-                                    <div>
-                                        <strong style={{ display: 'block', marginBottom: '2px' }}>{t('contact.phoneLabel') || 'Phone'}</strong>
-                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>+91 82527 31784</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Action buttons */}
-                            <div style={{ display: 'flex', gap: '12px' }}>
-                                <a 
-                                    href="tel:+918252731784"
-                                    style={{
-                                        flex: 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px',
-                                        padding: '12px',
-                                        borderRadius: '14px',
-                                        border: '1.5px solid var(--primary-color)',
-                                        color: 'var(--primary-color)',
-                                        textDecoration: 'none',
-                                        fontWeight: '800',
-                                        fontSize: '0.9rem',
-                                        textAlign: 'center',
-                                        transition: 'background-color 0.2s'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(155, 27, 48, 0.05)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                >
-                                    <i className="fas fa-phone-alt"></i> {language === 'hi' ? 'कॉल करें' : language === 'ar' ? 'اتصل بنا' : 'Call Us'}
-                                </a>
-                                <a 
-                                    href="https://www.google.com/maps/dir/?api=1&destination=22.6108,88.3370" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    style={{
-                                        flex: 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px',
-                                        padding: '12px',
-                                        borderRadius: '14px',
-                                        backgroundColor: 'var(--primary-color)',
-                                        color: '#FFF',
-                                        textDecoration: 'none',
-                                        fontWeight: '800',
-                                        fontSize: '0.9rem',
-                                        textAlign: 'center',
-                                        boxShadow: '0 4px 12px rgba(155, 27, 48, 0.2)'
-                                    }}
-                                >
-                                    <i className="fas fa-directions"></i> {language === 'hi' ? 'दिशा-निर्देश' : language === 'ar' ? 'الاتجاهات' : 'Directions'}
-                                </a>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

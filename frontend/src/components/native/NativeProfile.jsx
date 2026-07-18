@@ -10,7 +10,7 @@ export default function NativeProfile() {
     const navigate = useNavigate();
     const { t, language = 'en' } = useLanguage();
      const [showLangSelector, setShowLangSelector] = useState(false);
-    const [activeModal, setActiveModal] = useState(null); // 'membership', 'feedback', 'about', 'settings'
+    const [activeModal, setActiveModal] = useState(null); // 'feedback', 'about', 'settings'
     const [feedbackText, setFeedbackText] = useState('');
     const [orders, setOrders] = useState([]);
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
@@ -168,21 +168,30 @@ export default function NativeProfile() {
 
         // Establish real-time SSE listener
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const eventSource = new EventSource(sseUrl);
-
-        eventSource.onmessage = (event) => {
-            try {
-                const update = JSON.parse(event.data);
-                if (update.type === 'orders') {
-                    setOrders(update.data);
+        let eventSource = null;
+        try {
+            eventSource = new EventSource(sseUrl);
+            eventSource.onmessage = (event) => {
+                try {
+                    const update = JSON.parse(event.data);
+                    if (update.type === 'orders') {
+                        setOrders(update.data);
+                    }
+                } catch (err) {
+                    console.error('Error parsing SSE orders update:', err);
                 }
-            } catch (err) {
-                console.error('Error parsing SSE orders update:', err);
-            }
-        };
+            };
+            eventSource.onerror = () => {
+                if (eventSource) {
+                    eventSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in NativeProfile:', err.message);
+        }
 
         return () => {
-            eventSource.close();
+            if (eventSource) eventSource.close();
         };
     }, [user.email]);
 
@@ -351,106 +360,21 @@ export default function NativeProfile() {
                             Welcome to Khaliya
                         </p>
                     )}
-                    <span onClick={() => setActiveModal('membership')} style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>{t('reviews.memberSettings')} <i className="fas fa-chevron-right" style={{ fontSize: '0.75rem' }}></i></span>
                 </div>
             </div>
 
-            {/* 3D Digital Membership Card - Gold Saffron High-Res Edition */}
-            <motion.div 
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                style={{ 
-                    perspective: 1200, 
-                    padding: '5px 15px',
-                    marginBottom: '20px'
-                }}
-            >
-                <motion.div
-                    style={{
-                        rotateX,
-                        rotateY,
-                        width: '100%',
-                        height: '205px',
-                        background: 'linear-gradient(135deg, #FF8F00 0%, #FFB300 30%, #FFD54F 100%)',
-                        borderRadius: '25px',
-                        padding: '20px',
-                        color: '#FFF',
-                        boxShadow: '0 25px 50px rgba(255, 143, 0, 0.25), inset 0 0 15px rgba(255,255,255,0.3)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        transformStyle: 'preserve-3d',
-                        border: '1px solid rgba(255,255,255,0.2)'
-                    }}
-                >
-                    <div style={{ position: 'absolute', top: 0, left: '-100%', width: '100%', height: '100%', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent)', transform: 'skewX(-25deg)', animation: 'shimmer 2.5s infinite ease-out' }}></div>
-                    
-                    <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', pointerEvents: 'none' }}></div>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transform: 'translateZ(40px)' }}>
-                        <div>
-                            <div style={{ fontSize: '0.75rem', letterSpacing: '2px', fontWeight: '900', color: '#FFF', opacity: 0.85 }}>PREMIUM CLUB</div>
-                            <div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-heading)', marginTop: '2px', color: '#FFF', fontWeight: '900' }}>Saffron Select</div>
-                        </div>
-                        <div style={{ width: '42px', height: '42px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(5px)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <i className="fas fa-crown" style={{ fontSize: '1.3rem', color: '#FFF' }}></i>
-                        </div>
+            {/* Welcome Card */}
+            <div style={{ padding: '0 20px 25px 20px' }}>
+                <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '25px', padding: '20px', boxShadow: 'var(--shadow-sm)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-dark)' }}>Your profile</span>
+                        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--primary-color)' }}>Khaliya</span>
                     </div>
-
-                    <div style={{ transform: 'translateZ(55px)', marginTop: '-5px' }}>
-                        <div style={{ fontSize: '2.8rem', fontWeight: '900', letterSpacing: '1px', color: '#FFF', lineHeight: '1.1' }}>{user?.spicePoints || 0}</div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#FFF', opacity: 0.9 }}>Available Spice Points</div>
-                    </div>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', transform: 'translateZ(35px)', width: '100%' }}>
-                        <div style={{ fontSize: '0.95rem', fontWeight: '900', letterSpacing: '1px', color: '#FFF', textTransform: 'uppercase' }}>{user?.name || 'GUEST'}</div>
-                        {user?.email && (
-                            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#FFF', opacity: 0.8, textTransform: 'lowercase', letterSpacing: '0.5px' }}>{user.email}</div>
-                        )}
-                    </div>
-                </motion.div>
-            </motion.div>
-
-            {/* Rewards Progress Wallet */}
-            {user?.email && (
-                <div style={{ padding: '0 20px 25px 20px' }}>
-                    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '25px', padding: '20px', boxShadow: 'var(--shadow-sm)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                            <span style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-dark)' }}>Next Reward Progress</span>
-                            <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--primary-color)' }}>
-                                {user?.spicePoints || 0} / {
-                                    (user?.spicePoints || 0) < 1000 ? 1000 : (user?.spicePoints || 0) < 2500 ? 2500 : 5000
-                                } PTS
-                            </span>
-                        </div>
-
-                        {/* Progress Bar Container */}
-                        <div style={{ height: '10px', background: 'var(--bg-body)', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative', marginBottom: '12px' }}>
-                            <motion.div 
-                                initial={{ width: 0 }}
-                                animate={{ 
-                                    width: `${Math.min(100, ((user?.spicePoints || 0) / ((user?.spicePoints || 0) < 1000 ? 1000 : (user?.spicePoints || 0) < 2500 ? 2500 : 5000)) * 100)}%` 
-                                }}
-                                transition={{ duration: 1, ease: 'easeOut' }}
-                                style={{ height: '100%', background: 'linear-gradient(90deg, #FF8F00 0%, #FFD54F 100%)', borderRadius: '10px' }}
-                            />
-                        </div>
-
-                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-light)', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <i className="fas fa-gift" style={{ color: 'var(--primary-color)' }}></i>
-                            {(user?.spicePoints || 0) < 1000 ? (
-                                `Earn ${1000 - (user?.spicePoints || 0)} more points to unlock a Complimentary Saffron Dessert! 🍧`
-                            ) : (user?.spicePoints || 0) < 2500 ? (
-                                `Earn ${2500 - (user?.spicePoints || 0)} more points to unlock a VIP Gold Member Tasting! 🥂`
-                            ) : (
-                                `Earn ${5000 - (user?.spicePoints || 0)} more points to unlock a Royal Feast Box! 🎁`
-                            )}
-                        </p>
-                    </div>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-light)', fontWeight: '700' }}>
+                        Keep your contact details handy and enjoy a smoother dining experience.
+                    </p>
                 </div>
-            )}
+            </div>
 
             {/* Active Orders Tracker */}
             {activeOrders.length > 0 && (
@@ -697,26 +621,12 @@ export default function NativeProfile() {
                                 <i className="fas fa-arrow-left" style={{ fontSize: '1.4rem', color: 'var(--primary-color)' }}></i>
                             </button>
                             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--primary-color)', margin: 0, textTransform: 'capitalize' }}>
-                                {activeModal === 'membership' ? 'Saffron Membership' : activeModal}
+                                {activeModal}
                             </h2>
                         </div>
 
                         <div style={{ flex: 1, padding: '30px 20px', overflowY: 'auto' }}>
-                            {activeModal === 'membership' && (
-                                <div style={{ textAlign: 'center' }}>
-                                    <i className="fas fa-crown" style={{ fontSize: '4rem', color: 'var(--primary-color)', marginBottom: '20px' }}></i>
-                                    <h3 style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--text-dark)' }}>Saffron Select</h3>
-                                    <p style={{ color: 'var(--text-light)', fontWeight: '600' }}>You have {user?.spicePoints || 0} Spice Points</p>
-                                    <div style={{ marginTop: '30px', background: 'var(--bg-surface)', padding: '20px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
-                                        <h4 style={{ color: 'var(--primary-color)', fontWeight: '800' }}>Member Perks</h4>
-                                        <ul style={{ textAlign: 'left', listStyle: 'none', padding: 0, marginTop: '15px' }}>
-                                            <li style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}><i className="fas fa-star" style={{ color: '#F4A261' }}></i> Priority Seating</li>
-                                            <li style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}><i className="fas fa-star" style={{ color: '#F4A261' }}></i> Complimentary Dessert</li>
-                                            <li style={{ display: 'flex', gap: '10px' }}><i className="fas fa-star" style={{ color: '#F4A261' }}></i> Exclusive Tasting Events</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
+
 
                             {activeModal === 'feedback' && (
                                 <div>

@@ -902,34 +902,38 @@ export default function NativeMenu({ setActiveTab }) {
     const [showMatchmaker, setShowMatchmaker] = useState(false);
     const [visibleCount, setVisibleCount] = useState(12); // Speed: Start smaller
     const [searchQuery, setSearchQuery] = useState('');
-    const [isRenderReady, setIsRenderReady] = useState(false); 
+    const [isRenderReady, setIsRenderReady] = useState(true); 
 
-    // Initial mount delay to let the UI thread breathe
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsRenderReady(true);
-            setVisibleCount(24); // Expand after initial clear mount
-        }, 100);
-        return () => clearTimeout(timer);
-    }, []);
+    // Initial mount hook optimized for instant rendering
 
     // Real-time updates via SSE
     useEffect(() => {
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const evtSource = new EventSource(sseUrl);
-        
-        evtSource.onmessage = (e) => {
-            try {
-                const update = JSON.parse(e.data);
-                if (update.type === 'menu') {
-                    setMenuItems(update.data);
+        let evtSource = null;
+        try {
+            evtSource = new EventSource(sseUrl);
+            evtSource.onmessage = (e) => {
+                try {
+                    const update = JSON.parse(e.data);
+                    if (update.type === 'menu') {
+                        setMenuItems(update.data);
+                    }
+                } catch (err) {
+                    console.error("SSE parsing error", err);
                 }
-            } catch (err) {
-                console.error("SSE parsing error", err);
-            }
-        };
+            };
+            evtSource.onerror = () => {
+                if (evtSource) {
+                    evtSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in NativeMenu:', err.message);
+        }
         
-        return () => evtSource.close();
+        return () => {
+            if (evtSource) evtSource.close();
+        };
     }, [API_URL]);
 
     useEffect(() => {
@@ -1047,7 +1051,7 @@ export default function NativeMenu({ setActiveTab }) {
                                 className="native-menu-card futuristic-glass"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.4, delay: index * 0.05 }}
+                                transition={{ duration: 0.2, delay: Math.min(index, 6) * 0.02 }}
                                 whileHover={{ y: -5, boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}
                                 style={{ 
                                     background: '#FFFFFF', borderRadius: '25px', 

@@ -35,22 +35,31 @@ export default function NativeCart() {
         fetchSettings();
 
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const evtSource = new EventSource(sseUrl);
-        
-        evtSource.onmessage = (e) => {
-            try {
-                const update = JSON.parse(e.data);
-                if (update.type === 'settings' && isMounted) {
-                    setStoreSettings(update.data);
+        let evtSource = null;
+        try {
+            evtSource = new EventSource(sseUrl);
+            evtSource.onmessage = (e) => {
+                try {
+                    const update = JSON.parse(e.data);
+                    if (update.type === 'settings' && isMounted) {
+                        setStoreSettings(update.data);
+                    }
+                } catch (err) {
+                    console.error("SSE settings parsing error in NativeCart:", err);
                 }
-            } catch (err) {
-                console.error("SSE settings parsing error in NativeCart:", err);
-            }
-        };
+            };
+            evtSource.onerror = () => {
+                if (evtSource) {
+                    evtSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in NativeCart:', err.message);
+        }
 
         return () => {
             isMounted = false;
-            evtSource.close();
+            if (evtSource) evtSource.close();
         };
     }, [API_URL]);
 
@@ -228,10 +237,8 @@ export default function NativeCart() {
                             <div style={{ height: '1px', background: 'var(--border-color)', marginBottom: '20px' }}></div>
                             
                             <div style={{ marginBottom: '25px' }}>
-                                <label style={{ display: 'block', color: 'var(--text-dark)', fontWeight: '700', marginBottom: '8px', fontSize: '1.1rem' }}>Table Number *</label>
-                                <input 
-                                    type="text" 
-                                    placeholder="e.g. 12" 
+                                <label style={{ display: 'block', color: 'var(--text-dark)', fontWeight: '700', marginBottom: '8px', fontSize: '1.1rem' }}>Table Number (1 - 20) *</label>
+                                <select 
                                     value={tableNumber}
                                     onChange={(e) => setTableNumber(e.target.value)}
                                     style={{
@@ -244,8 +251,14 @@ export default function NativeCart() {
                                         fontSize: '1rem',
                                         fontWeight: '600'
                                     }}
-                                />
+                                >
+                                    <option value="">Select your table (20 available)</option>
+                                    {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+                                        <option key={num} value={num}>Table {num}</option>
+                                    ))}
+                                </select>
                             </div>
+                            
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                                 <span style={{ fontSize: '1.3rem', fontWeight: '900', color: 'var(--text-dark)' }}>Total</span>
                                 <span style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-color)' }}>₹{getCartTotal()}</span>

@@ -1,3 +1,6 @@
+const dns = require('dns');
+// dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
@@ -81,7 +84,9 @@ const VisitSchema = new mongoose.Schema({
 const models = {};
 
 if (isMongoEnabled) {
-    mongoose.connect(MONGODB_URI)
+    mongoose.connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 3000
+    })
         .then(() => {
             console.log('✅ [DB] Connected to MongoDB Atlas successfully');
             seedDatabase();
@@ -154,7 +159,7 @@ async function seedDatabase() {
  * otherwise falls back to reading from local JSON files on disk.
  */
 const readDataAsync = async (fileName) => {
-    if (isMongoEnabled) {
+    if (isMongoEnabled && mongoose.connection.readyState === 1) {
         try {
             const Model = models[fileName];
             if (Model) {
@@ -204,7 +209,7 @@ const writeDataAsync = async (fileName, data) => {
     }
 
     // 2. Synchronize to MongoDB if enabled (runs in background so it doesn't block the API response)
-    if (isMongoEnabled) {
+    if (isMongoEnabled && mongoose.connection.readyState === 1) {
         (async () => {
             try {
                 const Model = models[fileName];

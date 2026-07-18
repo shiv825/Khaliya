@@ -892,22 +892,31 @@ export default function Menu() {
     useEffect(() => {
         let isMounted = true;
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const evtSource = new EventSource(sseUrl);
-        
-        evtSource.onmessage = (e) => {
-            try {
-                const update = JSON.parse(e.data);
-                if (update.type === 'menu' && isMounted) {
-                    setMenuItems(update.data);
+        let evtSource = null;
+        try {
+            evtSource = new EventSource(sseUrl);
+            evtSource.onmessage = (e) => {
+                try {
+                    const update = JSON.parse(e.data);
+                    if (update.type === 'menu' && isMounted) {
+                        setMenuItems(update.data);
+                    }
+                } catch (err) {
+                    console.error("SSE parsing error", err);
                 }
-            } catch (err) {
-                console.error("SSE parsing error", err);
-            }
-        };
+            };
+            evtSource.onerror = () => {
+                if (evtSource) {
+                    evtSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in Menu:', err.message);
+        }
         
         return () => {
             isMounted = false;
-            evtSource.close();
+            if (evtSource) evtSource.close();
         };
     }, [API_URL]);
 

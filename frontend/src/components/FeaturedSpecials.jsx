@@ -31,22 +31,31 @@ export default function FeaturedSpecials({ isNative = false }) {
         fetchMenu();
 
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
-        const evtSource = new EventSource(sseUrl);
-        
-        evtSource.onmessage = (e) => {
-            try {
-                const update = JSON.parse(e.data);
-                if (update.type === 'menu' && isMounted) {
-                    setLiveMenu(update.data);
+        let evtSource = null;
+        try {
+            evtSource = new EventSource(sseUrl);
+            evtSource.onmessage = (e) => {
+                try {
+                    const update = JSON.parse(e.data);
+                    if (update.type === 'menu' && isMounted) {
+                        setLiveMenu(update.data);
+                    }
+                } catch (err) {
+                    console.error("SSE menu parsing error in specials:", err);
                 }
-            } catch (err) {
-                console.error("SSE menu parsing error in specials:", err);
-            }
-        };
+            };
+            evtSource.onerror = () => {
+                if (evtSource) {
+                    evtSource.close();
+                }
+            };
+        } catch (err) {
+            console.warn('SSE unavailable in FeaturedSpecials:', err.message);
+        }
 
         return () => {
             isMounted = false;
-            evtSource.close();
+            if (evtSource) evtSource.close();
         };
     }, [API_URL]);
 

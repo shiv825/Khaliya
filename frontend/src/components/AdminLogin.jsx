@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import '../assets/admin-style.css';
 
 export default function AdminLogin({ onLogin }) {
@@ -11,16 +12,26 @@ export default function AdminLogin({ onLogin }) {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         if (e) e.preventDefault();
+        setError('');
         
-        // Secure Admin Credentials
-        if (email === 'shivkumarrdn7@gmail.com' && password === 'shiv2006') {
-            localStorage.setItem('adminLoggedIn', 'true');
-            onLogin(true);
-            navigate('/admin/dashboard');
-        } else {
-            setError('🔒 Access Denied. Secure authentication failed.');
+        const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+        const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+        const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+        
+        try {
+            const res = await axios.post(`${API_URL}/auth/admin-login`, { email, password });
+            if (res.data.success && res.data.token) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminSessionToken', res.data.token);
+                onLogin(true);
+                navigate('/admin/dashboard');
+            } else {
+                throw new Error(res.data.message || 'Authentication failed');
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || '🔒 Access Denied. Secure authentication failed.');
             setPassword('');
         }
     };

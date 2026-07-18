@@ -167,7 +167,6 @@ export default function Navbar() {
                     }}>
                         <a href="#home" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.home')}</a>
                         <a href="#menu" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
-                        <a href="#loyalty" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--accent-color)' }}><i className="fas fa-gem" style={{ marginRight: '10px' }}></i> {t('nav.loyalty')}</a>
                         <a href="#reservations" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
                         
                         <a href="#profile" onClick={() => {

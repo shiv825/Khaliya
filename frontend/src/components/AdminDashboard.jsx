@@ -59,6 +59,33 @@ export default function AdminDashboard({ onLogout }) {
     }, []);
 
     useEffect(() => {
+        const token = localStorage.getItem('adminSessionToken');
+        if (!token) {
+            handleLogout();
+            return;
+        }
+
+        // Set default Authorization header for all subsequent Axios calls
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // Verify token with backend
+        axios.get(`${API_URL}/auth/verify-admin-token`)
+            .then(res => {
+                if (!res.data.success) {
+                    Swal.fire({
+                        title: 'Session Expired',
+                        text: 'Your secure session has expired. Please log in again.',
+                        icon: 'warning',
+                        confirmButtonColor: '#8E1C1C'
+                    });
+                    handleLogout();
+                }
+            })
+            .catch(() => {
+                // If backend is offline or fallback JSON mode, let them stay if local storage has token
+                console.warn('Could not verify token remotely, offline fallback');
+            });
+
         fetchData();
         
         // Setup EventSource for real-time SSE updates
@@ -125,6 +152,19 @@ export default function AdminDashboard({ onLogout }) {
                 });
             }
 
+            if (lastBookingId.current && newBookings.length > 0 && newBookings[0].id !== lastBookingId.current) {
+                playDing();
+                Swal.fire({
+                    title: 'New Live Booking!',
+                    text: `New reservation from ${newBookings[0].name} for ${newBookings[0].guests} guests!`,
+                    icon: 'success',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 4500,
+                    showConfirmButton: false,
+                });
+            }
+
             if (newBookings.length > 0) lastBookingId.current = newBookings[0].id;
             if (newOrders.length > 0) lastOrderId.current = newOrders[0].id;
 
@@ -143,6 +183,8 @@ export default function AdminDashboard({ onLogout }) {
 
     const handleLogout = () => {
         localStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('adminSessionToken');
+        delete axios.defaults.headers.common['Authorization'];
         onLogout(false);
         navigate('/');
     };
@@ -600,7 +642,7 @@ export default function AdminDashboard({ onLogout }) {
                                             </div>
                                             <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '15px' }}>
                                                 <span className="item-detail"><i className="far fa-calendar-check"></i> {b.date} at {b.time}</span>
-                                                <span className="item-detail"><i className="fas fa-phone-alt"></i> {b.phone}</span>
+                                                <span className="item-detail"><i className="fas fa-phone-alt"></i> {b.phone || b.contactNumber || b.mobile || 'No phone provided'}</span>
                                             </div>
                                         </div>
                                         <div className="actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>

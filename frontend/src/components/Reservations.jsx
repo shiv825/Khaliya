@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
-import InteractiveFloorplan from './InteractiveFloorplan';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Reservations({ predefinedTable }) {
@@ -130,18 +129,43 @@ export default function Reservations({ predefinedTable }) {
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+    const isSlotFull = () => {
+        if (!formData.time || !availability.bookedSlots) return false;
+        const currentBookings = availability.bookedSlots[formData.time] || 0;
+        return currentBookings >= availability.maxCapacity;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        const payload = { ...formData, source: 'Website' };
+        if (isSlotFull()) {
+            setMessage('Selected slot is fully booked. Please select a different slot.');
+            return;
+        }
+
+        const trimmedPhone = (formData.phone || '').trim();
+        if (!trimmedPhone) {
+            setMessage('Please enter a contact phone number for this reservation.');
+            return;
+        }
+
+        const phonePattern = /^\+?[0-9\s\-()]{7,15}$/;
+        if (!phonePattern.test(trimmedPhone)) {
+            setMessage('Please enter a valid contact phone number (7 to 15 digits).');
+            return;
+        }
+
+        const payload = { ...formData, phone: trimmedPhone, source: 'Website' };
         axios.post(`${API_URL}/bookings`, payload)
             .then(res => {
                 setMessage(t('msg.bookingConfirmed') || 'Booking saved!');
-                setFormData({ name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: '' });
+                setFormData({ name: '', phone: '', email: '', date: '', time: '', guests: '', tableType: '', specialRequests: '' });
+                setSelectedTableInfo(null);
                 setTimeout(() => setMessage(''), 5000);
             })
             .catch(err => {
                 console.error(err);
-                setMessage(t('msg.bookingError') || 'Error saving booking');
+                const errMsg = err.response?.data?.message || t('msg.bookingError') || 'Error saving booking';
+                setMessage(errMsg);
             });
     };
 
@@ -149,7 +173,7 @@ export default function Reservations({ predefinedTable }) {
         <section id="reservations" style={{ padding: '6rem 1.5rem', background: 'var(--bg-body)' }}>
             <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
                 <h2 style={{ marginBottom: '1.5rem' }}>{t('reservations.title')}</h2>
-                <p style={{ color: 'var(--text-light)', marginBottom: '4rem', fontSize: '1.1rem' }}>{t('reservations.sub', 'Secure your table for an unforgettable culinary experience.')}</p>
+                <p style={{ color: 'var(--text-light)', marginBottom: '4rem', fontSize: '1.1rem' }}>{t('reservations.sub', 'Secure one of our 20 exclusive tables for an unforgettable culinary experience.')}</p>
                 
                 
                 <form onSubmit={handleSubmit} style={{ 
@@ -225,9 +249,15 @@ export default function Reservations({ predefinedTable }) {
                                 value={formData.time} 
                                 onChange={handleChange} 
                                 required 
-                                style={{ width: '100%', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', marginTop: '0.5rem', background: 'var(--bg-body)', color: 'var(--text-dark)' }} 
+                                style={{ width: '100%', padding: '1rem', border: isSlotFull() ? '1.5px solid #ff9800' : '1px solid var(--border-color)', borderRadius: '8px', marginTop: '0.5rem', background: 'var(--bg-body)', color: 'var(--text-dark)' }} 
                             />
-                            <small style={{ color: 'var(--text-muted)', marginTop: '0.5rem', display: 'block', fontSize: '0.75rem' }}>Availability will be confirmed upon reservation</small>
+                            {isSlotFull() ? (
+                                <small style={{ color: '#ff9800', marginTop: '0.5rem', display: 'block', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                    ⚠️ This slot is fully booked for the selected table type.
+                                </small>
+                            ) : (
+                                <small style={{ color: 'var(--text-muted)', marginTop: '0.5rem', display: 'block', fontSize: '0.75rem' }}>Availability will be confirmed upon reservation</small>
+                            )}
                         </label>
                     </div>
 
@@ -273,7 +303,9 @@ export default function Reservations({ predefinedTable }) {
                         </label>
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '2.5rem', padding: '18px' }}>{t('form.confirmButton')}</button>
+                    <button type="submit" disabled={isSlotFull()} className="btn btn-primary" style={{ width: '100%', marginTop: '2.5rem', padding: '18px', opacity: isSlotFull() ? 0.5 : 1 }}>
+                        {isSlotFull() ? 'Fully Booked' : t('form.confirmButton')}
+                    </button>
                     
                     {message && (
                         <div style={{ marginTop: '1.5rem', padding: '1rem', borderRadius: '8px', background: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32', textAlign: 'center', fontWeight: 'bold' }}>

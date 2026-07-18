@@ -13,7 +13,6 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './assets/style.css';
 import './assets/ai-theme.css';
-import './assets/loyalty.css';
 
 function App() {
   const isAppMode = useAppMode();

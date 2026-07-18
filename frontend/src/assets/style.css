@@ -20,18 +20,18 @@
 
 :root {
     /* Culinary Elegance - Minimalist Michelin Star Palette */
-    --primary-color: #9B1B30; /* Deep Burgundy / Wine Red */
-    --primary-dark: #7A1526;
-    --secondary-color: #C5A059; /* Muted Elegant Gold */
+    --primary-color: #8E1C1C; /* Premium Saffron Burgundy/Red */
+    --primary-dark: #731616;
+    --secondary-color: #DAA520; /* Luxury Royal Gold */
     --accent-color: #2C3E50; /* Charcoal Accent */
     --accent-light: #FFD700; /* Gold/Yellow for highlights */
     --spice-saffron: #F57C00; /* Saffron orange */
-    --accent-glow: rgba(155, 27, 48, 0.1);
+    --accent-glow: rgba(142, 28, 28, 0.1);
     
-    --text-dark: #1A1A1A; /* Crisp Almost Black */
-    --text-light: #4A4A4A;
+    --text-dark: #2C2C2C; /* Crisp Premium Dark Charcoal */
+    --text-light: #555555;
     --text-muted: #8E8E8E;
-    --bg-body: #F9F7F3; /* Warm Alabaster */
+    --bg-body: #FCFAF6; /* Warm Premium Alabaster/Ivory */
     --bg-surface: #FFFFFF; /* Pure White */
     --bg-glass: rgba(255, 255, 255, 0.9);
     --border-color: rgba(0, 0, 0, 0.08);
@@ -49,49 +49,11 @@
     --radius-md: 12px;
     --radius-lg: 16px;
 
-    --gold-gradient: linear-gradient(135deg, #C5A059 0%, #B08D4C 100%);
-    --indigo-gradient: linear-gradient(135deg, #9B1B30 0%, #7A1526 100%);
+    --gold-gradient: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    --indigo-gradient: linear-gradient(135deg, #8E1C1C 0%, #731616 100%);
 }
 
-/* --- Dynamic Theme Extensions --- */
-
-/* Morning Mode: 5am - 12pm (Fresh, Bright) */
-.app-theme-morning {
-    --bg-body: #FDFCF0;
-    --primary-color: #B71C1C;
-    --accent-color: #FF8F00;
-    --spice-emerald: #1B5E20;
-    --text-dark: #1F1F1F;
-    --bg-surface: #FFFFFF;
-}
-
-/* Afternoon Mode: 12pm - 6pm (Warm, Sunset) */
-.app-theme-afternoon {
-    --bg-body: #FFF8E1;
-    --primary-color: #E65100;
-    --accent-color: #FFD600;
-    --spice-saffron: #F57C00;
-    --text-dark: #212121;
-    --bg-surface: rgba(255, 255, 255, 0.96);
-}
-
-/* Evening Mode: 6pm - 5am (Luminous Midnight Spice) */
-.app-theme-evening {
-    --bg-body: #011627;
-    --bg-surface: #0B243B;
-    --bg-glass: rgba(11, 36, 59, 0.9);
-    --text-dark: #FDFFFC;
-    --text-light: #E0E0E0;
-    --text-muted: #9E9E9E;
-    --primary-color: #E71D36;
-    --accent-color: #FF9F1C;
-    --accent-light: #FFD700;
-    --border-color: rgba(255, 159, 28, 0.3);
-    --border-light: rgba(255, 255, 255, 0.15);
-    --shadow-sm: 0 8px 30px rgba(0, 0, 0, 0.6);
-    --shadow-md: 0 20px 50px rgba(0, 0, 0, 0.8);
-    --shadow-lg: 0 40px 100px rgba(0, 0, 0, 0.9);
-}
+/* --- Dynamic Theme Extensions (Disabled) --- */
 
 /* Film Grain Overlay disabled to prevent scroll paint delays and ensure smooth 60fps rendering */
 
