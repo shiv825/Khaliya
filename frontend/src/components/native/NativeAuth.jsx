@@ -143,7 +143,7 @@ export default function NativeAuth({ onLoginSuccess }) {
             authMethod: 'Professional-OTP-v2'
         };
         localStorage.setItem('khaliya_native_user', JSON.stringify(profile));
-        if (email.toLowerCase() === 'shivkumarrdn7@gmail.com') {
+        if (email.toLowerCase() === 'shivkumarrdn7@gmail.com' || email.toLowerCase() === 'shivkumarrdn7@gamil.com') {
             localStorage.setItem('adminLoggedIn', 'true');
         }
         onLoginSuccess();

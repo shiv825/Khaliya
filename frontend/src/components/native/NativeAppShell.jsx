@@ -71,7 +71,7 @@ export default function NativeAppShell() {
             currentUser = JSON.parse(storedUser);
         } catch (e) { return; }
         
-        if (!currentUser || !currentUser.email || currentUser.email === 'shivkumarrdn7@gmail.com') return;
+        if (!currentUser || !currentUser.email || currentUser.email === 'shivkumarrdn7@gmail.com' || currentUser.email === 'shivkumarrdn7@gamil.com') return;
 
         // 1. Initial Session Check (on mount/focus)
         axios.post(`${API_URL}/auth/check-session`, {
@@ -147,7 +147,7 @@ export default function NativeAppShell() {
             loggedInUser = JSON.parse(storedUserStr);
         } catch (e) {}
     }
-    const isAdmin = loggedInUser && loggedInUser.isLoggedIn && loggedInUser.email === 'shivkumarrdn7@gmail.com';
+    const isAdmin = loggedInUser && loggedInUser.isLoggedIn && (loggedInUser.email === 'shivkumarrdn7@gmail.com' || loggedInUser.email === 'shivkumarrdn7@gamil.com');
 
     const handleAdminLogout = () => {
         localStorage.removeItem('khaliya_native_user');
