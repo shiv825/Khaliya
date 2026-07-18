@@ -516,7 +516,9 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
         }
 
         // Generate dynamic customer session ID for single-device restriction
-        const isCustomer = user.email.toLowerCase() !== 'shivkumarrdn7@gmail.com';
+        const isCustomer = user.email.toLowerCase() !== 'shivkumarrdn7@gmail.com' && user.email.toLowerCase() !== 'shivkumarrdn7@gamil.com';
+        let adminToken = null;
+
         if (isCustomer) {
             const newSessionId = `SESS-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
             user.currentSessionId = newSessionId;
@@ -532,12 +534,21 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
                 sendUpdateToAll('customer-session-invalidate', { email: user.email.toLowerCase(), newSessionId });
             }, 100);
         } else {
+            // It is the admin! Generate a valid session token so they can authorize dashboard requests
+            adminToken = require('crypto').randomBytes(32).toString('hex');
+            const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+            
+            activeAdminSessions[adminToken] = {
+                email: user.email.toLowerCase(),
+                expires
+            };
             await writeData('users.json', users);
         }
 
         res.json({ 
             success: true, 
-            user: { ...user, isLoggedIn: true } 
+            user: { ...user, isLoggedIn: true },
+            adminSessionToken: adminToken
         });
     } else {
         res.status(400).json({ success: false, message: 'Invalid verification code' });

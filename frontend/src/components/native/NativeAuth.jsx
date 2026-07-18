@@ -120,6 +120,12 @@ export default function NativeAuth({ onLoginSuccess }) {
             if (res.data.success) {
                 setIsLoading(false);
                 if (navigator.vibrate) navigator.vibrate([30, 50]); // Success vibration
+                
+                // Store admin session token if returned (OTP Admin Login)
+                if (res.data.adminSessionToken) {
+                    localStorage.setItem('adminSessionToken', res.data.adminSessionToken);
+                }
+                
                 finalizeLogin(res.data.user);
                 setStep('notification');
             }
