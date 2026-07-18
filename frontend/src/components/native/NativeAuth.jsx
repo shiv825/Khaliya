@@ -41,24 +41,23 @@ export default function NativeAuth({ onLoginSuccess }) {
                     setOtp(['', '', '', '', '', '']);
                     
                     if (res.data.simulatedOtp) {
-                        try {
-                            // Call the Vercel serverless function to actually send the email!
-                            // This bypasses the Render backend outbound email block.
-                            await axios.post('https://khaliya-restaurant.vercel.app/api/send-otp', { 
-                                email, 
-                                otp: res.data.simulatedOtp 
-                            });
+                        // Call the Vercel serverless function to actually send the email in the background!
+                        // This bypasses the Render backend outbound email block without delaying the UI transition.
+                        axios.post('https://khaliya-restaurant.vercel.app/api/send-otp', { 
+                            email, 
+                            otp: res.data.simulatedOtp 
+                        }).then(() => {
                             console.log('✅ OTP sent successfully via Vercel Serverless Function');
-                        } catch (emailErr) {
+                        }).catch((emailErr) => {
                             console.error('❌ Vercel Email Delivery Failed:', emailErr);
-                            // Fallback to popup if Vercel function fails (e.g. running locally without Vercel CLI)
+                            // Fallback popup if Vercel function fails (displayed asynchronously)
                             Swal.fire({
                                 title: 'Local Testing Mode',
                                 html: `Could not send email. Your OTP is: <strong style="font-size: 1.5rem; color: var(--primary-color);">${res.data.simulatedOtp}</strong>`,
                                 icon: 'info',
                                 confirmButtonColor: 'var(--primary-color)'
                             });
-                        }
+                        });
                     }
                 } else {
                     throw new Error(res.data.message || 'Failed to send OTP');
