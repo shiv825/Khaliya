@@ -10,10 +10,10 @@
   {
     "id": "USR-1779364364532",
     "email": "shivkumarrdn7@gmail.com",
-    "name": "Khaliya Member",
+    "name": "Khaliya Admin",
     "joinedAt": "2026-05-21T11:52:44.532Z",
     "spicePoints": 750,
-    "role": "customer"
+    "role": "admin"
   },
   {
     "id": "USR-1784206551148",
@@ -24,5 +24,14 @@
     "role": "customer",
     "currentSessionId": "SESS-1784206551148-p5e3clrip",
     "phone": "9876543210"
+  },
+  {
+    "id": "USR-1784409509293",
+    "email": "shivkumarrdn7@gamil.com",
+    "name": "Khaliya Member",
+    "joinedAt": "2026-07-18T21:18:29.293Z",
+    "spicePoints": 750,
+    "role": "customer",
+    "currentSessionId": "SESS-1784409509294-uyg7q1ckv"
   }
 ]

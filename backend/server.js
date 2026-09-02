@@ -63,33 +63,34 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-// Set up file uploads
+// Set up file uploads (Memory storage — images stored as Base64 in MongoDB so they survive server restarts)
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
 }
+// Keep serving old disk-uploaded files if any exist
 app.use('/uploads', express.static(uploadsDir));
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir)
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext)
-    }
+// Use memory storage so we can convert to Base64 and store in DB (permanent)
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
-const upload = multer({ storage: storage });
 
 app.post('/api/upload', upload.single('image'), (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
-    // Return relative path that the frontend can use
-    res.json({ imageUrl: `/uploads/${req.file.filename}` });
+    // Convert to Base64 data URL — stored in MongoDB, never lost on restart
+    const base64 = req.file.buffer.toString('base64');
+    const mimeType = req.file.mimetype || 'image/jpeg';
+    const dataUrl = `data:${mimeType};base64,${base64}`;
+    console.log(`✅ [Upload] Image converted to Base64 (${Math.round(base64.length / 1024)}KB), stored permanently in DB.`);
+    res.json({ imageUrl: dataUrl });
 });
 
 // Diagnostic Logger: Log every request to help debug 404s on the user's laptop
@@ -184,28 +185,44 @@ const writeData = async (fileName, data) => {
     sendUpdateToAll(type, data);
 };
 
-// -- ADMIN AUTHENTICATION SECURITY --
-let activeAdminSessions = {}; // { token: { email, expires } }
+// -- ADMIN AUTHENTICATION SECURITY (Stateless HMAC Tokens) --
+// Tokens are self-contained and survive server restarts.
+const crypto = require('crypto');
+const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || process.env.APP_SECRET || 'khaliya-admin-secret-key-2024';
+
+const signAdminToken = (email) => {
+    const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    const payload = Buffer.from(JSON.stringify({ email, expires })).toString('base64url');
+    const sig = crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(payload).digest('base64url');
+    return `${payload}.${sig}`;
+};
+
+const verifyAdminTokenData = (token) => {
+    try {
+        const [payload, sig] = token.split('.');
+        if (!payload || !sig) return null;
+        const expectedSig = crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(payload).digest('base64url');
+        // Constant-time comparison to prevent timing attacks
+        if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig))) return null;
+        const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
+        if (Date.now() > data.expires) return null;
+        return data;
+    } catch (e) {
+        return null;
+    }
+};
 
 const verifyAdminToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ success: false, message: 'Access Denied: No token provided' });
     }
-    
     const token = authHeader.split(' ')[1];
-    const session = activeAdminSessions[token];
-    
-    if (!session) {
-        return res.status(401).json({ success: false, message: 'Access Denied: Invalid token' });
+    const data = verifyAdminTokenData(token);
+    if (!data) {
+        return res.status(401).json({ success: false, message: 'Access Denied: Invalid or expired token' });
     }
-    
-    if (Date.now() > session.expires) {
-        delete activeAdminSessions[token];
-        return res.status(401).json({ success: false, message: 'Access Denied: Token expired' });
-    }
-    
-    req.adminEmail = session.email;
+    req.adminEmail = data.email;
     next();
 };
 
@@ -228,14 +245,7 @@ app.post('/api/auth/admin-login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
         }
         
-        const token = require('crypto').randomBytes(32).toString('hex');
-        const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-        
-        activeAdminSessions[token] = {
-            email: adminEmail,
-            expires
-        };
-        
+        const token = signAdminToken(adminEmail);
         res.json({ success: true, token, email: adminEmail });
     } catch (err) {
         console.error('Admin login error:', err);
@@ -249,20 +259,22 @@ app.get('/api/auth/verify-admin-token', (req, res) => {
         return res.json({ success: false });
     }
     const token = authHeader.split(' ')[1];
-    const session = activeAdminSessions[token];
-    if (session && Date.now() <= session.expires) {
-        return res.json({ success: true, email: session.email });
+    const data = verifyAdminTokenData(token);
+    if (data) {
+        return res.json({ success: true, email: data.email });
     }
     return res.json({ success: false });
 });
 
 // API: Menu
 app.get('/api/menu', async (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     const menu = await readData('menu.json');
     res.json(menu);
 });
 
 app.post('/api/menu', verifyAdminToken, async (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     const menu = await readData('menu.json');
     const newItem = { id: Date.now(), ...req.body };
     menu.push(newItem);
@@ -271,6 +283,7 @@ app.post('/api/menu', verifyAdminToken, async (req, res) => {
 });
 
 app.put('/api/menu/:id', verifyAdminToken, async (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     const menu = await readData('menu.json');
     const index = menu.findIndex(m => m.id == req.params.id || m.name == req.params.id);
     if (index !== -1) {
@@ -283,6 +296,7 @@ app.put('/api/menu/:id', verifyAdminToken, async (req, res) => {
 });
 
 app.delete('/api/menu/:id', verifyAdminToken, async (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     const menu = await readData('menu.json');
     const filtered = menu.filter(m => m.id != req.params.id && m.name != req.params.id);
     if (filtered.length !== menu.length) {
@@ -534,14 +548,8 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
                 sendUpdateToAll('customer-session-invalidate', { email: user.email.toLowerCase(), newSessionId });
             }, 100);
         } else {
-            // It is the admin! Generate a valid session token so they can authorize dashboard requests
-            adminToken = require('crypto').randomBytes(32).toString('hex');
-            const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-            
-            activeAdminSessions[adminToken] = {
-                email: user.email.toLowerCase(),
-                expires
-            };
+            // It is the admin! Generate a stateless HMAC-signed token for the dashboard
+            adminToken = signAdminToken(user.email.toLowerCase());
             await writeData('users.json', users);
         }
 
@@ -632,9 +640,11 @@ app.get('/api/orders', async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
     const orders = await readData('orders.json');
+    const epoch = Date.now();
     const newOrder = { 
-        id: `ORD-${Date.now()}`, 
+        id: `ORD-${epoch}`, 
         timestamp: new Date().toLocaleString(), 
+        createdAt: new Date().toISOString(),   // ISO for reliable date parsing
         status: 'received', 
         ...req.body 
     };
@@ -704,8 +714,23 @@ app.get('/api/analytics', async (req, res) => {
     
     let activeOrdersCount = orders.filter(o => o.status === 'received' || o.status === 'preparing').length;
 
+    const parseOrderDate = (order) => {
+        // 1. Prefer ISO createdAt (most reliable)
+        if (order.createdAt) return new Date(order.createdAt);
+        // 2. Fall back to epoch embedded in id: "ORD-1784405202104"
+        if (order.id && order.id.startsWith('ORD-')) {
+            const epoch = parseInt(order.id.replace('ORD-', ''), 10);
+            if (!isNaN(epoch)) return new Date(epoch);
+        }
+        // 3. Numeric id (bookings store id as Date.now() number)
+        if (typeof order.id === 'number') return new Date(order.id);
+        // 4. Last resort: try parsing timestamp string as-is
+        const d = new Date(order.timestamp || order.date);
+        return isNaN(d.getTime()) ? new Date() : d;
+    };
+
     validOrders.forEach(order => {
-        const orderDateObj = new Date(order.timestamp || order.date || Date.now());
+        const orderDateObj = parseOrderDate(order);
         const total = parseFloat(order.total) || 0;
         
         totalRevenue += total;
@@ -719,18 +744,19 @@ app.get('/api/analytics', async (req, res) => {
             
             if (order.items && Array.isArray(order.items)) {
                 order.items.forEach(item => {
-                    itemCounts[item.name] = (itemCounts[item.name] || 0) + (item.quantity || 1);
+                    const itemName = typeof item.name === 'object' ? (item.name.en || JSON.stringify(item.name)) : item.name;
+                    itemCounts[itemName] = (itemCounts[itemName] || 0) + (item.quantity || 1);
                 });
             }
         }
     });
     
-    let topItem = 'None yet';
+    let topItem = { name: 'None yet', sold: 0 };
     let maxCount = 0;
     for (const [name, count] of Object.entries(itemCounts)) {
         if (count > maxCount) {
             maxCount = count;
-            topItem = name;
+            topItem = { name, sold: count };
         }
     }
 
@@ -758,7 +784,7 @@ app.get('/api/analytics', async (req, res) => {
         revenue: { total: totalRevenue, weekly: weeklyRevenue, monthly: monthlyRevenue, today: todayRevenue },
         visitors: { total: visits.length, app: appVisits, website: webVisits, today: newCustomersToday },
         activeOrders: activeOrdersCount,
-        topItem: { name: topItem, sold: maxCount },
+        topItem: topItem,
         hourlyRush: hourlyRush
     });
 });
