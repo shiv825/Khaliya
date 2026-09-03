@@ -23,15 +23,28 @@ const playDing = () => {
     } catch (e) { console.log("Audio not supported"); }
 };
 
+const CULINARY_CATEGORIES = [
+    'All Categories',
+    'Appetizers & Starters',
+    'Tandoor & Kebabs',
+    'Vegetarian Main Course',
+    'Non-Vegetarian Main Course',
+    'Rice & Biryani',
+    'Breads',
+    'Desserts',
+    'Beverages'
+];
+
 export default function AdminDashboard({ onLogout }) {
-    const [activeTab, setActiveTab] = useState('dashboard'); // New Default
+    const [activeTab, setActiveTab] = useState('dashboard');
     const [bookings, setBookings] = useState([]);
     const [orders, setOrders] = useState([]);
     const [menu, setMenu] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [analytics, setAnalytics] = useState(null);
-    const [settings, setSettings] = useState({ isOpen: true });
+    const [settings, setSettings] = useState({ isOpen: true, isSurgeActive: false, surgeMultiplier: 1.2 });
     
+    const [selectedCategory, setSelectedCategory] = useState('All Categories');
     const [searchQuery, setSearchQuery] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
     const [isSyncing, setIsSyncing] = useState(false);
@@ -269,16 +282,41 @@ export default function AdminDashboard({ onLogout }) {
         }
     };
 
-    const toggleMenuItem = async (item) => {
-        const updatedItem = { ...item, available: !item.available };
-        // Optimistically update frontend state
-        setMenu(prev => prev.map(m => m.id === item.id ? updatedItem : m));
+    const toggleSurgePricing = async (active, multiplier = 1.2) => {
         try {
-            await axios.put(`${API_URL}/menu/${item.id}`, updatedItem);
+            const updatedSettings = { ...settings, isSurgeActive: active, surgeMultiplier: multiplier };
+            setSettings(updatedSettings);
+            await axios.post(`${API_URL}/settings`, updatedSettings);
+            Swal.fire({
+                title: active ? `Peak Demand Surge Activated (${multiplier}x)` : 'Surge Pricing Deactivated',
+                icon: active ? 'warning' : 'success',
+                toast: true, position: 'top-end', timer: 2500, showConfirmButton: false
+            });
+            fetchData();
         } catch (err) {
-            Swal.fire('Error', 'Failed to update availability. Re-syncing.', 'error');
+            Swal.fire('Error', 'Failed to update surge pricing', 'error');
+        }
+    };
+
+    const toggleStockStatus = async (item) => {
+        const isCurrentlyAvailable = item.available !== false && item.inStock !== false;
+        const updated = { ...item, available: !isCurrentlyAvailable, inStock: !isCurrentlyAvailable };
+        setMenu(prev => prev.map(m => m.id === item.id ? updated : m));
+        try {
+            await axios.put(`${API_URL}/menu/${item.id}`, updated);
+            Swal.fire({
+                title: !isCurrentlyAvailable ? 'Item Back In Stock!' : 'Item Marked Sold Out!',
+                icon: !isCurrentlyAvailable ? 'success' : 'info',
+                toast: true, position: 'top-end', timer: 2000, showConfirmButton: false
+            });
+        } catch (err) {
+            Swal.fire('Error', 'Failed to toggle stock', 'error');
             fetchData();
         }
+    };
+
+    const toggleMenuItem = async (item) => {
+        return toggleStockStatus(item);
     };
 
     const handleImageUpload = async (e) => {
@@ -287,29 +325,74 @@ export default function AdminDashboard({ onLogout }) {
         setIsUploading(true);
         const formData = new FormData();
         formData.append('image', file);
+        if (editingItem?.id) formData.append('productId', editingItem.id);
         try {
             const res = await axios.post(`${API_URL}/upload`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
+            const rawUrl = res.data.imageUrl;
             const baseUrl = API_URL.replace(/\/api$/, '');
-            const fullUrl = `${baseUrl}${res.data.imageUrl}`;
+            const fullUrl = (rawUrl && rawUrl.startsWith('/uploads')) ? `${baseUrl}${rawUrl}` : rawUrl;
             setEditingItem({ ...editingItem, image: fullUrl });
+            Swal.fire({ title: 'Image Saved!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
         } catch (err) {
             console.error('Upload failed', err);
             Swal.fire('Error', 'Image upload failed', 'error');
         } finally {
             setIsUploading(false);
-            // Reset input so same file can be selected again if needed
             e.target.value = '';
+        }
+    };
+
+    const handleImportUrl = async () => {
+        if (!editingItem?.image || (!editingItem.image.startsWith('http://') && !editingItem.image.startsWith('https://'))) {
+            Swal.fire('Notice', 'Please enter a valid online image HTTP/HTTPS link first.', 'info');
+            return;
+        }
+        setIsUploading(true);
+        try {
+            const res = await axios.post(`${API_URL}/upload-url`, {
+                url: editingItem.image,
+                productId: editingItem.id || Date.now()
+            });
+            if (res.data?.imageUrl) {
+                const rawUrl = res.data.imageUrl;
+                const baseUrl = API_URL.replace(/\/api$/, '');
+                const fullUrl = (rawUrl && rawUrl.startsWith('/uploads')) ? `${baseUrl}${rawUrl}` : rawUrl;
+                setEditingItem({ ...editingItem, image: fullUrl });
+                Swal.fire({ title: 'Online Image Downloaded & Saved!', icon: 'success', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false });
+            }
+        } catch (err) {
+            console.error('Import failed', err);
+            Swal.fire('Error', 'Failed to internally download online image.', 'error');
+        } finally {
+            setIsUploading(false);
         }
     };
 
     const handleSaveMenu = async (e) => {
         e.preventDefault();
         try {
-            const savedItem = { ...editingItem };
+            let savedItem = { ...editingItem };
             if (savedItem.price && !String(savedItem.price).startsWith('₹')) {
                 savedItem.price = `₹${savedItem.price}`;
+            }
+
+            // Automatically download & process online image URL if it's external
+            if (savedItem.image && (savedItem.image.startsWith('http://') || savedItem.image.startsWith('https://')) && !savedItem.image.includes('/uploads/menu/') && !savedItem.image.includes('cloudinary.com')) {
+                try {
+                    const urlRes = await axios.post(`${API_URL}/upload-url`, {
+                        url: savedItem.image,
+                        productId: savedItem.id || Date.now()
+                    });
+                    if (urlRes.data?.imageUrl) {
+                        const rawUrl = urlRes.data.imageUrl;
+                        const baseUrl = API_URL.replace(/\/api$/, '');
+                        savedItem.image = (rawUrl && rawUrl.startsWith('/uploads')) ? `${baseUrl}${rawUrl}` : rawUrl;
+                    }
+                } catch (imgErr) {
+                    console.warn('Could not internally download online image URL, saving original link:', imgErr);
+                }
             }
 
             // Close modal immediately for smooth transitions
@@ -370,59 +453,155 @@ export default function AdminDashboard({ onLogout }) {
     const pieData = Object.keys(categorySales).map(key => ({ name: key, value: categorySales[key] })).filter(d => d.value > 0);
 
     return (
-        <div className="admin-portal-wrapper">
-            {/* Horizontal Header Navbar */}
-            <header className="admin-header-nav">
-                <div className="admin-header-left">
-                    <h1 className="admin-header-logo">
-                        Khaliya<span style={{ color: 'var(--admin-primary)' }}>.</span>
-                    </h1>
-                </div>
+        <div className="admin-layout-wrapper">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && window.innerWidth <= 992 && (
+                <div className="admin-sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>
+            )}
 
-                <div className="admin-header-center">
-                    <nav className="admin-horizontal-nav">
-                        <button className={`nav-tab-h ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
-                            <i className="fas fa-th-large"></i>
-                            <span className="nav-label-h">Dashboard</span>
+            {/* LEFT SIDEBAR NAVIGATION */}
+            <aside className={`admin-sidebar ${!isSidebarOpen ? 'collapsed' : ''} ${isSidebarOpen && window.innerWidth <= 992 ? 'mobile-open' : ''}`}>
+                <div>
+                    {/* Brand Section */}
+                    <div className="sidebar-brand">
+                        <div className="sidebar-logo-icon">K</div>
+                        {isSidebarOpen && (
+                            <div className="sidebar-brand-text">
+                                <span className="sidebar-brand-title">Khaliya</span>
+                                <span className="sidebar-brand-sub">Command Center</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Navigation Menu Links */}
+                    <nav className="sidebar-nav">
+                        <button 
+                            className={`sidebar-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} 
+                            onClick={() => { setActiveTab('dashboard'); if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Dashboard"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-chart-pie"></i>
+                                {isSidebarOpen && <span>Dashboard</span>}
+                            </div>
                         </button>
-                        <button className={`nav-tab-h ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
-                            <i className="fas fa-fire-burner"></i>
-                            <span className="nav-label-h">Live Orders</span>
-                            {pendingOrdersCount > 0 && <span className="nav-badge-h">{pendingOrdersCount}</span>}
+
+                        <button 
+                            className={`sidebar-nav-item ${activeTab === 'products' || activeTab === 'menu' ? 'active' : ''}`} 
+                            onClick={() => { setActiveTab('products'); if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Product Catalog"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-utensils"></i>
+                                {isSidebarOpen && <span>Product Catalog</span>}
+                            </div>
                         </button>
-                        <button className={`nav-tab-h ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>
-                            <i className="fas fa-hamburger"></i>
-                            <span className="nav-label-h">Menu Setup</span>
+
+                        <button 
+                            className={`sidebar-nav-item ${activeTab === 'inventory' ? 'active' : ''}`} 
+                            onClick={() => { setActiveTab('inventory'); if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Stock & Surge Pricing"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-bolt"></i>
+                                {isSidebarOpen && <span>Stock & Surge</span>}
+                            </div>
+                            {settings.isSurgeActive && (
+                                <span className="sidebar-nav-badge" style={{ background: 'var(--admin-accent)' }}>SURGE</span>
+                            )}
                         </button>
-                        <button className={`nav-tab-h ${activeTab === 'bookings' ? 'active' : ''}`} onClick={() => setActiveTab('bookings')}>
-                            <i className="fas fa-calendar-check"></i>
-                            <span className="nav-label-h">Reservations</span>
+
+                        <button 
+                            className={`sidebar-nav-item ${activeTab === 'orders' ? 'active' : ''}`} 
+                            onClick={() => { setActiveTab('orders'); if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Live Orders"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-fire-burner"></i>
+                                {isSidebarOpen && <span>Live Orders</span>}
+                            </div>
+                            {pendingOrdersCount > 0 && (
+                                <span className="sidebar-nav-badge">{pendingOrdersCount}</span>
+                            )}
                         </button>
-                        <button className={`nav-tab-h ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>
-                            <i className="fas fa-star"></i>
-                            <span className="nav-label-h">Feedback</span>
+
+                        <button 
+                            className={`sidebar-nav-item ${activeTab === 'bookings' ? 'active' : ''}`} 
+                            onClick={() => { setActiveTab('bookings'); if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Reservations"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-calendar-check"></i>
+                                {isSidebarOpen && <span>Reservations</span>}
+                            </div>
+                        </button>
+
+                        <button 
+                            className={`sidebar-nav-item ${activeTab === 'reviews' ? 'active' : ''}`} 
+                            onClick={() => { setActiveTab('reviews'); if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Feedback"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-star"></i>
+                                {isSidebarOpen && <span>Feedback</span>}
+                            </div>
                         </button>
                     </nav>
                 </div>
 
-                <div className="admin-header-right">
-                    <div className="saas-search-bar" style={{ width: '180px', margin: 0 }}>
-                        <i className="fas fa-search" style={{ color: 'var(--admin-text-muted)' }}></i>
-                        <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-                    </div>
-                    <div className={`saas-status-toggle ${settings.isOpen ? 'open' : 'closed'}`} onClick={toggleStoreStatus} style={{ margin: 0, padding: '8px 12px' }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }}></div>
-                        <span className="status-toggle-label" style={{ fontSize: '0.85rem' }}>{settings.isOpen ? 'Accepting' : 'Closed'}</span>
-                    </div>
-                    <button className="action-btn btn-cancel" onClick={handleLogout} style={{ padding: '8px 12px', fontSize: '0.8rem', textTransform: 'none', height: '36px', border: '1px solid var(--admin-danger)' }}>
+                {/* Sidebar Footer */}
+                <div className="sidebar-footer">
+                    {isSidebarOpen && (
+                        <div className="sidebar-profile">
+                            <div className="sidebar-profile-avatar">S</div>
+                            <div className="sidebar-profile-info">
+                                <span className="sidebar-profile-name">Shiv Kumar</span>
+                                <span className="sidebar-profile-role">Administrator</span>
+                            </div>
+                        </div>
+                    )}
+                    <button className="sidebar-logout-btn" onClick={handleLogout} title="Sign Out">
                         <i className="fas fa-sign-out-alt"></i>
-                        <span className="logout-label">Sign Out</span>
+                        {isSidebarOpen && <span>Sign Out</span>}
                     </button>
                 </div>
-            </header>
+            </aside>
 
-            <main className="admin-main-full">
-                <div style={{ padding: '30px' }}>
+            {/* MAIN CONTENT AREA (RIGHT SIDE) */}
+            <div className="admin-content-wrapper">
+                {/* Topbar Header */}
+                <header className="admin-topbar">
+                    <div className="admin-topbar-left">
+                        <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)} title="Toggle Sidebar">
+                            <i className={`fas ${isSidebarOpen ? 'fa-outdent' : 'fa-indent'}`}></i>
+                        </button>
+                        <div className="admin-page-breadcrumb">
+                            <span className="breadcrumb-sub">Khaliya Sanctuary</span>
+                            <h2 className="breadcrumb-title">
+                                {activeTab === 'dashboard' && 'Executive Dashboard'}
+                                {activeTab === 'orders' && 'Live Kitchen Orders'}
+                                {activeTab === 'menu' && 'Menu & Recipe Management'}
+                                {activeTab === 'bookings' && 'Table Reservations'}
+                                {activeTab === 'reviews' && 'Customer Reviews & Ratings'}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div className="admin-topbar-right">
+                        <div className="saas-search-bar" style={{ width: '200px', margin: 0 }}>
+                            <i className="fas fa-search" style={{ color: 'var(--admin-text-muted)' }}></i>
+                            <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                        </div>
+
+                        <div className={`saas-status-toggle ${settings.isOpen ? 'open' : 'closed'}`} onClick={toggleStoreStatus} style={{ margin: 0, padding: '8px 14px' }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }}></div>
+                            <span className="status-toggle-label" style={{ fontSize: '0.85rem' }}>{settings.isOpen ? 'Accepting Orders' : 'Store Closed'}</span>
+                        </div>
+                    </div>
+                </header>
+
+                <main className="admin-main-full">
+                    <div style={{ padding: '30px' }}>
                     <AnimatePresence mode="wait">
                         
                         {/* DASHBOARD TAB */}
@@ -574,56 +753,188 @@ export default function AdminDashboard({ onLogout }) {
                             </motion.div>
                         )}
 
-                        {/* MENU MANAGEMENT */}
-                        {activeTab === 'menu' && (
-                            <motion.div key="menu" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-                                    <h2 style={{ margin: 0 }}>Menu Catalog</h2>
+                        {/* PRODUCT CATALOG & CREATOR TAB */}
+                        {(activeTab === 'products' || activeTab === 'menu') && (
+                            <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 15 }}>
+                                    <div>
+                                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800 }}>Product Catalog Creator</h2>
+                                        <p style={{ margin: '5px 0 0 0', color: 'var(--admin-text-muted)', fontSize: '0.9rem' }}>Manage multilingual dishes, dietary tags, and imagery across 8 culinary categories.</p>
+                                    </div>
                                     <button onClick={() => { 
                                         setEditingItem({ 
                                             name: { en: '', hi: '', ar: '' }, 
                                             description: { en: '', hi: '', ar: '' }, 
                                             price: '', 
-                                            category: 'Starters', 
+                                            category: 'Appetizers & Starters', 
                                             available: true, 
                                             image: '' 
                                         }); 
                                         setModalLang('en');
                                         setIsModalOpen(true); 
-                                    }} className="action-btn btn-primary">
-                                        + Add Item
+                                    }} className="action-btn btn-primary" style={{ padding: '12px 24px', fontSize: '0.95rem' }}>
+                                        + Create New Product
                                     </button>
                                 </div>
-                                <div className="menu-list-view">
-                                    {menu.map(item => (
-                                        <div key={item.id} className="menu-list-row">
-                                            <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
-                                                {item.image ? <img src={item.image} className="menu-list-image" alt="dish" /> : <div className="menu-list-image" style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-image" style={{ color: '#ccc' }}></i></div>}
-                                                <div>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{typeof item.name === 'object' ? item.name.en : item.name}</div>
-                                                    <div style={{ color: 'var(--admin-primary)', fontWeight: 'bold' }}>₹{item.price}</div>
-                                                </div>
-                                            </div>
-                                            <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                    <span style={{ fontSize: '0.85rem', color: '#666', width: 60, textAlign: 'right' }}>{item.available ? 'In Stock' : 'Out'}</span>
-                                                    <div className={`toggle-switch ${item.available ? 'on' : ''}`} onClick={() => toggleMenuItem(item)}></div>
-                                                </div>
-                                                <button onClick={() => { 
-                                                    const priceClean = item.price ? String(item.price).replace(/[^\d]/g, '') : '';
-                                                    setEditingItem({
-                                                        ...item,
-                                                        price: priceClean,
-                                                        name: typeof item.name === 'string' ? { en: item.name, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.name || {}) },
-                                                        description: typeof item.description === 'string' ? { en: item.description, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.description || {}) }
-                                                    }); 
-                                                    setModalLang('en');
-                                                    setIsModalOpen(true); 
-                                                }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--admin-accent)' }}><i className="fas fa-edit"></i></button>
-                                                <button onClick={() => handleDeleteMenu(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--admin-danger)' }}><i className="fas fa-trash"></i></button>
-                                            </div>
-                                        </div>
+
+                                {/* Culinary Category Filter Pills */}
+                                <div className="category-filter-bar">
+                                    {CULINARY_CATEGORIES.map(cat => (
+                                        <button 
+                                            key={cat} 
+                                            className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
+                                            onClick={() => setSelectedCategory(cat)}
+                                        >
+                                            {cat}
+                                        </button>
                                     ))}
+                                </div>
+
+                                <div className="menu-list-view">
+                                    {menu.filter(item => {
+                                        const matchesCat = selectedCategory === 'All Categories' || item.category === selectedCategory || (selectedCategory.includes('Starters') && (item.category === 'Starters' || item.category === 'Appetizers & Starters'));
+                                        const itemNameStr = (typeof item.name === 'object' ? item.name.en : item.name) || '';
+                                        const matchesSearch = itemNameStr.toLowerCase().includes(searchQuery.toLowerCase());
+                                        return matchesCat && matchesSearch;
+                                    }).length === 0 ? (
+                                        <div style={{ textAlignment: 'center', padding: '40px', color: 'var(--admin-text-muted)', background: 'var(--admin-surface)', borderRadius: '15px', border: '1px solid var(--admin-border)' }}>
+                                            No products found in this category. Click "+ Create New Product" to add one.
+                                        </div>
+                                    ) : (
+                                        menu.filter(item => {
+                                            const matchesCat = selectedCategory === 'All Categories' || item.category === selectedCategory || (selectedCategory.includes('Starters') && (item.category === 'Starters' || item.category === 'Appetizers & Starters'));
+                                            const itemNameStr = (typeof item.name === 'object' ? item.name.en : item.name) || '';
+                                            const matchesSearch = itemNameStr.toLowerCase().includes(searchQuery.toLowerCase());
+                                            return matchesCat && matchesSearch;
+                                        }).map(item => {
+                                            const isAvailable = item.available !== false && item.inStock !== false;
+                                            const nameEn = typeof item.name === 'object' ? item.name.en : item.name;
+                                            return (
+                                                <div key={item.id} className="menu-list-row" style={{ opacity: isAvailable ? 1 : 0.65 }}>
+                                                    <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
+                                                        {item.image ? (
+                                                            <img src={item.image} className="menu-list-image" alt={nameEn} />
+                                                        ) : (
+                                                            <div className="menu-list-image" style={{ background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <i className="fas fa-utensils" style={{ color: 'var(--admin-text-muted)' }}></i>
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <div style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--admin-text)' }}>{nameEn}</div>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                                                                <span style={{ color: 'var(--admin-primary)', fontWeight: '800', fontSize: '1rem' }}>₹{item.price}</span>
+                                                                <span className="category-pill" style={{ padding: '2px 10px', fontSize: '0.72rem', height: '22px' }}>{item.category || 'Appetizers'}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
+                                                        <button 
+                                                            className={`stock-toggle-btn ${isAvailable ? 'in-stock' : 'sold-out'}`}
+                                                            onClick={() => toggleStockStatus(item)}
+                                                        >
+                                                            <i className={`fas ${isAvailable ? 'fa-check-circle' : 'fa-times-circle'}`}></i>
+                                                            {isAvailable ? 'In Stock' : 'Sold Out'}
+                                                        </button>
+
+                                                        <button onClick={() => { 
+                                                            const priceClean = item.price ? String(item.price).replace(/[^\d]/g, '') : '';
+                                                            setEditingItem({
+                                                                ...item,
+                                                                price: priceClean,
+                                                                name: typeof item.name === 'string' ? { en: item.name, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.name || {}) },
+                                                                description: typeof item.description === 'string' ? { en: item.description, hi: '', ar: '' } : { en: '', hi: '', ar: '', ...(item.description || {}) }
+                                                            }); 
+                                                            setModalLang('en');
+                                                            setIsModalOpen(true); 
+                                                        }} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--admin-border)', padding: '8px 12px', borderRadius: '10px', cursor: 'pointer', color: 'var(--admin-primary)' }} title="Edit Product">
+                                                            <i className="fas fa-edit"></i>
+                                                        </button>
+                                                        <button onClick={() => handleDeleteMenu(item.id)} style={{ background: 'rgba(230,57,70,0.1)', border: '1px solid rgba(230,57,70,0.2)', padding: '8px 12px', borderRadius: '10px', cursor: 'pointer', color: 'var(--admin-danger)' }} title="Delete Product">
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* STOCK & PEAK SURGE PRICING TAB */}
+                        {activeTab === 'inventory' && (
+                            <motion.div key="inventory" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <div className="surge-controller-card">
+                                    <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                            <h2 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800, color: 'var(--admin-text)' }}>⚡ Peak Demand Surge Pricing Controller</h2>
+                                            <span className={`surge-status-badge ${settings.isSurgeActive ? 'active' : 'inactive'}`}>
+                                                {settings.isSurgeActive ? `Surge Active (${settings.surgeMultiplier || 1.2}x)` : 'Standard Pricing'}
+                                            </span>
+                                        </div>
+                                        <p style={{ margin: 0, color: 'var(--admin-text-muted)', fontSize: '0.9rem', maxWidth: '650px' }}>
+                                            Dynamically adjust menu prices during high peak demand (e.g. weekend dinner rush). Out of stock items are instantly hidden from customer ordering apps.
+                                        </p>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                        {[1.1, 1.2, 1.3, 1.5].map(m => (
+                                            <button 
+                                                key={m} 
+                                                className={`surge-multiplier-btn ${settings.isSurgeActive && settings.surgeMultiplier === m ? 'active' : ''}`}
+                                                onClick={() => toggleSurgePricing(true, m)}
+                                            >
+                                                {m}x (+{Math.round((m - 1) * 100)}%)
+                                            </button>
+                                        ))}
+                                        <button 
+                                            className={`action-btn ${settings.isSurgeActive ? 'btn-cancel' : 'btn-primary'}`}
+                                            onClick={() => toggleSurgePricing(!settings.isSurgeActive, settings.surgeMultiplier || 1.2)}
+                                            style={{ padding: '10px 18px' }}
+                                        >
+                                            {settings.isSurgeActive ? 'Deactivate Surge' : 'Activate Peak Surge'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="menu-list-view">
+                                    <h3 style={{ marginTop: 0, marginBottom: 15 }}>Live Inventory & Price Overrides</h3>
+                                    {menu.map(item => {
+                                        const isAvailable = item.available !== false && item.inStock !== false;
+                                        const nameEn = typeof item.name === 'object' ? item.name.en : item.name;
+                                        const basePrice = item.price ? String(item.price).replace(/[^\d.]/g, '') : '0';
+                                        const surgePrice = item.effectivePriceNum || Math.round(Number(basePrice) * (settings.surgeMultiplier || 1.2));
+                                        return (
+                                            <div key={item.id} className="menu-list-row" style={{ opacity: isAvailable ? 1 : 0.6 }}>
+                                                <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
+                                                    {item.image ? <img src={item.image} className="menu-list-image" alt={nameEn} /> : <div className="menu-list-image" style={{ background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-box" style={{ color: 'var(--admin-text-muted)' }}></i></div>}
+                                                    <div>
+                                                        <div style={{ fontWeight: '800', fontSize: '1.05rem', color: 'var(--admin-text)' }}>{nameEn}</div>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Category: {item.category || 'Main Course'}</div>
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <div style={{ textAlign: 'right' }}>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Base: ₹{basePrice}</div>
+                                                        {settings.isSurgeActive && (
+                                                            <div style={{ fontWeight: '800', color: 'var(--admin-accent)', fontSize: '0.95rem' }}>
+                                                                Surge: ₹{surgePrice}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <button 
+                                                        className={`stock-toggle-btn ${isAvailable ? 'in-stock' : 'sold-out'}`}
+                                                        onClick={() => toggleStockStatus(item)}
+                                                        style={{ padding: '8px 16px' }}
+                                                    >
+                                                        <i className={`fas ${isAvailable ? 'fa-check-circle' : 'fa-times-circle'}`}></i>
+                                                        {isAvailable ? 'In Stock' : 'Mark Out of Stock'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </motion.div>
                         )}
@@ -705,12 +1016,10 @@ export default function AdminDashboard({ onLogout }) {
                                     </div>
                                     <div className="admin-form-group" style={{ flex: 1 }}>
                                         <label>Category</label>
-                                        <select className="admin-select" value={editingItem.category} onChange={e => setEditingItem({...editingItem, category: e.target.value})}>
-                                            <option value="Starters">Starters</option>
-                                            <option value="Main Course">Main Course</option>
-                                            <option value="Breads">Breads</option>
-                                            <option value="Desserts">Desserts</option>
-                                            <option value="Beverages">Beverages</option>
+                                        <select className="admin-select" value={editingItem.category || 'Appetizers & Starters'} onChange={e => setEditingItem({...editingItem, category: e.target.value})}>
+                                            {CULINARY_CATEGORIES.filter(c => c !== 'All Categories').map(cat => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
@@ -736,7 +1045,7 @@ export default function AdminDashboard({ onLogout }) {
                                                     alt="Preview" 
                                                     onError={(e) => {
                                                         e.target.onerror = null;
-                                                        e.target.src = 'https://via.placeholder.com/90/ffebee/d32f2f?text=Broken';
+                                                        e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect width='90' height='90' fill='%23121620'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23D4AF37' font-size='11' font-family='sans-serif'%3ENo Image%3C/text%3E%3C/svg%3E";
                                                     }} 
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                                 />
@@ -753,6 +1062,7 @@ export default function AdminDashboard({ onLogout }) {
                     </motion.div>
                 )}
             </AnimatePresence>
+            </div>
         </div>
     );
 }

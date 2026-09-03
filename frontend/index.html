@@ -3,9 +3,9 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" sizes="192x192" href="./pwa-icon-192.png" />
-  <link rel="apple-touch-icon" href="./pwa-icon-192.png" />
-  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/pwa-icon-192.png" />
+  <link rel="apple-touch-icon" href="/pwa-icon-192.png" />
+  <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#2196F3" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="description" content="Experience the finest authentic Indian cuisine at Khaliya Restaurant. Order online, manage reservations, and explore our rich menu." />
@@ -81,15 +81,11 @@
         }, 6000);
       });
 
-      // 3. AUTO RESET: Only for major version bumps
-      if (!localStorage.getItem('nuclear_reset_v13')) {
-        localStorage.setItem('nuclear_reset_v13', 'true');
-        console.log('☢ [PWA] Nuclear Reset v13 in progress...');
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(rs) {
-            for(let r of rs) r.unregister();
-          });
-        }
+      // 3. DEV SERVICE WORKER CLEANUP: Unregister SWs on localhost to prevent infinite reload loops
+      if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(rs) {
+          for (let r of rs) r.unregister();
+        });
       }
       window.KHALIYA_API_URL = ""; 
     })();
@@ -112,24 +108,6 @@
   <div id="root"></div>
 
   <script type="module" src="./src/main.jsx"></script>
-  <script type="module" src="/pwa-manager.js"></script>
-
-  <!-- PWA Install Banner -->
-  <div id="pwaInstallBanner" class="pwa-banner">
-    <div class="pwa-banner-inner">
-      <div class="pwa-icon">
-        <img src="./pwa-icon-192.png" alt="Khaliya Logo">
-      </div>
-      <div class="pwa-content">
-        <h3 id="pwaInstallTitle">Install Khaliya App</h3>
-        <p id="pwaInstallDesc">Fast access to our menu and live order updates.</p>
-      </div>
-      <div class="pwa-actions">
-        <button id="pwaInstallBtn" class="pwa-btn-install" onclick="window.promptInstall()">Install</button>
-        <button id="pwaLaterBtn" class="pwa-btn-later">Later</button>
-      </div>
-    </div>
-  </div>
 </body>
 
 </html>

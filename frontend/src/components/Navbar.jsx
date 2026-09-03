@@ -165,15 +165,14 @@ export default function Navbar() {
                         overflow: 'hidden',
                         zIndex: 999
                     }}>
-                        <a href="#home" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.home')}</a>
-                        <a href="#menu" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
-                        <a href="#reservations" onClick={toggleMenu} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
+                        <a href="/" onClick={(e) => { e.preventDefault(); if (isMenuOpen) setIsMenuOpen(false); document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }); }} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.home')}</a>
+                        <a href="/" onClick={(e) => { e.preventDefault(); if (isMenuOpen) setIsMenuOpen(false); document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' }); }} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.menu')}</a>
+                        <a href="/" onClick={(e) => { e.preventDefault(); if (isMenuOpen) setIsMenuOpen(false); document.getElementById('reservations')?.scrollIntoView({ behavior: 'smooth' }); }} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>{t('nav.reservations')}</a>
                         
-                        <a href="#profile" onClick={() => {
-                            // On the web version, #profile might not exist as a section, 
-                            // but in PWA mode it's a view. 
-                            // For now, let's just make it clear it's for the app.
-                            toggleMenu();
+                        <a href="/" onClick={(e) => {
+                            e.preventDefault();
+                            if (isMenuOpen) setIsMenuOpen(false);
+                            document.getElementById('profile')?.scrollIntoView({ behavior: 'smooth' });
                         }} style={isDesktop ? { color: 'var(--text-dark)', fontWeight: '700', fontSize: '0.9rem' } : { fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary-color)' }}>
                             <i className="fas fa-user-circle" style={isDesktop ? { marginRight: '5px' } : { marginRight: '10px' }}></i> {t('reviews.yourProfile') || 'My Account'}
                         </a>

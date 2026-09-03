@@ -12,6 +12,7 @@ export default function Menu() {
 
     const getFallbackMenu = () => [
         {
+                "id": 1780141133327,
                 "category": "Appetizer",
                 "name": {
                         "en": "Samosa (4 pcs)",
@@ -28,10 +29,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "./menu-images/samosa.jpg",
-                "id": 1780141133327
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443766/khaliya_restaurant/product_1780141133327.jpg"
         },
         {
+                "id": 1780141131494,
                 "category": "Appetizer",
                 "name": {
                         "en": "Paneer Tikka",
@@ -48,10 +49,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "./menu-images/paneer-tikka.jpg",
-                "id": 1780141131494
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443767/khaliya_restaurant/product_1780141131494.jpg"
         },
         {
+                "id": 1780141134688,
                 "category": "Appetizer",
                 "name": {
                         "en": "Tandoori Chicken (Half)",
@@ -68,10 +69,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "./menu-images/tandoori-chicken.jpg",
-                "id": 1780141134688
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443768/khaliya_restaurant/product_1780141134688.jpg"
         },
         {
+                "id": 1780141128405,
                 "category": "Appetizer",
                 "name": {
                         "en": "Hara Bhara Kabab (6 pcs)",
@@ -88,10 +89,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "./menu-images/hara-bhara.jpg",
-                "id": 1780141128405
+                "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAwLh5sUZK_-QLfl1d0DamPaG-UnlSLkBjJSxJsE7VlA&s=10"
         },
         {
+                "id": 1780141133487,
                 "category": "Appetizer",
                 "name": {
                         "en": "Fish Amritsari",
@@ -108,10 +109,15 @@ export default function Menu() {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fried_fish_pieces.jpg/960px-Fried_fish_pieces.jpg",
-                "id": 1780141133487
+                "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGLQvjPkx0ESR53XRcU0VYgcNmbGyqdPvS9GhFv6KUWg&s=10",
+                "basePriceNum": 350,
+                "effectivePriceNum": 350,
+                "effectivePrice": "₹350",
+                "isSurgeActive": false,
+                "available": true
         },
         {
+                "id": 1780141134364,
                 "category": "Appetizer",
                 "name": {
                         "en": "Chili Paneer",
@@ -128,10 +134,10 @@ export default function Menu() {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Chilli_Paneer.jpg/960px-Chilli_Paneer.jpg",
-                "id": 1780141134364
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Chilli_Paneer.jpg/960px-Chilli_Paneer.jpg"
         },
         {
+                "id": 1780141129487,
                 "category": "Appetizer",
                 "name": {
                         "en": "Chicken 65",
@@ -148,10 +154,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-3"
                 ],
-                "image": "./menu-images/chicken-65.jpg",
-                "id": 1780141129487
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443773/khaliya_restaurant/product_1780141129487.png"
         },
         {
+                "id": 1780141127512,
                 "category": "Main Course",
                 "name": {
                         "en": "Chicken Biryani",
@@ -168,10 +174,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "./menu-images/chicken-biryani.jpg",
-                "id": 1780141127512
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443774/khaliya_restaurant/product_1780141127512.jpg"
         },
         {
+                "id": 1780141132061,
                 "category": "Main Course",
                 "name": {
                         "en": "Butter Chicken",
@@ -188,10 +194,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-1"
                 ],
-                "image": "./menu-images/butter-chicken.jpg",
-                "id": 1780141132061
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443776/khaliya_restaurant/product_1780141132061.jpg"
         },
         {
+                "id": 1780141129390,
                 "category": "Main Course",
                 "name": {
                         "en": "Chicken Tikka Masala",
@@ -208,10 +214,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "./menu-images/tikka-masala.jpg",
-                "id": 1780141129390
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443777/khaliya_restaurant/product_1780141129390.jpg"
         },
         {
+                "id": 1780141135395,
                 "category": "Main Course",
                 "name": {
                         "en": "Paneer Butter Masala",
@@ -228,10 +234,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "./menu-images/paneer-butter.jpg",
-                "id": 1780141135395
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443780/khaliya_restaurant/product_1780141135395.jpg"
         },
         {
+                "id": 1780141131257,
                 "category": "Main Course",
                 "name": {
                         "en": "Dal Makhani",
@@ -248,10 +254,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "./menu-images/dal-makhani.jpg",
-                "id": 1780141131257
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443781/khaliya_restaurant/product_1780141131257.jpg"
         },
         {
+                "id": 1780141136038,
                 "category": "Main Course",
                 "name": {
                         "en": "Lamb Rogan Josh",
@@ -268,10 +274,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-3"
                 ],
-                "image": "./menu-images/lamb-rogan.jpg",
-                "id": 1780141136038
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443783/khaliya_restaurant/product_1780141136038.jpg"
         },
         {
+                "id": 1780141133779,
                 "category": "Main Course",
                 "name": {
                         "en": "Malai Kofta",
@@ -288,10 +294,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Malai_Kofta_-_A_North_Indian_Dish.jpg/960px-Malai_Kofta_-_A_North_Indian_Dish.jpg",
-                "id": 1780141133779
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Malai_Kofta_-_A_North_Indian_Dish.jpg/960px-Malai_Kofta_-_A_North_Indian_Dish.jpg"
         },
         {
+                "id": 1780141128487,
                 "category": "Main Course",
                 "name": {
                         "en": "Palak Paneer",
@@ -308,10 +314,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "./menu-images/palak-paneer.jpg",
-                "id": 1780141128487
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443784/khaliya_restaurant/product_1780141128487.jpg"
         },
         {
+                "id": 1780141127149,
                 "category": "Main Course",
                 "name": {
                         "en": "Kadai Chicken",
@@ -328,10 +334,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-3"
                 ],
-                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Karahi_Chicken.jpg/960px-Karahi_Chicken.jpg",
-                "id": 1780141127149
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Karahi_Chicken.jpg/960px-Karahi_Chicken.jpg"
         },
         {
+                "id": 1780141135912,
                 "category": "Main Course",
                 "name": {
                         "en": "Goan Fish Curry",
@@ -348,10 +354,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Goan_Fish_Curry.jpg/960px-Goan_Fish_Curry.jpg",
-                "id": 1780141135912
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Goan_Fish_Curry.jpg/960px-Goan_Fish_Curry.jpg"
         },
         {
+                "id": 1780141135131,
                 "category": "Main Course",
                 "name": {
                         "en": "Chana Masala",
@@ -368,10 +374,10 @@ export default function Menu() {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "./menu-images/chana-masala.jpg",
-                "id": 1780141135131
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443785/khaliya_restaurant/product_1780141135131.jpg"
         },
         {
+                "id": 1780141129908,
                 "category": "Bread",
                 "name": {
                         "en": "Garlic Naan",
@@ -387,10 +393,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "./menu-images/garlic-naan.jpg",
-                "id": 1780141129908
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443786/khaliya_restaurant/product_1780141129908.jpg"
         },
         {
+                "id": 1780141126850,
                 "category": "Dessert",
                 "name": {
                         "en": "Gulab Jamun",
@@ -406,10 +412,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "./menu-images/gulab-jamun.jpg",
-                "id": 1780141126850
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443789/khaliya_restaurant/product_1780141126850.jpg"
         },
         {
+                "id": 1780141127210,
                 "category": "Appetizer",
                 "name": {
                         "en": "Murgh Malai Tikka",
@@ -426,10 +432,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop",
-                "id": 1780141127210
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443790/khaliya_restaurant/product_1780141127210.jpg"
         },
         {
+                "id": 1780141135552,
                 "category": "Main Course",
                 "name": {
                         "en": "Dal Tadka",
@@ -446,10 +452,10 @@ export default function Menu() {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop",
-                "id": 1780141135552
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443791/khaliya_restaurant/product_1780141135552.jpg"
         },
         {
+                "id": 1780141132771,
                 "category": "Main Course",
                 "name": {
                         "en": "Kashmiri Pulao",
@@ -465,10 +471,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1512149177596-f817c7ef5d4c?w=500&fit=crop",
-                "id": 1780141132771
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443793/khaliya_restaurant/product_1780141132771.jpg"
         },
         {
+                "id": 1780141135332,
                 "category": "Beverage",
                 "name": {
                         "en": "Mango Lassi",
@@ -484,10 +490,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "./menu-images/mango-lassi.jpg",
-                "id": 1780141135332
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443794/khaliya_restaurant/product_1780141135332.png"
         },
         {
+                "id": 1780141126903,
                 "category": "Appetizer",
                 "name": {
                         "en": "Veg Spring Rolls (4 pcs)",
@@ -503,10 +509,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&fit=crop",
-                "id": 1780141126903
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443796/khaliya_restaurant/product_1780141126903.jpg"
         },
         {
+                "id": 1780141135927,
                 "category": "Appetizer",
                 "name": {
                         "en": "Onion Bhaji (6 pcs)",
@@ -522,10 +528,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop",
-                "id": 1780141135927
+                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
         },
         {
+                "id": 1780141130153,
                 "category": "Appetizer",
                 "name": {
                         "en": "Paneer Seekh Kebab (4 pcs)",
@@ -542,10 +548,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&fit=crop",
-                "id": 1780141130153
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443797/khaliya_restaurant/product_1780141130153.jpg"
         },
         {
+                "id": 1780141129437,
                 "category": "Appetizer",
                 "name": {
                         "en": "Mutton Seekh Kebab (4 pcs)",
@@ -562,10 +568,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&fit=crop",
-                "id": 1780141129437
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443799/khaliya_restaurant/product_1780141129437.jpg"
         },
         {
+                "id": 1780141128421,
                 "category": "Appetizer",
                 "name": {
                         "en": "Gobi Manchurian Dry",
@@ -582,10 +588,10 @@ export default function Menu() {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&fit=crop",
-                "id": 1780141128421
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443800/khaliya_restaurant/product_1780141128421.jpg"
         },
         {
+                "id": 1780141133031,
                 "category": "Main Course",
                 "name": {
                         "en": "Mutton Biryani",
@@ -602,10 +608,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&fit=crop",
-                "id": 1780141133031
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443801/khaliya_restaurant/product_1780141133031.jpg"
         },
         {
+                "id": 1780141134913,
                 "category": "Main Course",
                 "name": {
                         "en": "Mutter Paneer",
@@ -622,10 +628,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&fit=crop",
-                "id": 1780141134913
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443802/khaliya_restaurant/product_1780141134913.jpg"
         },
         {
+                "id": 1780141136020,
                 "category": "Main Course",
                 "name": {
                         "en": "Kadai Paneer",
@@ -642,10 +648,10 @@ export default function Menu() {
                         "veg",
                         "spicy-2"
                 ],
-                "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&fit=crop",
-                "id": 1780141136020
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443804/khaliya_restaurant/product_1780141136020.jpg"
         },
         {
+                "id": 1780141131297,
                 "category": "Main Course",
                 "name": {
                         "en": "Aloo Gobi Masala",
@@ -662,10 +668,10 @@ export default function Menu() {
                         "veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&fit=crop",
-                "id": 1780141131297
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443805/khaliya_restaurant/product_1780141131297.jpg"
         },
         {
+                "id": 1780141131740,
                 "category": "Main Course",
                 "name": {
                         "en": "Chicken Korma",
@@ -682,10 +688,10 @@ export default function Menu() {
                         "non-veg",
                         "spicy-1"
                 ],
-                "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&fit=crop",
-                "id": 1780141131740
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443806/khaliya_restaurant/product_1780141131740.jpg"
         },
         {
+                "id": 1780141129332,
                 "category": "Main Course",
                 "name": {
                         "en": "Shahi Paneer",
@@ -701,10 +707,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&fit=crop",
-                "id": 1780141129332
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443807/khaliya_restaurant/product_1780141129332.jpg"
         },
         {
+                "id": 1780141131193,
                 "category": "Bread",
                 "name": {
                         "en": "Butter Naan",
@@ -720,10 +726,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop",
-                "id": 1780141131193
+                "image": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=500&fit=crop"
         },
         {
+                "id": 1780141127138,
                 "category": "Bread",
                 "name": {
                         "en": "Tandoori Roti",
@@ -739,10 +745,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop",
-                "id": 1780141127138
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443809/khaliya_restaurant/product_1780141127138.jpg"
         },
         {
+                "id": 1780141136167,
                 "category": "Bread",
                 "name": {
                         "en": "Lachha Paratha",
@@ -758,10 +764,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=500&fit=crop",
-                "id": 1780141136167
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443810/khaliya_restaurant/product_1780141136167.jpg"
         },
         {
+                "id": 1780141131627,
                 "category": "Bread",
                 "name": {
                         "en": "Aloo Paratha",
@@ -777,10 +783,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=500&fit=crop",
-                "id": 1780141131627
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443811/khaliya_restaurant/product_1780141131627.jpg"
         },
         {
+                "id": 1780141127274,
                 "category": "Dessert",
                 "name": {
                         "en": "Rasgulla (2 pcs)",
@@ -796,10 +802,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&fit=crop",
-                "id": 1780141127274
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443812/khaliya_restaurant/product_1780141127274.jpg"
         },
         {
+                "id": 1780141126548,
                 "category": "Dessert",
                 "name": {
                         "en": "Rice Kheer",
@@ -815,10 +821,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1574969899363-ee6121f3080a?w=500&fit=crop",
-                "id": 1780141126548
+                "image": "https://images.unsplash.com/photo-1574969899363-ee6121f3080a?w=500&fit=crop"
         },
         {
+                "id": 1780141127028,
                 "category": "Beverage",
                 "name": {
                         "en": "Masala Chai",
@@ -834,10 +840,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&fit=crop",
-                "id": 1780141127028
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443813/khaliya_restaurant/product_1780141127028.jpg"
         },
         {
+                "id": 1780141135558,
                 "category": "Beverage",
                 "name": {
                         "en": "Rose Lassi",
@@ -853,10 +859,10 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1571006682869-f54244517307?w=500&fit=crop",
-                "id": 1780141135558
+                "image": "https://images.unsplash.com/photo-1571006682869-f54244517307?w=500&fit=crop"
         },
         {
+                "id": 1780141127666,
                 "category": "Beverage",
                 "name": {
                         "en": "Fresh Lime Soda",
@@ -872,8 +878,7 @@ export default function Menu() {
                 "tags": [
                         "veg"
                 ],
-                "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&fit=crop",
-                "id": 1780141127666
+                "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443814/khaliya_restaurant/product_1780141127666.jpg"
         }
 ];
 

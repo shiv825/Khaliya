@@ -237,5 +237,6 @@ const writeDataAsync = async (fileName, data) => {
 module.exports = {
     isMongoEnabled,
     readDataAsync,
-    writeDataAsync
+    writeDataAsync,
+    models
 };

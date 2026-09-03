@@ -19,6 +19,14 @@ const PWAManager = {
     },
     registerServiceWorker: () => {
         if ('serviceWorker' in navigator) {
+            // Disable Service Worker on local development server to prevent HMR infinite reload loops
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                navigator.serviceWorker.getRegistrations().then(regs => {
+                    for (let r of regs) r.unregister();
+                });
+                return;
+            }
+
             const register = () => {
                 const isGithubPages = window.location.pathname.startsWith('/Khaliya-Restaurant');
                 const swPath = isGithubPages ? '/Khaliya-Restaurant/service-worker.js' : '/service-worker.js';
@@ -27,17 +35,6 @@ const PWAManager = {
                 navigator.serviceWorker.register(swPath)
                     .then(reg => {
                         console.log('✅ [PWA] Service Worker registered:', reg.scope);
-                        reg.update();
-                        
-                        reg.addEventListener('updatefound', () => {
-                            const newWorker = reg.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    console.log('✨ [PWA] New version available! Reloading in 1s...');
-                                    setTimeout(() => window.location.reload(), 1000);
-                                }
-                            });
-                        });
                     })
                     .catch(err => {
                         console.error('❌ [PWA] SW Registration failed:', err);
@@ -49,16 +46,6 @@ const PWAManager = {
             } else {
                 window.addEventListener('load', register);
             }
-
-            // Handle the case where the service worker has already updated but needs a refresh
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    refreshing = true;
-                    console.log('♻️ [PWA] Controller changed (new version activated). Reloading...');
-                    window.location.reload();
-                }
-            });
         }
     },
     setupInstallPrompt: () => {

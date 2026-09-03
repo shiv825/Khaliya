@@ -105,8 +105,8 @@ export default function Hero() {
                     transition={{ duration: 0.8, delay: 1 }}
                     style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}
                 >
-                    <a href="#reservations" className="btn btn-primary">{t('hero.makeReservation')}</a>
-                    <a href="#menu" className="btn">{t('hero.seeMenu')}</a>
+                    <button onClick={() => document.getElementById('reservations')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-primary">{t('hero.makeReservation')}</button>
+                    <button onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })} className="btn">{t('hero.seeMenu')}</button>
                     {isInstallable && (
                         <button 
                             onClick={() => window.promptInstall && window.promptInstall()}

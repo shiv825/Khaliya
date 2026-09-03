@@ -1,3 +1,7 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
 /* Khaliya Restaurant - Luxury Gold & Charcoal Theme */
 * {
     margin: 0;
@@ -96,7 +100,8 @@ h2 {
     letter-spacing: 2px;
 }
 
-h2::after {
+.section-title h2::after,
+.public-header-title::after {
     content: '';
     position: absolute;
     bottom: -15px;
