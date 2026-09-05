@@ -115,8 +115,43 @@ export default function ProductsPage() {
                 </button>
             </div>
 
+            {/* Instant Search Bar */}
+
+            <div style={{ position: 'relative', marginBottom: '18px', width: '100%' }}>
+                <i className="fas fa-search" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-primary)', fontSize: '1rem' }}></i>
+                <input 
+                    type="text"
+                    placeholder="Instant search dish by name (e.g. Biryani, Paneer, Kabab, Tikka)..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    style={{
+                        width: '100%',
+                        background: 'var(--admin-surface)',
+                        border: '1.5px solid var(--admin-border)',
+                        borderRadius: '14px',
+                        padding: '12px 42px 12px 46px',
+                        color: 'var(--admin-text)',
+                        fontSize: '0.95rem',
+                        fontWeight: '600',
+                        outline: 'none',
+                        boxShadow: 'var(--admin-shadow)',
+                        boxSizing: 'border-box'
+                    }}
+                />
+                {searchQuery && (
+                    <button
+                        onClick={() => setSearchQuery('')}
+                        style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}
+                        title="Clear search"
+                    >
+                        ×
+                    </button>
+                )}
+            </div>
+
             {/* Culinary Category Filter Pills */}
             <div className="category-filter-bar">
+
                 {CULINARY_CATEGORIES.map(cat => (
                     <button 
                         key={cat} 

@@ -1,3 +1,7 @@
 {
-  "isOpen": true
+  "isOpen": true,
+  "isSurgeActive": false,
+  "surgeMultiplier": 1.2,
+  "bookingDepositEnabled": true,
+  "bookingDepositAmount": 200
 }

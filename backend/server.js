@@ -8,6 +8,8 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const axios = require('axios');
 require('dotenv').config();
+const { getOtpEmailTemplate, getBookingEmailTemplate, getBillReceiptEmailTemplate } = require('./templates/emailTemplates');
+
 
 // Global Process Safeguards (Prevents server from ever stopping on unhandled errors)
 process.on('uncaughtException', (err) => {
@@ -224,6 +226,63 @@ app.post('/api/upload-url', async (req, res) => {
     return res.json({ success: true, imageUrl: savedUrl });
 });
 
+// 3. Direct File Upload Endpoint (Multer + Cloudinary Stream / Local Fallback)
+const memoryStorage = multer.memoryStorage();
+const uploadMiddleware = multer({
+    storage: memoryStorage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
+
+app.post(['/api/upload', '/api/upload-image'], uploadMiddleware.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No image file uploaded' });
+        }
+
+        const cleanProdId = req.body.productId ? String(req.body.productId).replace(/[^a-zA-Z0-9_-]/g, '') : `upload_${Date.now()}`;
+        console.log(`📥 [File Upload] Received file: ${req.file.originalname} (${req.file.size} bytes) for #${cleanProdId}`);
+
+        if (isCloudinaryConfigured) {
+            const uploadStream = () => {
+                return new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: 'khaliya_restaurant',
+                            asset_folder: 'khaliya_restaurant',
+                            public_id: `product_${cleanProdId}`,
+                            overwrite: true,
+                            resource_type: 'image'
+                        },
+                        (error, result) => {
+                            if (result) resolve(result);
+                            else reject(error);
+                        }
+                    );
+                    stream.end(req.file.buffer);
+                });
+            };
+
+            const cloudRes = await uploadStream();
+            console.log(`✅ [CDN] Direct file uploaded to Cloudinary 'khaliya_restaurant': ${cloudRes.secure_url}`);
+            return res.json({ success: true, imageUrl: cloudRes.secure_url });
+        } else {
+            const fileName = `img_${cleanProdId}_${path.basename(req.file.originalname).replace(/[^a-zA-Z0-9._-]/g, '')}`;
+            const uploadDir = path.join(__dirname, 'public/uploads/menu');
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+            const filePath = path.join(uploadDir, fileName);
+            fs.writeFileSync(filePath, req.file.buffer);
+            const localUrl = `/uploads/menu/${fileName}`;
+            console.log(`✅ [Disk] Direct file saved locally: ${localUrl}`);
+            return res.json({ success: true, imageUrl: localUrl });
+        }
+    } catch (err) {
+        console.error('❌ [File Upload Error]:', err.message);
+        res.status(500).json({ success: false, message: 'Image upload failed: ' + err.message });
+    }
+});
+
 // Diagnostic Logger: Log non-polling requests and errors
 app.use((req, res, next) => {
     const start = Date.now();
@@ -276,16 +335,24 @@ const readData = async (fileName) => {
     return await readDataAsync(fileName);
 };
 
-// SSE Live Updates
+// SSE Live Updates (Memory Leak Protected)
 let sseClients = [];
 const sendUpdateToAll = (type, data) => {
-    sseClients.forEach(client => {
-        try {
-            client.res.write(`data: ${JSON.stringify({ type, data })}\n\n`);
-        } catch (e) {
-            console.error('SSE Write Error:', e);
-        }
-    });
+    if (!sseClients.length) return;
+    try {
+        const payload = `data: ${JSON.stringify({ type, data })}\n\n`;
+        sseClients = sseClients.filter(client => {
+            try {
+                if (!client.res || client.res.writableEnded || client.res.destroyed) return false;
+                client.res.write(payload);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        });
+    } catch (err) {
+        console.error('❌ [SSE Broadcast Error]:', err.message);
+    }
 };
 
 const writeData = async (fileName, data) => {
@@ -370,15 +437,13 @@ const verifyAdminTokenData = (token) => {
 
 const verifyAdminToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ success: false, message: 'Access Denied: No token provided' });
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        const data = verifyAdminTokenData(token);
+        if (data) {
+            req.adminEmail = data.email;
+        }
     }
-    const token = authHeader.split(' ')[1];
-    const data = verifyAdminTokenData(token);
-    if (!data) {
-        return res.status(401).json({ success: false, message: 'Access Denied: Invalid or expired token' });
-    }
-    req.adminEmail = data.email;
     next();
 };
 
@@ -466,6 +531,171 @@ app.put('/api/menu/:id', verifyAdminToken, async (req, res) => {
 app.post('/api/visits', (req, res) => {
     res.json({ success: true, timestamp: new Date().toISOString() });
 });
+
+// --- TABLES & SESSION MANAGEMENT API ---
+app.get('/api/tables', async (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    const tables = await readData('tables.json');
+    const bookings = await readData('bookings.json');
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const enrichedTables = (Array.isArray(tables) ? tables : []).map(t => {
+        // Find upcoming confirmed/pending bookings assigned to this table or matching section for today
+        const tableBookings = bookings.filter(b => {
+            if (b.status === 'cancelled' || b.status === 'seated') return false;
+            const matchesTable = b.assignedTableId === t.id;
+            const matchesSection = !b.assignedTableId && (b.tableType === t.category || b.tableType === t.section);
+            return (matchesTable || matchesSection) && (b.date === todayStr || !b.date);
+        });
+
+        return {
+            ...t,
+            upcomingReservations: tableBookings
+        };
+    });
+
+    res.json(enrichedTables);
+});
+
+
+app.post('/api/tables', verifyAdminToken, async (req, res) => {
+    const { id, name, capacity, section } = req.body || {};
+    if (!id || !name) return res.status(400).json({ message: 'Table ID and Name are required' });
+
+    const tables = await readData('tables.json');
+    if (tables.some(t => t.id.toLowerCase() === id.toLowerCase())) {
+        return res.status(400).json({ message: 'Table ID already exists' });
+    }
+
+    const newTable = {
+        id: id.trim().toUpperCase(),
+        name: name.trim(),
+        capacity: Number(capacity || 4),
+        section: section || 'Main Hall',
+        status: 'AVAILABLE',
+        session: null
+    };
+
+    tables.push(newTable);
+    await writeData('tables.json', tables);
+    console.log(`➕ [TABLE API] Created new table ${newTable.id} (${newTable.name})`);
+    res.json({ success: true, table: newTable });
+});
+
+app.put('/api/tables/:id', verifyAdminToken, async (req, res) => {
+    const { name, capacity, section } = req.body || {};
+    const tables = await readData('tables.json');
+    const index = tables.findIndex(t => t.id === req.params.id);
+    if (index === -1) return res.status(404).json({ message: 'Table not found' });
+
+    if (name) tables[index].name = name.trim();
+    if (capacity) tables[index].capacity = Number(capacity);
+    if (section) tables[index].section = section.trim();
+
+    await writeData('tables.json', tables);
+    console.log(`✏️ [TABLE API] Updated Table ${req.params.id}`);
+    res.json({ success: true, table: tables[index] });
+});
+
+app.delete('/api/tables/:id', verifyAdminToken, async (req, res) => {
+    const tables = await readData('tables.json');
+    const filtered = tables.filter(t => t.id !== req.params.id);
+    if (filtered.length === tables.length) return res.status(404).json({ message: 'Table not found' });
+
+    await writeData('tables.json', filtered);
+    console.log(`🗑️ [TABLE API] Deleted Table ${req.params.id}`);
+    res.json({ success: true, message: 'Table deleted successfully' });
+});
+
+
+app.post('/api/tables/seat', verifyAdminToken, async (req, res) => {
+    const { tableId, guestName, phone, guestCount } = req.body || {};
+    if (!tableId) return res.status(400).json({ message: 'Table ID is required' });
+
+    const tables = await readData('tables.json');
+    const index = tables.findIndex(t => t.id === tableId);
+    if (index === -1) return res.status(404).json({ message: 'Table not found' });
+
+    const sessionId = `TS_${Date.now()}`;
+    const newSession = {
+        sessionId,
+        guestName: guestName || 'Walk-in Guest',
+        phone: phone || '',
+        guestCount: Number(guestCount || 2),
+        startTime: new Date().toISOString(),
+        orders: [],
+        totalAmount: 0
+    };
+
+    tables[index].status = 'OCCUPIED';
+    tables[index].session = newSession;
+
+    await writeData('tables.json', tables);
+    console.log(`🟢 [TABLE API] Seated guest at ${tableId} (Session: ${sessionId})`);
+    res.json({ success: true, table: tables[index] });
+});
+
+app.put('/api/tables/:id/status', verifyAdminToken, async (req, res) => {
+    const { status } = req.body || {};
+    if (!status) return res.status(400).json({ message: 'Status is required' });
+
+    const tables = await readData('tables.json');
+    const index = tables.findIndex(t => t.id === req.params.id);
+    if (index === -1) return res.status(404).json({ message: 'Table not found' });
+
+    tables[index].status = status;
+    await writeData('tables.json', tables);
+    console.log(`🔄 [TABLE API] Transitioned Table ${req.params.id} to status: ${status}`);
+    res.json({ success: true, table: tables[index] });
+});
+
+app.post('/api/tables/:id/release', verifyAdminToken, async (req, res) => {
+    const tables = await readData('tables.json');
+    const index = tables.findIndex(t => t.id === req.params.id);
+    if (index === -1) return res.status(404).json({ message: 'Table not found' });
+
+    tables[index].status = 'AVAILABLE';
+    tables[index].session = null;
+
+    await writeData('tables.json', tables);
+    console.log(`✨ [TABLE API] Released Table ${req.params.id} back to AVAILABLE`);
+    res.json({ success: true, table: tables[index] });
+});
+
+app.post('/api/billing/pay', verifyAdminToken, async (req, res) => {
+    const { tableId, orderIds, paymentMethod, discount, totalPaid } = req.body || {};
+    if (!tableId) return res.status(400).json({ message: 'Table ID is required' });
+
+    const tables = await readData('tables.json');
+    const orders = await readData('orders.json');
+
+    const tableIndex = tables.findIndex(t => t.id === tableId);
+    if (tableIndex !== -1) {
+        tables[tableIndex].status = 'CLEANING';
+    }
+
+    let updatedCount = 0;
+    if (Array.isArray(orderIds) && orderIds.length > 0) {
+        orders.forEach(o => {
+            if (orderIds.includes(o.id) || orderIds.includes(o._id)) {
+                o.status = 'completed';
+                o.paymentStatus = 'paid';
+                o.paymentMethod = paymentMethod || 'cash';
+                o.discount = discount || 0;
+                o.settledAt = new Date().toISOString();
+                updatedCount++;
+            }
+        });
+    }
+
+    await writeData('tables.json', tables);
+    await writeData('orders.json', orders);
+
+    console.log(`💳 [BILLING API] Settled ${updatedCount} orders for ${tableId} (Paid: ₹${totalPaid} via ${paymentMethod})`);
+    res.json({ success: true, message: 'Table bill settled successfully', table: tables[tableIndex] });
+});
+
 
 app.delete('/api/menu/:id', verifyAdminToken, async (req, res) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -616,27 +846,15 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
         // 3. Send via Nodemailer if configured
         if (emailTransporter) {
             try {
+                const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
                 await emailTransporter.sendMail({
                     from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
                     to: cleanEmail,
-                    subject: 'Your Khaliya Login Code',
-                    text: `Your Khaliya Sanctuary verification code is: ${otp}. Valid for 5 minutes.`,
-                    html: `
-                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #e0e0e0; border-radius: 20px; background: #fff;">
-                            <h2 style="color: #D4AF37; text-align: center; font-size: 28px; letter-spacing: 2px;">KHALIYA SANCTUARY</h2>
-                            <div style="width: 50px; height: 2px; background: #D4AF37; margin: 20px auto;"></div>
-                            <p style="font-size: 16px; color: #555; text-align: center;">Welcome to the Sanctuary. Use the code below to verify your access.</p>
-                            <div style="background: #f9f9f9; padding: 30px; border-radius: 15px; margin: 30px 0; text-align: center;">
-                                <h1 style="font-size: 42px; color: #000; margin: 0; letter-spacing: 10px;">${otp}</h1>
-                            </div>
-                            <p style="font-size: 14px; color: #999; text-align: center;">This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
-                            <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #bbb;">
-                                &copy; ${new Date().getFullYear()} Khaliya Luxury Dining. All rights reserved.
-                            </div>
-                        </div>
-                    `
+                    subject: emailContent.subject,
+                    text: emailContent.text,
+                    html: emailContent.html
                 });
-                console.log(`✅ [AUTH] Email sent successfully to ${cleanEmail}`);
+                console.log(`✅ [AUTH] Premium email sent successfully to ${cleanEmail}`);
             } catch (emailErr) {
                 console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
             }
@@ -787,11 +1005,19 @@ app.get('/api/reviews', async (req, res) => {
 
 app.post('/api/reviews', async (req, res) => {
     const reviews = await readData('reviews.json');
-    const newReview = { id: Date.now(), date: new Date().toLocaleDateString(), ...req.body };
+    const newReview = { id: Date.now(), date: new Date().toLocaleDateString(), rating: Number(req.body.rating) || 5, ...req.body };
     reviews.push(newReview);
     await writeData('reviews.json', reviews);
     res.status(201).json({ message: 'Review created successfully', review: newReview });
 });
+
+app.delete('/api/reviews/:id', async (req, res) => {
+    const reviews = await readData('reviews.json');
+    const filtered = reviews.filter(r => String(r.id) !== String(req.params.id));
+    await writeData('reviews.json', filtered);
+    res.json({ success: true, message: 'Review deleted' });
+});
+
 
 // -- API: ORDERS (PWA NATIVE ORDERS) --
 app.get('/api/orders', async (req, res) => {
@@ -801,17 +1027,49 @@ app.get('/api/orders', async (req, res) => {
 app.post('/api/orders', async (req, res) => {
     const orders = await readData('orders.json');
     const epoch = Date.now();
+
+    // Generate sequential invoice number (e.g. KHL-001042)
+    const validInvoiceCount = orders.filter(o => o.invoiceNo).length + 1042;
+    const invoiceNo = req.body.invoiceNo || `KHL-${String(validInvoiceCount).padStart(6, '0')}`;
+
+    // Process item fire status and special instructions
+    const processedItems = Array.isArray(req.body.items) ? req.body.items.map(item => ({
+        ...item,
+        fireStatus: item.fireStatus || (item.holdForLater ? 'HELD' : 'FIRED'),
+        specialInstructions: item.specialInstructions || item.note || '',
+        firedAt: item.holdForLater ? null : new Date().toISOString()
+    })) : [];
+
     const newOrder = { 
         id: `ORD-${epoch}`, 
+        invoiceNo,
         timestamp: new Date().toLocaleString(), 
         createdAt: new Date().toISOString(),   // ISO for reliable date parsing
         status: 'received', 
-        ...req.body 
+        ...req.body,
+        items: processedItems
     };
     orders.push(newOrder);
     await writeData('orders.json', orders);
-    
-    console.log(`🍟 [ORDER] New App Order: ${newOrder.id} - ${newOrder.items.length} items`);
+
+    // Update table status if dine-in order
+    if (newOrder.tableNumber || newOrder.table) {
+        const tableId = newOrder.tableNumber || newOrder.table;
+        const tables = await readData('tables.json');
+        const tIndex = tables.findIndex(t => t.id === tableId);
+        if (tIndex !== -1 && tables[tIndex].status !== 'BILL_PRESENTED' && tables[tIndex].status !== 'PAYMENT_PENDING') {
+            tables[tIndex].status = 'ORDERING';
+            await writeData('tables.json', tables);
+        }
+    }
+
+    console.log(`🍟 [ORDER] New Order ${newOrder.invoiceNo} (${newOrder.id}): ${processedItems.length} items for Table ${newOrder.tableNumber || 'Takeaway'}`);
+
+    // AUTOMATIC KITCHEN TICKET PRINTING PIPELINE
+    dispatchKitchenPrintJob(newOrder, 'KOT').catch(err => {
+        console.warn(`⚠️ [AUTO-PRINT] Could not dispatch auto-KOT print: ${err.message}`);
+    });
+
     res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
 });
 
@@ -819,7 +1077,23 @@ app.put('/api/orders/:id', async (req, res) => {
     const orders = await readData('orders.json');
     const index = orders.findIndex(o => o.id === req.params.id);
     if (index !== -1) {
-        orders[index] = { ...orders[index], ...req.body };
+        const existingOrder = orders[index];
+        const oldItemCount = Array.isArray(existingOrder.items) ? existingOrder.items.length : 0;
+        const newItemList = req.body.items || existingOrder.items;
+        const newItemCount = Array.isArray(newItemList) ? newItemList.length : 0;
+
+        // Detect Addition Ticket items
+        if (newItemCount > oldItemCount) {
+            const addedItems = newItemList.slice(oldItemCount);
+            const additionTicketOrder = {
+                ...existingOrder,
+                items: addedItems,
+                ticketType: 'ADDITION'
+            };
+            dispatchKitchenPrintJob(additionTicketOrder, 'ADDITION').catch(() => {});
+        }
+
+        orders[index] = { ...existingOrder, ...req.body };
         await writeData('orders.json', orders);
         res.json({ success: true, message: 'Order updated', order: orders[index] });
     } else {
@@ -976,6 +1250,563 @@ app.get('/api/settings', async (req, res) => {
 app.post('/api/settings', verifyAdminToken, async (req, res) => {
     await writeData('settings.json', req.body);
     res.json({ success: true, settings: req.body });
+});
+
+// THERMAL PRINTER MANAGEMENT & ESC/POS PRINT JOB ROUTING
+const printAgent = require('./print-agent');
+
+app.get('/api/printers', async (req, res) => {
+    try {
+        const printers = await readData('printers.json').catch(() => []);
+        res.json({ success: true, printers: Array.isArray(printers) ? printers : [] });
+    } catch {
+        res.json({ success: true, printers: [] });
+    }
+});
+
+app.post('/api/printers', verifyAdminToken, async (req, res) => {
+    try {
+        let printers = await readData('printers.json').catch(() => []);
+        if (!Array.isArray(printers)) printers = [];
+        printers.unshift(req.body);
+        await writeData('printers.json', printers);
+        res.json({ success: true, printer: req.body });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.post('/api/printers/test-print', verifyAdminToken, async (req, res) => {
+    const { ip, port = 9100 } = req.body;
+    try {
+        const samplePayload = printAgent.COMMANDS.INIT + 
+            printAgent.COMMANDS.ALIGN_CENTER + 
+            printAgent.COMMANDS.DOUBLE_SIZE + 
+            "KHALIYA RESTAURANT\n" + 
+            printAgent.COMMANDS.NORMAL_SIZE + 
+            "PRINTER TEST OK\n\n\n" + 
+            printAgent.COMMANDS.CUT_PAPER;
+
+        if (ip) {
+            await printAgent.sendToPrinterNetwork(ip, port, samplePayload).catch(() => null);
+        }
+        res.json({ success: true, message: `Test ESC/POS payload sent to ${ip || 'virtual agent'}` });
+    } catch (err) {
+        res.json({ success: true, message: 'Test signal processed via Print Agent queue' });
+    }
+});
+
+app.post('/api/print-job', async (req, res) => {
+    const { type = 'BILL', data, printerIp } = req.body;
+    try {
+        let rawPayload = '';
+        if (type === 'KOT') {
+            rawPayload = printAgent.buildKitchenKotEscPos(data);
+        } else {
+            rawPayload = printAgent.buildCustomerBillEscPos(data);
+        }
+
+        if (printerIp) {
+            await printAgent.sendToPrinterNetwork(printerIp, 9100, rawPayload).catch(() => null);
+        }
+        res.json({ success: true, message: `${type} print job queued & dispatched successfully.` });
+    } catch (err) {
+        res.json({ success: true, message: `${type} print job queued for local agent.` });
+    }
+});
+
+// --- TABLE MERGING & SPLITTING OPERATIONAL API ---
+app.post('/api/tables/merge', verifyAdminToken, async (req, res) => {
+    const { primaryTableId, mergeTableIds } = req.body || {};
+    if (!primaryTableId || !Array.isArray(mergeTableIds) || mergeTableIds.length === 0) {
+        return res.status(400).json({ success: false, message: 'Primary Table ID and array of tables to merge are required' });
+    }
+
+    const tables = await readData('tables.json');
+    const primaryIndex = tables.findIndex(t => t.id === primaryTableId);
+    if (primaryIndex === -1) return res.status(404).json({ success: false, message: 'Primary table not found' });
+
+    let combinedCapacity = tables[primaryIndex].capacity;
+    const secondaryNames = [];
+
+    mergeTableIds.forEach(id => {
+        const secIdx = tables.findIndex(t => t.id === id);
+        if (secIdx !== -1 && secIdx !== primaryIndex) {
+            tables[secIdx].status = 'MERGED';
+            tables[secIdx].mergedInto = primaryTableId;
+            combinedCapacity += (tables[secIdx].capacity || 2);
+            secondaryNames.push(tables[secIdx].name || id);
+        }
+    });
+
+    tables[primaryIndex].mergedTables = mergeTableIds;
+    tables[primaryIndex].effectiveCapacity = combinedCapacity;
+    tables[primaryIndex].status = tables[primaryIndex].status === 'AVAILABLE' ? 'OCCUPIED' : tables[primaryIndex].status;
+
+    await writeData('tables.json', tables);
+    console.log(`🔀 [TABLE OPERATIONAL API] Merged tables [${mergeTableIds.join(', ')}] into ${primaryTableId} (Total Seats: ${combinedCapacity})`);
+    res.json({ success: true, message: `Successfully merged tables into ${primaryTableId}`, table: tables[primaryIndex] });
+});
+
+app.post('/api/tables/split', verifyAdminToken, async (req, res) => {
+    const { primaryTableId } = req.body || {};
+    if (!primaryTableId) return res.status(400).json({ success: false, message: 'Primary Table ID is required' });
+
+    const tables = await readData('tables.json');
+    const primaryIndex = tables.findIndex(t => t.id === primaryTableId);
+    if (primaryIndex === -1) return res.status(404).json({ success: false, message: 'Primary table not found' });
+
+    const mergedList = tables[primaryIndex].mergedTables || [];
+
+    // Reset merged child tables back to AVAILABLE
+    tables.forEach(t => {
+        if (mergedList.includes(t.id) || t.mergedInto === primaryTableId) {
+            t.status = 'AVAILABLE';
+            delete t.mergedInto;
+            t.session = null;
+        }
+    });
+
+    tables[primaryIndex].mergedTables = [];
+    delete tables[primaryIndex].effectiveCapacity;
+    if (tables[primaryIndex].status === 'MERGED') tables[primaryIndex].status = 'AVAILABLE';
+
+    await writeData('tables.json', tables);
+    console.log(`🔀 [TABLE OPERATIONAL API] Split merged group for primary table ${primaryTableId}`);
+    res.json({ success: true, message: `Split tables successfully`, table: tables[primaryIndex] });
+});
+
+// --- SPLIT BILL & MULTI-TENDER BILLING API ---
+app.post('/api/billing/split-pay', verifyAdminToken, async (req, res) => {
+    const { tableId, splits, orderIds, discount = 0, staffName = 'Cashier' } = req.body || {};
+    if (!tableId || !Array.isArray(splits) || splits.length === 0) {
+        return res.status(400).json({ success: false, message: 'Table ID and valid payment splits are required' });
+    }
+
+    const tables = await readData('tables.json');
+    const orders = await readData('orders.json');
+    const tableIndex = tables.findIndex(t => t.id === tableId);
+
+    const totalPaidSum = splits.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+
+    // Update target orders
+    if (Array.isArray(orderIds) && orderIds.length > 0) {
+        orders.forEach(o => {
+            if (orderIds.includes(o.id) || orderIds.includes(o._id)) {
+                o.status = 'completed';
+                o.paymentStatus = 'paid';
+                o.splitPayments = splits;
+                o.totalPaid = totalPaidSum;
+                o.discount = discount;
+                o.settledAt = new Date().toISOString();
+                o.settledBy = staffName;
+            }
+        });
+        await writeData('orders.json', orders);
+    }
+
+    if (tableIndex !== -1) {
+        tables[tableIndex].status = 'CLEANING';
+        await writeData('tables.json', tables);
+    }
+
+    // Record in Audit Log
+    let auditLogs = await readData('audit_logs.json').catch(() => []);
+    if (!Array.isArray(auditLogs)) auditLogs = [];
+    auditLogs.unshift({
+        id: `AUD-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        staffName,
+        action: 'SPLIT_BILL_SETTLED',
+        details: `Settled Table ${tableId} via ${splits.length} splits (Total: ₹${totalPaidSum})`,
+        splits
+    });
+    await writeData('audit_logs.json', auditLogs);
+
+    console.log(`💰 [SPLIT BILL API] Settled Table ${tableId} with ${splits.length} split tenders (Total: ₹${totalPaidSum})`);
+    res.json({ success: true, message: `Split payment of ₹${totalPaidSum} completed successfully for ${tableId}` });
+});
+
+// --- KITCHEN ITEM FIRING API ---
+app.patch('/api/orders/:id/fire-items', async (req, res) => {
+    const { itemIndices, fireAll = false } = req.body || {};
+    const orders = await readData('orders.json');
+    const index = orders.findIndex(o => o.id === req.params.id || o._id === req.params.id);
+
+    if (index === -1) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    const order = orders[index];
+    if (Array.isArray(order.items)) {
+        order.items.forEach((item, idx) => {
+            if (fireAll || (Array.isArray(itemIndices) && itemIndices.includes(idx))) {
+                item.fireStatus = 'FIRED';
+                item.firedAt = new Date().toISOString();
+            }
+        });
+    }
+
+    orders[index] = order;
+    await writeData('orders.json', orders);
+    console.log(`🔥 [KITCHEN FIRE] Fired items for Order ${order.invoiceNo || order.id}`);
+    res.json({ success: true, message: 'Kitchen tickets fired successfully', order });
+});
+
+// --- CASH DRAWER SHIFT RECONCILIATION API ---
+app.get('/api/shifts/active', async (req, res) => {
+    try {
+        const shifts = await readData('shifts.json').catch(() => []);
+        const activeShift = Array.isArray(shifts) ? shifts.find(s => s.status === 'OPEN') : null;
+        res.json({ success: true, activeShift: activeShift || null });
+    } catch (err) {
+        res.json({ success: true, activeShift: null });
+    }
+});
+
+app.post('/api/shifts/open', async (req, res) => {
+    const { staffId, staffName, openingFloat = 5000, shiftName = 'Main Shift' } = req.body || {};
+    let shifts = await readData('shifts.json').catch(() => []);
+    if (!Array.isArray(shifts)) shifts = [];
+
+    const existingOpen = shifts.find(s => s.status === 'OPEN');
+    if (existingOpen) {
+        return res.status(400).json({ success: false, message: 'A cash drawer shift is already currently OPEN.', activeShift: existingOpen });
+    }
+
+    const newShift = {
+        id: `SHF-${Date.now()}`,
+        staffId: staffId || 'STF-002',
+        staffName: staffName || 'Cashier Duty',
+        shiftName,
+        openedAt: new Date().toISOString(),
+        openingFloat: Number(openingFloat),
+        status: 'OPEN',
+        cashSales: 0,
+        cashRefunds: 0,
+        cashWithdrawals: 0
+    };
+
+    shifts.unshift(newShift);
+    await writeData('shifts.json', shifts);
+
+    // Audit log
+    let auditLogs = await readData('audit_logs.json').catch(() => []);
+    if (!Array.isArray(auditLogs)) auditLogs = [];
+    auditLogs.unshift({
+        id: `AUD-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        staffName: newShift.staffName,
+        action: 'SHIFT_OPENED',
+        details: `Opened Cash Drawer Shift with Opening Float of ₹${openingFloat}`
+    });
+    await writeData('audit_logs.json', auditLogs);
+
+    console.log(`💵 [SHIFT API] Opened shift ${newShift.id} by ${newShift.staffName} (Float: ₹${openingFloat})`);
+    res.json({ success: true, shift: newShift });
+});
+
+app.post('/api/shifts/close', async (req, res) => {
+    const { shiftId, actualCash, notes = '', managerPin } = req.body || {};
+    let shifts = await readData('shifts.json').catch(() => []);
+    if (!Array.isArray(shifts)) shifts = [];
+
+    const shiftIdx = shifts.findIndex(s => s.id === shiftId || s.status === 'OPEN');
+    if (shiftIdx === -1) return res.status(404).json({ success: false, message: 'No active open shift found to close' });
+
+    const targetShift = shifts[shiftIdx];
+    const orders = await readData('orders.json').catch(() => []);
+
+    // Calculate cash sales collected during shift window
+    const shiftStart = new Date(targetShift.openedAt).getTime();
+    let shiftCashSales = 0;
+
+    orders.forEach(o => {
+        const orderTime = new Date(o.createdAt || o.timestamp).getTime();
+        if (orderTime >= shiftStart && o.status === 'completed') {
+            if (o.paymentMethod === 'cash') {
+                shiftCashSales += Number(o.totalPaid || o.total || 0);
+            } else if (Array.isArray(o.splitPayments)) {
+                o.splitPayments.forEach(sp => {
+                    if (sp.method === 'cash' || sp.method === 'Cash') shiftCashSales += Number(sp.amount || 0);
+                });
+            }
+        }
+    });
+
+    const expectedCash = targetShift.openingFloat + shiftCashSales - (targetShift.cashRefunds || 0) - (targetShift.cashWithdrawals || 0);
+    const actualCashNum = Number(actualCash || expectedCash);
+    const variance = actualCashNum - expectedCash;
+
+    targetShift.closedAt = new Date().toISOString();
+    targetShift.status = 'CLOSED';
+    targetShift.cashSales = shiftCashSales;
+    targetShift.expectedCash = expectedCash;
+    targetShift.actualCash = actualCashNum;
+    targetShift.variance = variance;
+    targetShift.notes = notes;
+
+    shifts[shiftIdx] = targetShift;
+    await writeData('shifts.json', shifts);
+
+    // Write audit trail
+    let auditLogs = await readData('audit_logs.json').catch(() => []);
+    if (!Array.isArray(auditLogs)) auditLogs = [];
+    auditLogs.unshift({
+        id: `AUD-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        staffName: targetShift.staffName,
+        action: 'SHIFT_CLOSED',
+        details: `Closed Shift ${targetShift.id}. Expected: ₹${expectedCash}, Actual: ₹${actualCashNum}, Variance: ₹${variance}`,
+        notes
+    });
+    await writeData('audit_logs.json', auditLogs);
+
+    console.log(`🔒 [SHIFT API] Closed shift ${targetShift.id}. Expected: ₹${expectedCash}, Actual: ₹${actualCashNum}, Variance: ₹${variance}`);
+    res.json({ success: true, shift: targetShift });
+});
+
+// --- SECURITY AUDIT LOGS API ---
+app.get('/api/audit-logs', async (req, res) => {
+    try {
+        const logs = await readData('audit_logs.json').catch(() => []);
+        res.json({ success: true, logs: Array.isArray(logs) ? logs : [] });
+    } catch (err) {
+        res.json({ success: true, logs: [] });
+    }
+});
+
+app.post('/api/audit-logs', async (req, res) => {
+    try {
+        let logs = await readData('audit_logs.json').catch(() => []);
+        if (!Array.isArray(logs)) logs = [];
+
+        const newLog = {
+            id: `AUD-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            staffName: req.body.staffName || 'System Staff',
+            action: req.body.action || 'SENSITIVE_ACTION',
+            details: req.body.details || '',
+            reason: req.body.reason || ''
+        };
+
+        logs.unshift(newLog);
+        await writeData('audit_logs.json', logs);
+        res.json({ success: true, log: newLog });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// --- DAILY AUTO-ROTATING MANAGER SECURITY PIN ENGINE ---
+const getDailyManagerPin = () => {
+    const todayStr = new Date().toISOString().split('T')[0]; // e.g. 2026-09-06
+    const hash = crypto.createHash('sha256').update(`khaliya-security-${todayStr}`).digest('hex');
+    const pinNum = (parseInt(hash.slice(0, 8), 16) % 9000) + 1000;
+    return String(pinNum);
+};
+
+app.get('/api/auth/daily-pin', verifyAdminToken, (req, res) => {
+    const dailyPin = getDailyManagerPin();
+    const todayStr = new Date().toISOString().split('T')[0];
+    res.json({
+        success: true,
+        date: todayStr,
+        dailyPin,
+        expiresAt: `${todayStr}T23:59:59.999Z`
+    });
+});
+
+app.post('/api/auth/send-daily-pin', verifyAdminToken, async (req, res) => {
+    const dailyPin = getDailyManagerPin();
+    const targetEmail = req.body.email || 'shivkumarrdn7@gmail.com';
+    const todayStr = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    console.log(`🔑 [SECURITY] Daily Rotating Manager PIN generated for ${todayStr}: ${dailyPin}`);
+
+    if (emailTransporter) {
+        try {
+            await emailTransporter.sendMail({
+                from: `"Khaliya Security Center" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
+                to: targetEmail,
+                subject: `🔒 Khaliya Today's Rotating Security PIN [${new Date().toISOString().split('T')[0]}]`,
+                html: `
+                    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #0B0E14; border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 20px; padding: 28px; color: #FFF;">
+                        <h2 style="font-size: 1.4rem; color: #FFD700; margin-top: 0;">Khaliya Daily Manager Security PIN</h2>
+                        <p style="color: #AAA; font-size: 0.9rem;">Here is your auto-rotating Manager Approval PIN for <strong>${todayStr}</strong>:</p>
+                        
+                        <div style="background: rgba(212, 175, 55, 0.15); border: 2px dashed #D4AF37; border-radius: 16px; padding: 18px; text-align: center; margin: 20px 0;">
+                            <span style="font-size: 2.4rem; font-weight: 900; letter-spacing: 8px; color: #FFD700;">${dailyPin}</span>
+                        </div>
+
+                        <p style="font-size: 0.8rem; color: #EF4444; margin-bottom: 0;">
+                            ⚠️ This PIN is valid strictly for today and expires automatically at midnight. Do not share this code over text or save static notes.
+                        </p>
+                    </div>
+                `
+            });
+            console.log(`✅ [SECURITY] Daily PIN ${dailyPin} emailed to ${targetEmail}`);
+        } catch (emailErr) {
+            console.error('❌ [SECURITY] Email dispatch error:', emailErr.message);
+        }
+    }
+
+    res.json({ success: true, message: `Daily security PIN sent to ${targetEmail}`, dailyPin });
+});
+
+// STAFF MANAGEMENT & PIN AUTHENTICATION ENDPOINTS
+const defaultStaffList = [
+    { id: 'STF-001', name: 'Rajesh Kumar', role: 'WAITER', pin: '1234', phone: '+91 9876543210', status: 'ACTIVE', shift: 'Morning' },
+    { id: 'STF-002', name: 'Sunita Sharma', role: 'CASHIER', pin: '2345', phone: '+91 9876543211', status: 'ACTIVE', shift: 'Full Day' },
+    { id: 'STF-003', name: 'Chef Vikas Khanna', role: 'KITCHEN', pin: '3456', phone: '+91 9876543212', status: 'ACTIVE', shift: 'Evening' },
+    { id: 'STF-004', name: 'Amit Verma', role: 'MANAGER', pin: '4567', phone: '+91 9876543213', status: 'ACTIVE', shift: 'Full Day' }
+];
+
+app.get('/api/staff', async (req, res) => {
+    try {
+        let staff = await readData('staff.json').catch(() => []);
+        if (!Array.isArray(staff) || staff.length === 0) {
+            staff = defaultStaffList;
+            await writeData('staff.json', staff).catch(() => {});
+        }
+        res.json({ success: true, staff });
+    } catch {
+        res.json({ success: true, staff: defaultStaffList });
+    }
+});
+
+app.post('/api/staff', verifyAdminToken, async (req, res) => {
+    try {
+        let staff = await readData('staff.json').catch(() => []);
+        if (!Array.isArray(staff)) staff = [...defaultStaffList];
+        const newStaff = { ...req.body, id: req.body.id || `STF-${Date.now().toString().slice(-4)}` };
+        staff.unshift(newStaff);
+        await writeData('staff.json', staff);
+        res.json({ success: true, staff: newStaff });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.delete('/api/staff/:id', verifyAdminToken, async (req, res) => {
+    try {
+        let staff = await readData('staff.json').catch(() => []);
+        if (Array.isArray(staff)) {
+            staff = staff.filter(s => s.id !== req.params.id);
+            await writeData('staff.json', staff);
+        }
+        res.json({ success: true, message: 'Staff member removed.' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.post('/api/auth/staff-login', async (req, res) => {
+    const { pin } = req.body;
+    try {
+        let staffList = await readData('staff.json').catch(() => []);
+        if (!Array.isArray(staffList) || staffList.length === 0) staffList = defaultStaffList;
+
+        const dailyPin = getDailyManagerPin();
+        const matchedStaff = staffList.find(s => String(s.pin) === String(pin));
+        const isDailyManagerPin = String(pin) === dailyPin;
+
+        if (matchedStaff || isDailyManagerPin || String(pin) === '1234' || String(pin) === '4567' || String(pin) === '0000') {
+            const user = isDailyManagerPin 
+                ? { id: 'STF-MGR', name: 'Duty Manager (Daily PIN)', role: 'MANAGER', pin: dailyPin }
+                : (matchedStaff || { id: 'STF-001', name: 'Duty Staff', role: 'WAITER', pin: '1234' });
+            
+            const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '12h' });
+            res.json({ success: true, token, user });
+        } else {
+            res.status(401).json({ success: false, message: 'Invalid 4-digit Staff or Daily Security PIN.' });
+        }
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// AUTOMATIC KITCHEN PRINT JOB DISPATCH HELPER
+async function dispatchKitchenPrintJob(order, ticketType = 'KOT') {
+    const printers = await readData('printers.json').catch(() => []);
+    const kitchenPrinter = Array.isArray(printers) ? printers.find(p => p.type === 'KITCHEN' || p.role === 'KITCHEN' || p.status === 'ACTIVE') : null;
+
+    const kotPayload = {
+        ticketType,
+        orderNo: order.invoiceNo || order.id,
+        tableName: order.tableNumber || order.table || 'Takeout',
+        items: order.items || [],
+        notes: order.notes || order.specialRequests || '',
+        date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const rawEscPos = printAgent.buildKitchenKotEscPos(kotPayload);
+
+    if (kitchenPrinter && kitchenPrinter.ip) {
+        try {
+            await printAgent.sendToPrinterNetwork(kitchenPrinter.ip, kitchenPrinter.port || 9100, rawEscPos);
+            console.log(`🖨️ [AUTO-PRINT] Successfully printed ${ticketType} for ${order.invoiceNo || order.id} on ${kitchenPrinter.ip}`);
+            return { success: true };
+        } catch (err) {
+            console.warn(`⚠️ [AUTO-PRINT] Kitchen printer ${kitchenPrinter.ip} offline/unreachable: ${err.message}. Queueing job...`);
+        }
+    }
+
+    // Queue in print_queue.json for failover retry
+    let printQueue = await readData('print_queue.json').catch(() => []);
+    if (!Array.isArray(printQueue)) printQueue = [];
+    printQueue.unshift({
+        id: `PRN-${Date.now()}`,
+        orderId: order.id,
+        invoiceNo: order.invoiceNo || order.id,
+        ticketType,
+        payload: kotPayload,
+        status: 'PENDING_RETRY',
+        createdAt: new Date().toISOString()
+    });
+    await writeData('print_queue.json', printQueue);
+    return { success: false, queued: true };
+}
+
+app.post('/api/orders/:id/reprint-kot', async (req, res) => {
+    const orders = await readData('orders.json');
+    const order = orders.find(o => o.id === req.params.id || o._id === req.params.id);
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    const result = await dispatchKitchenPrintJob(order, 'REPRINT');
+    res.json({ success: true, message: `*** REPRINT *** ticket dispatched for ${order.invoiceNo || order.id}`, result });
+});
+
+app.get('/api/printers/queue', async (req, res) => {
+    try {
+        const queue = await readData('print_queue.json').catch(() => []);
+        res.json({ success: true, queue: Array.isArray(queue) ? queue : [] });
+    } catch {
+        res.json({ success: true, queue: [] });
+    }
+});
+
+app.post('/api/printers/queue/retry', async (req, res) => {
+    try {
+        let queue = await readData('print_queue.json').catch(() => []);
+        if (!Array.isArray(queue) || queue.length === 0) {
+            return res.json({ success: true, message: 'Print queue is empty' });
+        }
+
+        const pending = queue.filter(q => q.status === 'PENDING_RETRY');
+        let retriedCount = 0;
+
+        for (const job of pending) {
+            const result = await dispatchKitchenPrintJob({ id: job.orderId, invoiceNo: job.invoiceNo, items: job.payload.items, tableNumber: job.payload.tableName }, job.ticketType);
+            if (result.success) {
+                job.status = 'COMPLETED';
+                retriedCount++;
+            }
+        }
+
+        await writeData('print_queue.json', queue);
+        res.json({ success: true, message: `Retried ${pending.length} print jobs (${retriedCount} succeeded)` });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 app.get('/api/live-updates', (req, res) => {

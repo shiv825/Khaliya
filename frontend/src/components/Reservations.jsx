@@ -29,6 +29,19 @@ export default function Reservations({ predefinedTable }) {
     };
 
     useEffect(() => {
+        const handleQuickBookEvent = (e) => {
+            if (e.detail) {
+                setFormData(prev => ({
+                    ...prev,
+                    date: e.detail.date || prev.date,
+                    time: e.detail.time || prev.time,
+                    guests: e.detail.guests || prev.guests,
+                    tableType: e.detail.tableType || prev.tableType
+                }));
+            }
+        };
+        window.addEventListener('khaliya-quick-book', handleQuickBookEvent);
+
         // AI Suggestion pre-fill
         const aiMatch = localStorage.getItem('khaliya_ai_match');
         if (aiMatch) {
@@ -86,6 +99,10 @@ export default function Reservations({ predefinedTable }) {
                 setSelectedTableInfo({ id: idMap[predefinedTable], type: predefinedTable });
             }
         }
+
+        return () => {
+            window.removeEventListener('khaliya-quick-book', handleQuickBookEvent);
+        };
     }, [predefinedTable]);
 
     useEffect(() => {
@@ -303,8 +320,26 @@ export default function Reservations({ predefinedTable }) {
                         </label>
                     </div>
 
-                    <button type="submit" disabled={isSlotFull()} className="btn btn-primary" style={{ width: '100%', marginTop: '2.5rem', padding: '18px', opacity: isSlotFull() ? 0.5 : 1 }}>
-                        {isSlotFull() ? 'Fully Booked' : t('form.confirmButton')}
+                    <button 
+                        type="submit" 
+                        disabled={isSlotFull()} 
+                        style={{ 
+                            width: '100%', 
+                            marginTop: '2.5rem', 
+                            padding: '18px', 
+                            background: 'var(--gold-gradient)',
+                            color: '#000',
+                            border: 'none',
+                            borderRadius: '30px',
+                            fontWeight: '900',
+                            fontSize: '1rem',
+                            letterSpacing: '1px',
+                            cursor: isSlotFull() ? 'not-allowed' : 'pointer',
+                            opacity: isSlotFull() ? 0.5 : 1,
+                            boxShadow: '0 10px 30px rgba(212, 175, 55, 0.35)'
+                        }}
+                    >
+                        {isSlotFull() ? 'Fully Booked' : t('form.confirmButton', 'Confirm Table Reservation')}
                     </button>
                     
                     {message && (

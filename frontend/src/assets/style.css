@@ -23,62 +23,69 @@
 }
 
 :root {
-    /* Culinary Elegance - Minimalist Michelin Star Palette */
-    --primary-color: #8E1C1C; /* Premium Saffron Burgundy/Red */
-    --primary-dark: #731616;
-    --secondary-color: #DAA520; /* Luxury Royal Gold */
-    --accent-color: #2C3E50; /* Charcoal Accent */
-    --accent-light: #FFD700; /* Gold/Yellow for highlights */
-    --spice-saffron: #F57C00; /* Saffron orange */
-    --accent-glow: rgba(142, 28, 28, 0.1);
+    /* Culinary Elegance - Michelin Star Sanctuary Palette */
+    --primary-color: #D4AF37; /* Imperial Gold Accent */
+    --primary-dark: #AA7C11;
+    --secondary-color: #FFD700; /* Bright Metallic Gold */
+    --accent-color: #121722; /* Midnight Obsidian */
+    --accent-light: #FFE066; /* Light Gold Highlight */
+    --spice-saffron: #E5A93C; /* Warm Saffron Gold */
+    --accent-glow: rgba(212, 175, 55, 0.3);
     
-    --text-dark: #2C2C2C; /* Crisp Premium Dark Charcoal */
-    --text-light: #555555;
-    --text-muted: #8E8E8E;
-    --bg-body: #FCFAF6; /* Warm Premium Alabaster/Ivory */
-    --bg-surface: #FFFFFF; /* Pure White */
-    --bg-glass: rgba(255, 255, 255, 0.9);
-    --border-color: rgba(0, 0, 0, 0.08);
-    --border-light: rgba(0, 0, 0, 0.04);
+    --text-dark: #F8FAFC; /* Crisp Platinum White */
+    --text-light: #CBD5E1; /* Soft Slate White */
+    --bg-body: transparent; /* Transparent so luxury-bg.jpg shows through */
+    --bg-surface: rgba(15, 20, 30, 0.82); /* Dark Glass Container */
+    --bg-glass: rgba(7, 10, 14, 0.88);
+    --border-color: rgba(212, 175, 55, 0.32);
+    --border-light: rgba(255, 255, 255, 0.08);
 
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Outfit', sans-serif;
+    --font-heading: 'Cinzel', 'Playfair Display', Georgia, serif;
+    --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.7);
+    --glass-shadow: 0 12px 40px 0 rgba(212, 175, 55, 0.12);
 
-    --transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
-    --radius-md: 12px;
-    --radius-lg: 16px;
+    --transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, opacity 0.3s ease;
+    --radius-md: 14px;
+    --radius-lg: 20px;
 
-    --gold-gradient: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
-    --indigo-gradient: linear-gradient(135deg, #8E1C1C 0%, #731616 100%);
+    --gold-gradient: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%);
+    --indigo-gradient: linear-gradient(135deg, #1A2130 0%, #121722 100%);
 }
 
 /* --- Dynamic Theme Extensions (Disabled) --- */
 
-/* Film Grain Overlay disabled to prevent scroll paint delays and ensure smooth 60fps rendering */
-
-html {
-    scroll-behavior: smooth;
-    overflow-x: hidden !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    -webkit-overflow-scrolling: touch;
-}
-
-body {
+html, body {
     font-family: var(--font-body);
-    background-color: var(--bg-body);
+    background: 
+        linear-gradient(180deg, rgba(6, 8, 11, 0.65) 0%, rgba(6, 8, 11, 0.45) 50%, rgba(6, 8, 11, 0.75) 100%),
+        url('/luxury-bg.jpg') center center / cover no-repeat fixed !important;
     color: var(--text-dark);
     line-height: 1.7;
     overflow-x: hidden !important;
     width: 100% !important;
     max-width: 100% !important;
     position: relative;
-    transition: background-color 0.8s ease, color 0.8s ease;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(255, 215, 0, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(170, 124, 17, 0.07) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* Typography Base */
@@ -90,13 +97,13 @@ h1, h2, h3, h4 {
 }
 
 h2 {
-    font-size: clamp(2.4rem, 6vw, 4rem);
-    margin-bottom: 4rem;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    margin-bottom: 3.5rem;
     text-align: center;
     position: relative;
     width: 100%;
-    color: #FFFFFF;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(245, 158, 11, 0.2);
+    color: #D4AF37;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 25px rgba(212, 175, 55, 0.35);
     letter-spacing: 2px;
 }
 

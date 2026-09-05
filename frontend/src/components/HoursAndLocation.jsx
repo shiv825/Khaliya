@@ -73,19 +73,19 @@ export default function HoursAndLocation() {
                             <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>{t('hours.monFri')}</td>
                             <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>11:00 AM</td>
                             <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>10:00 PM</td>
-                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: '#2e7d32', fontWeight: 'bold' }}>{t('hours.open')}</td>
+                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: '#4ADE80', fontWeight: 'bold' }}>{t('hours.open')}</td>
                         </tr>
                         <tr>
                             <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>{t('hours.sat')}</td>
                             <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>10:00 AM</td>
                             <td style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-dark)' }}>11:00 PM</td>
-                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: '#2e7d32', fontWeight: 'bold' }}>{t('hours.open')}</td>
+                            <td className="open" style={{ padding: '15px', borderBottom: '1px solid var(--border-light)', color: '#4ADE80', fontWeight: 'bold' }}>{t('hours.open')}</td>
                         </tr>
                         <tr>
                             <td style={{ padding: '15px', borderBottom: 'none', color: 'var(--text-dark)' }}>{t('hours.sun')}</td>
                             <td style={{ padding: '15px', borderBottom: 'none', color: 'var(--text-dark)' }}>10:00 AM</td>
                             <td style={{ padding: '15px', borderBottom: 'none', color: 'var(--text-dark)' }}>11:00 PM</td>
-                            <td className="open" style={{ padding: '15px', borderBottom: 'none', color: '#2e7d32', fontWeight: 'bold' }}>{t('hours.open')}</td>
+                            <td className="open" style={{ padding: '15px', borderBottom: 'none', color: '#4ADE80', fontWeight: 'bold' }}>{t('hours.open')}</td>
                         </tr>
                     </tbody>
                 </table>

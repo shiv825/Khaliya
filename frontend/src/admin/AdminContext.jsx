@@ -47,6 +47,7 @@ const deduplicateMenu = (arr) => {
 export function AdminProvider({ children }) {
     const [bookings, setBookings] = useState([]);
     const [orders, setOrders] = useState([]);
+    const [tables, setTables] = useState([]);
     const [menu, setMenu] = useState(() => {
         try {
             const cached = localStorage.getItem('khaliya_cached_menu');
@@ -76,6 +77,10 @@ export function AdminProvider({ children }) {
     const lastOrderId = useRef(null);
 
     useEffect(() => {
+        const token = localStorage.getItem('khaliya_admin_token') || sessionStorage.getItem('khaliya_admin_token');
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
         const handleResize = () => {
             if (window.innerWidth <= 992) setIsSidebarOpen(false);
             else setIsSidebarOpen(true);
@@ -88,11 +93,12 @@ export function AdminProvider({ children }) {
         setIsSyncing(true);
         try {
             const timestamp = Date.now();
-            const [bRes, oRes, mRes, rRes, aRes, sRes] = await Promise.all([
+            const [bRes, oRes, mRes, rRes, tRes, aRes, sRes] = await Promise.all([
                 axios.get(`${API_URL}/bookings?t=${timestamp}`),
                 axios.get(`${API_URL}/orders?t=${timestamp}`),
                 axios.get(`${API_URL}/menu?t=${timestamp}`),
                 axios.get(`${API_URL}/reviews?t=${timestamp}`),
+                axios.get(`${API_URL}/tables?t=${timestamp}`).catch(() => ({ data: [] })),
                 axios.get(`${API_URL}/analytics?t=${timestamp}`).catch(() => ({ data: null })),
                 axios.get(`${API_URL}/settings?t=${timestamp}`).catch(() => ({ data: null }))
             ]);
@@ -101,6 +107,7 @@ export function AdminProvider({ children }) {
             let newOrders = Array.isArray(oRes.data) ? oRes.data : [];
             let newMenu = Array.isArray(mRes.data) ? mRes.data : [];
             let newReviews = Array.isArray(rRes.data) ? rRes.data : [];
+            let newTables = Array.isArray(tRes.data) ? tRes.data : [];
 
             newBookings = [...newBookings].reverse();
             newOrders = [...newOrders].reverse();
@@ -122,6 +129,7 @@ export function AdminProvider({ children }) {
 
             setBookings(newBookings);
             setOrders(newOrders);
+            setTables(newTables);
             const cleanMenu = deduplicateMenu(newMenu);
             setMenu(cleanMenu);
             try { localStorage.setItem('khaliya_cached_menu', JSON.stringify(cleanMenu)); } catch (e) {}
@@ -138,36 +146,42 @@ export function AdminProvider({ children }) {
     useEffect(() => {
         fetchData();
         
-        const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
-        const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
-        const cleanSseUrl = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? `${cleanApiUrl}/live-updates` : `${cleanApiUrl}/api/live-updates`) : '/api/live-updates';
-        
-        const eventSource = new EventSource(cleanSseUrl);
-        eventSource.onmessage = (event) => {
-            try {
-                const payload = JSON.parse(event.data);
-                if (payload.type === 'menu' && Array.isArray(payload.data)) {
-                    setMenu(deduplicateMenu(payload.data));
-                } else if (payload.type === 'orders' && Array.isArray(payload.data)) {
-                    setOrders([...payload.data].reverse());
-                } else if (payload.type === 'bookings' && Array.isArray(payload.data)) {
-                    setBookings([...payload.data].reverse());
-                } else if (payload.type === 'reviews' && Array.isArray(payload.data)) {
-                    setReviews([...payload.data].reverse());
-                } else if (payload.type === 'settings' && payload.data) {
-                    setSettings(payload.data);
-                } else {
+        let eventSource = null;
+        const sseTimer = setTimeout(() => {
+            const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
+            const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+            const cleanSseUrl = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? `${cleanApiUrl}/live-updates` : `${cleanApiUrl}/api/live-updates`) : '/api/live-updates';
+            
+            eventSource = new EventSource(cleanSseUrl);
+            eventSource.onmessage = (event) => {
+                try {
+                    const payload = JSON.parse(event.data);
+                    if (payload.type === 'menu' && Array.isArray(payload.data)) {
+                        setMenu(deduplicateMenu(payload.data));
+                    } else if (payload.type === 'orders' && Array.isArray(payload.data)) {
+                        setOrders([...payload.data].reverse());
+                    } else if (payload.type === 'tables' && Array.isArray(payload.data)) {
+                        setTables(payload.data);
+                    } else if (payload.type === 'bookings' && Array.isArray(payload.data)) {
+                        setBookings([...payload.data].reverse());
+                    } else if (payload.type === 'reviews' && Array.isArray(payload.data)) {
+                        setReviews([...payload.data].reverse());
+                    } else if (payload.type === 'settings' && payload.data) {
+                        setSettings(payload.data);
+                    } else {
+                        fetchData();
+                    }
+                } catch (e) {
                     fetchData();
                 }
-            } catch (e) {
-                fetchData();
-            }
-        };
-        eventSource.onerror = () => {};
+            };
+            eventSource.onerror = () => {};
+        }, 1000);
 
         const interval = setInterval(fetchData, 15000);
         return () => {
-            eventSource.close();
+            clearTimeout(sseTimer);
+            if (eventSource) eventSource.close();
             clearInterval(interval);
         };
     }, []);
@@ -256,11 +270,31 @@ export function AdminProvider({ children }) {
             const fullUrl = (rawUrl && rawUrl.startsWith('/uploads')) ? `${baseUrl}${rawUrl}` : rawUrl;
             setEditingItem({ ...editingItem, image: fullUrl });
             Swal.fire({ title: 'Image Saved!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
-        } catch (err) {
-            Swal.fire('Error', 'Image upload failed', 'error');
         } finally {
             setIsUploading(false);
-            e.target.value = '';
+            if (e.target) e.target.value = '';
+        }
+    };
+
+    const handleConvertUrlToCloudinary = async (urlToConvert) => {
+        if (!urlToConvert || (!urlToConvert.startsWith('http://') && !urlToConvert.startsWith('https://'))) return;
+        if (urlToConvert.includes('cloudinary.com')) return;
+
+        setIsUploading(true);
+        try {
+            const res = await axios.post(`${API_URL}/upload-url`, {
+                url: urlToConvert,
+                productId: editingItem?.id || Date.now()
+            });
+            if (res.data?.imageUrl) {
+                setEditingItem(prev => ({ ...prev, image: res.data.imageUrl }));
+                Toast.fire({ icon: 'success', title: 'URL Saved to Cloudinary!' });
+            }
+        } catch (err) {
+            console.error('Error converting URL to Cloudinary:', err);
+            Toast.fire({ icon: 'error', title: 'Cloudinary conversion failed' });
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -283,12 +317,28 @@ const Toast = Swal.mixin({
             const cleanPriceNum = String(savedItem.price || '0').replace(/[^\d.]/g, '');
             savedItem.price = `₹${cleanPriceNum}`;
 
+            const targetId = savedItem.id || savedItem._id;
+            
+            // ☁️ Convert public/online image URL to Cloudinary CDN URL before saving
+            if (savedItem.image && (savedItem.image.startsWith('http://') || savedItem.image.startsWith('https://')) && !savedItem.image.includes('cloudinary.com')) {
+                try {
+                    const urlRes = await axios.post(`${API_URL}/upload-url`, {
+                        url: savedItem.image,
+                        productId: targetId || Date.now()
+                    });
+                    if (urlRes.data?.imageUrl) {
+                        savedItem.image = urlRes.data.imageUrl;
+                    }
+                } catch (imgErr) {
+                    console.warn('Could not convert online image URL, saving original:', imgErr);
+                }
+            }
+
             setIsModalOpen(false);
 
-            const targetId = savedItem.id || savedItem._id;
             if (targetId) {
                 savedItem.id = targetId;
-                // ⚡ Instant Optimistic Update (0ms delay for UI)
+                // ⚡ Optimistic Update with Cloudinary URL
                 setMenu(prev => {
                     const next = deduplicateMenu(prev.map(m => String(m.id || m._id) === String(targetId) ? { ...m, ...savedItem } : m));
                     try { localStorage.setItem('khaliya_cached_menu', JSON.stringify(next)); } catch (e) {}
@@ -309,7 +359,6 @@ const Toast = Swal.mixin({
                 const tempId = Date.now();
                 const optimisticItem = { ...savedItem, id: tempId };
 
-                // ⚡ Instant Optimistic Create (0ms delay for UI)
                 setMenu(prev => {
                     const next = deduplicateMenu([optimisticItem, ...prev]);
                     try { localStorage.setItem('khaliya_cached_menu', JSON.stringify(next)); } catch (e) {}
@@ -317,7 +366,6 @@ const Toast = Swal.mixin({
                 });
                 Toast.fire({ icon: 'success', title: 'Product Created Successfully!' });
 
-                // Async network sync to Cloudinary & DB
                 const res = await axios.post(`${API_URL}/menu`, savedItem);
                 if (res.data && (res.data.id || res.data._id)) {
                     setMenu(prev => {
@@ -350,10 +398,89 @@ const Toast = Swal.mixin({
         }
     };
 
+    const seatCustomer = async (tableId, guestInfo) => {
+        try {
+            const res = await axios.post(`${API_URL}/tables/seat`, { tableId, ...guestInfo });
+            if (res.data?.table) {
+                setTables(prev => prev.map(t => t.id === tableId ? res.data.table : t));
+                Toast.fire({ icon: 'success', title: `Seated guest at ${tableId}!` });
+            }
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: 'Failed to seat guest' });
+        }
+    };
+
+    const changeTableStatus = async (tableId, status) => {
+        try {
+            const res = await axios.put(`${API_URL}/tables/${tableId}/status`, { status });
+            if (res.data?.table) {
+                setTables(prev => prev.map(t => t.id === tableId ? res.data.table : t));
+                Toast.fire({ icon: 'info', title: `Table ${tableId} set to ${status}` });
+            }
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: 'Failed to update table status' });
+        }
+    };
+
+    const releaseTable = async (tableId) => {
+        try {
+            const res = await axios.post(`${API_URL}/tables/${tableId}/release`);
+            if (res.data?.table) {
+                setTables(prev => prev.map(t => t.id === tableId ? res.data.table : t));
+                Toast.fire({ icon: 'success', title: `Table ${tableId} is now AVAILABLE!` });
+            }
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: 'Failed to release table' });
+        }
+    };
+
+    const addTable = async (tableData) => {
+        try {
+            const res = await axios.post(`${API_URL}/tables`, tableData);
+            if (res.data?.table) {
+                setTables(prev => [...prev, res.data.table]);
+                Toast.fire({ icon: 'success', title: `Created ${res.data.table.name}!` });
+                return true;
+            }
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: err.response?.data?.message || 'Failed to add table' });
+            return false;
+        }
+    };
+
+    const updateTable = async (tableId, tableData) => {
+        try {
+            const res = await axios.put(`${API_URL}/tables/${tableId}`, tableData);
+            if (res.data?.table) {
+                setTables(prev => prev.map(t => t.id === tableId ? res.data.table : t));
+                Toast.fire({ icon: 'success', title: `Updated ${tableId}!` });
+                return true;
+            }
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: 'Failed to update table' });
+            return false;
+        }
+    };
+
+    const deleteTable = async (tableId) => {
+        try {
+            const res = await axios.delete(`${API_URL}/tables/${tableId}`);
+            if (res.data?.success) {
+                setTables(prev => prev.filter(t => t.id !== tableId));
+                Toast.fire({ icon: 'success', title: `Deleted table ${tableId}` });
+                return true;
+            }
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: 'Failed to delete table' });
+            return false;
+        }
+    };
+
     const value = {
         API_URL,
         bookings,
         orders,
+        tables,
         menu,
         reviews,
         analytics,
@@ -378,11 +505,22 @@ const Toast = Swal.mixin({
         toggleSurgePricing,
         toggleStockStatus,
         handleImageUpload,
+        handleConvertUrlToCloudinary,
         handleSaveMenu,
-        handleDeleteMenu
+        handleDeleteMenu,
+        seatCustomer,
+        changeTableStatus,
+        releaseTable,
+        addTable,
+        updateTable,
+        deleteTable
     };
 
-    return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
+    return (
+        <AdminContext.Provider value={value}>
+            {children}
+        </AdminContext.Provider>
+    );
 }
 
 export function useAdmin() {

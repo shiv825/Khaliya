@@ -1,10 +1,21 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './components/Home';
+
+// Public Multi-Page System Imports
+import PublicLayout from './pages/PublicLayout';
+import HomePage from './pages/HomePage';
+import MenuPage from './pages/MenuPage';
+import ReservePage from './pages/ReservePage';
+import TablesExplorePage from './pages/TablesExplorePage';
+import ReviewsPublicPage from './pages/ReviewsPublicPage';
+import LocationPage from './pages/LocationPage';
+import BillVerificationPage from './pages/BillVerificationPage';
+
+// Mobile PWA App Shell
 import NativeAppShell from './components/native/NativeAppShell';
 import NativeSplash from './components/native/NativeSplash';
 
-// Standalone Subdomain-Ready Admin Module imports
+// Subdomain-Ready Admin Module imports
 import AdminLayout from './admin/AdminLayout';
 import AdminLoginPage from './admin/pages/AdminLoginPage';
 import DashboardPage from './admin/pages/DashboardPage';
@@ -13,6 +24,20 @@ import InventoryPage from './admin/pages/InventoryPage';
 import OrdersPage from './admin/pages/OrdersPage';
 import BookingsPage from './admin/pages/BookingsPage';
 import ReviewsPage from './admin/pages/ReviewsPage';
+import TablesPage from './admin/pages/TablesPage';
+import QrManagementPage from './admin/pages/QrManagementPage';
+import KitchenPage from './admin/pages/KitchenPage';
+import BillingPage from './admin/pages/BillingPage';
+import PrintersPage from './admin/pages/PrintersPage';
+import StaffPage from './admin/pages/StaffPage';
+import AuditLogsPage from './admin/pages/AuditLogsPage';
+
+// Staff Portal Module Imports
+import StaffLayout from './staff/StaffLayout';
+import StaffLoginPage from './staff/pages/StaffLoginPage';
+import WaiterDashboard from './staff/pages/WaiterDashboard';
+
+import TableQrOrder from './components/TableQrOrder';
 
 import { useAppMode } from './hooks/useAppMode';
 import { useDynamicTheme } from './hooks/useDynamicTheme';
@@ -62,22 +87,56 @@ function App() {
           ) : (
             <Router>
               <Routes>
-                <Route path="/" element={isAppMode ? <NativeAppShell /> : <Home />} />
+                {/* Mobile PWA Shell Routing */}
+                {isAppMode ? (
+                  <Route path="*" element={<NativeAppShell />} />
+                ) : (
+                  <>
+                    {/* Public Multi-Page Routes */}
+                    <Route path="/" element={<PublicLayout />}>
+                      <Route index element={<HomePage />} />
+                      <Route path="menu" element={<MenuPage />} />
+                      <Route path="reserve" element={<ReservePage />} />
+                      <Route path="tables" element={<TablesExplorePage />} />
+                      <Route path="reviews" element={<ReviewsPublicPage />} />
+                      <Route path="location" element={<LocationPage />} />
+                    </Route>
 
-                {/* Subdomain-Ready Admin Module Routes */}
-                <Route path="/admin/login" element={<AdminLoginPage />} />
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<DashboardPage />} />
-                  <Route path="dashboard" element={<DashboardPage />} />
-                  <Route path="products" element={<ProductsPage />} />
-                  <Route path="inventory" element={<InventoryPage />} />
-                  <Route path="orders" element={<OrdersPage />} />
-                  <Route path="bookings" element={<BookingsPage />} />
-                  <Route path="reviews" element={<ReviewsPage />} />
-                </Route>
+                    {/* QR Code In-Restaurant Direct Order & Bill Verification */}
+                    <Route path="/table/:tableId" element={<TableQrOrder />} />
+                    <Route path="/bill/:billNo" element={<BillVerificationPage />} />
 
-                {/* Fallback */}
-                <Route path="*" element={isAppMode ? <NativeAppShell /> : <Home />} />
+                    {/* Staff Portal Routes */}
+                    <Route path="/staff/login" element={<StaffLoginPage />} />
+                    <Route path="/staff" element={<StaffLayout />}>
+                      <Route index element={<WaiterDashboard />} />
+                      <Route path="waiter" element={<WaiterDashboard />} />
+                      <Route path="kitchen" element={<KitchenPage />} />
+                    </Route>
+
+                    {/* Subdomain-Ready Admin Module Routes */}
+                    <Route path="/admin/login" element={<AdminLoginPage />} />
+                    <Route path="/admin" element={<AdminLayout />}>
+                      <Route index element={<DashboardPage />} />
+                      <Route path="dashboard" element={<DashboardPage />} />
+                      <Route path="tables" element={<TablesPage />} />
+                      <Route path="products" element={<ProductsPage />} />
+                      <Route path="inventory" element={<InventoryPage />} />
+                      <Route path="orders" element={<OrdersPage />} />
+                      <Route path="kitchen" element={<KitchenPage />} />
+                      <Route path="billing" element={<BillingPage />} />
+                      <Route path="printers" element={<PrintersPage />} />
+                      <Route path="staff" element={<StaffPage />} />
+                      <Route path="audit-logs" element={<AuditLogsPage />} />
+                      <Route path="qr" element={<QrManagementPage />} />
+                      <Route path="bookings" element={<BookingsPage />} />
+                      <Route path="reviews" element={<ReviewsPage />} />
+                    </Route>
+
+                    {/* Fallback */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </>
+                )}
               </Routes>
             </Router>
           )}

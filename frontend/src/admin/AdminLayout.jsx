@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { AdminProvider, useAdmin, CULINARY_CATEGORIES } from './AdminContext';
+import ServiceModeToggle from '../components/ServiceModeToggle';
+import ShiftReconciliationModal from '../components/ShiftReconciliationModal';
 import '../assets/admin-style.css';
 
 function AdminLayoutInner() {
@@ -25,11 +27,14 @@ function AdminLayoutInner() {
         isUploading,
         setIsUploading,
         handleImageUpload,
+        handleConvertUrlToCloudinary,
         handleSaveMenu
     } = useAdmin();
 
     const location = useLocation();
     const navigate = useNavigate();
+    const [mode, setMode] = React.useState('MANAGEMENT');
+    const [isShiftModalOpen, setIsShiftModalOpen] = React.useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('adminSessionToken');
@@ -64,6 +69,11 @@ function AdminLayoutInner() {
 
     const getBreadcrumbTitle = () => {
         const path = location.pathname;
+        if (path.includes('/tables')) return 'Table Session Lifecycle & Interactive Floor Map';
+        if (path.includes('/kitchen')) return 'Kitchen Display System (KDS) Live Monitor';
+        if (path.includes('/billing')) return 'POS Billing Terminal & Digital Receipts';
+        if (path.includes('/printers')) return '80mm Thermal Printer & KOT Routing Management';
+        if (path.includes('/qr')) return 'Table Stand QR Code Generator & Printing';
         if (path.includes('/products')) return 'Product Creator & Culinary Catalog';
         if (path.includes('/inventory')) return 'Stock & Peak Surge Pricing Controller';
         if (path.includes('/orders')) return 'Live Kitchen Orders & Kanban';
@@ -81,20 +91,19 @@ function AdminLayoutInner() {
 
             {/* LEFT SIDEBAR NAVIGATION */}
             <aside className={`admin-sidebar ${!isSidebarOpen ? 'collapsed' : ''} ${isSidebarOpen && window.innerWidth <= 992 ? 'mobile-open' : ''}`}>
-                <div>
-                    {/* Brand Section */}
-                    <div className="sidebar-brand">
-                        <div className="sidebar-logo-icon">K</div>
-                        {isSidebarOpen && (
-                            <div className="sidebar-brand-text">
-                                <span className="sidebar-brand-title">Khaliya</span>
-                                <span className="sidebar-brand-sub">Command Center</span>
-                            </div>
-                        )}
-                    </div>
+                {/* Brand Section (Fixed at top) */}
+                <div className="sidebar-brand">
+                    <div className="sidebar-logo-icon">K</div>
+                    {isSidebarOpen && (
+                        <div className="sidebar-brand-text">
+                            <span className="sidebar-brand-title">Khaliya</span>
+                            <span className="sidebar-brand-sub">Command Center</span>
+                        </div>
+                    )}
+                </div>
 
-                    {/* Navigation Menu Links */}
-                    <nav className="sidebar-nav">
+                {/* Navigation Menu Links (Scrollable middle pane) */}
+                <nav className="sidebar-nav">
                         <NavLink 
                             to="/admin/dashboard" 
                             className={({ isActive }) => `sidebar-nav-item ${isActive || location.pathname === '/admin' ? 'active' : ''}`}
@@ -141,12 +150,84 @@ function AdminLayoutInner() {
                             title="Live Orders"
                         >
                             <div className="sidebar-nav-item-content">
-                                <i className="fas fa-fire-burner"></i>
-                                {isSidebarOpen && <span>Live Orders</span>}
+                                <i className="fas fa-list-check"></i>
+                                {isSidebarOpen && <span>All Orders Kanban</span>}
                             </div>
                             {pendingOrdersCount > 0 && (
                                 <span className="sidebar-nav-badge">{pendingOrdersCount}</span>
                             )}
+                        </NavLink>
+
+                        <NavLink 
+                            to="/admin/tables" 
+                            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Floor Map & Tables"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-th"></i>
+                                {isSidebarOpen && <span>Floor Map & Tables</span>}
+                            </div>
+                        </NavLink>
+
+                        <NavLink 
+                            to="/admin/kitchen" 
+                            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Kitchen KDS"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-fire-burner"></i>
+                                {isSidebarOpen && <span>Kitchen (KDS)</span>}
+                            </div>
+                        </NavLink>
+
+                        <NavLink 
+                            to="/admin/billing" 
+                            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="POS Billing"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-calculator"></i>
+                                {isSidebarOpen && <span>POS & Billing</span>}
+                            </div>
+                        </NavLink>
+
+                        <NavLink 
+                            to="/admin/printers" 
+                            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Thermal Printers"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-print"></i>
+                                {isSidebarOpen && <span>Thermal Printers</span>}
+                            </div>
+                        </NavLink>
+
+                        <NavLink 
+                            to="/admin/staff" 
+                            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Staff Accounts & Roles"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-users-cog"></i>
+                                {isSidebarOpen && <span>Staff Accounts</span>}
+                            </div>
+                        </NavLink>
+
+                        <NavLink 
+                            to="/admin/qr" 
+                            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Table QR Generator"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-qrcode"></i>
+                                {isSidebarOpen && <span>Table QR Stands</span>}
+                            </div>
                         </NavLink>
 
                         <NavLink 
@@ -162,6 +243,18 @@ function AdminLayoutInner() {
                         </NavLink>
 
                         <NavLink 
+                            to="/admin/audit-logs" 
+                            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
+                            title="Audit Trail & Security"
+                        >
+                            <div className="sidebar-nav-item-content">
+                                <i className="fas fa-shield-alt"></i>
+                                {isSidebarOpen && <span>Security & Audit Logs</span>}
+                            </div>
+                        </NavLink>
+
+                        <NavLink 
                             to="/admin/reviews" 
                             className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
                             onClick={() => { if (window.innerWidth <= 992) setIsSidebarOpen(false); }}
@@ -173,9 +266,11 @@ function AdminLayoutInner() {
                             </div>
                         </NavLink>
                     </nav>
-                </div>
+
+
 
                 {/* Sidebar Footer */}
+
                 <div className="sidebar-footer">
                     {isSidebarOpen && (
                         <div className="sidebar-profile">
@@ -208,16 +303,47 @@ function AdminLayoutInner() {
                     </div>
 
                     <div className="admin-topbar-right">
-                        <div className="saas-search-bar" style={{ width: '200px', margin: 0 }}>
-                            <i className="fas fa-search" style={{ color: 'var(--admin-text-muted)' }}></i>
-                            <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-                        </div>
+                        <ServiceModeToggle 
+                            currentMode={mode} 
+                            onToggleMode={(newMode) => {
+                                setMode(newMode);
+                                if (newMode === 'SERVICE') {
+                                    navigate('/staff/waiter');
+                                }
+                            }} 
+                        />
+
+                        <button
+                            onClick={() => setIsShiftModalOpen(true)}
+                            style={{
+                                background: 'rgba(212, 175, 55, 0.15)',
+                                color: '#FFD700',
+                                border: '1px solid rgba(212, 175, 55, 0.4)',
+                                borderRadius: '20px',
+                                padding: '6px 14px',
+                                fontWeight: 800,
+                                fontSize: '0.82rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                            }}
+                        >
+                            <span>💰</span>
+                            <span>Cash Shift</span>
+                        </button>
 
                         <div className={`saas-status-toggle ${settings.isOpen ? 'open' : 'closed'}`} onClick={toggleStoreStatus} style={{ margin: 0, padding: '8px 14px' }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }}></div>
                             <span className="status-toggle-label" style={{ fontSize: '0.85rem' }}>{settings.isOpen ? 'Accepting Orders' : 'Store Closed'}</span>
                         </div>
                     </div>
+
+                    <ShiftReconciliationModal 
+                        isOpen={isShiftModalOpen} 
+                        onClose={() => setIsShiftModalOpen(false)}
+                        staffUser={{ id: 'ADM-001', name: 'Shiv Kumar (Admin)', role: 'MANAGER' }} 
+                    />
                 </header>
 
                 <main className="admin-main-full">

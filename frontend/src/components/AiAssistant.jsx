@@ -101,45 +101,45 @@ export default function AiAssistant() {
                 position: 'fixed',
                 bottom: '100px',
                 right: '30px',
-                width: '380px',
-                height: '550px',
+                width: '395px',
+                height: '580px',
                 flexDirection: 'column',
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '30px',
-                boxShadow: 'var(--shadow-lg)',
+                background: '#121722',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
+                borderRadius: '28px',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.8)',
                 zIndex: 10000,
                 overflow: 'hidden'
             }}>
                 <div className="khali-header" style={{ 
-                    padding: '25px', 
-                    background: 'var(--bg-body)', 
-                    borderBottom: '1px solid var(--border-color)',
+                    padding: '22px 25px', 
+                    background: 'linear-gradient(180deg, #1A2130 0%, #121722 100%)', 
+                    borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <div className="title" style={{ color: 'var(--primary-color)', fontWeight: '800', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-heading)' }}>
-                        <div style={{ width: '10px', height: '10px', background: '#10B981', borderRadius: '50%', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)' }}></div>
-                        Khali Concierge
+                    <div className="title" style={{ color: '#D4AF37', fontWeight: '800', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-heading)' }}>
+                        <div style={{ width: '10px', height: '10px', background: '#FFD700', borderRadius: '50%', boxShadow: '0 0 12px rgba(255, 215, 0, 0.8)' }}></div>
+                        Khaliya Concierge &amp; Sommelier
                     </div>
-                    <button onClick={() => setIsOpen(false)} style={{ background: 'rgba(0,0,0,0.05)', border: 'none', width: '32px', height: '32px', borderRadius: '50%', color: 'var(--text-dark)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-times"></i></button>
+                    <button onClick={() => setIsOpen(false)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', width: '32px', height: '32px', borderRadius: '50%', color: '#8A94A6', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-times"></i></button>
                 </div>
 
-                <div className="khali-chat-area" style={{ flex: 1, padding: '25px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px', background: 'var(--bg-surface)' }}>
+                <div className="khali-chat-area" style={{ flex: 1, padding: '25px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px', background: '#0B0E14' }}>
                     {messages.map((m, i) => (
                         <div key={i} className={`khali-msg ${m.type}`} style={{ 
                             alignSelf: m.type === 'bot' ? 'flex-start' : 'flex-end',
-                            background: m.type === 'bot' ? 'var(--bg-body)' : 'var(--primary-color)',
-                            color: m.type === 'bot' ? 'var(--text-dark)' : '#FFF',
-                            padding: '12px 18px',
-                            borderRadius: m.type === 'bot' ? '20px 20px 20px 4px' : '20px 20px 4px 20px',
+                            background: m.type === 'bot' ? 'rgba(255, 255, 255, 0.05)' : 'linear-gradient(135deg, #D4AF37, #AA7C11)',
+                            color: m.type === 'bot' ? '#E2E8F0' : '#000',
+                            padding: '14px 20px',
+                            borderRadius: m.type === 'bot' ? '22px 22px 22px 4px' : '22px 22px 4px 22px',
                             fontSize: '0.95rem',
                             maxWidth: '85%',
                             lineHeight: '1.6',
                             fontWeight: '500',
-                            border: m.type === 'bot' ? '1px solid var(--border-color)' : 'none',
-                            boxShadow: 'var(--shadow-sm)'
+                            border: m.type === 'bot' ? '1px solid rgba(212, 175, 55, 0.2)' : 'none',
+                            boxShadow: '0 6px 18px rgba(0,0,0,0.3)'
                         }}>
                             {m.text}
                         </div>

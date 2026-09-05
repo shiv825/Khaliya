@@ -13,16 +13,8 @@
     "name": "Khaliya Admin",
     "joinedAt": "2026-05-21T11:52:44.532Z",
     "spicePoints": 750,
-    "role": "admin"
-  },
-  {
-    "id": "USR-1784206551148",
-    "email": "customer@khaliya.com",
-    "name": "John Doe",
-    "joinedAt": "2026-07-16T12:55:51.148Z",
-    "spicePoints": 750,
-    "role": "customer",
-    "currentSessionId": "SESS-1784206551148-p5e3clrip"
+    "role": "admin",
+    "currentSessionId": "eyJlbWFpbCI6InNoaXZrdW1hcnJkbjdAZ21haWwuY29tIiwiZXhwaXJlcyI6MTc4ODY2NDczNzk4MX0.vqItDyhuGGAiHBNVDS2dJklBCWn14M8kHfmMrXSqBI8"
   },
   {
     "id": "USR-1784409509293",
@@ -32,5 +24,14 @@
     "spicePoints": 750,
     "role": "customer",
     "currentSessionId": "SESS-1784409509294-uyg7q1ckv"
+  },
+  {
+    "id": "USR-1784206551148",
+    "email": "customer@khaliya.com",
+    "name": "John Doe",
+    "joinedAt": "2026-07-16T12:55:51.148Z",
+    "spicePoints": 750,
+    "role": "customer",
+    "currentSessionId": "SESS-1784206551148-p5e3clrip"
   }
 ]

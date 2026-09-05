@@ -1,100 +1,265 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAdmin } from '../AdminContext';
 
 export default function OrdersPage() {
-    const { orders, menu, searchQuery, updateStatus } = useAdmin();
+    const { orders, menu, searchQuery, setSearchQuery, updateStatus, updateOrderStatus } = useAdmin();
+    const [orderTypeFilter, setOrderTypeFilter] = useState('ALL');
 
-    const filteredOrders = orders.filter(o => o.id.includes(searchQuery) || (o.user?.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
+    const handleUpdateStatus = (id, newStatus) => {
+        if (updateOrderStatus) {
+            updateOrderStatus(id, newStatus);
+        } else {
+            updateStatus('orders', id, newStatus);
+        }
+    };
 
-    const pendingOrdersCount = orders.filter(o => o.status === 'received' || o.status === 'preparing').length;
-    const outOfStockItems = menu.filter(m => m.available === false || m.inStock === false);
-    const kitchenLoad = Math.min((pendingOrdersCount / 20) * 100, 100);
+    // Filter orders by search & order type
+    const filteredOrders = orders.filter(o => {
+        const orderIdStr = String(o.id || o._id || '');
+        const custName = String(o.user?.name || o.customerName || '').toLowerCase();
+        const tableStr = String(o.table || o.tableNumber || '').toLowerCase();
+        const search = searchQuery.toLowerCase();
+
+        const matchesSearch = !search || 
+            orderIdStr.toLowerCase().includes(search) || 
+            custName.includes(search) || 
+            tableStr.includes(search);
+
+        const isDineIn = Boolean(o.table || o.tableNumber || o.orderType === 'dine-in');
+        const matchesType = orderTypeFilter === 'ALL' ? true :
+                            orderTypeFilter === 'DINE_IN' ? isDineIn :
+                            !isDineIn;
+
+        return matchesSearch && matchesType;
+    });
+
+    const getElapsedTime = (createdAt) => {
+        if (!createdAt) return 'Just now';
+        const start = new Date(createdAt).getTime();
+        const now = new Date().getTime();
+        const diffMins = Math.floor((now - start) / 60000);
+        if (diffMins < 1) return 'Just now';
+        return `${diffMins} min ago`;
+    };
+
+    const getOrderTotal = (o) => {
+        if (o.total !== undefined) return o.total;
+        if (o.totalAmount !== undefined) return o.totalAmount;
+        if (Array.isArray(o.items)) {
+            return o.items.reduce((sum, i) => sum + (Number(i.price || 0) * Number(i.quantity || 1)), 0);
+        }
+        return 0;
+    };
 
     return (
-        <motion.div key="orders" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="split-screen">
-            <div className="split-left kanban-grid">
-                {['received', 'preparing', 'ready'].map(status => (
-                    <div 
-                        key={status} 
-                        className="kanban-column" 
-                        style={{ display: 'flex', flexDirection: 'column', gap: '15px', padding: '15px', borderRadius: '15px', background: 'rgba(0,0,0,0.02)', border: '1px solid var(--admin-border)' }}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => {
-                            e.preventDefault();
-                            const orderId = e.dataTransfer.getData('orderId');
-                            if (orderId) updateStatus('orders', orderId, status);
-                        }}
-                    >
-                        <h2 style={{ marginTop: 0, marginBottom: 10, fontSize: '1.2rem', textTransform: 'capitalize', color: 'var(--admin-text)' }}>
-                            {status === 'received' ? 'New Orders 🛎️' : status === 'preparing' ? 'In Kitchen 🍳' : 'Ready for Pickup 📦'}
+        <motion.div key="orders" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+            {/* Top Toolbar Header with Search & Filter */}
+            <div style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)', borderRadius: '18px', padding: '18px', marginBottom: '22px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '15px' }}>
+                    <div>
+                        <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: 'var(--admin-text)' }}>
+                            <i className="fas fa-list-check" style={{ color: 'var(--admin-primary)', marginRight: '10px' }}></i>
+                            Live Orders Command Hub & Kanban
                         </h2>
-                        {filteredOrders.filter(o => o.status === status).length === 0 ? (
-                            <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem' }}>No orders</p>
-                        ) : (
-                            filteredOrders.filter(o => o.status === status).map(o => (
-                                <div 
-                                    key={o.id} 
-                                    className={`kanban-card status-${o.status}`}
-                                    draggable
-                                    onDragStart={(e) => e.dataTransfer.setData('orderId', o.id)}
-                                    style={{ cursor: 'grab' }}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <h3 style={{ margin: 0, fontSize: '1.1rem' }}>
-                                            {o.user?.name || 'Guest Customer'} 
-                                            <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginLeft: '6px' }}>#{o.id.substring(0,8)}</span>
-                                        </h3>
-                                        <span className={`item-badge badge-${o.status === 'received' ? 'pending' : 'confirmed'}`}>{o.status.toUpperCase()}</span>
-                                    </div>
-
-                                    <div style={{ fontSize: '0.92rem', color: 'var(--admin-text)', marginTop: '12px' }}>
-                                        {o.items?.map((i, idx) => {
-                                            const isVeg = menu.find(m => m.name?.en === i.name || m.name === i.name)?.tags?.includes('veg');
-                                            const isNonVeg = menu.find(m => m.name?.en === i.name || m.name === i.name)?.tags?.includes('non-veg');
-                                            return (
-                                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0', borderBottom: '1px dashed var(--admin-border)' }}>
-                                                    <span style={{ fontWeight: '800', color: 'var(--admin-primary)', minWidth: '24px' }}>{i.quantity}x</span> 
-                                                    <span style={{ flex: 1 }}>{typeof i.name === 'object' ? i.name.en : i.name}</span>
-                                                    {isVeg && <span title="Vegetarian">🌱</span>}
-                                                    {isNonVeg && <span title="Non-Vegetarian">🍖</span>}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-
-                                    <div className="order-card-actions" style={{ marginTop: '15px' }}>
-                                        {o.status === 'received' && <button onClick={() => updateStatus('orders', o.id, 'preparing')} className="action-btn btn-primary">Start Cooking</button>}
-                                        {o.status === 'preparing' && <button onClick={() => updateStatus('orders', o.id, 'ready')} className="action-btn btn-confirm">Mark Ready</button>}
-                                        {o.status === 'ready' && <button onClick={() => updateStatus('orders', o.id, 'delivered')} className="action-btn btn-complete">Complete</button>}
-                                        {(o.status === 'received' || o.status === 'preparing') && <button onClick={() => updateStatus('orders', o.id, 'cancelled')} className="action-btn btn-cancel">Cancel</button>}
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                        <p style={{ margin: '4px 0 0 0', color: 'var(--admin-text-muted)', fontSize: '0.88rem' }}>
+                            Drag and drop or click to dispatch live kitchen tickets across preparation stages.
+                        </p>
                     </div>
-                ))}
-            </div>
 
-            <div className="split-right" style={{ flex: 1, minWidth: '280px' }}>
-                <div style={{ background: 'var(--admin-surface)', padding: '20px', borderRadius: '15px', border: '1px solid var(--admin-border)', marginBottom: '20px' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '10px' }}>Kitchen Load Capacity</h3>
-                    <div style={{ width: '100%', height: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 6, marginBottom: 8, overflow: 'hidden' }}>
-                        <div style={{ width: `${kitchenLoad}%`, height: '100%', background: kitchenLoad > 80 ? 'var(--admin-danger)' : 'var(--admin-primary)', borderRadius: 6, transition: 'width 0.5s' }}></div>
+                    {/* Order Type Filter Pills */}
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {[
+                            { id: 'ALL', label: 'All Orders' },
+                            { id: 'DINE_IN', label: 'Dine-In Tables 🍽️' },
+                            { id: 'TAKEAWAY', label: 'Takeaway / Online 🛍️' }
+                        ].map(tf => (
+                            <button
+                                key={tf.id}
+                                onClick={() => setOrderTypeFilter(tf.id)}
+                                style={{
+                                    background: orderTypeFilter === tf.id ? 'var(--admin-primary)' : 'rgba(255,255,255,0.04)',
+                                    color: orderTypeFilter === tf.id ? '#000' : 'var(--admin-text)',
+                                    border: '1px solid var(--admin-border)',
+                                    padding: '8px 16px',
+                                    borderRadius: '18px',
+                                    fontWeight: '800',
+                                    fontSize: '0.82rem',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {tf.label}
+                            </button>
+                        ))}
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--admin-text-muted)' }}>{kitchenLoad > 80 ? '⚠️ High Capacity Rush' : '✅ Normal Kitchen Velocity'}</p>
                 </div>
 
-                <div style={{ background: 'var(--admin-surface)', padding: '20px', borderRadius: '15px', border: '1px solid var(--admin-border)' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '10px' }}>Stock Alert Summary</h3>
-                    {outOfStockItems.length === 0 ? (
-                        <p style={{ fontSize: '0.9rem', color: 'var(--admin-success)', margin: 0 }}>All menu items are currently in stock.</p>
-                    ) : (
-                        <ul style={{ paddingLeft: 20, margin: 0, color: 'var(--admin-danger)', fontSize: '0.9rem' }}>
-                            {outOfStockItems.map(m => <li key={m.id}>{typeof m.name === 'object' ? m.name.en : m.name}</li>)}
-                        </ul>
+                {/* Instant Search Input Bar */}
+                <div style={{ position: 'relative', width: '100%' }}>
+                    <i className="fas fa-search" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-primary)', fontSize: '1rem' }}></i>
+                    <input 
+                        type="text"
+                        placeholder="Search orders instantly by customer name, Order #, or Table (e.g. T01, Shiv, #104)..."
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        style={{
+                            width: '100%',
+                            background: 'rgba(0, 0, 0, 0.3)',
+                            border: '1.5px solid var(--admin-border)',
+                            borderRadius: '14px',
+                            padding: '12px 42px 12px 46px',
+                            color: 'var(--admin-text)',
+                            fontSize: '0.95rem',
+                            fontWeight: '600',
+                            outline: 'none',
+                            boxSizing: 'border-box'
+                        }}
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}
+                            title="Clear search"
+                        >
+                            ×
+                        </button>
                     )}
                 </div>
+            </div>
+
+            {/* 3-Column Full-Width Kanban Board */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                {['received', 'preparing', 'ready'].map(status => {
+                    const statusOrders = filteredOrders.filter(o => o.status === status);
+
+                    return (
+                        <div 
+                            key={status} 
+                            className="kanban-column" 
+                            style={{ display: 'flex', flexDirection: 'column', gap: '15px', padding: '18px', borderRadius: '20px', background: 'var(--admin-surface)', border: `1px solid ${status === 'received' ? '#f1c40f' : status === 'preparing' ? '#e67e22' : '#2ecc71'}`, minHeight: '500px' }}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                const orderId = e.dataTransfer.getData('orderId');
+                                if (orderId) handleUpdateStatus(orderId, status);
+                            }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', borderBottom: `2px solid ${status === 'received' ? '#f1c40f' : status === 'preparing' ? '#e67e22' : '#2ecc71'}`, paddingBottom: '10px' }}>
+                                <h2 style={{ marginTop: 0, marginBottom: 0, fontSize: '1.15rem', fontWeight: '900', color: status === 'received' ? '#f1c40f' : status === 'preparing' ? '#e67e22' : '#2ecc71' }}>
+                                    {status === 'received' ? '🛎️ NEW ORDERS' : status === 'preparing' ? '🍳 IN KITCHEN' : '📦 READY TO SERVE'}
+                                </h2>
+                                <span style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem', fontWeight: '900', color: 'var(--admin-text)' }}>
+                                    {statusOrders.length}
+                                </span>
+                            </div>
+
+                            {statusOrders.length === 0 ? (
+                                <div style={{ textAlign: 'center', color: 'var(--admin-text-muted)', padding: '50px 0', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                                    No tickets in this stage
+                                </div>
+                            ) : (
+                                statusOrders.map(o => {
+                                    const orderIdDisplay = String(o.id || o._id).slice(-4);
+                                    const tableNo = o.table || o.tableNumber;
+                                    const totalAmt = getOrderTotal(o);
+
+                                    return (
+                                        <div 
+                                            key={o.id || o._id} 
+                                            className={`kanban-card status-${o.status}`}
+                                            draggable
+                                            onDragStart={(e) => e.dataTransfer.setData('orderId', o.id || o._id)}
+                                            style={{ cursor: 'grab', background: '#161B26', border: '1px solid var(--admin-border)', borderRadius: '14px', padding: '16px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)' }}
+                                        >
+                                            {/* Ticket Header */}
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                                <div>
+                                                    <div style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--admin-text)' }}>
+                                                        {o.user?.name || o.customerName || 'Guest Customer'}
+                                                        <span style={{ fontSize: '0.78rem', color: 'var(--admin-primary)', marginLeft: '6px', fontWeight: '900' }}>#{orderIdDisplay}</span>
+                                                    </div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#e74c3c', marginTop: '2px', fontWeight: '700' }}>
+                                                        <i className="fas fa-clock"></i> {getElapsedTime(o.createdAt)}
+                                                    </div>
+                                                </div>
+
+                                                {/* Table Badge or Takeaway Badge */}
+                                                {tableNo ? (
+                                                    <span style={{ background: '#D4AF37', color: '#000', padding: '3px 8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '900' }}>
+                                                        <i className="fas fa-chair"></i> {tableNo}
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ background: 'rgba(255,255,255,0.1)', color: '#CCC', padding: '3px 8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800' }}>
+                                                        TAKEOUT
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Notes */}
+                                            {o.notes && (
+                                                <div style={{ background: 'rgba(231, 76, 60, 0.15)', color: '#ff6b6b', border: '1px solid rgba(231, 76, 60, 0.3)', padding: '6px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', marginBottom: '10px' }}>
+                                                    <i className="fas fa-exclamation-circle"></i> NOTE: {o.notes}
+                                                </div>
+                                            )}
+
+                                            {/* Items */}
+                                            <div style={{ fontSize: '0.88rem', color: 'var(--admin-text)', marginTop: '8px', borderTop: '1px dashed var(--admin-border)', borderBottom: '1px dashed var(--admin-border)', padding: '8px 0' }}>
+                                                {Array.isArray(o.items) && o.items.map((i, idx) => {
+                                                    const itemName = typeof i.name === 'object' ? (i.name.en || i.name.hi || 'Item') : i.name;
+                                                    const matchedMenuItem = menu.find(m => (typeof m.name === 'object' ? m.name.en : m.name) === itemName);
+                                                    const isVeg = matchedMenuItem?.isVeg !== false;
+
+                                                    return (
+                                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '3px 0' }}>
+                                                            <span style={{ fontWeight: '900', color: 'var(--admin-primary)', minWidth: '22px' }}>{i.quantity || 1}x</span> 
+                                                            <span style={{ flex: 1, fontWeight: '700' }}>{itemName}</span>
+                                                            <span style={{ fontSize: '0.75rem' }}>{isVeg ? '🌱' : '🍖'}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Total Amount & Payment Status */}
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', fontSize: '0.85rem' }}>
+                                                <span style={{ color: 'var(--admin-text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: '700' }}>
+                                                    Payment: <span style={{ color: o.paymentStatus === 'paid' ? '#2ecc71' : '#f1c40f' }}>{o.paymentStatus || 'unpaid'}</span>
+                                                </span>
+                                                <span style={{ fontSize: '1.1rem', fontWeight: '900', color: 'var(--admin-primary)' }}>
+                                                    ₹{totalAmt}
+                                                </span>
+                                            </div>
+
+                                            {/* Actions */}
+                                            <div className="order-card-actions" style={{ marginTop: '12px' }}>
+                                                {o.status === 'received' && (
+                                                    <button onClick={() => handleUpdateStatus(o.id || o._id, 'preparing')} className="action-btn btn-primary" style={{ width: '100%' }}>
+                                                        🔥 Start Cooking
+                                                    </button>
+                                                )}
+                                                {o.status === 'preparing' && (
+                                                    <button onClick={() => handleUpdateStatus(o.id || o._id, 'ready')} className="action-btn btn-confirm" style={{ width: '100%' }}>
+                                                        ✅ Mark Ready
+                                                    </button>
+                                                )}
+                                                {o.status === 'ready' && (
+                                                    <button onClick={() => handleUpdateStatus(o.id || o._id, 'completed')} className="action-btn btn-complete" style={{ width: '100%' }}>
+                                                        🛎️ Serve / Complete
+                                                    </button>
+                                                )}
+                                                {(o.status === 'received' || o.status === 'preparing') && (
+                                                    <button onClick={() => handleUpdateStatus(o.id || o._id, 'cancelled')} className="action-btn btn-cancel" style={{ width: '100%', marginTop: '6px' }}>
+                                                        Cancel Order
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    );
+                })}
             </div>
         </motion.div>
     );

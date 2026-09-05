@@ -1,7 +1,7 @@
 export const i18nData = {
     en: {
         common: { 
-            name: 'Khaliya Restaurant',
+            name: 'Khaliya',
             add: 'Add Item',
             orderNow: 'Add Item'
         },
@@ -28,7 +28,7 @@ export const i18nData = {
         },
         header: { sub: 'Authentic Indian Cuisine • Est. 2020' },
         hero: {
-            title: 'Welcome to Khaliya Restaurant',
+            title: 'Welcome to Khaliya',
             sub: 'Experience authentic Indian cuisine prepared with fresh, local ingredients',
             makeReservation: 'Make a Reservation',
             seeMenu: 'See Menu',

@@ -706,11 +706,13 @@ select.admin-input option, select.admin-select option, select option {
    ========================================================================== */
 .admin-layout-wrapper {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
   background: var(--admin-bg);
   color: var(--admin-text);
   font-family: 'Outfit', sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* Left Sidebar Container */
@@ -723,14 +725,14 @@ select.admin-input option, select.admin-select option, select option {
   flex-direction: column;
   justify-content: space-between;
   padding: 24px 16px;
-  position: sticky;
-  top: 0;
   height: 100vh;
   box-sizing: border-box;
   z-index: 1000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 4px 0 25px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
 }
+
 
 .admin-sidebar.collapsed {
   width: 80px;
@@ -745,8 +747,9 @@ select.admin-input option, select.admin-select option, select option {
   gap: 12px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--admin-border);
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .sidebar-logo-icon {
@@ -788,13 +791,31 @@ select.admin-input option, select.admin-select option, select option {
   font-weight: 700;
 }
 
-/* Sidebar Nav */
+/* Sidebar Nav (Scrollable middle container) */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: 8px;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 15px;
 }
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-primary);
+}
+
 
 .sidebar-nav-item {
   display: flex;
@@ -867,7 +888,9 @@ select.admin-input option, select.admin-select option, select option {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex-shrink: 0;
 }
+
 
 .sidebar-profile {
   display: flex;
@@ -944,8 +967,9 @@ select.admin-input option, select.admin-select option, select option {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow-y: auto;
   height: 100vh;
+  overflow-y: auto;
+  background: var(--admin-bg);
 }
 
 /* Topbar Header */
@@ -960,7 +984,9 @@ select.admin-input option, select.admin-select option, select option {
   top: 0;
   z-index: 900;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
+
 
 .admin-topbar-left {
   display: flex;
