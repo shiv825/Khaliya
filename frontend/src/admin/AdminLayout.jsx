@@ -6,6 +6,7 @@ import axios from 'axios';
 import { AdminProvider, useAdmin, CULINARY_CATEGORIES } from './AdminContext';
 import ServiceModeToggle from '../components/ServiceModeToggle';
 import ShiftReconciliationModal from '../components/ShiftReconciliationModal';
+import StoreSettingsModal from '../components/StoreSettingsModal';
 import CustomAdminSelect from '../components/CustomAdminSelect';
 import '../assets/admin-style.css';
 
@@ -36,6 +37,7 @@ function AdminLayoutInner() {
     const navigate = useNavigate();
     const [mode, setMode] = React.useState('MANAGEMENT');
     const [isShiftModalOpen, setIsShiftModalOpen] = React.useState(false);
+    const [isStoreSettingsModalOpen, setIsStoreSettingsModalOpen] = React.useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('adminSessionToken');
@@ -334,6 +336,27 @@ function AdminLayoutInner() {
                             <span>Cash Shift</span>
                         </button>
 
+                        <button
+                            onClick={() => setIsStoreSettingsModalOpen(true)}
+                            style={{
+                                background: 'rgba(212, 175, 55, 0.15)',
+                                color: '#FFD700',
+                                border: '1px solid rgba(212, 175, 55, 0.4)',
+                                borderRadius: '20px',
+                                padding: '6px 14px',
+                                fontWeight: 800,
+                                fontSize: '0.82rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                            }}
+                            title="Store Fees & Delivery Radius Settings"
+                        >
+                            <span>⚙️</span>
+                            <span>Store &amp; Fees</span>
+                        </button>
+
                         <div className={`saas-status-toggle ${settings.isOpen ? 'open' : 'closed'}`} onClick={toggleStoreStatus} style={{ margin: 0, padding: '8px 14px' }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }}></div>
                             <span className="status-toggle-label" style={{ fontSize: '0.85rem' }}>{settings.isOpen ? 'Accepting Orders' : 'Store Closed'}</span>
@@ -344,6 +367,11 @@ function AdminLayoutInner() {
                         isOpen={isShiftModalOpen} 
                         onClose={() => setIsShiftModalOpen(false)}
                         staffUser={{ id: 'ADM-001', name: 'Shiv Kumar (Admin)', role: 'MANAGER' }} 
+                    />
+
+                    <StoreSettingsModal
+                        isOpen={isStoreSettingsModalOpen}
+                        onClose={() => setIsStoreSettingsModalOpen(false)}
                     />
                 </header>
 

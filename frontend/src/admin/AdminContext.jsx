@@ -258,6 +258,31 @@ export function AdminProvider({ children }) {
         }
     };
 
+    const updateStoreSettings = async (newSettings) => {
+        try {
+            const merged = { ...settings, ...newSettings };
+            setSettings(merged);
+            const res = await axios.post(`${API_URL}/settings`, merged);
+            if (res.data?.success || res.data?.settings) {
+                if (res.data.settings) setSettings(res.data.settings);
+                Swal.fire({
+                    title: 'Settings Saved!',
+                    text: 'Store fees, location & delivery radius updated successfully.',
+                    icon: 'success',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return true;
+            }
+        } catch (err) {
+            Swal.fire('Error', 'Failed to save store settings', 'error');
+            fetchData();
+            return false;
+        }
+    };
+
     const toggleStockStatus = async (item) => {
         const isCurrentlyAvailable = item.available !== false && item.inStock !== false;
         const updated = { ...item, available: !isCurrentlyAvailable, inStock: !isCurrentlyAvailable };
@@ -537,6 +562,7 @@ const Toast = Swal.mixin({
         updateStatus,
         toggleStoreStatus,
         toggleSurgePricing,
+        updateStoreSettings,
         toggleStockStatus,
         handleImageUpload,
         handleConvertUrlToCloudinary,

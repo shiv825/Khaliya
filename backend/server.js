@@ -1543,13 +1543,30 @@ app.post('/api/visits', async (req, res) => {
     }
 });
 
+const DEFAULT_STORE_SETTINGS = {
+    isOpen: true,
+    gstRate: 5,               // 5% GST (Admin Configurable)
+    packagingFee: 25,          // Packaging fee ₹25 (Admin Configurable)
+    deliveryFee: 40,           // Delivery fee ₹40 (Admin Configurable)
+    deliveryRadiusKm: 15,      // Max delivery radius 15 km (Admin Configurable)
+    restaurantLat: 28.6139,    // Latitude (Admin Configurable)
+    restaurantLng: 77.2090,    // Longitude (Admin Configurable)
+    restaurantAddress: "Khaliya Sanctuary, Main Boulevard, New Delhi"
+};
+
 app.get('/api/settings', async (req, res) => {
-    res.json(await readData('settings'));
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    const dbSettings = await readData('settings') || {};
+    res.json({ ...DEFAULT_STORE_SETTINGS, ...dbSettings });
 });
 
 app.post('/api/settings', verifyAdminToken, async (req, res) => {
-    await writeData('settings', req.body);
-    res.json({ success: true, settings: req.body });
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    const existing = await readData('settings') || {};
+    const updatedSettings = { ...DEFAULT_STORE_SETTINGS, ...existing, ...req.body };
+    await writeData('settings', updatedSettings);
+    console.log('⚙️ [SETTINGS API] Admin updated store, fees, & location settings:', updatedSettings);
+    res.json({ success: true, settings: updatedSettings });
 });
 
 // THERMAL PRINTER MANAGEMENT & ESC/POS PRINT JOB ROUTING

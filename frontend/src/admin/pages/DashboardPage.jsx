@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAdmin } from '../AdminContext';
+import StoreSettingsModal from '../../components/StoreSettingsModal';
 
 export default function DashboardPage() {
-    const { analytics, orders, menu } = useAdmin();
+    const { analytics, orders, menu, settings } = useAdmin();
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
     const pieColors = ['#E63946', '#FF9F1C', '#2A9D8F', '#264653', '#E9C46A'];
     const categorySales = {};
@@ -21,6 +23,64 @@ export default function DashboardPage() {
 
     return (
         <motion.div key="dashboard" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+            {/* Store & Delivery Settings Overview Card */}
+            <div style={{
+                background: 'linear-gradient(135deg, rgba(20, 24, 34, 0.95) 0%, rgba(11, 14, 20, 0.98) 100%)',
+                border: '1.5px solid rgba(212, 175, 55, 0.4)',
+                borderRadius: '20px',
+                padding: '24px',
+                marginBottom: '24px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '20px',
+                boxShadow: '0 12px 30px rgba(0,0,0,0.6)'
+            }}>
+                <div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: '50px', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', marginBottom: '8px' }}>
+                        <span style={{ color: '#FFD700', fontSize: '0.8rem' }}>⚙️</span>
+                        <span style={{ color: '#D4AF37', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                            LIVE STORE &amp; DELIVERY SETTINGS
+                        </span>
+                    </div>
+                    <h3 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: '0 0 10px 0', fontSize: '1.4rem', fontWeight: '800' }}>
+                        Configured Fees &amp; Radius
+                    </h3>
+                    <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', color: '#CBD5E1', fontSize: '0.88rem' }}>
+                        <span>📊 <strong>GST:</strong> {settings?.gstRate ?? 5}%</span>
+                        <span>📦 <strong>Packaging Fee:</strong> ₹{settings?.packagingFee ?? 25}</span>
+                        <span>🛵 <strong>Delivery Fee:</strong> ₹{settings?.deliveryFee ?? 40}</span>
+                        <span>📍 <strong>Delivery Radius:</strong> {settings?.deliveryRadiusKm ?? 15} km</span>
+                    </div>
+                    <div style={{ color: '#94A3B8', fontSize: '0.8rem', marginTop: '6px' }}>
+                        🏢 <strong>Address:</strong> {settings?.restaurantAddress || "Khaliya Sanctuary, Main Boulevard, New Delhi"} (Lat: {settings?.restaurantLat ?? 28.6139}, Lng: {settings?.restaurantLng ?? 77.2090})
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => setIsSettingsModalOpen(true)}
+                    style={{
+                        background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
+                        color: '#000',
+                        border: 'none',
+                        padding: '12px 24px',
+                        borderRadius: '12px',
+                        fontWeight: '900',
+                        fontSize: '0.88rem',
+                        letterSpacing: '1px',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        boxShadow: '0 8px 20px rgba(212, 175, 55, 0.3)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}
+                >
+                    <i className="fas fa-sliders-h"></i> Configure Store Fees
+                </button>
+            </div>
+
             <div className="hero-grid">
                 <div className="hero-card">
                     <div className="hero-card-title">Today's Revenue</div>
@@ -87,6 +147,12 @@ export default function DashboardPage() {
                     )}
                 </div>
             </div>
+
+            {/* Store Settings Modal */}
+            <StoreSettingsModal
+                isOpen={isSettingsModalOpen}
+                onClose={() => setIsSettingsModalOpen(false)}
+            />
         </motion.div>
     );
 }
