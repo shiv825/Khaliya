@@ -1,44 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
-// Popular Recommended Pairing Add-ons
-const RECOMMENDED_ADDONS = [
+// Authentic Original Products Catalog Fallback
+const ORIGINAL_PRODUCTS = [
     {
-        id: 'addon-naan-1',
-        name: { en: 'Garlic Butter Naan', hi: 'गार्लिक बटर नान' },
-        price: '₹55',
-        numericPrice: 55,
-        image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?w=400&fit=crop',
-        category: 'Bread'
+        id: 1780141133327,
+        category: "Appetizer",
+        name: { en: "Samosa (4 pcs)", hi: "समोसा (4 पीसी)" },
+        description: { en: "Crispy golden pastry stuffed with royal spiced potato & pea filling." },
+        price: "₹150",
+        tags: ["veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443766/khaliya_restaurant/product_1780141133327.jpg"
     },
     {
-        id: 'addon-lassi-2',
-        name: { en: 'Kesari Mango Lassi', hi: 'केसरी आम लस्सी' },
-        price: '₹110',
-        numericPrice: 110,
-        image: 'https://images.unsplash.com/photo-1571006682860-910408544d6c?w=400&fit=crop',
-        category: 'Beverage'
+        id: 1780141131494,
+        category: "Appetizer",
+        name: { en: "Paneer Tikka", hi: "पनीर टिक्का" },
+        description: { en: "Char-grilled artisan cottage cheese marinated in hung curd & royal spices." },
+        price: "₹320",
+        tags: ["veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443767/khaliya_restaurant/product_1780141131494.jpg"
     },
     {
-        id: 'addon-sweet-3',
-        name: { en: 'Awadhi Gulab Jamun (2 Pcs)', hi: 'अवधी गुलाब जामुन' },
-        price: '₹95',
-        numericPrice: 95,
-        image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&fit=crop',
-        category: 'Dessert'
+        id: 1780141134688,
+        category: "Appetizer",
+        name: { en: "Tandoori Chicken (Half)", hi: "तंदूरी चिकन (आधा)" },
+        description: { en: "Signature tandoori chicken marinated in secret Mughlai spices." },
+        price: "₹420",
+        tags: ["non-veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443768/khaliya_restaurant/product_1780141134688.jpg"
     },
     {
-        id: 'addon-raita-4',
-        name: { en: 'Royal Boondi Raita', hi: 'रॉयल बूंदी रायता' },
-        price: '₹75',
-        numericPrice: 75,
-        image: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&fit=crop',
-        category: 'Sides'
+        id: 1780141127512,
+        category: "Main Course",
+        name: { en: "Chicken Biryani", hi: "चिकन बिरयानी" },
+        description: { en: "Dum-cooked aged Basmati rice layered with saffron chicken." },
+        price: "₹450",
+        tags: ["non-veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443774/khaliya_restaurant/product_1780141127512.jpg"
+    },
+    {
+        id: 1780141132061,
+        category: "Main Course",
+        name: { en: "Butter Chicken", hi: "बटर चिकन" },
+        description: { en: "Tandoori chicken simmered in rich velvet tomato-butter gravy." },
+        price: "₹400",
+        tags: ["non-veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443776/khaliya_restaurant/product_1780141132061.jpg"
+    },
+    {
+        id: 1780141131257,
+        category: "Main Course",
+        name: { en: "Dal Makhani", hi: "दाल मखनी" },
+        description: { en: "Overnight slow-cooked black lentils enriched with butter & cream." },
+        price: "₹280",
+        tags: ["veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443781/khaliya_restaurant/product_1780141131257.jpg"
+    },
+    {
+        id: 1780141135395,
+        category: "Main Course",
+        name: { en: "Paneer Butter Masala", hi: "पनीर बटर मसाला" },
+        description: { en: "Melt-in-mouth malai paneer cubes in rich butter-tomato sauce." },
+        price: "₹320",
+        tags: ["veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443780/khaliya_restaurant/product_1780141135395.jpg"
+    },
+    {
+        id: 1780141136038,
+        category: "Main Course",
+        name: { en: "Lamb Rogan Josh", hi: "लैम्ब रोगन जोश" },
+        description: { en: "Kashmiri tender lamb braised in fennel & cardamom gravy." },
+        price: "₹450",
+        tags: ["non-veg"],
+        image: "https://res.cloudinary.com/mbib5dog/image/upload/v1788443783/khaliya_restaurant/product_1780141136038.jpg"
     }
 ];
 
@@ -61,6 +101,9 @@ export default function CartPage() {
     const [guestEmail, setGuestEmail] = useState('');
     const [specialNotes, setSpecialNotes] = useState('');
     
+    // Live original products list
+    const [catalogProducts, setCatalogProducts] = useState(ORIGINAL_PRODUCTS);
+
     // Promo Code State
     const [couponInput, setCouponInput] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -94,16 +137,26 @@ export default function CartPage() {
             }
         } catch (e) {}
 
-        const fetchSettings = async () => {
+        // Fetch live original products & settings
+        const fetchOriginalProductsAndSettings = async () => {
             try {
-                const res = await axios.get(`${API_URL}/settings?t=${Date.now()}`);
-                if (res.data) setStoreSettings(res.data);
+                const [prodRes, setRes] = await Promise.all([
+                    axios.get(`${API_URL}/products?t=${Date.now()}`),
+                    axios.get(`${API_URL}/settings?t=${Date.now()}`)
+                ]);
+
+                if (prodRes.data && Array.isArray(prodRes.data) && prodRes.data.length > 0) {
+                    setCatalogProducts(prodRes.data);
+                }
+                if (setRes.data) {
+                    setStoreSettings(setRes.data);
+                }
             } catch (err) {
-                console.warn('Failed to fetch settings in CartPage:', err.message);
+                console.warn('Using authentic fallback catalog:', err.message);
             }
         };
 
-        fetchSettings();
+        fetchOriginalProductsAndSettings();
     }, [API_URL]);
 
     // Financial Calculations
@@ -257,6 +310,13 @@ export default function CartPage() {
         }
     };
 
+    // Filter out items already in the cart for recommended original products
+    const cartItemIds = cart.map(item => String(item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name)));
+    const recommendedOriginalProducts = catalogProducts.filter(prod => {
+        const prodId = String(prod.id || prod.slug || (typeof prod.name === 'object' ? prod.name.en : prod.name));
+        return !cartItemIds.includes(prodId);
+    }).slice(0, 6);
+
     return (
         <div className="cart-checkout-page" style={{ minHeight: '100vh', background: '#070A0E', color: '#F8FAFC', paddingBottom: '90px' }}>
             {/* Header Hero Section */}
@@ -344,7 +404,7 @@ export default function CartPage() {
                     /* Active Checkout Grid */
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '32px', alignItems: 'start' }}>
                         
-                        {/* LEFT COLUMN: Rich Product Cards & Addon Recommendations */}
+                        {/* LEFT COLUMN: Rich Product Cards & Original Products Showcase */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                             
                             {/* Product Cards Container */}
@@ -421,7 +481,7 @@ export default function CartPage() {
                                                                 border: '1.5px solid #D4AF37',
                                                                 boxShadow: '0 4px 12px rgba(0,0,0,0.6)'
                                                             }}
-                                                            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&fit=crop'; }}
+                                                            onError={(e) => { e.target.src = 'https://res.cloudinary.com/mbib5dog/image/upload/v1788443766/khaliya_restaurant/product_1780141133327.jpg'; }}
                                                         />
                                                     </div>
 
@@ -514,92 +574,100 @@ export default function CartPage() {
                                 </div>
                             </motion.div>
 
-                            {/* Recommended Add-Ons Showcase */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                style={{
-                                    background: 'linear-gradient(145deg, rgba(15, 20, 30, 0.75) 0%, rgba(7, 10, 14, 0.9) 100%)',
-                                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                                    borderRadius: '24px',
-                                    padding: '24px'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                                    <span style={{ color: '#FFD700', fontSize: '1rem' }}>✨</span>
-                                    <h4 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>
-                                        Recommended Royal Pairings
-                                    </h4>
-                                </div>
-                                <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginTop: '-8px', marginBottom: '18px' }}>
-                                    Enhance your dining experience with authentic breads, beverages, and desserts.
-                                </p>
+                            {/* ORIGINAL PRODUCTS RECOMMENDATION SHOWCASE */}
+                            {recommendedOriginalProducts.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    style={{
+                                        background: 'linear-gradient(145deg, rgba(15, 20, 30, 0.75) 0%, rgba(7, 10, 14, 0.9) 100%)',
+                                        border: '1px solid rgba(212, 175, 55, 0.3)',
+                                        borderRadius: '24px',
+                                        padding: '24px'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                                        <span style={{ color: '#FFD700', fontSize: '1rem' }}>✨</span>
+                                        <h4 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>
+                                            RECOMMENDED ROYAL PAIRINGS
+                                        </h4>
+                                    </div>
+                                    <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginTop: '-8px', marginBottom: '18px' }}>
+                                        Enhance your dining experience with authentic dishes from our royal kitchen.
+                                    </p>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '14px' }}>
-                                    {RECOMMENDED_ADDONS.map(addon => (
-                                        <div
-                                            key={addon.id}
-                                            style={{
-                                                background: 'rgba(255,255,255,0.03)',
-                                                border: '1px solid rgba(212, 175, 55, 0.2)',
-                                                borderRadius: '14px',
-                                                padding: '12px',
-                                                textAlign: 'center',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between'
-                                            }}
-                                        >
-                                            <img
-                                                src={addon.image}
-                                                alt={getLocalized(addon.name)}
-                                                style={{ width: '60px', height: '60px', borderRadius: '10px', objectFit: 'cover', border: '1px solid #D4AF37', marginBottom: '8px' }}
-                                            />
-                                            <div style={{ color: '#FFF', fontSize: '0.82rem', fontWeight: '700', marginBottom: '4px', lineHeight: '1.2' }}>
-                                                {getLocalized(addon.name)}
-                                            </div>
-                                            <div style={{ color: '#FFD700', fontSize: '0.85rem', fontWeight: '800', marginBottom: '10px' }}>
-                                                {addon.price}
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    addToCart({
-                                                        id: addon.id,
-                                                        name: addon.name,
-                                                        price: addon.price,
-                                                        image: addon.image,
-                                                        category: addon.category
-                                                    });
-                                                    Swal.fire({
-                                                        title: 'Added!',
-                                                        text: `${getLocalized(addon.name)} added to selection.`,
-                                                        icon: 'success',
-                                                        toast: true,
-                                                        position: 'top-end',
-                                                        showConfirmButton: false,
-                                                        timer: 1800
-                                                    });
-                                                }}
-                                                style={{
-                                                    width: '100%',
-                                                    background: 'rgba(212, 175, 55, 0.15)',
-                                                    border: '1px solid #D4AF37',
-                                                    color: '#FFD700',
-                                                    borderRadius: '8px',
-                                                    padding: '6px 10px',
-                                                    fontSize: '0.78rem',
-                                                    fontWeight: '800',
-                                                    cursor: 'pointer',
-                                                    transition: 'all 0.2s ease'
-                                                }}
-                                            >
-                                                + Add
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </motion.div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
+                                        {recommendedOriginalProducts.map(prod => {
+                                            const prodName = getLocalized(prod.name);
+                                            return (
+                                                <div
+                                                    key={prod.id || prod.slug || prodName}
+                                                    style={{
+                                                        background: 'rgba(255,255,255,0.03)',
+                                                        border: '1.5px solid rgba(212, 175, 55, 0.25)',
+                                                        borderRadius: '16px',
+                                                        padding: '14px',
+                                                        textAlign: 'center',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={prod.image}
+                                                        alt={prodName}
+                                                        style={{ width: '75px', height: '75px', borderRadius: '12px', objectFit: 'cover', border: '1.5px solid #D4AF37', marginBottom: '10px' }}
+                                                        onError={(e) => { e.target.src = 'https://res.cloudinary.com/mbib5dog/image/upload/v1788443766/khaliya_restaurant/product_1780141133327.jpg'; }}
+                                                    />
+                                                    <div style={{ color: '#FFF', fontSize: '0.85rem', fontWeight: '700', marginBottom: '4px', lineHeight: '1.2' }}>
+                                                        {prodName}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.68rem', color: '#D4AF37', marginBottom: '6px', fontWeight: '600' }}>
+                                                        {prod.category || 'Specialty'}
+                                                    </div>
+                                                    <div style={{ color: '#FFD700', fontSize: '0.95rem', fontWeight: '900', marginBottom: '12px' }}>
+                                                        {prod.price}
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            addToCart(prod);
+                                                            Swal.fire({
+                                                                title: 'Added!',
+                                                                text: `${prodName} added to your selection.`,
+                                                                icon: 'success',
+                                                                toast: true,
+                                                                position: 'top-end',
+                                                                showConfirmButton: false,
+                                                                timer: 1800
+                                                            });
+                                                        }}
+                                                        style={{
+                                                            width: '100%',
+                                                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%)',
+                                                            border: '1.5px solid #D4AF37',
+                                                            color: '#FFD700',
+                                                            borderRadius: '10px',
+                                                            padding: '8px 12px',
+                                                            fontSize: '0.82rem',
+                                                            fontWeight: '800',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s ease',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            gap: '6px'
+                                                        }}
+                                                    >
+                                                        + Add
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </motion.div>
+                            )}
                         </div>
 
                         {/* RIGHT COLUMN: Dining Option, Promo Code & Final Checkout Summary */}
