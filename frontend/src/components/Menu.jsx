@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import Swal from 'sweetalert2';
-import AiMatchmaker from './AiMatchmaker';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Menu() {
@@ -512,7 +511,6 @@ export default function Menu() {
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState('default');
     const [isSortOpen, setIsSortOpen] = useState(false);
-    const [showMatchmaker, setShowMatchmaker] = useState(false);
 
     const sortOptions = [
         { value: 'default', label: t('menu.sortDefault', 'Default Sort'), icon: 'fa-sort' },
@@ -591,69 +589,6 @@ export default function Menu() {
                 </p>
                 <div style={{ height: '2px', width: '80px', background: 'linear-gradient(90deg, transparent, #FFD700, transparent)', margin: '1.2rem auto 0' }}></div>
             </div>
-
-            {/* AI Matchmaker Trigger Banner */}
-            <div style={{
-                background: 'linear-gradient(135deg, rgba(30, 25, 18, 0.85), rgba(18, 14, 10, 0.95))',
-                border: '1px solid rgba(212, 175, 55, 0.3)',
-                borderRadius: '16px',
-                padding: '1.2rem 1.8rem',
-                marginBottom: '2.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justify: 'space-between',
-                flexWrap: 'wrap',
-                gap: '1rem',
-                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 235, 175, 0.2)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{
-                        width: '46px',
-                        height: '46px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #FFD700, #B8860B)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#0d0d0d',
-                        fontSize: '1.2rem',
-                        boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)'
-                    }}>
-                        <i className="fas fa-magic"></i>
-                    </div>
-                    <div>
-                        <h4 style={{ color: '#FFF5C0', margin: 0, fontFamily: 'var(--font-heading)', fontSize: '1.1rem' }}>
-                            {t('aiMatchmaker.bannerTitle', 'AI Culinary Sommelier')}
-                        </h4>
-                        <p style={{ color: 'rgba(255, 255, 255, 0.7)', margin: 0, fontSize: '0.85rem' }}>
-                            {t('aiMatchmaker.bannerDesc', 'Not sure what to choose? Let our AI match flavor profiles to your taste.')}
-                        </p>
-                    </div>
-                </div>
-                <button
-                    onClick={() => setShowMatchmaker(!showMatchmaker)}
-                    className="btn"
-                    style={{
-                        background: showMatchmaker ? 'transparent' : 'linear-gradient(135deg, #D4AF37, #B8860B)',
-                        color: showMatchmaker ? '#FFD700' : '#0d0d0d',
-                        border: '1px solid #FFD700',
-                        fontWeight: 700,
-                        padding: '10px 22px',
-                        borderRadius: '30px',
-                        fontSize: '0.85rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                    }}
-                >
-                    {showMatchmaker ? t('aiMatchmaker.close', 'Hide Sommelier') : t('aiMatchmaker.open', 'Consult Sommelier ✨')}
-                </button>
-            </div>
-
-            {showMatchmaker && (
-                <div style={{ marginBottom: '2.5rem' }}>
-                    <AiMatchmaker menuItems={menuItems} />
-                </div>
-            )}
 
             {/* Filter and Search Bar Container */}
             <div style={{

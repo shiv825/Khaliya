@@ -4,7 +4,6 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useLanguage } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import AiMatchmaker from './AiMatchmaker';
 import '../assets/style.css';
 
 export default function TableQrOrder() {
@@ -24,7 +23,6 @@ export default function TableQrOrder() {
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeOrders, setActiveOrders] = useState([]);
-    const [showAiMatchmaker, setShowAiMatchmaker] = useState(false);
 
     const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
     const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
@@ -398,31 +396,8 @@ export default function TableQrOrder() {
                     </div>
                 )}
 
-                {/* AI Matchmaker Banner Button & Modal */}
-                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <button
-                        onClick={() => setShowAiMatchmaker(true)}
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(15, 12, 9, 0.9))',
-                            border: '1px solid rgba(212, 175, 55, 0.4)',
-                            borderRadius: '16px',
-                            padding: '10px 20px',
-                            color: '#FFD700',
-                            fontWeight: '700',
-                            fontSize: '0.88rem',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
-                            transition: 'all 0.3s ease'
-                        }}
-                    >
-                        <i className="fas fa-wand-magic-sparkles" style={{ color: '#FFD700' }}></i>
-                        <span>✦ AI Flavor Assistant (Ask for Recommendations)</span>
-                    </button>
-
-                    {/* Diet Toggle Filter (All, Veg, Non-Veg) */}
+                {/* Diet Toggle Filter (All, Veg, Non-Veg) */}
+                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', gap: '6px', background: 'rgba(22, 18, 14, 0.8)', padding: '4px', borderRadius: '25px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
                         <button
                             onClick={() => setDietFilter('ALL')}

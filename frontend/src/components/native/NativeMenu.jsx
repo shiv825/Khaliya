@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
-import AiMatchmaker from '../AiMatchmaker';
 import masterMenu from '../../data/menu.json';
 
 /**
@@ -235,7 +234,7 @@ export default function NativeMenu({ setActiveTab }) {
                 "name": {
                         "en": "Paneer Butter Masala",
                         "hi": "पनीर बटर मसाला",
-                        "ar": "بانيयर بوتر ماسالا"
+                        "ar": "بانيير بوتر ماسالا"
                 },
                 "description": {
                         "en": "Soft cottage cheese in rich tomato butter gravy. Vegetarian favorite.",
@@ -893,25 +892,19 @@ export default function NativeMenu({ setActiveTab }) {
                 ],
                 "image": "https://res.cloudinary.com/mbib5dog/image/upload/v1788443814/khaliya_restaurant/product_1780141127666.jpg"
         }
-];
+    ];
 
     const [activeCategory, setActiveCategory] = useState('All');
     const [menuItems, setMenuItems] = useState([]);
-    
-    // Reset visible count when category changes for speed
+    const [loading, setLoading] = useState(true);
+    const [visibleCount, setVisibleCount] = useState(12);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isRenderReady, setIsRenderReady] = useState(true);
+
     useEffect(() => {
         setVisibleCount(20);
     }, [activeCategory]);
 
-    const [loading, setLoading] = useState(true);
-    const [showMatchmaker, setShowMatchmaker] = useState(false);
-    const [visibleCount, setVisibleCount] = useState(12); // Speed: Start smaller
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isRenderReady, setIsRenderReady] = useState(true); 
-
-    // Initial mount hook optimized for instant rendering
-
-    // Real-time updates via SSE
     useEffect(() => {
         const sseUrl = `${API_URL.replace('/api', '')}/api/live-updates`;
         let evtSource = null;
