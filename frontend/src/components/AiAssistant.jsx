@@ -377,7 +377,7 @@ export default function AiAssistant() {
                                                                 </div>
                                                             </div>
                                                             <div style={{ color: '#FFD700', fontWeight: '800', fontSize: '0.82rem', marginTop: '2px' }}>
-                                                                ₹{dish.price}
+                                                                {dish.price ? (String(dish.price).startsWith('₹') ? dish.price : `₹${dish.price}`) : '₹0'}
                                                             </div>
                                                         </div>
                                                         <button 
