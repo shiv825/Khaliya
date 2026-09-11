@@ -67,9 +67,7 @@ export default function Navbar() {
         { path: '/', label: t('nav.home', 'Home'), icon: 'fa-home' },
         { path: '/menu', label: t('nav.menu', 'Menu'), icon: 'fa-utensils' },
         { path: '/reserve', label: t('nav.reservations', 'Reserve Table'), icon: 'fa-chair' },
-        { path: '/tables', label: 'Dining Spaces', icon: 'fa-gem' },
-        { path: '/reviews', label: 'Guest Reviews', icon: 'fa-star' },
-        { path: '/location', label: 'Hours & Location', icon: 'fa-map-marker-alt' }
+        { path: '/tables', label: 'Dining Spaces', icon: 'fa-gem' }
     ];
 
     const legalNavLinks = [
