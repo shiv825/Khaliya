@@ -3,14 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { NavLink, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
-import CartDrawer from './CartDrawer';
 import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Navbar() {
     const { language, setLanguage, t } = useLanguage();
     const { getCartCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isCartOpen, setIsCartOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
     const [isInstallable, setIsInstallable] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -176,10 +174,11 @@ export default function Navbar() {
 
                     {/* Right Side Header Controls */}
                     <div className="nav-controls" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {/* Cart Icon */}
-                        <div 
+                        {/* Cart Icon - Direct Link to /cart Page */}
+                        <Link 
+                            to="/cart"
                             className="nav-cart-btn" 
-                            onClick={() => setIsCartOpen(true)}
+                            aria-label="View Shopping Cart Page"
                             style={{ 
                                 position: 'relative', 
                                 cursor: 'pointer', 
@@ -193,7 +192,8 @@ export default function Navbar() {
                                 height: '38px',
                                 borderRadius: '10px',
                                 background: 'rgba(212, 175, 55, 0.1)',
-                                border: '1px solid rgba(212, 175, 55, 0.3)'
+                                border: '1px solid rgba(212, 175, 55, 0.3)',
+                                textDecoration: 'none'
                             }}
                         >
                             <i className="fas fa-shopping-cart"></i>
@@ -215,7 +215,7 @@ export default function Navbar() {
                                     boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
                                 }}>{cartCount}</span>
                             )}
-                        </div>
+                        </Link>
 
                         {/* Language Switcher (Desktop Header Only) */}
                         {isDesktop && <LanguageSwitcher mode="dropdown" />}
@@ -448,9 +448,6 @@ export default function Navbar() {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {/* Shopping Cart Side Drawer */}
-            <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
         </>
     );
 }
