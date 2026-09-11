@@ -1,13 +1,13 @@
 {
-  "name": "Khaliya Restaurant - Authentic Indian Cuisine",
+  "name": "Khaliya Sanctuary - Royal Indian Cuisine",
   "short_name": "Khaliya",
-  "description": "Experience the finest authentic Indian cuisine at Khaliya Restaurant. Order online, manage reservations, and explore our rich menu.",
+  "description": "Experience the royal heritage of authentic Indian fine dining with Khaliya Sanctuary. Order online, reserve dining spaces, and explore signature delicacies.",
   "start_url": "./?mode=pwa",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FDFCF0",
-  "theme_color": "#8E1C1C",
+  "background_color": "#070A0E",
+  "theme_color": "#D4AF37",
   "categories": [
     "food",
     "lifestyle"

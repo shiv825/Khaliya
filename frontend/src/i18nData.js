@@ -178,10 +178,11 @@ export const i18nData = {
             newsletterError: '❌ Signup failed. Please try again.'
         },
         pwa: {
-            installTitle: 'Install Khaliya App',
-            installDesc: 'Access our menu faster and get real-time order updates.',
-            installBtn: 'Install',
+            installTitle: 'Install Khaliya Sanctuary',
+            installDesc: 'Experience royal dining with instant table bookings & mobile orders.',
+            installBtn: 'Install App',
             laterBtn: 'Later',
+            cancelBtn: 'Later',
             installed: '🎉 App installed successfully!',
             offlineNotify: '🔌 You are offline. Changes will sync when reconnected.',
             notificationsEnabled: '🔔 Notifications enabled!',
@@ -380,10 +381,11 @@ export const i18nData = {
             newsletterError: '❌ साइनअप विफल रहा। कृपया पुनः प्रयास करें।'
         },
         pwa: {
-            installTitle: 'खालिया ऐप इंस्टॉल करें',
-            installDesc: 'हमारे मेनू तक तेजी से पहुंचें और रीयल-टाइम ऑर्डर अपडेट प्राप्त करें।',
-            installBtn: 'इंस्टॉल करें',
+            installTitle: 'खालीया सैंक्चुअरी ऐप इंस्टॉल करें',
+            installDesc: 'शाही भोजन का अनुभव, इंस्टेंट टेबल बुकिंग और मोबाइल ऑर्डर प्राप्त करें।',
+            installBtn: 'ऐप इंस्टॉल करें',
             laterBtn: 'बाद में',
+            cancelBtn: 'बाद में',
             installed: '🎉 ऐप सफलतापूर्वक इंस्टॉल हो गया!',
             offlineNotify: '🔌 आप ऑफ़लाइन हैं। दोबारा जुड़ने पर परिवर्तन सिंक होंगे।',
             notificationsEnabled: '🔔 सूचनाएं चालू हो गईं!',

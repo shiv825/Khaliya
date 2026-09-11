@@ -311,7 +311,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Navigation Links Group */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '1.5rem' }}>
                             <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#D4AF37', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '4px' }}>
                                 Dining &amp; Exploration
                             </div>
@@ -346,10 +346,67 @@ export default function Navbar() {
                                     )}
                                 </NavLink>
                             ))}
+
+                            {/* Prominent Small-Screen PWA Install Card under Menu */}
+                            <div 
+                                style={{
+                                    marginTop: '8px',
+                                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.18) 0%, rgba(15, 20, 30, 0.8) 100%)',
+                                    border: '1.5px solid #D4AF37',
+                                    borderRadius: '16px',
+                                    padding: '14px 16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: '12px',
+                                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.2)'
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <img 
+                                        src="/khaliya-logo.jpg" 
+                                        alt="Logo" 
+                                        style={{ width: '42px', height: '42px', borderRadius: '10px', border: '1.5px solid #D4AF37', objectFit: 'cover' }} 
+                                    />
+                                    <div>
+                                        <div style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', fontWeight: '800', fontSize: '0.95rem', lineHeight: '1.2' }}>
+                                            Khaliya App
+                                        </div>
+                                        <div style={{ fontSize: '0.72rem', color: '#CBD5E1', marginTop: '2px', fontWeight: '500' }}>
+                                            ⚡ Fast &amp; Offline Access
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        let prompted = false;
+                                        if (window.promptInstall) prompted = window.promptInstall();
+                                        if (!prompted && window.forceShowPwaBanner) window.forceShowPwaBanner();
+                                        setIsMenuOpen(false);
+                                    }}
+                                    style={{
+                                        background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
+                                        color: '#000',
+                                        border: 'none',
+                                        padding: '10px 16px',
+                                        borderRadius: '10px',
+                                        fontWeight: '900',
+                                        fontSize: '0.85rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    <i className="fas fa-download"></i> Install
+                                </button>
+                            </div>
                         </div>
 
                         {/* Razorpay & Statutory Legal Section in Mobile Menu */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '2rem', background: 'rgba(15, 20, 30, 0.6)', padding: '14px', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '1.5rem', background: 'rgba(15, 20, 30, 0.6)', padding: '14px', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
                             <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#D4AF37', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '4px' }}>
                                 Merchant Policies &amp; Legal
                             </div>
@@ -379,35 +436,6 @@ export default function Navbar() {
                                 ))}
                             </div>
                         </div>
-
-                        {/* PWA App Download CTA Button */}
-                        {isInstallable && (
-                            <button
-                                onClick={() => {
-                                    if (window.promptInstall) window.promptInstall();
-                                    setIsMenuOpen(false);
-                                }}
-                                style={{
-                                    background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
-                                    color: '#000',
-                                    border: 'none',
-                                    padding: '14px 20px',
-                                    borderRadius: '12px',
-                                    fontWeight: '900',
-                                    fontSize: '0.95rem',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '10px',
-                                    boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
-                                    marginBottom: '1.5rem',
-                                    letterSpacing: '0.5px'
-                                }}
-                            >
-                                <i className="fas fa-download" style={{ fontSize: '1rem' }}></i> {t('pwa.installBtn', 'Download Khaliya App')}
-                            </button>
-                        )}
 
                         {/* Mobile Drawer Bottom Info */}
                         <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
