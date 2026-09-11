@@ -63,12 +63,12 @@ export const i18nData = {
         testimonials: {
             title: "Our Guests' Stories",
             sub: "Hear from those who have experienced the magic of Khaliya.",
-            text1: `"The Butter Chicken here is unlike anything I've had before.Truly authentic and the service is impeccably warm!"`,
-            author1: 'Aarav Sharma', status1: 'Frequent Guest',
-            text2: '"A perfect place for family gatherings. The ambiance is premium yet cozy, and the menu variety is impressive."',
-            author2: 'Priya Patel', status2: 'Food Critic',
-            text3: '"The real-time synchronization of bookings made my plans so much easier. Technology meets great taste!"',
-            author3: 'John Doe', status3: 'International Traveler'
+            text1: "The Butter Chicken and Dum Biryani here are unlike anything I've had before. Truly authentic and the service is impeccably warm!",
+            author1: 'Aarav Sharma', status1: 'Royal Food Connoisseur',
+            text2: "A perfect place for family gatherings. The royal ambiance is premium yet cozy, and the menu variety is breathtaking.",
+            author2: 'Priya Patel', status2: 'Gourmet Food Critic',
+            text3: "The real-time synchronization of table orders made our celebration seamless. Technology meets authentic royal taste!",
+            author3: 'Karan Malhotra', status3: 'Fine Dining Reviewer'
         },
         menu: {
             title: 'Our Signature Menu',
@@ -265,12 +265,12 @@ export const i18nData = {
         testimonials: {
             title: "हमारे मेहमानों की कहानियाँ",
             sub: "उन लोगों से सुनें जिन्होंने खालिया के जादू का अनुभव किया है।",
-            text1: '"यहाँ का बटर चिकन ऐसा है जैसा मैंने पहले कभी नहीं खाया। वास्तव में प्रामाणिक और सेवा बहुत ही गर्मजोशी भरी है!"',
-            author1: 'आरव शर्मा', status1: 'नियमित मेहमान',
-            text2: '"पारिवारिक समारोहों के लिए एक आदर्श स्थान। माहौल प्रीमियम और आरामदायक है, और मेनू की विविधता प्रभावशाली है।"',
+            text1: "यहाँ का बटर चिकन और दम बिरयानी ऐसा है जैसा मैंने पहले कभी नहीं खाया। वास्तव में प्रामाणिक स्वाद और सेवा बहुत ही गर्मजोशी भरी है!",
+            author1: 'आरव शर्मा', status1: 'शाही भोजन प्रेमी',
+            text2: "पारिवारिक समारोहों के लिए एक आदर्श स्थान। माहौल बेहद प्रीमियम और आरामदायक है, और मेनू की विविधता प्रभावशाली है।",
             author2: 'प्रिया पटेल', status2: 'खाद्य समीक्षक',
-            text3: '"बुकिंग के रीयल-टाइम सिंक्रोनाइज़ेशन ने मेरी योजनाओं को बहुत आसान बना दिया। तकनीक और स्वाद का बेहतरीन संगम!"',
-            author3: 'जॉन डो', status3: 'अंतर्राष्ट्रीय यात्री'
+            text3: "टेबल ऑर्डर के रीयल-टाइम सिंक्रोनाइज़ेशन ने हमारे उत्सव को बहुत आसान बना दिया। तकनीक और शाही स्वाद का बेहतरीन संगम!",
+            author3: 'करण मल्होत्रा', status3: 'शाही व्यंजन पारखी'
         },
         menu: {
             title: 'हमारा सिग्नेचर मेनू',
@@ -467,12 +467,12 @@ export const i18nData = {
         testimonials: {
             title: "قصص ضيوفنا",
             sub: "استمع إلى أولئك الذين اختبروا سحر خاليا.",
-            text1: '"دجاج الزبدة هنا لا يشبه أي شيء تذوقته من قبل. أصيل حقًا والخدمة دافئة بشكل رائع!"',
-            author1: 'آراف شارما', status1: 'ضيف دائم',
-            text2: '"مكان مثالي للتجمعات العائلية. الأجواء فاخرة ومريحة، وتنوع القائمة مثير للإعجاب."',
-            author2: 'بريا باتيل', status2: 'ناقدة طعام',
-            text3: '"جعلت المزامنة في الوقت الفعلي للحجوزات خططي أسهل بكثير. التكنولوجيا تلتقي بالمذاق الرائع!"',
-            author3: 'جون دو', status3: 'مسافر دولي'
+            text1: "دجاج الزبدة والبرياني الملكي هنا لا يشبه أي شيء تذوقته من قبل. أصيل حقًا والخدمة دافئة بشكل رائع!",
+            author1: 'آراف شارما', status1: 'ذواقة الطعام الملكي',
+            text2: "مكان مثالي للتجمعات العائلية. الأجواء فاخرة ومريحة، وتنوع القائمة مثير للإعجاب.",
+            author2: 'بريا باتيل', status2: 'ناقدة طعام فاخر',
+            text3: "جعلت المزامنة في الوقت الفعلي لطلبات الطاولات احتفالنا سلسًا للغاية. التكنولوجيا تلتقي بالمذاق الملكي الأصيل!",
+            author3: 'كاران مالموترا', status3: 'مراجعة المأكولات الملكية'
         },
         menu: {
             title: 'قائمتنا المميزة',

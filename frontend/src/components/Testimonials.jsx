@@ -7,19 +7,19 @@ export default function Testimonials() {
 
     const reviews = [
         {
-            text: t('testimonials.text1', 'The Awadhi Dum Biryani and Lamb Rogan Josh were otherworldly! The richness of spices and the royal atmosphere made our anniversary truly unforgettable.'),
-            author: t('testimonials.author1', 'Lord Alistair Sterling'),
-            status: t('testimonials.status1', 'Gourmet Critic & Fine Dining Patron')
+            text: t('testimonials.text1', 'The Awadhi Dum Biryani and Butter Chicken here are unlike anything I have had before. Truly authentic royal flavors, and the hospitality is impeccably warm!'),
+            author: t('testimonials.author1', 'Aarav Sharma'),
+            status: t('testimonials.status1', 'Royal Food Connoisseur')
         },
         {
-            text: t('testimonials.text2', 'Khaliya brings authentic Lucknow court dining to life. The Murgh Malai Tikka literally melts in your mouth. Hands down the finest Indian dining experience.'),
-            author: t('testimonials.author2', 'Priya Sharma'),
-            status: t('testimonials.status2', 'Culinary Enthusiast')
+            text: t('testimonials.text2', 'Khaliya brings authentic Lucknow court dining to life. The Murgh Malai Tikka literally melts in your mouth, and the ambiance is breathtaking.'),
+            author: t('testimonials.author2', 'Priya Patel'),
+            status: t('testimonials.status2', 'Gourmet Food Critic')
         },
         {
-            text: t('testimonials.text3', 'From the warm sommelier greeting to the copper handi presentation, every detail at Khaliya screams royal perfection. A true culinary landmark.'),
-            author: t('testimonials.author3', 'Marcus Vance'),
-            status: t('testimonials.status3', 'Food & Wine Reviewer')
+            text: t('testimonials.text3', 'From the warm royal greeting to the copper handi presentation, every detail at Khaliya screams perfection. Technology seamlessly meets royal taste!'),
+            author: t('testimonials.author3', 'Karan Malhotra'),
+            status: t('testimonials.status3', 'Fine Dining Reviewer')
         }
     ];
 
@@ -74,57 +74,60 @@ export default function Testimonials() {
 
             {/* Testimonial Cards Grid */}
             <div className="testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px', maxWidth: '1380px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                {reviews.map((rev, index) => (
-                    <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.15, duration: 0.8 }}
-                        whileHover={{ y: -8 }}
-                        style={{
-                            background: 'rgba(15, 20, 30, 0.85)',
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)',
-                            border: '1.5px solid rgba(212, 175, 55, 0.32)',
-                            borderRadius: '24px',
-                            padding: '2.5rem',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
-                            position: 'relative'
-                        }}
-                    >
-                        {/* Quote Mark */}
-                        <div style={{ position: 'absolute', top: '25px', right: '25px', fontSize: '3rem', color: 'rgba(212, 175, 55, 0.15)', fontFamily: 'serif' }}>“</div>
+                {reviews.map((rev, index) => {
+                    const cleanText = String(rev.text || '').replace(/^["'“”]+|["'“”]+$/g, '').trim();
+                    return (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.15, duration: 0.8 }}
+                            whileHover={{ y: -8 }}
+                            style={{
+                                background: 'rgba(15, 20, 30, 0.85)',
+                                backdropFilter: 'blur(20px)',
+                                WebkitBackdropFilter: 'blur(20px)',
+                                border: '1.5px solid rgba(212, 175, 55, 0.32)',
+                                borderRadius: '24px',
+                                padding: '2.5rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+                                position: 'relative'
+                            }}
+                        >
+                            {/* Quote Mark */}
+                            <div style={{ position: 'absolute', top: '25px', right: '25px', fontSize: '3rem', color: 'rgba(212, 175, 55, 0.15)', fontFamily: 'serif' }}>“</div>
 
-                        <div>
-                            {/* Gold 5 Stars */}
-                            <div style={{ color: '#FFD700', fontSize: '1rem', marginBottom: '1.2rem', display: 'flex', gap: '4px' }}>
-                                <i className="fas fa-star"></i>
-                                <i className="fas fa-star"></i>
-                                <i className="fas fa-star"></i>
-                                <i className="fas fa-star"></i>
-                                <i className="fas fa-star"></i>
-                            </div>
-
-                            <p style={{ color: '#CBD5E1', fontSize: '1.02rem', lineHeight: '1.8', fontStyle: 'italic', marginBottom: '2rem' }}>
-                                "{rev.text}"
-                            </p>
-                        </div>
-
-                        <div style={{ borderTop: '1px solid rgba(212, 175, 55, 0.18)', paddingTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                            <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)', color: '#070A0E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '1.1rem' }}>
-                                {rev.author.charAt(0)}
-                            </div>
                             <div>
-                                <h4 style={{ color: '#FFD700', fontFamily: "'Cinzel', serif", fontSize: '1.15rem', margin: 0, fontWeight: '700' }}>{rev.author}</h4>
-                                <span style={{ color: '#94A3B8', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>{rev.status}</span>
+                                {/* Gold 5 Stars */}
+                                <div style={{ color: '#FFD700', fontSize: '1rem', marginBottom: '1.2rem', display: 'flex', gap: '4px' }}>
+                                    <i className="fas fa-star"></i>
+                                    <i className="fas fa-star"></i>
+                                    <i className="fas fa-star"></i>
+                                    <i className="fas fa-star"></i>
+                                    <i className="fas fa-star"></i>
+                                </div>
+
+                                <p style={{ color: '#CBD5E1', fontSize: '1.02rem', lineHeight: '1.8', fontStyle: 'italic', marginBottom: '2rem' }}>
+                                    "{cleanText}"
+                                </p>
                             </div>
-                        </div>
-                    </motion.div>
-                ))}
+
+                            <div style={{ borderTop: '1px solid rgba(212, 175, 55, 0.18)', paddingTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)', color: '#070A0E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '1.1rem' }}>
+                                    {rev.author.charAt(0)}
+                                </div>
+                                <div>
+                                    <h4 style={{ color: '#FFD700', fontFamily: "'Cinzel', serif", fontSize: '1.15rem', margin: 0, fontWeight: '700' }}>{rev.author}</h4>
+                                    <span style={{ color: '#94A3B8', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>{rev.status}</span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    );
+                })}
             </div>
         </section>
     );

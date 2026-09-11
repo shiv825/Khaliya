@@ -11,14 +11,13 @@ export default function Navbar() {
     const { getCartCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
-    const [isDesktop, setIsDesktop] = useState(window.innerWidth > 992);
-
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
     const [isInstallable, setIsInstallable] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(prev => !prev);
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -29,12 +28,18 @@ export default function Navbar() {
             setIsInstallable(e.detail);
         };
 
+        const handleResize = () => {
+            const desktopState = window.innerWidth >= 992;
+            setIsDesktop(desktopState);
+            if (desktopState) {
+                setIsMenuOpen(false);
+            }
+        };
+
         window.addEventListener('scroll', handleScroll);
         window.addEventListener('khaliya-pwa-ready', handlePwaReady);
-        const handleResize = () => setIsDesktop(window.innerWidth > 992);
         window.addEventListener('resize', handleResize);
         
-        // Initial check in case it already fired
         if (window.khaliya_pwa_prompt) setIsInstallable(true);
 
         return () => {
@@ -44,7 +49,35 @@ export default function Navbar() {
         };
     }, []);
 
+    // Prevent body scrolling when mobile menu drawer is open
+    useEffect(() => {
+        if (isMenuOpen && !isDesktop) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isMenuOpen, isDesktop]);
+
     const cartCount = getCartCount();
+
+    const mainNavLinks = [
+        { path: '/', label: t('nav.home', 'Home'), icon: 'fa-home' },
+        { path: '/menu', label: t('nav.menu', 'Menu'), icon: 'fa-utensils' },
+        { path: '/reserve', label: t('nav.reservations', 'Reserve Table'), icon: 'fa-chair' },
+        { path: '/tables', label: 'Dining Spaces', icon: 'fa-gem' },
+        { path: '/reviews', label: 'Guest Reviews', icon: 'fa-star' },
+        { path: '/location', label: 'Hours & Location', icon: 'fa-map-marker-alt' }
+    ];
+
+    const legalNavLinks = [
+        { path: '/privacy-policy', label: 'Privacy Policy' },
+        { path: '/terms-and-conditions', label: 'Terms & Conditions' },
+        { path: '/refund-policy', label: 'Refund & Cancellation' },
+        { path: '/contact', label: 'Contact Us' }
+    ];
 
     return (
         <>
@@ -52,35 +85,37 @@ export default function Navbar() {
                 className={`main-nav ${scrolled ? 'nav-scrolled' : ''}`}
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 style={{
                     position: 'fixed',
                     top: 0,
                     left: 0,
                     width: '100%',
                     zIndex: 1000,
-                    padding: scrolled ? '0.8rem 2rem' : '1.2rem 2rem',
-                    background: scrolled ? 'rgba(7, 10, 14, 0.92)' : 'rgba(7, 10, 14, 0.65)',
+                    padding: scrolled ? '0.7rem 1.2rem' : '1rem 1.5rem',
+                    background: scrolled ? 'rgba(7, 10, 14, 0.95)' : 'rgba(7, 10, 14, 0.78)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
-                    borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
-                    boxShadow: scrolled ? '0 10px 40px rgba(0,0,0,0.8)' : 'none',
+                    borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
+                    boxShadow: scrolled ? '0 10px 40px rgba(0,0,0,0.85)' : 'none',
                     transition: 'var(--transition)'
                 }}
             >
-                <div className="nav-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '100%', width: '100%', padding: '0 2vw' }}>
-                    <Link to="/" className="nav-brand" style={{ display: 'flex', alignItems: 'center', gap: '14px', textDecoration: 'none' }}>
+                <div className="nav-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
+                    {/* Brand Logo & Title */}
+                    <Link to="/" className="nav-brand" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
                         <div style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '12px',
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '10px',
                             overflow: 'hidden',
-                            border: '1.5px solid rgba(212, 175, 55, 0.6)',
-                            boxShadow: '0 0 20px rgba(212, 175, 55, 0.35)',
+                            border: '1.5px solid rgba(212, 175, 55, 0.7)',
+                            boxShadow: '0 0 15px rgba(212, 175, 55, 0.35)',
                             background: '#000',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            flexShrink: 0
                         }}>
                             <img 
                                 src="/khaliya-logo.jpg" 
@@ -95,20 +130,20 @@ export default function Navbar() {
                                 background: 'linear-gradient(135deg, #FFF5C0 0%, #FFD700 40%, #D4AF37 80%, #AA7C11 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
-                                fontSize: '1.75rem',
+                                fontSize: '1.55rem',
                                 fontWeight: '800',
-                                letterSpacing: '2px',
-                                lineHeight: '1.05'
+                                letterSpacing: '1.5px',
+                                lineHeight: '1'
                             }}>
                                 KHALIYA
                             </div>
-                            <div style={{
-                                fontSize: '0.62rem',
+                            <div className="brand-subtitle" style={{
+                                fontSize: '0.58rem',
                                 fontWeight: '800',
                                 color: '#D4AF37',
-                                letterSpacing: '3px',
+                                letterSpacing: '2px',
                                 textTransform: 'uppercase',
-                                marginTop: '3px',
+                                marginTop: '2px',
                                 opacity: 0.9
                             }}>
                                 ROYAL INDIAN CUISINE
@@ -116,7 +151,32 @@ export default function Navbar() {
                         </div>
                     </Link>
 
-                    <div className="nav-controls" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    {/* Desktop Navigation Links */}
+                    {isDesktop && (
+                        <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '1.8rem' }}>
+                            {mainNavLinks.map((link) => (
+                                <NavLink 
+                                    key={link.path}
+                                    to={link.path} 
+                                    end={link.path === '/'}
+                                    style={({ isActive }) => ({
+                                        color: isActive ? '#FFD700' : '#F8FAFC',
+                                        fontWeight: '800',
+                                        fontSize: '0.86rem',
+                                        borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent',
+                                        paddingBottom: '4px',
+                                        textDecoration: 'none',
+                                        transition: 'var(--transition)'
+                                    })}
+                                >
+                                    {link.label}
+                                </NavLink>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Right Side Header Controls */}
+                    <div className="nav-controls" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {/* Cart Icon */}
                         <div 
                             className="nav-cart-btn" 
@@ -124,185 +184,247 @@ export default function Navbar() {
                             style={{ 
                                 position: 'relative', 
                                 cursor: 'pointer', 
-                                fontSize: '1.3rem', 
-                                color: 'var(--text-dark)',
+                                fontSize: '1.1rem', 
+                                color: '#FFD700',
                                 transition: 'var(--transition)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '50%',
-                                background: scrolled ? 'rgba(142, 28, 28, 0.05)' : 'rgba(255, 255, 255, 0.4)'
+                                width: '38px',
+                                height: '38px',
+                                borderRadius: '10px',
+                                background: 'rgba(212, 175, 55, 0.1)',
+                                border: '1px solid rgba(212, 175, 55, 0.3)'
                             }}
                         >
                             <i className="fas fa-shopping-cart"></i>
                             {cartCount > 0 && (
                                 <span style={{
                                     position: 'absolute',
-                                    top: '-2px',
-                                    right: '-2px',
-                                    background: 'var(--accent-color)',
-                                    color: 'var(--secondary-color)',
+                                    top: '-4px',
+                                    right: '-4px',
+                                    background: '#E53E3E',
+                                    color: '#FFF',
                                     borderRadius: '50%',
                                     width: '18px',
                                     height: '18px',
-                                    fontSize: '0.7rem',
+                                    fontSize: '0.68rem',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontWeight: '800',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+                                    fontWeight: '900',
+                                    boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
                                 }}>{cartCount}</span>
                             )}
                         </div>
 
-                        <LanguageSwitcher />
-                        
+                        {/* Language Switcher (Desktop Header Only) */}
+                        {isDesktop && <LanguageSwitcher mode="dropdown" />}
+
+                        {/* Mobile Menu Toggle Button (Visible on screens < 992px) */}
                         {!isDesktop && (
                             <button 
-                                className={`hamburger ${isMenuOpen ? 'active' : ''}`} 
-                                onClick={toggleMenu} 
-                                aria-label="Toggle menu"
-                                style={{ 
-                                    background: 'none', 
-                                    border: 'none', 
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '5px'
-                                }}
-                            >
-                                 <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }}></span>
-                                <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', opacity: isMenuOpen ? 0 : 1 }}></span>
-                                <span style={{ width: '25px', height: '2.5px', background: 'var(--primary-color)', transition: 'var(--transition)', transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }}></span>
-                            </button>
-                        )}
-                    </div>
-
-                    <div className={`nav-links ${isMenuOpen ? 'open' : ''}`} style={isDesktop ? {
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '2rem'
-                    } : {
-                        position: 'fixed',
-                        top: 0,
-                        right: 0,
-                        height: '100vh',
-                        width: isMenuOpen ? '100%' : '0',
-                        background: 'var(--bg-body)',
-                        backdropFilter: 'blur(20px)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '2.5rem',
-                        transition: 'var(--transition)',
-                        overflow: 'hidden',
-                        zIndex: 999
-                    }}>
-                        <NavLink 
-                            to="/" 
-                            end
-                            onClick={() => setIsMenuOpen(false)}
-                            style={({ isActive }) => isDesktop ? { color: isActive ? '#FFD700' : '#F8FAFC', fontWeight: '800', fontSize: '0.88rem', borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent', paddingBottom: '4px' } : { fontSize: '1.6rem', fontWeight: '800', color: isActive ? '#FFD700' : '#FFF' }}
-                        >
-                            {t('nav.home', 'Home')}
-                        </NavLink>
-                        
-                        <NavLink 
-                            to="/menu" 
-                            onClick={() => setIsMenuOpen(false)}
-                            style={({ isActive }) => isDesktop ? { color: isActive ? '#FFD700' : '#F8FAFC', fontWeight: '800', fontSize: '0.88rem', borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent', paddingBottom: '4px' } : { fontSize: '1.6rem', fontWeight: '800', color: isActive ? '#FFD700' : '#FFF' }}
-                        >
-                            {t('nav.menu', 'Menu')}
-                        </NavLink>
-                        
-                        <NavLink 
-                            to="/reserve" 
-                            onClick={() => setIsMenuOpen(false)}
-                            style={({ isActive }) => isDesktop ? { color: isActive ? '#FFD700' : '#F8FAFC', fontWeight: '800', fontSize: '0.88rem', borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent', paddingBottom: '4px' } : { fontSize: '1.6rem', fontWeight: '800', color: isActive ? '#FFD700' : '#FFF' }}
-                        >
-                            {t('nav.reservations', 'Reserve Table')}
-                        </NavLink>
-
-                        <NavLink 
-                            to="/tables" 
-                            onClick={() => setIsMenuOpen(false)}
-                            style={({ isActive }) => isDesktop ? { color: isActive ? '#FFD700' : '#F8FAFC', fontWeight: '800', fontSize: '0.88rem', borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent', paddingBottom: '4px' } : { fontSize: '1.6rem', fontWeight: '800', color: isActive ? '#FFD700' : '#FFF' }}
-                        >
-                            Dining Spaces
-                        </NavLink>
-
-                        <NavLink 
-                            to="/reviews" 
-                            onClick={() => setIsMenuOpen(false)}
-                            style={({ isActive }) => isDesktop ? { color: isActive ? '#FFD700' : '#F8FAFC', fontWeight: '800', fontSize: '0.88rem', borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent', paddingBottom: '4px' } : { fontSize: '1.6rem', fontWeight: '800', color: isActive ? '#FFD700' : '#FFF' }}
-                        >
-                            Reviews
-                        </NavLink>
-
-                        <NavLink 
-                            to="/location" 
-                            onClick={() => setIsMenuOpen(false)}
-                            style={({ isActive }) => isDesktop ? { color: isActive ? '#FFD700' : '#F8FAFC', fontWeight: '800', fontSize: '0.88rem', borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent', paddingBottom: '4px' } : { fontSize: '1.6rem', fontWeight: '800', color: isActive ? '#FFD700' : '#FFF' }}
-                        >
-                            Hours &amp; Directions
-                        </NavLink>
-                        
-                        {isInstallable && (
-                            <button 
-                                onClick={() => {
-                                    if (window.promptInstall) window.promptInstall();
-                                    toggleMenu();
-                                }}
-                                style={isDesktop ? {
-                                    fontSize: '0.85rem', 
-                                    fontWeight: '800', 
-                                    color: '#FFF', 
-                                    background: 'var(--gold-gradient)',
-                                    border: 'none',
-                                    padding: '8px 20px',
-                                    borderRadius: '50px',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                                onClick={toggleMenu}
+                                aria-label="Toggle mobile menu"
+                                style={{
+                                    background: isMenuOpen ? 'rgba(212, 175, 55, 0.25)' : 'rgba(212, 175, 55, 0.12)',
+                                    border: '1.5px solid #D4AF37',
+                                    color: '#FFD700',
+                                    borderRadius: '10px',
+                                    padding: '8px 12px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '8px'
-                                } : { 
-                                    fontSize: '1.5rem', 
-                                    fontWeight: '900', 
-                                    color: '#FFF', 
-                                    background: 'var(--gold-gradient)',
-                                    border: 'none',
-                                    padding: '15px 30px',
-                                    borderRadius: '50px',
+                                    gap: '6px',
                                     cursor: 'pointer',
-                                    boxShadow: '0 10px 20px rgba(0,0,0,0.3)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px'
+                                    fontWeight: '800',
+                                    fontSize: '0.85rem',
+                                    letterSpacing: '1px',
+                                    boxShadow: '0 0 15px rgba(212, 175, 55, 0.2)'
                                 }}
                             >
-                                <i className="fas fa-download"></i> {t('pwa.installBtn') || 'Download App'}
+                                <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`} style={{ fontSize: '1rem' }}></i>
+                                <span style={{ textTransform: 'uppercase', fontSize: '0.75rem' }}>{isMenuOpen ? 'Close' : 'Menu'}</span>
                             </button>
-                        )}
-                        {!isDesktop && (
-                            <div style={{
-                                marginTop: 'auto',
-                                paddingBottom: '2rem',
-                                opacity: 0.3,
-                                fontSize: '0.8rem',
-                                color: 'var(--primary-color)',
-                                fontFamily: 'monospace'
-                            }}>
-                                v15.0.4-HARDENED
-                            </div>
                         )}
                     </div>
                 </div>
             </motion.nav>
 
+            {/* Mobile Full-Screen Navigation Drawer Overlay */}
+            <AnimatePresence>
+                {!isDesktop && isMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, x: '100%' }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: '100%' }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh',
+                            background: 'linear-gradient(180deg, #070A0E 0%, #030508 100%)',
+                            backdropFilter: 'blur(25px)',
+                            WebkitBackdropFilter: 'blur(25px)',
+                            zIndex: 9999,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            padding: '1.2rem 1.5rem 2rem 1.5rem',
+                            overflowY: 'auto'
+                        }}
+                    >
+                        {/* Drawer Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: '1px solid rgba(212, 175, 55, 0.25)', marginBottom: '1.2rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <img src="/khaliya-logo.jpg" alt="Logo" style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid #D4AF37' }} />
+                                <span style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', fontWeight: '800', fontSize: '1.3rem', letterSpacing: '1.5px' }}>
+                                    KHALIYA
+                                </span>
+                            </div>
+                            <button
+                                onClick={toggleMenu}
+                                style={{
+                                    background: 'rgba(255,255,255,0.08)',
+                                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                                    color: '#FFD700',
+                                    borderRadius: '50%',
+                                    width: '38px',
+                                    height: '38px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1.1rem',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        {/* Language Selector Inside Drawer (Segmented Theme) */}
+                        <div style={{ marginBottom: '1.5rem', background: 'rgba(15, 20, 30, 0.6)', padding: '12px 14px', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                            <div style={{ fontSize: '0.68rem', fontWeight: '800', color: '#D4AF37', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px' }}>
+                                Preferred Language / भाषा
+                            </div>
+                            <LanguageSwitcher mode="segmented" />
+                        </div>
+
+                        {/* Navigation Links Group */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '2rem' }}>
+                            <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#D4AF37', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                Dining &amp; Exploration
+                            </div>
+
+                            {mainNavLinks.map((link) => (
+                                <NavLink
+                                    key={link.path}
+                                    to={link.path}
+                                    end={link.path === '/'}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    style={({ isActive }) => ({
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '14px',
+                                        padding: '14px 18px',
+                                        background: isActive ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.05) 100%)' : 'rgba(255, 255, 255, 0.03)',
+                                        border: `1px solid ${isActive ? 'rgba(212, 175, 55, 0.6)' : 'rgba(255, 255, 255, 0.08)'}`,
+                                        borderRadius: '14px',
+                                        color: isActive ? '#FFD700' : '#F8FAFC',
+                                        fontWeight: '800',
+                                        fontSize: '1.05rem',
+                                        textDecoration: 'none',
+                                        transition: 'all 0.2s ease'
+                                    })}
+                                >
+                                    {({ isActive }) => (
+                                        <>
+                                            <i className={`fas ${link.icon}`} style={{ color: isActive ? '#FFD700' : '#D4AF37', fontSize: '1.1rem', width: '22px' }}></i>
+                                            <span>{link.label}</span>
+                                            <i className="fas fa-chevron-right" style={{ marginLeft: 'auto', fontSize: '0.8rem', color: isActive ? '#FFD700' : 'rgba(255,255,255,0.2)' }}></i>
+                                        </>
+                                    )}
+                                </NavLink>
+                            ))}
+                        </div>
+
+                        {/* Razorpay & Statutory Legal Section in Mobile Menu */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '2rem', background: 'rgba(15, 20, 30, 0.6)', padding: '14px', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                            <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#D4AF37', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                Merchant Policies &amp; Legal
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                {legalNavLinks.map(legal => (
+                                    <Link
+                                        key={legal.path}
+                                        to={legal.path}
+                                        onClick={() => setIsMenuOpen(false)}
+                                        style={{
+                                            color: '#CBD5E1',
+                                            fontSize: '0.78rem',
+                                            textDecoration: 'none',
+                                            padding: '6px 8px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            borderRadius: '6px',
+                                            border: '1px solid rgba(255,255,255,0.05)',
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '5px'
+                                        }}
+                                    >
+                                        <i className="fas fa-shield-alt" style={{ fontSize: '0.65rem', color: '#D4AF37' }}></i>
+                                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{legal.label}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* PWA App Download CTA Button */}
+                        {isInstallable && (
+                            <button
+                                onClick={() => {
+                                    if (window.promptInstall) window.promptInstall();
+                                    setIsMenuOpen(false);
+                                }}
+                                style={{
+                                    background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
+                                    color: '#000',
+                                    border: 'none',
+                                    padding: '14px 20px',
+                                    borderRadius: '12px',
+                                    fontWeight: '900',
+                                    fontSize: '0.95rem',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '10px',
+                                    boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
+                                    marginBottom: '1.5rem',
+                                    letterSpacing: '0.5px'
+                                }}
+                            >
+                                <i className="fas fa-download" style={{ fontSize: '1rem' }}></i> {t('pwa.installBtn', 'Download Khaliya App')}
+                            </button>
+                        )}
+
+                        {/* Mobile Drawer Bottom Info */}
+                        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                                Khaliya Hospitality Private Limited
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: '#D4AF37', marginTop: '2px', fontWeight: '700' }}>
+                                FSSAI: 12723000000000 • GSTIN: 09AAAAA0000A1Z5
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Shopping Cart Side Drawer */}
             <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
         </>
     );

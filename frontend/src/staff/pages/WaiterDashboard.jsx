@@ -29,12 +29,11 @@ export default function WaiterDashboard() {
                 axios.get(`${API_URL}/orders`)
             ]);
 
-            if (tablesRes.data.success) {
-                setTables(tablesRes.data.tables || []);
-            }
-            if (ordersRes.data.success) {
-                setOrders(ordersRes.data.orders || []);
-            }
+            const tablesList = Array.isArray(tablesRes.data) ? tablesRes.data : (tablesRes.data?.tables || []);
+            setTables(tablesList);
+
+            const ordersList = Array.isArray(ordersRes.data) ? ordersRes.data : (ordersRes.data?.orders || []);
+            setOrders(ordersList);
         } catch (err) {
             console.error('Error fetching waiter live floor map:', err);
         } finally {

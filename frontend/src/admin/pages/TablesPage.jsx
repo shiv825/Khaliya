@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../AdminContext';
 import Swal from 'sweetalert2';
+import { motion, AnimatePresence } from 'framer-motion';
+import CustomAdminSelect from '../../components/CustomAdminSelect';
 
 export default function TablesPage() {
     const { tables, seatCustomer, changeTableStatus, releaseTable, orders, addTable, updateTable, deleteTable, searchQuery, setSearchQuery } = useAdmin();
@@ -484,142 +486,259 @@ export default function TablesPage() {
             </div>
 
             {/* Modal: Add or Edit Table */}
-            {tableModalOpen && (
-                <div className="admin-modal-overlay">
-                    <div className="admin-modal-content" style={{ maxWidth: '480px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '900', color: 'var(--admin-text)' }}>
-                                {editingTable ? `Edit ${editingTable.id}` : '➕ Add New Dining Table'}
-                            </h2>
-                            <button onClick={() => setTableModalOpen(false)} style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.4rem', cursor: 'pointer' }}>×</button>
-                        </div>
-
-                        <form onSubmit={handleSaveTableSubmit}>
-                            <div className="admin-form-group">
-                                <label>Table ID (e.g. T09, T10, VIP1)</label>
-                                <input 
-                                    type="text" 
-                                    className="admin-input" 
-                                    placeholder="T09" 
-                                    value={tableForm.id}
-                                    onChange={e => setTableForm({ ...tableForm, id: e.target.value })}
-                                    disabled={Boolean(editingTable)}
-                                    required
-                                />
+            <AnimatePresence>
+                {tableModalOpen && (
+                    <div className="admin-modal-overlay">
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.92, y: 15 }} 
+                            animate={{ opacity: 1, scale: 1, y: 0 }} 
+                            exit={{ opacity: 0, scale: 0.92, y: 15 }}
+                            transition={{ duration: 0.22, ease: 'easeOut' }}
+                            className="admin-modal-content" 
+                            style={{ maxWidth: '480px' }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', paddingBottom: '12px', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                                <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: '900' }}>
+                                    {editingTable ? `✨ EDIT ${editingTable.id}` : '➕ ADD NEW DINING TABLE'}
+                                </h2>
+                                <button 
+                                    onClick={() => setTableModalOpen(false)} 
+                                    style={{ 
+                                        background: 'rgba(255, 255, 255, 0.05)', 
+                                        border: '1px solid rgba(212, 175, 55, 0.3)', 
+                                        color: '#D4AF37', 
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '1.2rem', 
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    ×
+                                </button>
                             </div>
 
-                            <div className="admin-form-group">
-                                <label>Table Display Name</label>
-                                <input 
-                                    type="text" 
-                                    className="admin-input" 
-                                    placeholder="Table 09" 
-                                    value={tableForm.name}
-                                    onChange={e => setTableForm({ ...tableForm, name: e.target.value })}
-                                    required
-                                />
-                            </div>
-
-                            <div className="admin-form-row" style={{ display: 'flex', gap: '15px' }}>
-                                <div className="admin-form-group" style={{ flex: 1 }}>
-                                    <label>Seating Capacity</label>
+                            <form onSubmit={handleSaveTableSubmit}>
+                                <div className="admin-form-group">
+                                    <label>Table ID (e.g. T09, T10, VIP1)</label>
                                     <input 
-                                        type="number" 
-                                        min="1" 
-                                        max="30"
+                                        type="text" 
                                         className="admin-input" 
-                                        value={tableForm.capacity}
-                                        onChange={e => setTableForm({ ...tableForm, capacity: e.target.value })}
+                                        placeholder="T09" 
+                                        value={tableForm.id}
+                                        onChange={e => setTableForm({ ...tableForm, id: e.target.value })}
+                                        disabled={Boolean(editingTable)}
                                         required
                                     />
                                 </div>
 
-                                <div className="admin-form-group" style={{ flex: 1 }}>
-                                    <label>Floor Section Mapping</label>
-                                    <select 
-                                        className="admin-select"
-                                        value={tableForm.section}
-                                        onChange={e => setTableForm({ ...tableForm, section: e.target.value })}
-                                    >
-                                        {availableSections.map(sec => (
-                                            <option key={sec} value={sec}>{sec}</option>
-                                        ))}
-                                    </select>
+                                <div className="admin-form-group">
+                                    <label>Table Display Name</label>
+                                    <input 
+                                        type="text" 
+                                        className="admin-input" 
+                                        placeholder="Table 09" 
+                                        value={tableForm.name}
+                                        onChange={e => setTableForm({ ...tableForm, name: e.target.value })}
+                                        required
+                                    />
                                 </div>
-                            </div>
 
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-                                <button type="button" onClick={() => setTableModalOpen(false)} className="action-btn" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--admin-text)' }}>Cancel</button>
-                                <button type="submit" className="action-btn btn-primary" style={{ flex: 1 }}>{editingTable ? 'Save Changes' : 'Create Table'}</button>
-                            </div>
-                        </form>
+                                <div className="admin-form-row" style={{ display: 'flex', gap: '15px' }}>
+                                    <div className="admin-form-group" style={{ flex: 1 }}>
+                                        <label>Seating Capacity</label>
+                                        <input 
+                                            type="number" 
+                                            min="1" 
+                                            max="30"
+                                            className="admin-input" 
+                                            value={tableForm.capacity}
+                                            onChange={e => setTableForm({ ...tableForm, capacity: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="admin-form-group" style={{ flex: 1 }}>
+                                        <label>Floor Section Mapping</label>
+                                        <CustomAdminSelect 
+                                            options={availableSections}
+                                            value={tableForm.section}
+                                            onChange={val => setTableForm({ ...tableForm, section: val })}
+                                            placeholder="Select Section..."
+                                            icon="fas fa-layer-group"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setTableModalOpen(false)} 
+                                        style={{ 
+                                            flex: 1, 
+                                            background: 'rgba(255,255,255,0.04)', 
+                                            color: '#ccc', 
+                                            border: '1px solid rgba(212, 175, 55, 0.25)', 
+                                            padding: '12px', 
+                                            borderRadius: '12px', 
+                                            fontWeight: '800', 
+                                            cursor: 'pointer',
+                                            fontSize: '0.88rem'
+                                        }}
+                                    >
+                                        CANCEL
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        style={{ 
+                                            flex: 1, 
+                                            background: 'linear-gradient(135deg, #D4AF37 0%, #B8860B 50%, #8B6508 100%)', 
+                                            color: '#000', 
+                                            border: 'none', 
+                                            padding: '12px', 
+                                            borderRadius: '12px', 
+                                            fontWeight: '900', 
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 18px rgba(212, 175, 55, 0.4)',
+                                            letterSpacing: '0.05em',
+                                            fontSize: '0.88rem'
+                                        }}
+                                    >
+                                        {editingTable ? 'SAVE CHANGES' : 'CREATE TABLE'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
 
             {/* Modal: Seat Walk-In Guest */}
-            {seatModalOpen && selectedTableForSeating && (
-                <div className="admin-modal-overlay">
-                    <div className="admin-modal-content" style={{ maxWidth: '450px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                            <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '900', color: 'var(--admin-text)' }}>
-                                Seat Walk-In — {selectedTableForSeating.name}
-                            </h2>
-                            <button onClick={() => setSeatModalOpen(false)} style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
-                        </div>
-
-                        {/* Safe Dining Window Alert if table has an upcoming reservation */}
-                        {Array.isArray(selectedTableForSeating.upcomingReservations) && selectedTableForSeating.upcomingReservations.length > 0 && (
-                            <div style={{ background: 'rgba(241, 196, 15, 0.15)', border: '1px solid #f1c40f', color: '#f1c40f', borderRadius: '12px', padding: '12px', fontSize: '0.85rem', fontWeight: '800', marginBottom: '18px' }}>
-                                <i className="fas fa-exclamation-triangle" style={{ marginRight: '6px' }}></i>
-                                Notice: Scheduled reservation today for <strong>{selectedTableForSeating.upcomingReservations[0].name}</strong> at <strong>{selectedTableForSeating.upcomingReservations[0].time}</strong>. Ensure walk-in completes dining within remaining window.
-                            </div>
-                        )}
-
-                        <form onSubmit={handleSeatSubmit}>
-                            <div className="admin-form-group">
-                                <label>Guest Name</label>
-                                <input 
-                                    type="text" 
-                                    className="admin-input" 
-                                    placeholder="Enter guest name..." 
-                                    value={walkInForm.guestName}
-                                    onChange={e => setWalkInForm({ ...walkInForm, guestName: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="admin-form-group">
-                                <label>Phone Number (Optional)</label>
-                                <input 
-                                    type="tel" 
-                                    className="admin-input" 
-                                    placeholder="+91 98765 43210" 
-                                    value={walkInForm.phone}
-                                    onChange={e => setWalkInForm({ ...walkInForm, phone: e.target.value })}
-                                />
+            <AnimatePresence>
+                {seatModalOpen && selectedTableForSeating && (
+                    <div className="admin-modal-overlay">
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.92, y: 15 }} 
+                            animate={{ opacity: 1, scale: 1, y: 0 }} 
+                            exit={{ opacity: 0, scale: 0.92, y: 15 }}
+                            transition={{ duration: 0.22, ease: 'easeOut' }}
+                            className="admin-modal-content" 
+                            style={{ maxWidth: '450px' }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                                <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '900' }}>
+                                    SEAT WALK-IN — {selectedTableForSeating.name}
+                                </h2>
+                                <button 
+                                    onClick={() => setSeatModalOpen(false)} 
+                                    style={{ 
+                                        background: 'rgba(255, 255, 255, 0.05)', 
+                                        border: '1px solid rgba(212, 175, 55, 0.3)', 
+                                        color: '#D4AF37', 
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '1.2rem', 
+                                        cursor: 'pointer' 
+                                    }}
+                                >
+                                    ×
+                                </button>
                             </div>
 
-                            <div className="admin-form-group">
-                                <label>Party Size (Number of Guests)</label>
-                                <input 
-                                    type="number" 
-                                    min="1" 
-                                    max="20"
-                                    className="admin-input" 
-                                    value={walkInForm.guestCount}
-                                    onChange={e => setWalkInForm({ ...walkInForm, guestCount: e.target.value })}
-                                    required
-                                />
-                            </div>
+                            {/* Safe Dining Window Alert if table has an upcoming reservation */}
+                            {Array.isArray(selectedTableForSeating.upcomingReservations) && selectedTableForSeating.upcomingReservations.length > 0 && (
+                                <div style={{ background: 'rgba(241, 196, 15, 0.12)', border: '1px solid #f1c40f', color: '#f1c40f', borderRadius: '14px', padding: '12px 14px', fontSize: '0.85rem', fontWeight: '700', marginBottom: '20px' }}>
+                                    <i className="fas fa-exclamation-triangle" style={{ marginRight: '6px' }}></i>
+                                    Notice: Scheduled reservation today for <strong>{selectedTableForSeating.upcomingReservations[0].name}</strong> at <strong>{selectedTableForSeating.upcomingReservations[0].time}</strong>. Ensure walk-in completes dining within remaining window.
+                                </div>
+                            )}
 
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-                                <button type="button" onClick={() => setSeatModalOpen(false)} className="action-btn" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--admin-text)' }}>Cancel</button>
-                                <button type="submit" className="action-btn btn-primary" style={{ flex: 1 }}>Confirm & Seat</button>
-                            </div>
-                        </form>
+                            <form onSubmit={handleSeatSubmit}>
+                                <div className="admin-form-group">
+                                    <label>Guest Name</label>
+                                    <input 
+                                        type="text" 
+                                        className="admin-input" 
+                                        placeholder="Enter guest name..." 
+                                        value={walkInForm.guestName}
+                                        onChange={e => setWalkInForm({ ...walkInForm, guestName: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="admin-form-group">
+                                    <label>Phone Number (Optional)</label>
+                                    <input 
+                                        type="tel" 
+                                        className="admin-input" 
+                                        placeholder="+91 98765 43210" 
+                                        value={walkInForm.phone}
+                                        onChange={e => setWalkInForm({ ...walkInForm, phone: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="admin-form-group">
+                                    <label>Party Size (Number of Guests)</label>
+                                    <input 
+                                        type="number" 
+                                        min="1" 
+                                        max="20"
+                                        className="admin-input" 
+                                        value={walkInForm.guestCount}
+                                        onChange={e => setWalkInForm({ ...walkInForm, guestCount: e.target.value })}
+                                        required
+                                    />
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setSeatModalOpen(false)} 
+                                        style={{ 
+                                            flex: 1, 
+                                            background: 'rgba(255,255,255,0.04)', 
+                                            color: '#ccc', 
+                                            border: '1px solid rgba(212, 175, 55, 0.25)', 
+                                            padding: '12px', 
+                                            borderRadius: '12px', 
+                                            fontWeight: '800', 
+                                            cursor: 'pointer',
+                                            fontSize: '0.88rem'
+                                        }}
+                                    >
+                                        CANCEL
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        style={{ 
+                                            flex: 1, 
+                                            background: 'linear-gradient(135deg, #D4AF37 0%, #B8860B 50%, #8B6508 100%)', 
+                                            color: '#000', 
+                                            border: 'none', 
+                                            padding: '12px', 
+                                            borderRadius: '12px', 
+                                            fontWeight: '900', 
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 18px rgba(212, 175, 55, 0.4)',
+                                            letterSpacing: '0.05em',
+                                            fontSize: '0.88rem'
+                                        }}
+                                    >
+                                        CONFIRM & SEAT
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
         </div>
     );
 }

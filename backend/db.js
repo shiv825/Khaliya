@@ -1,15 +1,8 @@
-const dns = require('dns');
-// dns.setServers(['8.8.8.8', '1.1.1.1']);
-
+require('dotenv').config();
 const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const isMongoEnabled = !!MONGODB_URI;
-
-// Helper to resolve file paths
-const getFilePath = (fileName) => path.join(__dirname, fileName);
 
 // Mongoose Schemas & Models
 const MenuSchema = new mongoose.Schema({
@@ -80,157 +73,200 @@ const VisitSchema = new mongoose.Schema({
     source: String
 }, { collection: 'visits', minimize: false });
 
-// Exportable models object
+const TableSchema = new mongoose.Schema({
+    id: String,
+    name: String,
+    capacity: Number,
+    tableType: String,
+    section: String,
+    status: String,
+    session: mongoose.Schema.Types.Mixed,
+    mergedTables: [String],
+    mergedInto: String,
+    effectiveCapacity: Number
+}, { collection: 'tables', minimize: false });
+
+const PrinterSchema = new mongoose.Schema({
+    id: String,
+    name: String,
+    type: String,
+    ip: String,
+    port: Number,
+    paperWidth: Number,
+    status: String
+}, { collection: 'printers', minimize: false });
+
+const StaffSchema = new mongoose.Schema({
+    id: String,
+    name: String,
+    role: String,
+    pin: String,
+    phone: String,
+    status: String,
+    shift: String
+}, { collection: 'staff', minimize: false });
+
+const ShiftSchema = new mongoose.Schema({
+    id: String,
+    staffId: String,
+    staffName: String,
+    shiftName: String,
+    openedAt: String,
+    closedAt: String,
+    openingFloat: Number,
+    status: String,
+    cashSales: Number,
+    expectedCash: Number,
+    actualCash: Number,
+    variance: Number,
+    notes: String
+}, { collection: 'shifts', minimize: false });
+
+const AuditLogSchema = new mongoose.Schema({
+    id: String,
+    timestamp: String,
+    staffName: String,
+    action: String,
+    details: String,
+    reason: String,
+    splits: mongoose.Schema.Types.Mixed
+}, { collection: 'audit_logs', minimize: false });
+
+const PrintQueueSchema = new mongoose.Schema({
+    id: String,
+    orderId: String,
+    invoiceNo: String,
+    ticketType: String,
+    payload: mongoose.Schema.Types.Mixed,
+    status: String,
+    createdAt: String
+}, { collection: 'print_queue', minimize: false });
+
+// Register Mongoose Models
 const models = {};
 
 if (isMongoEnabled) {
     mongoose.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 3000
+        serverSelectionTimeoutMS: 5000
     })
         .then(() => {
-            console.log('✅ [DB] Connected to MongoDB Atlas successfully');
-            seedDatabase();
+            console.log('✅ [DB] Connected 100% directly to MongoDB Atlas database');
         })
         .catch(err => {
-            console.error('❌ [DB] MongoDB Connection Error:', err.message);
+            console.error('❌ [DB] MongoDB Atlas Connection Error:', err.message);
         });
 
-    models['menu.json'] = mongoose.model('Menu', MenuSchema);
-    models['bookings.json'] = mongoose.model('Booking', BookingSchema);
-    models['orders.json'] = mongoose.model('Order', OrderSchema);
-    models['reviews.json'] = mongoose.model('Review', ReviewSchema);
-    models['users.json'] = mongoose.model('User', UserSchema);
-    models['settings.json'] = mongoose.model('Setting', SettingSchema);
-    models['visits.json'] = mongoose.model('Visit', VisitSchema);
+    const menuModel = mongoose.model('Menu', MenuSchema);
+    const bookingModel = mongoose.model('Booking', BookingSchema);
+    const orderModel = mongoose.model('Order', OrderSchema);
+    const reviewModel = mongoose.model('Review', ReviewSchema);
+    const userModel = mongoose.model('User', UserSchema);
+    const settingModel = mongoose.model('Setting', SettingSchema);
+    const visitModel = mongoose.model('Visit', VisitSchema);
+    const tableModel = mongoose.model('Table', TableSchema);
+    const printerModel = mongoose.model('Printer', PrinterSchema);
+    const staffModel = mongoose.model('Staff', StaffSchema);
+    const shiftModel = mongoose.model('Shift', ShiftSchema);
+    const auditLogModel = mongoose.model('AuditLog', AuditLogSchema);
+    const printQueueModel = mongoose.model('PrintQueue', PrintQueueSchema);
+
+    // Map direct MongoDB collection names
+    models['menu'] = menuModel;
+    models['bookings'] = bookingModel;
+    models['orders'] = orderModel;
+    models['reviews'] = reviewModel;
+    models['users'] = userModel;
+    models['settings'] = settingModel;
+    models['visits'] = visitModel;
+    models['tables'] = tableModel;
+    models['printers'] = printerModel;
+    models['staff'] = staffModel;
+    models['shifts'] = shiftModel;
+    models['audit_logs'] = auditLogModel;
+    models['print_queue'] = printQueueModel;
 } else {
-    console.log('ℹ️ [DB] MONGODB_URI environment variable not found. Running in Local JSON File mode.');
+    console.warn('⚠️ [DB] MONGODB_URI environment variable not found.');
 }
 
-/**
- * Automatically seeds the MongoDB database with local JSON file contents if the database collections are empty.
- */
-async function seedDatabase() {
-    try {
-        console.log('🔄 [DB] Checking if MongoDB needs seeding...');
-        
-        // Clean up known dummy testing records from MongoDB
-        const deletedOrders = await models['orders.json'].deleteMany({ id: { $in: ['ORD-1780129270435', 'ORD-17'] } });
-        if (deletedOrders.deletedCount > 0) {
-            console.log(`🧹 [DB] Cleaned up ${deletedOrders.deletedCount} dummy orders from MongoDB`);
-        }
-        const deletedBookings = await models['bookings.json'].deleteMany({ id: 1779958785272 });
-        if (deletedBookings.deletedCount > 0) {
-            console.log(`🧹 [DB] Cleaned up ${deletedBookings.deletedCount} dummy bookings from MongoDB`);
-        }
-
-        for (const [fileName, Model] of Object.entries(models)) {
-            if (fileName === 'settings.json') {
-                const count = await Model.countDocuments();
-                if (count === 0) {
-                    const filePath = getFilePath(fileName);
-                    if (fs.existsSync(filePath)) {
-                        const localData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-                        await Model.create(localData);
-                        console.log(`🌱 [DB] Seeded settings from local settings.json`);
-                    }
-                }
-            } else {
-                const count = await Model.countDocuments();
-                if (count === 0) {
-                    const filePath = getFilePath(fileName);
-                    if (fs.existsSync(filePath)) {
-                        const localData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-                        if (Array.isArray(localData) && localData.length > 0) {
-                            await Model.insertMany(localData);
-                            console.log(`🌱 [DB] Seeded ${localData.length} records into '${Model.modelName}' from local ${fileName}`);
-                        }
-                    }
-                }
-            }
-        }
-        console.log('✅ [DB] Database seeding check complete.');
-    } catch (err) {
-        console.error('❌ [DB] Error seeding database:', err.message);
-    }
-}
+const cleanKey = (key) => key ? key.replace(/\.json$/i, '') : '';
 
 /**
- * Asynchronously reads data. Returns an array (or object for settings) from MongoDB if enabled,
- * otherwise falls back to reading from local JSON files on disk.
+ * Ensures MongoDB connection is active before executing any queries.
  */
-const readDataAsync = async (fileName) => {
-    if (isMongoEnabled && mongoose.connection.readyState === 1) {
-        try {
-            const Model = models[fileName];
-            if (Model) {
-                if (fileName === 'settings.json') {
-                    const doc = await Model.findOne().lean();
-                    return doc || { isOpen: true };
-                } else {
-                    const docs = await Model.find().lean();
-                    // Clean up Mongoose fields to match exact JSON interface
-                    return docs.map(d => {
-                        const cleanDoc = { ...d };
-                        delete cleanDoc._id;
-                        delete cleanDoc.__v;
-                        return cleanDoc;
-                    });
-                }
-            }
-        } catch (err) {
-            console.error(`❌ [DB] Error reading ${fileName} from MongoDB (falling back to disk):`, err.message);
-        }
-    }
+const ensureDbConnected = async () => {
+    if (!isMongoEnabled) return false;
+    if (mongoose.connection.readyState === 1) return true;
 
-    // Local JSON file mode fallback
-    const filePath = getFilePath(fileName);
-    if (!fs.existsSync(filePath)) {
-        return fileName === 'settings.json' ? { isOpen: true } : [];
-    }
-    try {
-        const data = await fs.promises.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (err) {
-        console.error(`❌ [DB] Error reading ${fileName} from filesystem:`, err.message);
-        return fileName === 'settings.json' ? { isOpen: true } : [];
-    }
+    return new Promise((resolve) => {
+        let attempts = 0;
+        const interval = setInterval(() => {
+            attempts++;
+            if (mongoose.connection.readyState === 1) {
+                clearInterval(interval);
+                resolve(true);
+            } else if (attempts > 50) { // 5 seconds max wait
+                clearInterval(interval);
+                resolve(false);
+            }
+        }, 100);
+    });
 };
 
 /**
- * Asynchronously writes data. Writes to local JSON files as a backup/sync, and synchronizes to MongoDB if enabled.
+ * Reads 100% directly from MongoDB Atlas collection.
  */
-const writeDataAsync = async (fileName, data) => {
-    // 1. Always write to local file as backup and to support local file-watchers
-    const filePath = getFilePath(fileName);
+const readDataAsync = async (key) => {
+    await ensureDbConnected();
+
     try {
-        await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+        const collectionKey = cleanKey(key);
+        const Model = models[collectionKey];
+        if (Model) {
+            if (collectionKey === 'settings') {
+                const doc = await Model.findOne().lean();
+                return doc || { isOpen: true };
+            } else {
+                const docs = await Model.find().lean();
+                return docs.map(d => {
+                    const cleanDoc = { ...d };
+                    delete cleanDoc._id;
+                    delete cleanDoc.__v;
+                    return cleanDoc;
+                });
+            }
+        }
     } catch (err) {
-        console.error(`❌ [DB] Failed to save local file backup of ${fileName}:`, err.message);
+        console.error(`❌ [DB] Direct MongoDB Atlas Query Error on '${key}':`, err.message);
     }
 
-    // 2. Synchronize to MongoDB if enabled (runs in background so it doesn't block the API response)
+    return cleanKey(key) === 'settings' ? { isOpen: true } : [];
+};
+
+/**
+ * Writes 100% directly to MongoDB Atlas collection without JSON disk operations.
+ */
+const writeDataAsync = async (key, data) => {
+    await ensureDbConnected();
+
     if (isMongoEnabled && mongoose.connection.readyState === 1) {
-        (async () => {
-            try {
-                const Model = models[fileName];
-                if (Model) {
-                    if (fileName === 'settings.json') {
-                        await Model.replaceOne({}, data, { upsert: true });
-                    } else {
-                        if (Array.isArray(data)) {
-                            await Model.deleteMany({});
-                            if (data.length > 0) {
-                                await Model.insertMany(data);
-                            }
-                        } else {
-                            console.warn(`⚠️ [DB] Data for ${fileName} is not an array, skipping MongoDB sync.`);
-                        }
+        try {
+            const collectionKey = cleanKey(key);
+            const Model = models[collectionKey];
+            if (Model) {
+                if (collectionKey === 'settings') {
+                    await Model.replaceOne({}, data, { upsert: true });
+                } else if (Array.isArray(data)) {
+                    await Model.deleteMany({});
+                    if (data.length > 0) {
+                        await Model.insertMany(data);
                     }
                 }
-            } catch (err) {
-                console.error(`❌ [DB] Error writing ${fileName} to MongoDB in background:`, err.message);
             }
-        })();
+        } catch (err) {
+            console.error(`❌ [DB] Direct MongoDB Write Error on '${key}':`, err.message);
+        }
+    } else {
+        console.error(`❌ [DB] Cannot write '${key}': MongoDB Atlas connection inactive.`);
     }
 };
 

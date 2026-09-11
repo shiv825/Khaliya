@@ -883,3 +883,87 @@ body {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
 }
+
+/* ==========================================================================
+   Mobile Accordion Responsive Footer (Ultra-Compact Mobile Layout)
+   ========================================================================== */
+@media (max-width: 600px) {
+    .brand-subtitle {
+        display: none !important;
+    }
+    .main-nav {
+        padding: 0.8rem 1rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    footer {
+        padding: 2.5rem 1.2rem 2rem 1.2rem !important;
+    }
+    .footer-main-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 2rem !important;
+    }
+    .footer-brand-desc {
+        font-size: 0.84rem !important;
+        line-height: 1.5 !important;
+        margin-bottom: 0.8rem !important;
+    }
+    .footer-column-title {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        cursor: pointer !important;
+        margin-bottom: 0 !important;
+        padding: 12px 14px !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(212, 175, 55, 0.25) !important;
+        border-radius: 12px !important;
+        font-size: 0.88rem !important;
+        color: #FFD700 !important;
+        user-select: none;
+    }
+    .footer-column-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.3s ease;
+        opacity: 0;
+        padding: 0 10px;
+    }
+    .footer-column-content.open {
+        max-height: 600px;
+        opacity: 1;
+        padding: 14px 10px 6px 10px;
+    }
+    .footer-security-banner {
+        flex-direction: column !important;
+        text-align: center !important;
+        align-items: center !important;
+        padding: 14px 16px !important;
+        margin-bottom: 1.5rem !important;
+        gap: 12px !important;
+    }
+    .footer-security-banner > div {
+        text-align: center !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .footer-column-title {
+        cursor: default !important;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
+        padding-bottom: 8px !important;
+        margin-bottom: 1.4rem !important;
+    }
+    .footer-column-title i.accordion-arrow {
+        display: none !important;
+    }
+    .footer-column-content {
+        max-height: none !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+}
+

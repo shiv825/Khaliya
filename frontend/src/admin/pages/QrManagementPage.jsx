@@ -30,18 +30,163 @@ export default function QrManagementPage() {
         window.print();
     };
 
-    const handleCopyLink = (tableId, tableName) => {
-        const url = getTableQrUrl(tableId);
-        navigator.clipboard.writeText(url);
+    const drawFullTableCardToCanvas = (table, isDark) => {
+        return new Promise((resolve, reject) => {
+            const canvas = document.createElement('canvas');
+            const width = 600;
+            const height = 920;
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            if (isDark) {
+                const grad = ctx.createLinearGradient(0, 0, width, height);
+                grad.addColorStop(0, '#181e2b');
+                grad.addColorStop(1, '#0f131c');
+                ctx.fillStyle = grad;
+            } else {
+                ctx.fillStyle = '#FFFFFF';
+            }
+            ctx.fillRect(0, 0, width, height);
+
+            // Outer Border
+            ctx.lineWidth = 12;
+            ctx.strokeStyle = isDark ? '#D4AF37' : '#CBD5E1';
+            ctx.strokeRect(10, 10, width - 20, height - 20);
+
+            // Inner Gold Accent Line
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = isDark ? 'rgba(212, 175, 55, 0.4)' : '#AA7C11';
+            ctx.strokeRect(20, 20, width - 40, height - 40);
+
+            // Brand Header
+            ctx.fillStyle = isDark ? '#D4AF37' : '#AA7C11';
+            ctx.font = '900 22px "Cinzel", Georgia, serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('KHALIYA RESTAURANT', width / 2, 75);
+
+            // Table Name Title
+            ctx.fillStyle = isDark ? '#FFFFFF' : '#1A202C';
+            ctx.font = '900 52px "Cinzel", Georgia, serif';
+            ctx.fillText(table.name || 'TABLE 01', width / 2, 140);
+
+            // Floor Section
+            ctx.fillStyle = isDark ? '#8A94A6' : '#718096';
+            ctx.font = '700 24px "Outfit", sans-serif';
+            ctx.fillText(table.category || table.section || 'Ground Hall', width / 2, 180);
+
+            // QR Target Link
+            const qrTargetUrl = getTableQrUrl(table.id);
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrTargetUrl)}&color=000000&bgcolor=ffffff`;
+
+            const qrImg = new Image();
+            qrImg.crossOrigin = 'anonymous';
+            qrImg.onload = () => {
+                // QR White Frame Container
+                const boxSize = 420;
+                const boxX = (width - boxSize) / 2;
+                const boxY = 210;
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(boxX, boxY, boxSize, boxSize);
+
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = isDark ? '#D4AF37' : '#1A202C';
+                ctx.strokeRect(boxX, boxY, boxSize, boxSize);
+
+                // Draw QR Image inside frame
+                ctx.drawImage(qrImg, boxX + 20, boxY + 20, 380, 380);
+
+                // CTA Callout
+                ctx.fillStyle = isDark ? '#FFFFFF' : '#1A202C';
+                ctx.font = '900 28px "Outfit", sans-serif';
+                ctx.fillText('📱 SCAN TO ORDER DINE-IN', width / 2, 690);
+
+                // Multi-Language Subtext
+                ctx.fillStyle = isDark ? '#FFD700' : '#AA7C11';
+                ctx.font = '800 22px "Outfit", sans-serif';
+                ctx.fillText('ऑर्डर करने के लिए स्कैन करें | امسح للطلب', width / 2, 735);
+
+                // Subtitle Instructions
+                ctx.fillStyle = isDark ? '#8A94A6' : '#718096';
+                ctx.font = '600 18px "Outfit", sans-serif';
+                ctx.fillText('View digital menu, order dishes & request your', width / 2, 780);
+                ctx.fillText('bill directly from your table.', width / 2, 810);
+
+                // Capacity Footer Badge
+                ctx.fillStyle = isDark ? '#D4AF37' : '#4A5568';
+                ctx.font = '800 20px "Outfit", sans-serif';
+                ctx.fillText(`Khaliya Table Stand Card • ${table.capacity || 4} Seats`, width / 2, 875);
+
+                canvas.toBlob(blob => resolve(blob), 'image/png');
+            };
+
+            qrImg.onerror = () => reject(new Error('Failed to load QR image'));
+            qrImg.src = qrApiUrl;
+        });
+    };
+
+    const handleDownloadQrPng = async (table) => {
+        const isDark = cardTheme === 'gold';
+        try {
+            Swal.fire({
+                title: 'Generating Luxury Full Card PNG...',
+                text: `Rendering full stand card for ${table.name}`,
+                icon: 'info',
+                showConfirmButton: false,
+                timer: 1500,
+                background: '#121620',
+                color: '#FFF'
+            });
+
+            const blob = await drawFullTableCardToCanvas(table, isDark);
+            const blobUrl = URL.createObjectURL(blob);
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobUrl;
+            downloadLink.download = `Khaliya_FullCard_${table.id}_${table.name.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(blobUrl);
+
+            Swal.fire({
+                title: '📥 Full Stand Card Downloaded!',
+                text: `Saved Khaliya_FullCard_${table.id}.png to downloads folder.`,
+                icon: 'success',
+                confirmButtonColor: '#D4AF37',
+                background: '#121620',
+                color: '#FFF'
+            });
+        } catch (err) {
+            console.error('Error generating card canvas:', err);
+            Swal.fire({
+                title: 'Download Error',
+                text: 'Could not generate full stand card image.',
+                icon: 'error',
+                background: '#121620',
+                color: '#FFF'
+            });
+        }
+    };
+
+    const handleDownloadAllQrPngs = async () => {
         Swal.fire({
-            title: 'Link Copied!',
-            text: `Direct Dine-In QR link for ${tableName} copied to clipboard:\n${url}`,
-            icon: 'success',
-            timer: 2000,
+            title: `Downloading ${filteredTables.length} Full Stand Cards...`,
+            text: 'Preparing high-res PNG files for acrylic table displays',
+            icon: 'info',
             showConfirmButton: false,
+            timer: 3000,
             background: '#121620',
             color: '#FFF'
         });
+
+        for (let i = 0; i < filteredTables.length; i++) {
+            const table = filteredTables[i];
+            await new Promise(r => setTimeout(r, 600));
+            handleDownloadQrPng(table);
+        }
     };
 
     return (
@@ -91,6 +236,24 @@ export default function QrManagementPage() {
                             ☀️ Crisp White
                         </button>
                     </div>
+
+                    <button
+                        onClick={handleDownloadAllQrPngs}
+                        style={{
+                            background: 'rgba(46, 204, 113, 0.2)',
+                            color: '#2ECC71',
+                            border: '1px solid #2ECC71',
+                            padding: '10px 18px',
+                            borderRadius: '12px',
+                            fontWeight: '900',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}
+                    >
+                        <i className="fas fa-download"></i> Download All PNGs
+                    </button>
 
                     <button
                         onClick={handlePrint}
@@ -258,23 +421,27 @@ export default function QrManagementPage() {
                                 View digital menu, order dishes & request your bill directly from your table.
                             </div>
 
-                            {/* Action Buttons for Admin Testing */}
-                            <div className="no-print" style={{ marginTop: '16px', width: '100%', display: 'flex', gap: '8px' }}>
+                            {/* Action Buttons for Admin Testing & Downloads */}
+                            <div className="no-print" style={{ marginTop: '16px', width: '100%', display: 'flex', gap: '6px' }}>
                                 <button
-                                    onClick={() => handleCopyLink(table.id, table.name)}
+                                    onClick={() => handleDownloadQrPng(table)}
                                     style={{
                                         flex: 1,
-                                        background: isDark ? 'rgba(255,255,255,0.06)' : '#EDF2F7',
-                                        color: isDark ? 'var(--admin-text-muted)' : '#4A5568',
-                                        border: `1px solid ${isDark ? 'var(--admin-border)' : '#CBD5E0'}`,
-                                        padding: '7px',
+                                        background: 'rgba(46, 204, 113, 0.15)',
+                                        color: '#2ECC71',
+                                        border: '1px solid #2ECC71',
+                                        padding: '7px 4px',
                                         borderRadius: '10px',
                                         fontSize: '0.75rem',
                                         fontWeight: '800',
-                                        cursor: 'pointer'
+                                        cursor: 'pointer',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '4px'
                                     }}
                                 >
-                                    <i className="fas fa-link"></i> Copy Link
+                                    <i className="fas fa-download"></i> Download PNG
                                 </button>
                                 <a
                                     href={qrTargetUrl}
@@ -285,7 +452,7 @@ export default function QrManagementPage() {
                                         background: 'rgba(212, 175, 55, 0.15)',
                                         color: isDark ? '#D4AF37' : '#AA7C11',
                                         border: `1px solid ${isDark ? '#D4AF37' : '#AA7C11'}`,
-                                        padding: '7px',
+                                        padding: '7px 4px',
                                         borderRadius: '10px',
                                         fontSize: '0.75rem',
                                         fontWeight: '800',

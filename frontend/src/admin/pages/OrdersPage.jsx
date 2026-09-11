@@ -175,12 +175,24 @@ export default function OrdersPage() {
                                             {/* Ticket Header */}
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                                                 <div>
-                                                    <div style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--admin-text)' }}>
-                                                        {o.user?.name || o.customerName || 'Guest Customer'}
-                                                        <span style={{ fontSize: '0.78rem', color: 'var(--admin-primary)', marginLeft: '6px', fontWeight: '900' }}>#{orderIdDisplay}</span>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                        <span style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--admin-text)' }}>
+                                                            #{o.orderNo || o.invoiceNo || orderIdDisplay}
+                                                        </span>
+                                                        <span style={{ background: 'rgba(255,255,255,0.1)', color: '#AAA', padding: '1px 6px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 900 }}>
+                                                            {sequenceType}
+                                                        </span>
+                                                        {o.invoiceNo && o.orderNo && o.invoiceNo !== o.orderNo && (
+                                                            <span style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#3B82F6', border: '1px solid #3B82F6', padding: '1px 6px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 900 }}>
+                                                                {o.orderNo}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     <div style={{ fontSize: '0.75rem', color: '#e74c3c', marginTop: '2px', fontWeight: '700' }}>
                                                         <i className="fas fa-clock"></i> {getElapsedTime(o.createdAt)}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--admin-text)', marginTop: '4px' }}>
+                                                        {o.user?.name || o.customerName || 'Guest Customer'}
                                                     </div>
                                                 </div>
 
@@ -190,8 +202,8 @@ export default function OrdersPage() {
                                                         <i className="fas fa-chair"></i> {tableNo}
                                                     </span>
                                                 ) : (
-                                                    <span style={{ background: 'rgba(255,255,255,0.1)', color: '#CCC', padding: '3px 8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800' }}>
-                                                        TAKEOUT
+                                                    <span style={{ background: 'rgba(234, 179, 8, 0.2)', color: '#EAB308', border: '1px solid #EAB308', padding: '3px 8px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '900' }}>
+                                                        📦 {sequenceType === 'KHL' ? 'ONLINE' : 'PICKUP'}
                                                     </span>
                                                 )}
                                             </div>

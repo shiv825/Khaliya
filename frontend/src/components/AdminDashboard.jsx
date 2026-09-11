@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Swal from 'sweetalert2';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import CustomAdminSelect from './CustomAdminSelect';
 import '../assets/admin-style.css';
 
 const playDing = () => {
@@ -1016,11 +1017,52 @@ export default function AdminDashboard({ onLogout }) {
                                     </div>
                                     <div className="admin-form-group" style={{ flex: 1 }}>
                                         <label>Category</label>
-                                        <select className="admin-select" value={editingItem.category || 'Appetizers & Starters'} onChange={e => setEditingItem({...editingItem, category: e.target.value})}>
-                                            {CULINARY_CATEGORIES.filter(c => c !== 'All Categories').map(cat => (
-                                                <option key={cat} value={cat}>{cat}</option>
-                                            ))}
-                                        </select>
+                                        <CustomAdminSelect 
+                                            options={CULINARY_CATEGORIES.filter(c => c !== 'All Categories')}
+                                            value={editingItem.category || 'Appetizers & Starters'}
+                                            onChange={val => setEditingItem({ ...editingItem, category: val })}
+                                            placeholder="Select Category..."
+                                            icon="fas fa-utensils"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="admin-form-row" style={{ marginTop: '12px' }}>
+                                    <div className="admin-form-group" style={{ flex: 1 }}>
+                                        <label>Dietary Type</label>
+                                        <CustomAdminSelect 
+                                            options={[
+                                                { label: '🟢 Pure Veg', value: 'veg' },
+                                                { label: '🔴 Non-Veg', value: 'non-veg' }
+                                            ]}
+                                            value={editingItem.tags?.includes('non-veg') ? 'non-veg' : 'veg'}
+                                            onChange={val => {
+                                                let tags = (editingItem.tags || []).filter(t => t !== 'veg' && t !== 'non-veg');
+                                                tags.push(val);
+                                                setEditingItem({ ...editingItem, tags });
+                                            }}
+                                            placeholder="Select Dietary Type..."
+                                            icon="fas fa-leaf"
+                                        />
+                                    </div>
+                                    <div className="admin-form-group" style={{ flex: 1 }}>
+                                        <label>Spice Level Indicator</label>
+                                        <CustomAdminSelect 
+                                            options={[
+                                                { label: '🌱 Mild / Not Spicy (0 🌶️)', value: '' },
+                                                { label: '🌶️ Mild Spicy (1 🌶️)', value: 'spicy-1' },
+                                                { label: '🌶️🌶️ Medium Spicy (2 🌶️)', value: 'spicy-2' },
+                                                { label: '🌶️🌶️🌶️ Fiery Hot (3 🌶️)', value: 'spicy-3' }
+                                            ]}
+                                            value={(editingItem.tags || []).find(t => t.startsWith('spicy-')) || ''}
+                                            onChange={val => {
+                                                let tags = (editingItem.tags || []).filter(t => !t.startsWith('spicy-'));
+                                                if (val) tags.push(val);
+                                                setEditingItem({ ...editingItem, tags });
+                                            }}
+                                            placeholder="Select Spice Level..."
+                                            icon="fas fa-pepper-hot"
+                                        />
                                     </div>
                                 </div>
                                 <div className="admin-form-group" style={{ marginTop: '15px' }}>

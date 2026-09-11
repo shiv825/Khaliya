@@ -19,6 +19,45 @@ export default function LanguageSwitcher({ mode = 'dropdown' }) {
         setIsOpen(false);
     };
 
+    if (mode === 'segmented') {
+        return (
+            <div className="language-segmented" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', width: '100%' }}>
+                {languages.map((lang) => {
+                    const isSelected = language === lang.code;
+                    return (
+                        <button
+                            key={lang.code}
+                            onClick={() => handleLanguageChange(lang.code)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                padding: '10px 8px',
+                                background: isSelected 
+                                    ? 'linear-gradient(135deg, #FFF5C0 0%, #FFD700 40%, #D4AF37 80%, #AA7C11 100%)' 
+                                    : 'rgba(255, 255, 255, 0.04)',
+                                border: isSelected 
+                                    ? '1.5px solid #FFD700' 
+                                    : '1px solid rgba(212, 175, 55, 0.25)',
+                                borderRadius: '12px',
+                                color: isSelected ? '#000000' : '#E2E8F0',
+                                fontWeight: '900',
+                                fontSize: '0.86rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: isSelected ? '0 4px 15px rgba(212, 175, 55, 0.35)' : 'none'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.05rem' }}>{lang.flag}</span>
+                            <span>{lang.localName}</span>
+                        </button>
+                    );
+                })}
+            </div>
+        );
+    }
+
     if (mode === 'list') {
         return (
             <div className="language-list" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

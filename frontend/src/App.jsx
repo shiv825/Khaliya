@@ -10,6 +10,7 @@ import TablesExplorePage from './pages/TablesExplorePage';
 import ReviewsPublicPage from './pages/ReviewsPublicPage';
 import LocationPage from './pages/LocationPage';
 import BillVerificationPage from './pages/BillVerificationPage';
+import PolicyPage from './pages/PolicyPage';
 
 // Mobile PWA App Shell
 import NativeAppShell from './components/native/NativeAppShell';
@@ -100,6 +101,19 @@ function App() {
                       <Route path="tables" element={<TablesExplorePage />} />
                       <Route path="reviews" element={<ReviewsPublicPage />} />
                       <Route path="location" element={<LocationPage />} />
+
+                      {/* Razorpay & Statutory Merchant Legal Routes (Dedicated Standalone Pages) */}
+                      <Route path="policy/:policyType" element={<PolicyPage />} />
+                      <Route path="privacy-policy" element={<PolicyPage defaultType="privacy" />} />
+                      <Route path="terms-and-conditions" element={<PolicyPage defaultType="terms" />} />
+                      <Route path="refund-policy" element={<PolicyPage defaultType="refund" />} />
+                      <Route path="shipping-policy" element={<PolicyPage defaultType="shipping" />} />
+                      <Route path="grievance-redressal" element={<PolicyPage defaultType="grievance" />} />
+                      <Route path="pricing-policy" element={<PolicyPage defaultType="pricing" />} />
+                      <Route path="fssai-declaration" element={<PolicyPage defaultType="fssai" />} />
+                      <Route path="corporate-info" element={<PolicyPage defaultType="corporate" />} />
+                      <Route path="disclaimer" element={<PolicyPage defaultType="disclaimer" />} />
+                      <Route path="contact" element={<PolicyPage defaultType="contact" />} />
                     </Route>
 
                     {/* QR Code In-Restaurant Direct Order & Bill Verification */}

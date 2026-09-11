@@ -58,8 +58,12 @@ export default function PrintersPage() {
         }
     ];
 
+    const [printQueue, setPrintQueue] = useState([]);
+    const [retryingQueue, setRetryingQueue] = useState(false);
+
     useEffect(() => {
         fetchPrinters();
+        fetchPrintQueue();
     }, []);
 
     const fetchPrinters = async () => {
@@ -75,6 +79,37 @@ export default function PrintersPage() {
             setPrinters(defaultPrinters);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchPrintQueue = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/printers/queue`).catch(() => null);
+            if (res && res.data && Array.isArray(res.data.queue)) {
+                setPrintQueue(res.data.queue);
+            }
+        } catch (err) {
+            console.error('Error fetching print queue:', err);
+        }
+    };
+
+    const handleRetryQueue = async () => {
+        setRetryingQueue(true);
+        try {
+            const res = await axios.post(`${API_URL}/printers/queue/retry`).catch(() => null);
+            Swal.fire({
+                icon: 'success',
+                title: 'Print Queue Processed',
+                text: res?.data?.message || 'Retried pending print jobs',
+                background: '#121620',
+                color: '#FFF',
+                confirmButtonColor: '#D4AF37'
+            });
+            fetchPrintQueue();
+        } catch (err) {
+            Swal.fire({ title: 'Error', text: 'Could not retry print queue.', icon: 'error', background: '#121620', color: '#FFF' });
+        } finally {
+            setRetryingQueue(false);
         }
     };
 
@@ -222,9 +257,55 @@ export default function PrintersPage() {
                         boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
                     }}
                 >
-                    <i className="fas fa-plus"></i> Add New Printer
+                    <i className="fas fa-plus-circle"></i> Register New Printer
                 </button>
             </div>
+
+            {/* Offline Print Queue Failover Monitor Banner */}
+            {printQueue.filter(q => q.status === 'PENDING_RETRY').length > 0 && (
+                <div style={{
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid #EF4444',
+                    borderRadius: '16px',
+                    padding: '16px 20px',
+                    marginBottom: '22px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+                        <div>
+                            <div style={{ fontWeight: 900, color: '#EF4444', fontSize: '1.02rem' }}>
+                                Printer Offline — {printQueue.filter(q => q.status === 'PENDING_RETRY').length} Print Jobs Queued
+                            </div>
+                            <div style={{ fontSize: '0.82rem', color: '#CBD5E1', marginTop: '2px' }}>
+                                Orders are safely saved in database. Tapping retry will dispatch queued tickets to online printers.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={handleRetryQueue}
+                        disabled={retryingQueue}
+                        style={{
+                            background: '#EF4444',
+                            color: '#FFF',
+                            border: 'none',
+                            padding: '10px 18px',
+                            borderRadius: '12px',
+                            fontWeight: 900,
+                            fontSize: '0.88rem',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)'
+                        }}
+                    >
+                        {retryingQueue ? 'Retrying Queue...' : '🔄 Retry Queued Jobs Now'}
+                    </button>
+                </div>
+            )}
 
             {/* Architecture Explainer Card */}
             <div style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(18, 23, 34, 0.85) 100%)', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '18px', padding: '18px 22px', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import masterMenu from '../data/menu.json';
 
 const AdminContext = createContext(null);
 
@@ -35,11 +36,19 @@ const playDing = () => {
 
 const deduplicateMenu = (arr) => {
     if (!Array.isArray(arr)) return [];
-    const seen = new Set();
+    const seenIds = new Set();
+    const seenNames = new Set();
     return arr.filter(item => {
-        const key = String(item.id || item._id || item.name?.en || item.name);
-        if (!key || seen.has(key)) return false;
-        seen.add(key);
+        if (!item) return false;
+        const idKey = item.id || item._id ? String(item.id || item._id) : null;
+        const rawName = typeof item.name === 'object' ? item.name?.en : item.name;
+        const nameKey = rawName ? String(rawName).trim().toLowerCase() : null;
+
+        if (idKey && seenIds.has(idKey)) return false;
+        if (nameKey && seenNames.has(nameKey)) return false;
+
+        if (idKey) seenIds.add(idKey);
+        if (nameKey) seenNames.add(nameKey);
         return true;
     });
 };
@@ -51,10 +60,14 @@ export function AdminProvider({ children }) {
     const [menu, setMenu] = useState(() => {
         try {
             const cached = localStorage.getItem('khaliya_cached_menu');
-            return cached ? deduplicateMenu(JSON.parse(cached)) : [];
-        } catch (e) {
-            return [];
-        }
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    return deduplicateMenu(parsed);
+                }
+            }
+        } catch (e) {}
+        return deduplicateMenu(masterMenu);
     });
     const [reviews, setReviews] = useState([]);
     const [analytics, setAnalytics] = useState(null);
@@ -94,10 +107,10 @@ export function AdminProvider({ children }) {
         try {
             const timestamp = Date.now();
             const [bRes, oRes, mRes, rRes, tRes, aRes, sRes] = await Promise.all([
-                axios.get(`${API_URL}/bookings?t=${timestamp}`),
-                axios.get(`${API_URL}/orders?t=${timestamp}`),
-                axios.get(`${API_URL}/menu?t=${timestamp}`),
-                axios.get(`${API_URL}/reviews?t=${timestamp}`),
+                axios.get(`${API_URL}/bookings?t=${timestamp}`).catch(() => ({ data: [] })),
+                axios.get(`${API_URL}/orders?t=${timestamp}`).catch(() => ({ data: [] })),
+                axios.get(`${API_URL}/menu?t=${timestamp}`).catch(() => ({ data: [] })),
+                axios.get(`${API_URL}/reviews?t=${timestamp}`).catch(() => ({ data: [] })),
                 axios.get(`${API_URL}/tables?t=${timestamp}`).catch(() => ({ data: [] })),
                 axios.get(`${API_URL}/analytics?t=${timestamp}`).catch(() => ({ data: null })),
                 axios.get(`${API_URL}/settings?t=${timestamp}`).catch(() => ({ data: null }))
@@ -105,7 +118,7 @@ export function AdminProvider({ children }) {
 
             let newBookings = Array.isArray(bRes.data) ? bRes.data : [];
             let newOrders = Array.isArray(oRes.data) ? oRes.data : [];
-            let newMenu = Array.isArray(mRes.data) ? mRes.data : [];
+            let fetchedMenu = Array.isArray(mRes.data) && mRes.data.length > 0 ? mRes.data : null;
             let newReviews = Array.isArray(rRes.data) ? rRes.data : [];
             let newTables = Array.isArray(tRes.data) ? tRes.data : [];
 
@@ -130,9 +143,15 @@ export function AdminProvider({ children }) {
             setBookings(newBookings);
             setOrders(newOrders);
             setTables(newTables);
-            const cleanMenu = deduplicateMenu(newMenu);
-            setMenu(cleanMenu);
-            try { localStorage.setItem('khaliya_cached_menu', JSON.stringify(cleanMenu)); } catch (e) {}
+            
+            // Only update menu if backend returned non-empty data, or use masterMenu fallback if empty
+            if (fetchedMenu && fetchedMenu.length > 0) {
+                const cleanMenu = deduplicateMenu(fetchedMenu);
+                setMenu(cleanMenu);
+                try { localStorage.setItem('khaliya_cached_menu', JSON.stringify(cleanMenu)); } catch (e) {}
+            } else {
+                setMenu(prev => (prev && prev.length > 0) ? prev : deduplicateMenu(masterMenu));
+            }
             setReviews(newReviews);
             if (aRes.data) setAnalytics(aRes.data);
             if (sRes.data) setSettings(sRes.data);
@@ -145,6 +164,9 @@ export function AdminProvider({ children }) {
 
     useEffect(() => {
         fetchData();
+        const pollInterval = setInterval(() => {
+            fetchData();
+        }, 8000);
         
         let eventSource = null;
         const sseTimer = setTimeout(() => {
@@ -178,11 +200,10 @@ export function AdminProvider({ children }) {
             eventSource.onerror = () => {};
         }, 1000);
 
-        const interval = setInterval(fetchData, 15000);
         return () => {
+            clearInterval(pollInterval);
             clearTimeout(sseTimer);
             if (eventSource) eventSource.close();
-            clearInterval(interval);
         };
     }, []);
 
@@ -317,8 +338,18 @@ const Toast = Swal.mixin({
             const cleanPriceNum = String(savedItem.price || '0').replace(/[^\d.]/g, '');
             savedItem.price = `₹${cleanPriceNum}`;
 
-            const targetId = savedItem.id || savedItem._id;
-            
+            // Match existing item by ID or English dish name to ensure in-place update
+            const existingInMenu = menu.find(m => 
+                (savedItem.id && String(m.id || m._id) === String(savedItem.id)) ||
+                (savedItem._id && String(m.id || m._id) === String(savedItem._id)) ||
+                (m.name && savedItem.name && (
+                    (typeof m.name === 'object' && typeof savedItem.name === 'object' && m.name.en && savedItem.name.en && String(m.name.en).trim().toLowerCase() === String(savedItem.name.en).trim().toLowerCase()) ||
+                    (typeof m.name === 'string' && typeof savedItem.name === 'string' && m.name.trim().toLowerCase() === savedItem.name.trim().toLowerCase())
+                ))
+            );
+
+            const targetId = savedItem.id || savedItem._id || (existingInMenu ? (existingInMenu.id || existingInMenu._id) : null);
+
             // ☁️ Convert public/online image URL to Cloudinary CDN URL before saving
             if (savedItem.image && (savedItem.image.startsWith('http://') || savedItem.image.startsWith('https://')) && !savedItem.image.includes('cloudinary.com')) {
                 try {
@@ -340,7 +371,10 @@ const Toast = Swal.mixin({
                 savedItem.id = targetId;
                 // ⚡ Optimistic Update with Cloudinary URL
                 setMenu(prev => {
-                    const next = deduplicateMenu(prev.map(m => String(m.id || m._id) === String(targetId) ? { ...m, ...savedItem } : m));
+                    const next = deduplicateMenu(prev.map(m => (
+                        String(m.id || m._id) === String(targetId) ||
+                        (typeof m.name === 'object' && typeof savedItem.name === 'object' && m.name.en && savedItem.name.en && String(m.name.en).trim().toLowerCase() === String(savedItem.name.en).trim().toLowerCase())
+                    ) ? { ...m, ...savedItem, id: targetId } : m));
                     try { localStorage.setItem('khaliya_cached_menu', JSON.stringify(next)); } catch (e) {}
                     return next;
                 });
