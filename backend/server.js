@@ -44,6 +44,7 @@ try {
             host: smtpHost,
             port: smtpPort,
             secure: smtpPort === 465, // true for 465, false for 587
+            family: 4, // Force IPv4 addressing on cloud hosts like Render
             connectionTimeout: 15000,
             greetingTimeout: 15000,
             socketTimeout: 15000,
