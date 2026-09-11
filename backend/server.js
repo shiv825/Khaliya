@@ -37,26 +37,29 @@ try {
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'khaliyarestaurant@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'ojusvrcpwdshdxoi';
-    const smtpPort = process.env.SMTP_PORT || 465;
+    const smtpPort = Number(process.env.SMTP_PORT || 587);
 
     if (smtpHost && smtpUser && smtpPass) {
         emailTransporter = nodemailer.createTransport({
             host: smtpHost,
             port: smtpPort,
-            secure: Number(smtpPort) === 465, // true for 465, false for 587
-            connectionTimeout: 8000,
-            greetingTimeout: 8000,
-            socketTimeout: 8000,
+            secure: smtpPort === 465, // true for 465, false for 587
+            connectionTimeout: 15000,
+            greetingTimeout: 15000,
+            socketTimeout: 15000,
             auth: {
                 user: smtpUser,
                 pass: smtpPass
+            },
+            tls: {
+                rejectUnauthorized: false
             }
         });
         
-        // Verify connection configuration
+        // Verify connection configuration asynchronously
         emailTransporter.verify((error, success) => {
             if (error) {
-                console.error('❌ [AUTH] SMTP Connection Error (falling back to Simulated Mode):', error.message);
+                console.warn('⚠️ [AUTH] SMTP Connection Notice (falling back to Simulated Mode):', error.message);
                 emailTransporter = null;
             } else {
                 console.log('✅ [AUTH] Nodemailer is ready to send emails');
@@ -71,6 +74,19 @@ try {
 
 const app = express();
 const PORT = process.env.PORT || 5005;
+
+// Health Check Routes (Required for Render & Cloud Monitors)
+app.get('/', (req, res) => {
+    res.status(200).json({ 
+        status: 'online', 
+        service: 'Khaliya Restaurant API Server',
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
 
 // Middleware
 app.use(cors());
