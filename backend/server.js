@@ -112,6 +112,21 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
     console.warn('⚠️ [CDN] Cloudinary credentials missing. Falling back to Base64 in-memory images.');
 }
 
+// Initialize Razorpay SDK (Safely)
+const Razorpay = require('razorpay');
+let razorpayInstance = null;
+try {
+    const keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_TaosPGZhWQa5wH';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'DN0HnVoBaz6JoksTvPYBvf2T';
+    razorpayInstance = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret
+    });
+    console.log('✅ [PAYMENT] Razorpay client initialized successfully (Key ID:', keyId, ')');
+} catch (err) {
+    console.error('❌ [PAYMENT] Failed to initialize Razorpay:', err.message);
+}
+
 // Set up file uploads directory
 const uploadsDir = path.join(__dirname, 'uploads');
 const menuUploadsDir = path.join(__dirname, 'uploads/menu');
@@ -1308,6 +1323,122 @@ const getNextSequenceNumber = (type, existingList = []) => {
         }
     }
 };
+
+// -- API: RAZORPAY PAYMENT GATEWAY --
+app.post('/api/create-razorpay-order', async (req, res) => {
+    try {
+        const { amount, currency = 'INR', receipt } = req.body;
+        if (!amount || Number(amount) <= 0) {
+            return res.status(400).json({ success: false, message: 'Invalid payment amount' });
+        }
+        const keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_TaosPGZhWQa5wH';
+        const keySecret = process.env.RAZORPAY_KEY_SECRET || 'DN0HnVoBaz6JoksTvPYBvf2T';
+
+        const rzp = razorpayInstance || new Razorpay({ key_id: keyId, key_secret: keySecret });
+        const amountInPaise = Math.round(Number(amount) * 100);
+
+        const options = {
+            amount: amountInPaise,
+            currency: currency || 'INR',
+            receipt: receipt || `rcpt_${Date.now()}`,
+            payment_capture: 1
+        };
+
+        const razorpayOrder = await rzp.orders.create(options);
+        console.log(`💳 [RAZORPAY API] Created order ${razorpayOrder.id} for ₹${amount}`);
+
+        res.json({
+            success: true,
+            orderId: razorpayOrder.id,
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+            key: keyId
+        });
+    } catch (err) {
+        console.error('❌ [RAZORPAY CREATE ERROR]:', err.message);
+        res.status(500).json({ success: false, message: err.message || 'Failed to create Razorpay order' });
+    }
+});
+
+app.post('/api/verify-razorpay-payment', async (req, res) => {
+    try {
+        const crypto = require('crypto');
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderData } = req.body;
+        const keySecret = process.env.RAZORPAY_KEY_SECRET || 'DN0HnVoBaz6JoksTvPYBvf2T';
+
+        const expectedSignature = crypto
+            .createHmac('sha256', keySecret)
+            .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+            .digest('hex');
+
+        if (expectedSignature !== razorpay_signature) {
+            console.error('❌ [RAZORPAY VERIFY] Payment signature verification failed!');
+            return res.status(400).json({ success: false, message: 'Payment verification failed: Signature mismatch' });
+        }
+
+        console.log('✅ [RAZORPAY VERIFY] Payment verified successfully!', razorpay_payment_id);
+
+        let createdOrder = null;
+        if (orderData) {
+            const orders = await readData('orders');
+            const epoch = Date.now();
+            const isPickup = orderData.orderType === 'pickup' || orderData.orderType === 'takeout' || !orderData.tableNumber;
+            
+            const invoiceNo = orderData.invoiceNo || getNextSequenceNumber('DINE_IN', orders);
+            const orderNo = orderData.orderNo || (isPickup ? getNextSequenceNumber('PICKUP', orders) : invoiceNo);
+            const kotNo = getNextSequenceNumber('KOT', orders);
+
+            const processedItems = Array.isArray(orderData.items) ? orderData.items.map(item => ({
+                ...item,
+                fireStatus: item.fireStatus || (item.holdForLater ? 'HELD' : 'FIRED'),
+                specialInstructions: item.specialInstructions || item.note || '',
+                firedAt: item.holdForLater ? null : new Date().toISOString()
+            })) : [];
+
+            createdOrder = {
+                id: `ORD-${epoch}`,
+                invoiceNo,
+                orderNo,
+                kotNo,
+                timestamp: new Date().toLocaleString(),
+                createdAt: new Date().toISOString(),
+                status: 'received',
+                paymentStatus: 'PAID',
+                paymentMethod: 'RAZORPAY',
+                razorpayPaymentId: razorpay_payment_id,
+                razorpayOrderId: razorpay_order_id,
+                ...orderData,
+                items: processedItems
+            };
+
+            orders.push(createdOrder);
+            await writeData('orders', orders);
+
+            if (createdOrder.tableNumber || createdOrder.table) {
+                const tableId = createdOrder.tableNumber || createdOrder.table;
+                const tables = await readData('tables');
+                const tIndex = tables.findIndex(t => t.id === tableId);
+                if (tIndex !== -1 && tables[tIndex].status !== 'BILL_PRESENTED' && tables[tIndex].status !== 'PAYMENT_PENDING') {
+                    tables[tIndex].status = 'ORDERING';
+                    await writeData('tables', tables);
+                }
+            }
+
+            console.log(`🍟 [RAZORPAY ORDER] Saved Order ${createdOrder.invoiceNo} (Payment: ${razorpay_payment_id})`);
+            dispatchKitchenPrintJob(createdOrder, 'KOT').catch(() => {});
+        }
+
+        res.json({
+            success: true,
+            message: 'Payment verified and order saved successfully!',
+            paymentId: razorpay_payment_id,
+            order: createdOrder
+        });
+    } catch (err) {
+        console.error('❌ [RAZORPAY VERIFY ERROR]:', err.message);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 // -- API: ORDERS (PWA NATIVE ORDERS) --
 app.get('/api/orders', async (req, res) => {

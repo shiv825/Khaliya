@@ -12,6 +12,21 @@ const PROMO_CODES = {
     'FIRST50': { type: 'flat', value: 50, desc: 'Flat ₹50 Welcome Offer' }
 };
 
+// Helper script loader for Razorpay Checkout
+const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+        if (window.Razorpay) {
+            resolve(true);
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
+
 export default function CheckoutPage() {
     const { cart, getCartTotal, clearCart } = useCart();
     const { t, language } = useLanguage();
@@ -23,7 +38,7 @@ export default function CheckoutPage() {
     const [guestPhone, setGuestPhone] = useState('');
     const [guestEmail, setGuestEmail] = useState('');
     const [specialNotes, setSpecialNotes] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' | 'upi' | 'card'
+    const [paymentMethod, setPaymentMethod] = useState('upi'); // 'upi' | 'card' | 'cash'
 
     // Live backend tables from DB
     const [liveTables, setLiveTables] = useState([]);
@@ -51,6 +66,9 @@ export default function CheckoutPage() {
     const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
 
     useEffect(() => {
+        // Pre-load Razorpay Checkout Script
+        loadRazorpayScript();
+
         // Load saved user info
         try {
             const storedUser = localStorage.getItem('khaliya_user');
@@ -165,87 +183,240 @@ export default function CheckoutPage() {
             return;
         }
 
-        setIsSubmitting(true);
+        const orderItems = cart.map(item => ({
+            id: item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name),
+            name: getLocalized(item.name),
+            quantity: item.quantity,
+            price: item.price
+        }));
 
-        Swal.fire({
-            title: 'Processing Order & Payment...',
-            text: 'Please wait while your order is being synchronized with the kitchen.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
+        let formattedAddress = `Dine-In Table: ${tableNumber}`;
+        if (diningMode === 'takeaway') {
+            formattedAddress = `Takeaway Pickup Order`;
+        }
+        if (specialNotes) {
+            formattedAddress += ` | Instruction: ${specialNotes}`;
+        }
 
-        try {
-            const orderItems = cart.map(item => ({
-                id: item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name),
-                name: getLocalized(item.name),
-                quantity: item.quantity,
-                price: item.price
-            }));
+        const orderData = {
+            items: orderItems,
+            total: grandTotal,
+            tableNumber: diningMode === 'dine-in' ? tableNumber : null,
+            orderType: diningMode === 'takeaway' ? 'pickup' : 'dine-in',
+            paymentMethod: paymentMethod.toUpperCase(),
+            user: {
+                name: guestName.trim() || 'Royal Guest',
+                email: guestEmail.trim() || 'guest@khaliya.web',
+                phone: guestPhone.trim() || 'N/A',
+                address: formattedAddress
+            },
+            source: `Web Checkout (${diningMode.toUpperCase()})`
+        };
 
-            let formattedAddress = `Dine-In Table: ${tableNumber}`;
-            if (diningMode === 'takeaway') {
-                formattedAddress = `Takeaway Pickup Order`;
-            }
-            if (specialNotes) {
-                formattedAddress += ` | Instruction: ${specialNotes}`;
-            }
-
-            const orderData = {
-                items: orderItems,
-                total: grandTotal,
-                paymentMethod: paymentMethod.toUpperCase(),
-                user: {
-                    name: guestName.trim() || 'Royal Guest',
-                    email: guestEmail.trim() || 'guest@khaliya.web',
-                    phone: guestPhone.trim() || 'N/A',
-                    address: formattedAddress
-                },
-                source: `Dedicated Checkout Page (${diningMode.toUpperCase()})`
-            };
-
-            await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
-
-            // Save user details for convenience
-            if (guestName || guestPhone || guestEmail) {
+        // Save guest details locally for convenience
+        if (guestName || guestPhone || guestEmail) {
+            try {
                 localStorage.setItem('khaliya_user', JSON.stringify({
                     name: guestName,
                     phone: guestPhone,
                     email: guestEmail
                 }));
+            } catch (err) {}
+        }
+
+        // --- RAZORPAY ONLINE PAYMENT FLOW (UPI / CARD) ---
+        if (paymentMethod === 'upi' || paymentMethod === 'card' || paymentMethod === 'razorpay') {
+            setIsSubmitting(true);
+
+            const isLoaded = await loadRazorpayScript();
+            if (!isLoaded) {
+                setIsSubmitting(false);
+                Swal.fire({
+                    title: 'Razorpay SDK Load Failed',
+                    text: 'Unable to load payment gateway. Please check your internet connection.',
+                    icon: 'error',
+                    confirmButtonColor: '#D4AF37'
+                });
+                return;
             }
 
             Swal.fire({
-                title: '🎉 Order Placed Successfully!',
-                html: `<div style="text-align:center; color:#CBD5E1; font-family:sans-serif">
-                        <div style="font-size:3.5rem; margin-bottom:10px">👑</div>
-                        <p style="font-size:1.2rem; color:#FFD700; font-weight:800; margin-bottom:8px">
-                            ${diningMode === 'dine-in' ? `Table: ${tableNumber}` : 'Takeaway Pickup Order'}
-                        </p>
-                        <p style="font-size:1.1rem; color:#FFF; font-weight:700">Total Amount: ₹${grandTotal}</p>
-                        <p style="font-size:0.85rem; color:#94A3B8; margin-top:4px">Payment via: <strong>${paymentMethod.toUpperCase()}</strong></p>
-                        ${appliedCoupon ? `<p style="color:#4ADE80; font-size:0.85rem; margin-top:6px">Saved ₹${discountAmount} with code ${appliedCoupon.code}!</p>` : ''}
-                        <p style="font-size:0.85rem; opacity:0.8; margin-top:14px">Your order has been routed to our Kitchen KDS. Enjoy your meal!</p>
-                       </div>`,
-                icon: 'success',
-                confirmButtonColor: '#D4AF37'
+                title: 'Initiating Secure Payment...',
+                text: 'Generating Razorpay transaction credentials...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
             });
 
-            clearCart();
-            setIsSubmitting(false);
-            navigate('/menu');
-        } catch (err) {
-            console.error('Order submission error:', err);
+            try {
+                // Step 1: Create Razorpay Order on Backend
+                const orderRes = await axios.post(`${API_URL}/create-razorpay-order`, {
+                    amount: grandTotal,
+                    currency: 'INR',
+                    receipt: `rcpt_${Date.now()}`
+                });
+
+                if (!orderRes.data || !orderRes.data.success || !orderRes.data.orderId) {
+                    throw new Error(orderRes.data?.message || 'Failed to initialize Razorpay payment');
+                }
+
+                Swal.close();
+
+                const { orderId, amount, currency, key } = orderRes.data;
+
+                // Step 2: Configure & Open Razorpay Modal
+                const options = {
+                    key: key || import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_TaosPGZhWQa5wH',
+                    amount: amount,
+                    currency: currency || 'INR',
+                    name: 'Khaliya Sanctuary',
+                    description: 'Royal Dining Bill Payment',
+                    image: 'https://res.cloudinary.com/mbib5dog/image/upload/v1788443766/khaliya_restaurant/product_1780141133327.jpg',
+                    order_id: orderId,
+                    handler: async function (response) {
+                        Swal.fire({
+                            title: 'Verifying Payment with Bank...',
+                            text: 'Please wait while we verify your transaction.',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        try {
+                            const verifyRes = await axios.post(`${API_URL}/verify-razorpay-payment`, {
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderData
+                            });
+
+                            if (verifyRes.data?.success) {
+                                Swal.fire({
+                                    title: '🎉 Payment Successful & Order Sent to Kitchen!',
+                                    html: `<div style="text-align:center; color:#CBD5E1; font-family:sans-serif">
+                                            <div style="font-size:3.5rem; margin-bottom:10px">💳</div>
+                                            <p style="font-size:1.15rem; color:#4ADE80; font-weight:800; margin-bottom:6px">
+                                                Paid via Razorpay
+                                            </p>
+                                            <p style="font-size:0.85rem; color:#FFD700; margin-bottom:8px">Payment ID: <strong>${response.razorpay_payment_id}</strong></p>
+                                            <p style="font-size:1.1rem; color:#FFF; font-weight:700">Total Amount: ₹${grandTotal}</p>
+                                            ${appliedCoupon ? `<p style="color:#4ADE80; font-size:0.85rem; margin-top:6px">Saved ₹${discountAmount} with code ${appliedCoupon.code}!</p>` : ''}
+                                            <p style="font-size:0.85rem; opacity:0.8; margin-top:14px">Our chef has received your order on the Kitchen KDS!</p>
+                                           </div>`,
+                                    icon: 'success',
+                                    confirmButtonColor: '#D4AF37'
+                                });
+
+                                clearCart();
+                                setIsSubmitting(false);
+                                navigate('/menu');
+                            } else {
+                                throw new Error(verifyRes.data?.message || 'Payment verification failed');
+                            }
+                        } catch (verifyErr) {
+                            console.error('Razorpay verification error:', verifyErr);
+                            Swal.fire({
+                                title: 'Payment Verification Error',
+                                text: verifyErr.message || 'Verification failed. Please contact restaurant staff.',
+                                icon: 'error',
+                                confirmButtonColor: '#D4AF37'
+                            });
+                            setIsSubmitting(false);
+                        }
+                    },
+                    prefill: {
+                        name: guestName.trim() || 'Royal Guest',
+                        email: guestEmail.trim() || 'guest@khaliya.web',
+                        contact: guestPhone.trim() || '9999999999'
+                    },
+                    notes: {
+                        diningMode: diningMode,
+                        tableNumber: tableNumber || 'N/A'
+                    },
+                    theme: {
+                        color: '#D4AF37'
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            setIsSubmitting(false);
+                            Swal.fire({
+                                title: 'Payment Modal Closed',
+                                text: 'Payment was not completed.',
+                                icon: 'info',
+                                toast: true, position: 'top-end', timer: 3000, showConfirmButton: false
+                            });
+                        }
+                    }
+                };
+
+                const rzpWindow = new window.Razorpay(options);
+                rzpWindow.on('payment.failed', function (response) {
+                    setIsSubmitting(false);
+                    Swal.fire({
+                        title: 'Payment Failed',
+                        text: response.error.description || 'Transaction was declined by bank or card issuer.',
+                        icon: 'error',
+                        confirmButtonColor: '#D4AF37'
+                    });
+                });
+
+                rzpWindow.open();
+            } catch (err) {
+                console.error('Razorpay Initialization Error:', err);
+                setIsSubmitting(false);
+                Swal.fire({
+                    title: 'Payment Gateway Error',
+                    text: err.message || 'Failed to launch Razorpay window',
+                    icon: 'error',
+                    confirmButtonColor: '#D4AF37'
+                });
+            }
+        } 
+        // --- CASH ON TABLE / COUNTER FLOW ---
+        else {
+            setIsSubmitting(true);
+
             Swal.fire({
-                title: 'Order Recorded Locally',
-                text: 'We could not reach the server instantly, but your order is saved. Please inform our waiting staff.',
-                icon: 'info',
-                confirmButtonColor: '#D4AF37'
+                title: 'Sending Order to Kitchen...',
+                text: 'Please wait while your order is being synchronized.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-            clearCart();
-            setIsSubmitting(false);
-            navigate('/menu');
+
+            try {
+                await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
+
+                Swal.fire({
+                    title: '🎉 Order Received & Sent to Kitchen!',
+                    html: `<div style="text-align:center; color:#CBD5E1; font-family:sans-serif">
+                            <div style="font-size:3.5rem; margin-bottom:10px">👑</div>
+                            <p style="font-size:1.2rem; color:#FFD700; font-weight:800; margin-bottom:8px">
+                                ${diningMode === 'dine-in' ? `Table: ${tableNumber}` : 'Takeaway Pickup Order'}
+                            </p>
+                            <p style="font-size:1.1rem; color:#FFF; font-weight:700">Total Amount: ₹${grandTotal}</p>
+                            <p style="font-size:0.85rem; color:#94A3B8; margin-top:4px">Payment Method: <strong>CASH ON TABLE / COUNTER</strong></p>
+                            ${appliedCoupon ? `<p style="color:#4ADE80; font-size:0.85rem; margin-top:6px">Saved ₹${discountAmount} with code ${appliedCoupon.code}!</p>` : ''}
+                            <p style="font-size:0.85rem; opacity:0.8; margin-top:14px">Our chef has started preparing your fresh royal meal.</p>
+                           </div>`,
+                    icon: 'success',
+                    confirmButtonColor: '#D4AF37'
+                });
+
+                clearCart();
+                setIsSubmitting(false);
+                navigate('/menu');
+            } catch (err) {
+                console.error('Order submission error:', err);
+                Swal.fire({
+                    title: 'Order Recorded Locally',
+                    text: 'We could not reach the server instantly, but your order is saved. Please inform our waiting staff.',
+                    icon: 'info',
+                    confirmButtonColor: '#D4AF37'
+                });
+                clearCart();
+                setIsSubmitting(false);
+                navigate('/menu');
+            }
         }
     };
 
@@ -262,14 +433,14 @@ export default function CheckoutPage() {
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 18px', borderRadius: '50px', background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.35)', marginBottom: '12px' }}>
                         <span style={{ color: '#FFD700', fontSize: '0.8rem' }}>💳</span>
                         <span style={{ color: '#D4AF37', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '2px', textTransform: 'uppercase' }}>
-                            FINAL STEP TO DINE
+                            SECURE RAZORPAY PAYMENT GATEWAY
                         </span>
                     </div>
                     <h1 style={{ fontFamily: "'Cinzel', 'Playfair Display', serif", fontSize: 'clamp(2rem, 3.8vw, 3rem)', color: '#FFD700', margin: '0 0 8px 0', fontWeight: '800' }}>
                         Royal Checkout &amp; Order Dispatch
                     </h1>
                     <p style={{ color: '#CBD5E1', fontSize: '0.95rem', maxWidth: '580px', margin: '0 auto' }}>
-                        Confirm dining preferences, guest information, payment method, and send order to kitchen.
+                        Confirm dining preferences, guest information, pay securely via Razorpay, and send order to kitchen.
                     </p>
                 </div>
             </div>
@@ -467,15 +638,15 @@ export default function CheckoutPage() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
                                 <span style={{ background: '#D4AF37', color: '#000', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '0.85rem' }}>3</span>
                                 <h3 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: 0, fontSize: '1.25rem', fontWeight: '800' }}>
-                                    Payment Method
+                                    Payment Gateway Option
                                 </h3>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 {[
-                                    { id: 'cash', icon: '💵', name: 'Cash on Table / Counter', desc: 'Pay with cash directly to our waiting staff' },
-                                    { id: 'upi', icon: '⚡', name: 'Instant UPI / GPay / PhonePe / Paytm', desc: 'Scan QR code or pay via mobile apps' },
-                                    { id: 'card', icon: '💳', name: 'Credit / Debit Card / Netbanking', desc: 'Pay safely using card terminal or online portal' }
+                                    { id: 'upi', icon: '⚡', name: 'Razorpay Instant UPI / GPay / PhonePe / Paytm', desc: 'Fast, secure UPI QR code & app checkout via Razorpay' },
+                                    { id: 'card', icon: '💳', name: 'Razorpay Credit / Debit Card & Netbanking', desc: 'All Visa, Mastercard, RuPay & 50+ Banks supported' },
+                                    { id: 'cash', icon: '💵', name: 'Cash on Table / Pay at Counter', desc: 'Pay with cash directly to our waiting staff' }
                                 ].map((method) => (
                                     <div
                                         key={method.id}
@@ -646,8 +817,12 @@ export default function CheckoutPage() {
                                 gap: '8px'
                             }}
                         >
-                            {isSubmitting ? 'Submitting Order...' : '👑 Confirm & Place Order Now'}
+                            {isSubmitting ? 'Processing Payment...' : (paymentMethod === 'cash' ? '👑 Place Order (Pay Cash)' : '💳 Pay via Razorpay Now')}
                         </button>
+
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#94A3B8', fontSize: '0.75rem', marginTop: '12px' }}>
+                            <i className="fas fa-lock" style={{ color: '#4ADE80' }}></i> 256-Bit SSL Encrypted Razorpay Gateway
+                        </div>
                     </motion.div>
                 </form>
             </div>
