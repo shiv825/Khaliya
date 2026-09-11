@@ -89,38 +89,17 @@ const PROMO_CODES = {
     'FIRST50': { type: 'flat', value: 50, desc: 'Flat ₹50 Welcome Offer' }
 };
 
-// Haversine formula distance calculation in kilometers
-function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
-    if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return null;
-    const R = 6371; // Radius of the Earth in km
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-}
-
 export default function CartPage() {
     const { cart, addToCart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
     const { t, language } = useLanguage();
     const navigate = useNavigate();
 
-    const [diningMode, setDiningMode] = useState('dine-in'); // 'dine-in' | 'takeaway' | 'delivery'
+    const [diningMode, setDiningMode] = useState('dine-in'); // 'dine-in' | 'takeaway'
     const [tableNumber, setTableNumber] = useState('');
     const [guestName, setGuestName] = useState('');
     const [guestPhone, setGuestPhone] = useState('');
     const [guestEmail, setGuestEmail] = useState('');
     const [specialNotes, setSpecialNotes] = useState('');
-
-    // Delivery & Location States
-    const [deliveryAddress, setDeliveryAddress] = useState('');
-    const [userLat, setUserLat] = useState(null);
-    const [userLng, setUserLng] = useState(null);
-    const [isDetectingLocation, setIsDetectingLocation] = useState(false);
-    const [locationError, setLocationError] = useState('');
 
     // Live backend tables from DB
     const [liveTables, setLiveTables] = useState([]);
@@ -136,16 +115,11 @@ export default function CartPage() {
     // Per-item cooking notes
     const [itemNotes, setItemNotes] = useState({});
 
-    // Store settings state (Admin configurable fees, location, and radius)
+    // Store settings state (Admin configurable fees)
     const [storeSettings, setStoreSettings] = useState({
         isOpen: true,
         gstRate: 5,
-        packagingFee: 25,
-        deliveryFee: 40,
-        deliveryRadiusKm: 15,
-        restaurantLat: 28.6139,
-        restaurantLng: 77.2090,
-        restaurantAddress: "Khaliya Sanctuary, Main Boulevard, New Delhi"
+        packagingFee: 25
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -167,7 +141,6 @@ export default function CartPage() {
                 if (parsed.name) setGuestName(parsed.name);
                 if (parsed.phone) setGuestPhone(parsed.phone);
                 if (parsed.email) setGuestEmail(parsed.email);
-                if (parsed.address) setDeliveryAddress(parsed.address);
             }
         } catch (e) {}
 
@@ -200,19 +173,6 @@ export default function CartPage() {
     // Admin Configurable Fee Values (No hardcoding!)
     const gstRate = Number(storeSettings?.gstRate ?? 5);
     const packagingFeeSetting = Number(storeSettings?.packagingFee ?? 25);
-    const deliveryFeeSetting = Number(storeSettings?.deliveryFee ?? 40);
-
-    const restLat = Number(storeSettings?.restaurantLat ?? 28.6139);
-    const restLng = Number(storeSettings?.restaurantLng ?? 77.2090);
-    const maxRadiusKm = Number(storeSettings?.deliveryRadiusKm ?? 15);
-    const restAddress = storeSettings?.restaurantAddress || "Khaliya Sanctuary, Main Boulevard, New Delhi";
-
-    // Haversine distance calculation for delivery location check
-    const calculatedDistanceKm = (userLat !== null && userLng !== null)
-        ? calculateHaversineDistance(userLat, userLng, restLat, restLng)
-        : null;
-
-    const isWithinDeliveryRadius = calculatedDistanceKm !== null ? calculatedDistanceKm <= maxRadiusKm : null;
 
     // Financial Calculations
     const subtotal = getCartTotal();
@@ -228,55 +188,9 @@ export default function CartPage() {
 
     const netSubtotal = Math.max(0, subtotal - discountAmount);
     const taxAmount = Math.round((netSubtotal * gstRate) / 100);
-    const packagingFee = (diningMode === 'takeaway' || diningMode === 'delivery') ? packagingFeeSetting : 0;
-    const deliveryFee = diningMode === 'delivery' ? deliveryFeeSetting : 0;
+    const packagingFee = diningMode === 'takeaway' ? packagingFeeSetting : 0;
 
-    const grandTotal = netSubtotal + taxAmount + packagingFee + deliveryFee;
-
-    const handleDetectUserLocation = () => {
-        if (!navigator.geolocation) {
-            setLocationError('Geolocation is not supported by your browser.');
-            return;
-        }
-
-        setIsDetectingLocation(true);
-        setLocationError('');
-
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                const lat = parseFloat(pos.coords.latitude.toFixed(6));
-                const lng = parseFloat(pos.coords.longitude.toFixed(6));
-                setUserLat(lat);
-                setUserLng(lng);
-                setIsDetectingLocation(false);
-
-                const dist = calculateHaversineDistance(lat, lng, restLat, restLng);
-                if (dist <= maxRadiusKm) {
-                    Swal.fire({
-                        title: '📍 Location Verified!',
-                        text: `You are ~${dist.toFixed(1)} km from ${restAddress}. Delivery is available!`,
-                        icon: 'success',
-                        toast: true,
-                        position: 'top-end',
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
-                } else {
-                    Swal.fire({
-                        title: '⚠️ Outside Delivery Zone',
-                        text: `You are ${dist.toFixed(1)} km away. Maximum delivery radius is ${maxRadiusKm} km.`,
-                        icon: 'warning',
-                        confirmButtonColor: '#D4AF37'
-                    });
-                }
-            },
-            (err) => {
-                setIsDetectingLocation(false);
-                setLocationError(`GPS access error (${err.message}). You can still enter your address manually.`);
-            },
-            { enableHighAccuracy: true, timeout: 10000 }
-        );
-    };
+    const grandTotal = netSubtotal + taxAmount + packagingFee;
 
     const handleApplyCoupon = (e) => {
         e.preventDefault();
@@ -334,28 +248,6 @@ export default function CartPage() {
             return;
         }
 
-        if (diningMode === 'delivery') {
-            if (!deliveryAddress || deliveryAddress.trim() === '') {
-                Swal.fire({
-                    title: 'Delivery Address Required',
-                    text: 'Please enter your complete delivery street address.',
-                    icon: 'warning',
-                    confirmButtonColor: '#D4AF37'
-                });
-                return;
-            }
-
-            if (isWithinDeliveryRadius === false) {
-                Swal.fire({
-                    title: 'Delivery Radius Exceeded',
-                    text: `Your location (${calculatedDistanceKm?.toFixed(1)} km) is outside our maximum delivery radius of ${maxRadiusKm} km from ${restAddress}.`,
-                    icon: 'error',
-                    confirmButtonColor: '#D4AF37'
-                });
-                return;
-            }
-        }
-
         setIsSubmitting(true);
 
         Swal.fire({
@@ -382,8 +274,6 @@ export default function CartPage() {
             let formattedAddress = `Dine-In Table: ${tableNumber}`;
             if (diningMode === 'takeaway') {
                 formattedAddress = `Takeaway Pickup Order`;
-            } else if (diningMode === 'delivery') {
-                formattedAddress = `Delivery Address: ${deliveryAddress}${calculatedDistanceKm ? ` (~${calculatedDistanceKm.toFixed(1)} km away)` : ''}`;
             }
             if (specialNotes) {
                 formattedAddress += ` | Instruction: ${specialNotes}`;
@@ -404,21 +294,20 @@ export default function CartPage() {
             await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
 
             // Store guest info for convenience
-            if (guestName || guestPhone || guestEmail || deliveryAddress) {
+            if (guestName || guestPhone || guestEmail) {
                 localStorage.setItem('khaliya_user', JSON.stringify({
                     name: guestName,
                     phone: guestPhone,
-                    email: guestEmail,
-                    address: deliveryAddress
+                    email: guestEmail
                 }));
             }
 
             Swal.fire({
                 title: '🎉 Order Received & Sent to Kitchen!',
                 html: `<div style="text-align:center; color:#CBD5E1; font-family:sans-serif">
-                        <div style="font-size:3rem; margin-bottom:10px">${diningMode === 'delivery' ? '🛵' : '👨‍🍳'}</div>
+                        <div style="font-size:3rem; margin-bottom:10px">👨‍🍳</div>
                         <p style="font-size:1.15rem; color:#FFD700; font-weight:800; margin-bottom:8px">
-                            ${diningMode === 'dine-in' ? `Table: ${tableNumber}` : (diningMode === 'delivery' ? 'Home Delivery Order' : 'Takeaway Pickup Order')}
+                            ${diningMode === 'dine-in' ? `Table: ${tableNumber}` : 'Takeaway Pickup Order'}
                         </p>
                         <p style="font-size:1.1rem; color:#FFF; font-weight:700">Total Amount Paid: ₹${grandTotal}</p>
                         ${appliedCoupon ? `<p style="color:#4ADE80; font-size:0.85rem">You saved ₹${discountAmount} with code ${appliedCoupon.code}!</p>` : ''}
@@ -805,7 +694,7 @@ export default function CartPage() {
                             )}
                         </div>
 
-                        {/* RIGHT COLUMN: Dining Option, Dynamic Location & Delivery Radius Check, & Final Checkout Summary */}
+                        {/* RIGHT COLUMN: Dining Option & Final Checkout Summary */}
                         <motion.div
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -823,12 +712,12 @@ export default function CartPage() {
                                 Order Checkout
                             </h3>
 
-                            {/* Dining Mode Selector: Table Dining | Takeaway | Delivery */}
+                            {/* Dining Mode Selector: Table Dining | Takeaway */}
                             <div style={{ marginBottom: '22px' }}>
                                 <label style={{ display: 'block', color: '#D4AF37', fontWeight: '800', fontSize: '0.82rem', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
                                     Dining Mode Option
                                 </label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', background: '#070A0E', padding: '4px', borderRadius: '12px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', background: '#070A0E', padding: '4px', borderRadius: '12px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
                                     <button
                                         type="button"
                                         onClick={() => setDiningMode('dine-in')}
@@ -836,18 +725,18 @@ export default function CartPage() {
                                             background: diningMode === 'dine-in' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
                                             color: diningMode === 'dine-in' ? '#000' : '#CBD5E1',
                                             border: 'none',
-                                            padding: '9px 6px',
+                                            padding: '10px',
                                             borderRadius: '10px',
                                             fontWeight: '800',
-                                            fontSize: '0.78rem',
+                                            fontSize: '0.85rem',
                                             cursor: 'pointer',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            gap: '4px'
+                                            gap: '6px'
                                         }}
                                     >
-                                        <i className="fas fa-chair"></i> Dine-In
+                                        <i className="fas fa-chair"></i> Table Dining
                                     </button>
                                     <button
                                         type="button"
@@ -856,38 +745,18 @@ export default function CartPage() {
                                             background: diningMode === 'takeaway' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
                                             color: diningMode === 'takeaway' ? '#000' : '#CBD5E1',
                                             border: 'none',
-                                            padding: '9px 6px',
+                                            padding: '10px',
                                             borderRadius: '10px',
                                             fontWeight: '800',
-                                            fontSize: '0.78rem',
+                                            fontSize: '0.85rem',
                                             cursor: 'pointer',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            gap: '4px'
+                                            gap: '6px'
                                         }}
                                     >
                                         <i className="fas fa-shopping-bag"></i> Takeaway
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setDiningMode('delivery')}
-                                        style={{
-                                            background: diningMode === 'delivery' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
-                                            color: diningMode === 'delivery' ? '#000' : '#CBD5E1',
-                                            border: 'none',
-                                            padding: '9px 6px',
-                                            borderRadius: '10px',
-                                            fontWeight: '800',
-                                            fontSize: '0.78rem',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '4px'
-                                        }}
-                                    >
-                                        <i className="fas fa-motorcycle"></i> Delivery
                                     </button>
                                 </div>
                             </div>
@@ -928,98 +797,6 @@ export default function CartPage() {
                                                 ))
                                             )}
                                         </select>
-                                    </div>
-                                )}
-
-                                {/* Location Detection & Radius Checking (Visible for Delivery) */}
-                                {diningMode === 'delivery' && (
-                                    <div style={{
-                                        background: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1.5px solid rgba(212, 175, 55, 0.35)',
-                                        borderRadius: '16px',
-                                        padding: '18px',
-                                        marginBottom: '20px'
-                                    }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                                            <label style={{ color: '#FFD700', fontWeight: '800', fontSize: '0.85rem' }}>
-                                                📍 Delivery Address &amp; Location
-                                            </label>
-                                            <button
-                                                type="button"
-                                                onClick={handleDetectUserLocation}
-                                                disabled={isDetectingLocation}
-                                                style={{
-                                                    background: 'rgba(212, 175, 55, 0.2)',
-                                                    border: '1px solid #D4AF37',
-                                                    color: '#FFD700',
-                                                    padding: '5px 12px',
-                                                    borderRadius: '8px',
-                                                    fontSize: '0.78rem',
-                                                    fontWeight: '800',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '5px'
-                                                }}
-                                            >
-                                                <i className="fas fa-crosshairs"></i> {isDetectingLocation ? 'Locating...' : 'Detect GPS'}
-                                            </button>
-                                        </div>
-
-                                        <input
-                                            type="text"
-                                            placeholder="Enter your street address, house no, landmark..."
-                                            value={deliveryAddress}
-                                            onChange={(e) => setDeliveryAddress(e.target.value)}
-                                            required={diningMode === 'delivery'}
-                                            style={{
-                                                width: '100%',
-                                                padding: '12px 14px',
-                                                borderRadius: '10px',
-                                                border: '1px solid rgba(255,255,255,0.15)',
-                                                background: 'rgba(0,0,0,0.5)',
-                                                color: '#FFF',
-                                                fontSize: '0.88rem',
-                                                outline: 'none',
-                                                boxSizing: 'border-box',
-                                                marginBottom: '10px'
-                                            }}
-                                        />
-
-                                        {/* Restaurant Location & Service Info */}
-                                        <div style={{ fontSize: '0.78rem', color: '#CBD5E1', background: 'rgba(0,0,0,0.3)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '10px' }}>
-                                            <i className="fas fa-store" style={{ color: '#D4AF37', marginRight: '6px' }}></i>
-                                            <strong>Delivering from:</strong> {restAddress}
-                                            <div style={{ marginTop: '3px', color: '#94A3B8' }}>
-                                                ⚡ Delivery Radius: <strong>Within {maxRadiusKm} km</strong>
-                                            </div>
-                                        </div>
-
-                                        {/* Radius Calculation Status Indicator */}
-                                        {calculatedDistanceKm !== null && (
-                                            <div style={{
-                                                background: isWithinDeliveryRadius ? 'rgba(74, 222, 128, 0.12)' : 'rgba(239, 68, 68, 0.15)',
-                                                border: `1px solid ${isWithinDeliveryRadius ? '#4ADE80' : '#EF4444'}`,
-                                                color: isWithinDeliveryRadius ? '#4ADE80' : '#EF4444',
-                                                padding: '10px 12px',
-                                                borderRadius: '8px',
-                                                fontSize: '0.82rem',
-                                                fontWeight: '700',
-                                                textAlign: 'center'
-                                            }}>
-                                                {isWithinDeliveryRadius ? (
-                                                    <span>✅ Location Verified: You are ~{calculatedDistanceKm.toFixed(1)} km away (Eligible for delivery!)</span>
-                                                ) : (
-                                                    <span>❌ Outside Delivery Radius: You are {calculatedDistanceKm.toFixed(1)} km away (Max allowed: {maxRadiusKm} km)</span>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {locationError && (
-                                            <div style={{ color: '#F87171', fontSize: '0.75rem', marginTop: '6px' }}>
-                                                {locationError}
-                                            </div>
-                                        )}
                                     </div>
                                 )}
 
@@ -1147,13 +924,6 @@ export default function CartPage() {
                                         </div>
                                     )}
 
-                                    {deliveryFee > 0 && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1', fontSize: '0.9rem', marginBottom: '8px' }}>
-                                            <span>Delivery Fee</span>
-                                            <span>₹{deliveryFee}</span>
-                                        </div>
-                                    )}
-
                                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#FFD700', fontSize: '1.35rem', fontWeight: '900', paddingTop: '10px', borderTop: '1px solid rgba(212, 175, 55, 0.3)' }}>
                                         <span>Total Amount</span>
                                         <span>₹{grandTotal}</span>
@@ -1167,8 +937,9 @@ export default function CartPage() {
                                 )}
 
                                 <button
-                                    type="submit"
-                                    disabled={storeSettings.isOpen === false || isSubmitting || (diningMode === 'delivery' && isWithinDeliveryRadius === false)}
+                                    type="button"
+                                    onClick={() => navigate('/checkout')}
+                                    disabled={storeSettings.isOpen === false || isSubmitting}
                                     style={{
                                         width: '100%',
                                         background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
@@ -1180,13 +951,17 @@ export default function CartPage() {
                                         fontSize: '1rem',
                                         letterSpacing: '1px',
                                         textTransform: 'uppercase',
-                                        cursor: (storeSettings.isOpen === false || isSubmitting || (diningMode === 'delivery' && isWithinDeliveryRadius === false)) ? 'not-allowed' : 'pointer',
-                                        opacity: (storeSettings.isOpen === false || isSubmitting || (diningMode === 'delivery' && isWithinDeliveryRadius === false)) ? 0.6 : 1,
+                                        cursor: (storeSettings.isOpen === false || isSubmitting) ? 'not-allowed' : 'pointer',
+                                        opacity: (storeSettings.isOpen === false || isSubmitting) ? 0.6 : 1,
                                         boxShadow: '0 10px 30px rgba(212, 175, 55, 0.35)',
-                                        transition: 'all 0.2s ease'
+                                        transition: 'all 0.2s ease',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
                                     }}
                                 >
-                                    {isSubmitting ? 'Submitting Order...' : 'Place Order Now'}
+                                    Proceed to Checkout <i className="fas fa-arrow-right"></i>
                                 </button>
                             </form>
                         </motion.div>
