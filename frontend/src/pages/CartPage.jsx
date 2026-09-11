@@ -94,34 +94,30 @@ export default function CartPage() {
     const { t, language } = useLanguage();
     const navigate = useNavigate();
 
-    const [diningMode, setDiningMode] = useState('dine-in'); // 'dine-in' | 'takeaway'
-    const [tableNumber, setTableNumber] = useState('');
-    const [guestName, setGuestName] = useState('');
-    const [guestPhone, setGuestPhone] = useState('');
-    const [guestEmail, setGuestEmail] = useState('');
-    const [specialNotes, setSpecialNotes] = useState('');
-
-    // Live backend tables from DB
-    const [liveTables, setLiveTables] = useState([]);
-    
     // Live original products list
     const [catalogProducts, setCatalogProducts] = useState(ORIGINAL_PRODUCTS);
 
     // Promo Code State
     const [couponInput, setCouponInput] = useState('');
-    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [appliedCoupon, setAppliedCoupon] = useState(() => {
+        try {
+            const saved = localStorage.getItem('khaliya_applied_coupon');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            return null;
+        }
+    });
     const [couponError, setCouponError] = useState('');
 
     // Per-item cooking notes
     const [itemNotes, setItemNotes] = useState({});
 
-    // Store settings state (Admin configurable fees)
+    // Store settings state
     const [storeSettings, setStoreSettings] = useState({
         isOpen: true,
         gstRate: 5,
         packagingFee: 25
     });
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const getLocalized = (field) => {
         if (field && typeof field === 'object') return field[language] || field.en || '';
@@ -133,24 +129,12 @@ export default function CartPage() {
     const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
 
     useEffect(() => {
-        // Load saved user info
-        try {
-            const storedUser = localStorage.getItem('khaliya_user');
-            if (storedUser) {
-                const parsed = JSON.parse(storedUser);
-                if (parsed.name) setGuestName(parsed.name);
-                if (parsed.phone) setGuestPhone(parsed.phone);
-                if (parsed.email) setGuestEmail(parsed.email);
-            }
-        } catch (e) {}
-
-        // Fetch live catalog, admin settings, and live database tables
+        // Fetch live catalog and admin settings
         const fetchDataFromBackend = async () => {
             try {
-                const [prodRes, setRes, tabRes] = await Promise.all([
+                const [prodRes, setRes] = await Promise.all([
                     axios.get(`${API_URL}/products?t=${Date.now()}`).catch(() => null),
-                    axios.get(`${API_URL}/settings?t=${Date.now()}`).catch(() => null),
-                    axios.get(`${API_URL}/tables?t=${Date.now()}`).catch(() => null)
+                    axios.get(`${API_URL}/settings?t=${Date.now()}`).catch(() => null)
                 ]);
 
                 if (prodRes?.data && Array.isArray(prodRes.data) && prodRes.data.length > 0) {
@@ -158,9 +142,6 @@ export default function CartPage() {
                 }
                 if (setRes?.data) {
                     setStoreSettings(prev => ({ ...prev, ...setRes.data }));
-                }
-                if (tabRes?.data && Array.isArray(tabRes.data)) {
-                    setLiveTables(tabRes.data);
                 }
             } catch (err) {
                 console.warn('Backend fetch notice:', err.message);
@@ -170,11 +151,8 @@ export default function CartPage() {
         fetchDataFromBackend();
     }, [API_URL]);
 
-    // Admin Configurable Fee Values (No hardcoding!)
-    const gstRate = Number(storeSettings?.gstRate ?? 5);
-    const packagingFeeSetting = Number(storeSettings?.packagingFee ?? 25);
-
     // Financial Calculations
+    const gstRate = Number(storeSettings?.gstRate ?? 5);
     const subtotal = getCartTotal();
 
     let discountAmount = 0;
@@ -188,9 +166,7 @@ export default function CartPage() {
 
     const netSubtotal = Math.max(0, subtotal - discountAmount);
     const taxAmount = Math.round((netSubtotal * gstRate) / 100);
-    const packagingFee = diningMode === 'takeaway' ? packagingFeeSetting : 0;
-
-    const grandTotal = netSubtotal + taxAmount + packagingFee;
+    const grandTotal = netSubtotal + taxAmount;
 
     const handleApplyCoupon = (e) => {
         e.preventDefault();
@@ -200,11 +176,13 @@ export default function CartPage() {
         if (!code) return;
 
         if (PROMO_CODES[code]) {
-            setAppliedCoupon({ code, ...PROMO_CODES[code] });
+            const couponObj = { code, ...PROMO_CODES[code] };
+            setAppliedCoupon(couponObj);
+            try { localStorage.setItem('khaliya_applied_coupon', JSON.stringify(couponObj)); } catch (e) {}
             setCouponInput('');
             Swal.fire({
                 title: 'Coupon Applied! 🎉',
-                text: `${PROMO_CODES[code].desc} has been applied to your bill.`,
+                text: `${PROMO_CODES[code].desc} has been applied to your order.`,
                 icon: 'success',
                 toast: true,
                 position: 'top-end',
@@ -218,16 +196,15 @@ export default function CartPage() {
 
     const handleRemoveCoupon = () => {
         setAppliedCoupon(null);
+        try { localStorage.removeItem('khaliya_applied_coupon'); } catch (e) {}
     };
 
     const handleItemNoteChange = (cartKey, note) => {
         setItemNotes(prev => ({ ...prev, [cartKey]: note }));
     };
 
-    const handlePlaceOrder = async (e) => {
-        e.preventDefault();
+    const handleProceedToCheckout = () => {
         if (cart.length === 0) return;
-
         if (storeSettings.isOpen === false) {
             Swal.fire({
                 title: 'Ordering Temporarily Closed',
@@ -237,101 +214,7 @@ export default function CartPage() {
             });
             return;
         }
-
-        if (diningMode === 'dine-in' && (!tableNumber || tableNumber.trim() === '')) {
-            Swal.fire({
-                title: 'Table Selection Required',
-                text: 'Please select your table number from our live dining floor tables.',
-                icon: 'warning',
-                confirmButtonColor: '#D4AF37'
-            });
-            return;
-        }
-
-        setIsSubmitting(true);
-
-        Swal.fire({
-            title: 'Sending Order to Kitchen...',
-            text: 'Please wait while your order is being synchronized.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        try {
-            const orderItems = cart.map(item => {
-                const cartKey = item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name);
-                const note = itemNotes[cartKey];
-                return {
-                    id: cartKey,
-                    name: getLocalized(item.name) + (note ? ` (${note})` : ''),
-                    quantity: item.quantity,
-                    price: item.price
-                };
-            });
-
-            let formattedAddress = `Dine-In Table: ${tableNumber}`;
-            if (diningMode === 'takeaway') {
-                formattedAddress = `Takeaway Pickup Order`;
-            }
-            if (specialNotes) {
-                formattedAddress += ` | Instruction: ${specialNotes}`;
-            }
-
-            const orderData = {
-                items: orderItems,
-                total: grandTotal,
-                user: {
-                    name: guestName.trim() || 'Royal Guest',
-                    email: guestEmail.trim() || 'guest@khaliya.web',
-                    phone: guestPhone.trim() || 'N/A',
-                    address: formattedAddress
-                },
-                source: `Web Checkout (${diningMode.toUpperCase()})`
-            };
-
-            await axios.post(`${API_URL}/orders`, orderData, { timeout: 10000 });
-
-            // Store guest info for convenience
-            if (guestName || guestPhone || guestEmail) {
-                localStorage.setItem('khaliya_user', JSON.stringify({
-                    name: guestName,
-                    phone: guestPhone,
-                    email: guestEmail
-                }));
-            }
-
-            Swal.fire({
-                title: '🎉 Order Received & Sent to Kitchen!',
-                html: `<div style="text-align:center; color:#CBD5E1; font-family:sans-serif">
-                        <div style="font-size:3rem; margin-bottom:10px">👨‍🍳</div>
-                        <p style="font-size:1.15rem; color:#FFD700; font-weight:800; margin-bottom:8px">
-                            ${diningMode === 'dine-in' ? `Table: ${tableNumber}` : 'Takeaway Pickup Order'}
-                        </p>
-                        <p style="font-size:1.1rem; color:#FFF; font-weight:700">Total Amount Paid: ₹${grandTotal}</p>
-                        ${appliedCoupon ? `<p style="color:#4ADE80; font-size:0.85rem">You saved ₹${discountAmount} with code ${appliedCoupon.code}!</p>` : ''}
-                        <p style="font-size:0.85rem; opacity:0.8; margin-top:12px">Our chef has started preparing your fresh royal meal.</p>
-                       </div>`,
-                icon: 'success',
-                confirmButtonColor: '#D4AF37'
-            });
-
-            clearCart();
-            setIsSubmitting(false);
-            navigate('/menu');
-        } catch (err) {
-            console.error('Order submission error:', err);
-            Swal.fire({
-                title: 'Order Recorded Locally',
-                text: 'We could not reach the server instantly, but your order is saved. Please inform our waiting staff.',
-                icon: 'info',
-                confirmButtonColor: '#D4AF37'
-            });
-            clearCart();
-            setIsSubmitting(false);
-            navigate('/menu');
-        }
+        navigate('/checkout');
     };
 
     // Filter out items already in the cart for recommended original products
@@ -354,14 +237,14 @@ export default function CartPage() {
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 18px', borderRadius: '50px', background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.35)', marginBottom: '14px' }}>
                         <span style={{ color: '#FFD700', fontSize: '0.8rem' }}>👑</span>
                         <span style={{ color: '#D4AF37', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '2px', textTransform: 'uppercase' }}>
-                            ROYAL DINING EXPERIENCE
+                            ROYAL DINING BASKET
                         </span>
                     </div>
                     <h1 style={{ fontFamily: "'Cinzel', 'Playfair Display', serif", fontSize: 'clamp(2.1rem, 4vw, 3.2rem)', color: '#FFD700', margin: '0 0 10px 0', fontWeight: '800' }}>
-                        Your Selection &amp; Checkout
+                        Your Selected Dishes
                     </h1>
                     <p style={{ color: '#CBD5E1', fontSize: '0.98rem', maxWidth: '620px', margin: '0 auto' }}>
-                        Review dishes, customize chef instructions, select dining option, and place your order.
+                        Review your chosen delicacies, add custom chef notes, and proceed to checkout.
                     </p>
                 </div>
             </div>
@@ -425,7 +308,7 @@ export default function CartPage() {
                         </Link>
                     </motion.div>
                 ) : (
-                    /* Active Checkout Grid */
+                    /* Active Cart Grid */
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '32px', alignItems: 'start' }}>
                         
                         {/* LEFT COLUMN: Rich Product Cards & Original Products Showcase */}
@@ -449,7 +332,7 @@ export default function CartPage() {
                                             Selected Dishes ({cart.length})
                                         </h3>
                                         <span style={{ fontSize: '0.78rem', color: '#94A3B8' }}>
-                                            {cart.reduce((sum, item) => sum + item.quantity, 0)} total items in order
+                                            {cart.reduce((sum, item) => sum + item.quantity, 0)} total items in basket
                                         </span>
                                     </div>
                                     <button
@@ -694,7 +577,7 @@ export default function CartPage() {
                             )}
                         </div>
 
-                        {/* RIGHT COLUMN: Dining Option & Final Checkout Summary */}
+                        {/* RIGHT COLUMN: Clean Order Summary & Proceed to Checkout */}
                         <motion.div
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -709,261 +592,117 @@ export default function CartPage() {
                             }}
                         >
                             <h3 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: '0 0 18px 0', fontSize: '1.4rem', fontWeight: '800', paddingBottom: '12px', borderBottom: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                                Order Checkout
+                                Basket Summary
                             </h3>
 
-                            {/* Dining Mode Selector: Table Dining | Takeaway */}
+                            {/* Promo Code Box */}
                             <div style={{ marginBottom: '22px' }}>
-                                <label style={{ display: 'block', color: '#D4AF37', fontWeight: '800', fontSize: '0.82rem', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                                    Dining Mode Option
+                                <label style={{ display: 'block', color: '#CBD5E1', fontWeight: '700', fontSize: '0.82rem', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                                    Have a Promo Code?
                                 </label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', background: '#070A0E', padding: '4px', borderRadius: '12px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => setDiningMode('dine-in')}
-                                        style={{
-                                            background: diningMode === 'dine-in' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
-                                            color: diningMode === 'dine-in' ? '#000' : '#CBD5E1',
-                                            border: 'none',
-                                            padding: '10px',
-                                            borderRadius: '10px',
-                                            fontWeight: '800',
-                                            fontSize: '0.85rem',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '6px'
-                                        }}
-                                    >
-                                        <i className="fas fa-chair"></i> Table Dining
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setDiningMode('takeaway')}
-                                        style={{
-                                            background: diningMode === 'takeaway' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
-                                            color: diningMode === 'takeaway' ? '#000' : '#CBD5E1',
-                                            border: 'none',
-                                            padding: '10px',
-                                            borderRadius: '10px',
-                                            fontWeight: '800',
-                                            fontSize: '0.85rem',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '6px'
-                                        }}
-                                    >
-                                        <i className="fas fa-shopping-bag"></i> Takeaway
-                                    </button>
+                                {appliedCoupon ? (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(74, 222, 128, 0.1)', border: '1px solid rgba(74, 222, 128, 0.4)', padding: '10px 14px', borderRadius: '10px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: '700' }}>
+                                        <span>✓ Code <strong>{appliedCoupon.code}</strong> ({appliedCoupon.desc})</span>
+                                        <button type="button" onClick={handleRemoveCoupon} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontWeight: '800' }}>✕</button>
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. KHALIYA20"
+                                            value={couponInput}
+                                            onChange={(e) => setCouponInput(e.target.value)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px 14px',
+                                                borderRadius: '10px',
+                                                border: '1px solid rgba(255,255,255,0.15)',
+                                                background: 'rgba(0,0,0,0.4)',
+                                                color: '#FFF',
+                                                fontSize: '0.85rem',
+                                                textTransform: 'uppercase',
+                                                outline: 'none'
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleApplyCoupon}
+                                            style={{
+                                                background: 'rgba(212, 175, 55, 0.2)',
+                                                border: '1px solid #D4AF37',
+                                                color: '#FFD700',
+                                                padding: '10px 16px',
+                                                borderRadius: '10px',
+                                                fontWeight: '800',
+                                                fontSize: '0.82rem',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Apply
+                                        </button>
+                                    </div>
+                                )}
+                                {couponError && <div style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{couponError}</div>}
+                            </div>
+
+                            {/* Detailed Financial Summary Breakdown */}
+                            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.25)', marginBottom: '22px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1', fontSize: '0.9rem', marginBottom: '8px' }}>
+                                    <span>Items Subtotal</span>
+                                    <span>₹{subtotal}</span>
+                                </div>
+
+                                {appliedCoupon && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4ADE80', fontSize: '0.9rem', marginBottom: '8px' }}>
+                                        <span>Coupon Discount ({appliedCoupon.code})</span>
+                                        <span>- ₹{discountAmount}</span>
+                                    </div>
+                                )}
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1', fontSize: '0.9rem', marginBottom: '8px' }}>
+                                    <span>Estimated Taxes &amp; GST ({gstRate}%)</span>
+                                    <span>₹{taxAmount}</span>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#FFD700', fontSize: '1.35rem', fontWeight: '900', paddingTop: '10px', borderTop: '1px solid rgba(212, 175, 55, 0.3)' }}>
+                                    <span>Estimated Total</span>
+                                    <span>₹{grandTotal}</span>
                                 </div>
                             </div>
 
-                            <form onSubmit={handlePlaceOrder}>
-                                {/* Live Table Selection from Database (Visible for Dine-In) */}
-                                {diningMode === 'dine-in' && (
-                                    <div style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'block', color: '#FFD700', fontWeight: '800', fontSize: '0.88rem', marginBottom: '8px' }}>
-                                            Select Table from Floor *
-                                        </label>
-                                        <select
-                                            value={tableNumber}
-                                            onChange={(e) => setTableNumber(e.target.value)}
-                                            required={diningMode === 'dine-in'}
-                                            style={{
-                                                width: '100%',
-                                                padding: '13px 16px',
-                                                borderRadius: '12px',
-                                                border: '1.5px solid rgba(212, 175, 55, 0.5)',
-                                                background: '#070A0E',
-                                                color: '#FFF',
-                                                fontSize: '0.92rem',
-                                                fontWeight: '700',
-                                                outline: 'none'
-                                            }}
-                                        >
-                                            <option value="">Select your table ({liveTables.length > 0 ? liveTables.length : 20} available)</option>
-                                            {liveTables.length > 0 ? (
-                                                liveTables.map(t => (
-                                                    <option key={t.id} value={t.name || `Table ${t.id}`}>
-                                                        {t.name || `Table ${t.id}`} {t.section ? `(${t.section})` : ''} - {t.capacity || 4} Seats {t.status ? `[${t.status}]` : ''}
-                                                    </option>
-                                                ))
-                                            ) : (
-                                                Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
-                                                    <option key={num} value={num}>Table {num}</option>
-                                                ))
-                                            )}
-                                        </select>
-                                    </div>
-                                )}
-
-                                {/* Promo Code Box */}
-                                <div style={{ marginBottom: '22px' }}>
-                                    <label style={{ display: 'block', color: '#CBD5E1', fontWeight: '700', fontSize: '0.82rem', letterSpacing: '0.5px', marginBottom: '6px' }}>
-                                        Have a Promo Code?
-                                    </label>
-                                    {appliedCoupon ? (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(74, 222, 128, 0.1)', border: '1px solid rgba(74, 222, 128, 0.4)', padding: '10px 14px', borderRadius: '10px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: '700' }}>
-                                            <span>✓ Code <strong>{appliedCoupon.code}</strong> ({appliedCoupon.desc})</span>
-                                            <button type="button" onClick={handleRemoveCoupon} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontWeight: '800' }}>✕</button>
-                                        </div>
-                                    ) : (
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <input
-                                                type="text"
-                                                placeholder="e.g. KHALIYA20"
-                                                value={couponInput}
-                                                onChange={(e) => setCouponInput(e.target.value)}
-                                                style={{
-                                                    flex: 1,
-                                                    padding: '10px 14px',
-                                                    borderRadius: '10px',
-                                                    border: '1px solid rgba(255,255,255,0.15)',
-                                                    background: 'rgba(0,0,0,0.4)',
-                                                    color: '#FFF',
-                                                    fontSize: '0.85rem',
-                                                    textTransform: 'uppercase',
-                                                    outline: 'none'
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={handleApplyCoupon}
-                                                style={{
-                                                    background: 'rgba(212, 175, 55, 0.2)',
-                                                    border: '1px solid #D4AF37',
-                                                    color: '#FFD700',
-                                                    padding: '10px 16px',
-                                                    borderRadius: '10px',
-                                                    fontWeight: '800',
-                                                    fontSize: '0.82rem',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                Apply
-                                            </button>
-                                        </div>
-                                    )}
-                                    {couponError && <div style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{couponError}</div>}
+                            {storeSettings.isOpen === false && (
+                                <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', padding: '12px', borderRadius: '10px', marginBottom: '16px', fontWeight: '700', fontSize: '0.82rem', textAlign: 'center', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                                    <i className="fas fa-exclamation-triangle" style={{ marginRight: '6px' }}></i> Ordering temporarily paused right now.
                                 </div>
+                            )}
 
-                                {/* Guest Info Inputs */}
-                                <div style={{ marginBottom: '14px' }}>
-                                    <label style={{ display: 'block', color: '#CBD5E1', fontWeight: '600', fontSize: '0.82rem', marginBottom: '4px' }}>
-                                        Guest Name (Optional)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Aarav Sharma"
-                                        value={guestName}
-                                        onChange={(e) => setGuestName(e.target.value)}
-                                        style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.04)', color: '#FFF', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box' }}
-                                    />
-                                </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
-                                    <div>
-                                        <label style={{ display: 'block', color: '#CBD5E1', fontWeight: '600', fontSize: '0.8rem', marginBottom: '4px' }}>Phone</label>
-                                        <input
-                                            type="tel"
-                                            placeholder="+91 Phone"
-                                            value={guestPhone}
-                                            onChange={(e) => setGuestPhone(e.target.value)}
-                                            style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.04)', color: '#FFF', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', color: '#CBD5E1', fontWeight: '600', fontSize: '0.8rem', marginBottom: '4px' }}>Email</label>
-                                        <input
-                                            type="email"
-                                            placeholder="Email"
-                                            value={guestEmail}
-                                            onChange={(e) => setGuestEmail(e.target.value)}
-                                            style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.04)', color: '#FFF', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div style={{ marginBottom: '20px' }}>
-                                    <label style={{ display: 'block', color: '#CBD5E1', fontWeight: '600', fontSize: '0.82rem', marginBottom: '4px' }}>General Order Instructions</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Serve desserts together..."
-                                        value={specialNotes}
-                                        onChange={(e) => setSpecialNotes(e.target.value)}
-                                        style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.04)', color: '#FFF', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
-                                    />
-                                </div>
-
-                                {/* Detailed Financial Summary Breakdown (Fully Admin Configured Fees) */}
-                                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.25)', marginBottom: '20px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1', fontSize: '0.9rem', marginBottom: '8px' }}>
-                                        <span>Items Subtotal</span>
-                                        <span>₹{subtotal}</span>
-                                    </div>
-
-                                    {appliedCoupon && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4ADE80', fontSize: '0.9rem', marginBottom: '8px' }}>
-                                            <span>Coupon Discount ({appliedCoupon.code})</span>
-                                            <span>- ₹{discountAmount}</span>
-                                        </div>
-                                    )}
-
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1', fontSize: '0.9rem', marginBottom: '8px' }}>
-                                        <span>Taxes &amp; GST ({gstRate}%)</span>
-                                        <span>₹{taxAmount}</span>
-                                    </div>
-
-                                    {packagingFee > 0 && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1', fontSize: '0.9rem', marginBottom: '8px' }}>
-                                            <span>Packaging Fee</span>
-                                            <span>₹{packagingFee}</span>
-                                        </div>
-                                    )}
-
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#FFD700', fontSize: '1.35rem', fontWeight: '900', paddingTop: '10px', borderTop: '1px solid rgba(212, 175, 55, 0.3)' }}>
-                                        <span>Total Amount</span>
-                                        <span>₹{grandTotal}</span>
-                                    </div>
-                                </div>
-
-                                {storeSettings.isOpen === false && (
-                                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', padding: '12px', borderRadius: '10px', marginBottom: '16px', fontWeight: '700', fontSize: '0.82rem', textAlign: 'center', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                                        <i className="fas fa-exclamation-triangle" style={{ marginRight: '6px' }}></i> Ordering temporarily paused right now.
-                                    </div>
-                                )}
-
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/checkout')}
-                                    disabled={storeSettings.isOpen === false || isSubmitting}
-                                    style={{
-                                        width: '100%',
-                                        background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
-                                        color: '#000',
-                                        border: 'none',
-                                        padding: '16px',
-                                        borderRadius: '14px',
-                                        fontWeight: '900',
-                                        fontSize: '1rem',
-                                        letterSpacing: '1px',
-                                        textTransform: 'uppercase',
-                                        cursor: (storeSettings.isOpen === false || isSubmitting) ? 'not-allowed' : 'pointer',
-                                        opacity: (storeSettings.isOpen === false || isSubmitting) ? 0.6 : 1,
-                                        boxShadow: '0 10px 30px rgba(212, 175, 55, 0.35)',
-                                        transition: 'all 0.2s ease',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px'
-                                    }}
-                                >
-                                    Proceed to Checkout <i className="fas fa-arrow-right"></i>
-                                </button>
-                            </form>
+                            <button
+                                type="button"
+                                onClick={handleProceedToCheckout}
+                                disabled={storeSettings.isOpen === false}
+                                style={{
+                                    width: '100%',
+                                    background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
+                                    color: '#000',
+                                    border: 'none',
+                                    padding: '16px',
+                                    borderRadius: '14px',
+                                    fontWeight: '900',
+                                    fontSize: '1.02rem',
+                                    letterSpacing: '1px',
+                                    textTransform: 'uppercase',
+                                    cursor: storeSettings.isOpen === false ? 'not-allowed' : 'pointer',
+                                    opacity: storeSettings.isOpen === false ? 0.6 : 1,
+                                    boxShadow: '0 10px 30px rgba(212, 175, 55, 0.35)',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px'
+                                }}
+                            >
+                                PROCEED TO CHECKOUT <i className="fas fa-arrow-right"></i>
+                            </button>
                         </motion.div>
                     </div>
                 )}

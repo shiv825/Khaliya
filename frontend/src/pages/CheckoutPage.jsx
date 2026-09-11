@@ -45,7 +45,14 @@ export default function CheckoutPage() {
     
     // Promo Code State
     const [couponInput, setCouponInput] = useState('');
-    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [appliedCoupon, setAppliedCoupon] = useState(() => {
+        try {
+            const saved = localStorage.getItem('khaliya_applied_coupon');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            return null;
+        }
+    });
     const [couponError, setCouponError] = useState('');
 
     // Store settings state (Admin configurable fees)
