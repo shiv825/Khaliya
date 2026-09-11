@@ -10,6 +10,7 @@ export default function AiAssistant() {
     const { addToCart } = useCart();
     
     const [isOpen, setIsOpen] = useState(false);
+    const [menuItems, setMenuItems] = useState([]);
     const [messages, setMessages] = useState([
         { 
             type: 'bot', 
@@ -34,6 +35,66 @@ export default function AiAssistant() {
     const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
     const cleanApiUrl = rawApiUrl ? rawApiUrl.replace(/\/+$/, '') : '';
     const API_URL = cleanApiUrl ? (cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`) : '/api';
+
+    // Pre-fetch live menu items for robust dish recommendations
+    useEffect(() => {
+        axios.get(`${API_URL}/menu`)
+            .then(res => {
+                if (Array.isArray(res.data) && res.data.length > 0) {
+                    setMenuItems(res.data);
+                }
+            })
+            .catch(err => console.warn('Menu fetch for AI assistant fallback:', err.message));
+    }, [API_URL]);
+
+    // Client-side intelligent dish matcher fallback
+    const filterMenuItems = (query, menuList) => {
+        if (!menuList || menuList.length === 0) return [];
+        const lower = query.toLowerCase();
+        
+        if (lower.includes('veg') && !lower.includes('non-veg') && !lower.includes('non veg')) {
+            const filtered = menuList.filter(m => {
+                const tags = Array.isArray(m.tags) ? m.tags : [];
+                const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
+                const isExplicitVeg = tags.includes('veg') && !tags.includes('non-veg');
+                const isVegName = nameStr.includes('paneer') || nameStr.includes('dal') || nameStr.includes('subzi') || nameStr.includes('chana') || nameStr.includes('aloo') || nameStr.includes('veggie') || nameStr.includes('vegetable');
+                return isExplicitVeg || isVegName || (!tags.includes('non-veg') && !nameStr.includes('chicken') && !nameStr.includes('mutton') && !nameStr.includes('fish'));
+            });
+            return filtered.length > 0 ? filtered.slice(0, 4) : menuList.slice(0, 4);
+        }
+        
+        if (lower.includes('non-veg') || lower.includes('non veg') || lower.includes('chicken') || lower.includes('mutton') || lower.includes('kebab')) {
+            const filtered = menuList.filter(m => {
+                const tags = Array.isArray(m.tags) ? m.tags : [];
+                const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
+                return tags.includes('non-veg') || nameStr.includes('chicken') || nameStr.includes('mutton') || nameStr.includes('kebab') || nameStr.includes('fish');
+            });
+            return filtered.length > 0 ? filtered.slice(0, 4) : menuList.slice(0, 4);
+        }
+
+        if (lower.includes('biryani')) {
+            const filtered = menuList.filter(m => {
+                const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
+                return nameStr.includes('biryani');
+            });
+            return filtered.length > 0 ? filtered.slice(0, 3) : menuList.slice(0, 3);
+        }
+
+        if (lower.includes('starter') || lower.includes('appetizer')) {
+            const filtered = menuList.filter(m => {
+                const cat = (m.category || '').toLowerCase();
+                return cat.includes('starter') || cat.includes('appetizer');
+            });
+            return filtered.length > 0 ? filtered.slice(0, 4) : menuList.slice(0, 4);
+        }
+
+        const matched = menuList.filter(m => {
+            const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
+            const descStr = (typeof m.description === 'object' ? m.description.en : m.description || '').toLowerCase();
+            return nameStr.includes(lower) || descStr.includes(lower);
+        });
+        return matched.length > 0 ? matched.slice(0, 4) : menuList.slice(0, 4);
+    };
 
     // Speak response if Speech Synthesis (TTS) is enabled
     const speakText = (text) => {
@@ -102,7 +163,12 @@ export default function AiAssistant() {
             const botReply = (rawReply && typeof rawReply === 'string' && rawReply.trim().length > 0)
                 ? rawReply.trim()
                 : "Here are our recommendations based on your request:";
-            const dishes = res.data?.dishes || [];
+            
+            let dishes = res.data?.dishes || [];
+            if (dishes.length === 0 && menuItems.length > 0) {
+                dishes = filterMenuItems(userMsg, menuItems);
+            }
+
             const action = res.data?.action;
             const newSuggestions = res.data?.suggestions || suggestions;
 
@@ -126,11 +192,9 @@ export default function AiAssistant() {
             console.warn('AI API fallback to local engine:', err.message);
             setIsTyping(false);
             
-            // Intelligent local fallback response generator
             let fallbackText = "Here are our recommendations based on your request:";
-            let fallbackDishes = [];
-
             const lower = userMsg.toLowerCase();
+            
             if (lower.includes('special') || lower.includes('today') || lower.includes('chef')) {
                 fallbackText = "Here are today's featured chef specialities:";
             } else if (lower.includes('veg') && !lower.includes('non-veg')) {
@@ -147,6 +211,7 @@ export default function AiAssistant() {
                 fallbackText = "We are located at 123 Spice Garden, Luxury Culinary Haven, Food City (110001).";
             }
 
+            const fallbackDishes = filterMenuItems(userMsg, menuItems);
             setMessages(prev => [...prev, { type: 'bot', text: fallbackText, dishes: fallbackDishes }]);
             speakText(fallbackText);
         }
@@ -183,12 +248,13 @@ export default function AiAssistant() {
                         className="khali-window active" 
                         style={{ 
                             position: 'fixed',
-                            bottom: '100px',
-                            right: '30px',
+                            bottom: '90px',
+                            right: '25px',
                             left: 'auto',
                             transformOrigin: 'bottom right',
-                            width: '400px',
-                            height: '600px',
+                            width: '380px',
+                            height: '520px',
+                            maxHeight: 'calc(100vh - 110px)',
                             display: 'flex',
                             flexDirection: 'column',
                             background: '#121722',
@@ -202,14 +268,14 @@ export default function AiAssistant() {
                     >
                         {/* Concierge Header */}
                         <div className="khali-header" style={{ 
-                            padding: '18px 22px', 
+                            padding: '16px 20px', 
                             background: 'linear-gradient(180deg, #1A2130 0%, #121722 100%)', 
                             borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center'
                         }}>
-                            <div className="title" style={{ color: '#D4AF37', fontWeight: '800', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '10px', fontFamily: "'Cinzel', serif" }}>
+                            <div className="title" style={{ color: '#D4AF37', fontWeight: '800', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px', fontFamily: "'Cinzel', serif" }}>
                                 <div style={{ width: '10px', height: '10px', background: '#FFD700', borderRadius: '50%', boxShadow: '0 0 12px rgba(255, 215, 0, 0.8)' }}></div>
                                 Khaliya AI Concierge
                             </div>
@@ -258,7 +324,7 @@ export default function AiAssistant() {
                         </div>
 
                         {/* Chat Messages Body */}
-                        <div className="khali-chat-area" style={{ flex: 1, padding: '20px 22px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', background: '#0B0E14' }}>
+                        <div className="khali-chat-area" style={{ flex: 1, padding: '18px 20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', background: '#0B0E14' }}>
                             {messages.map((m, i) => (
                                 <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.type === 'bot' ? 'flex-start' : 'flex-end', width: '100%' }}>
                                     <div className={`khali-msg ${m.type}`} style={{ 
@@ -267,7 +333,7 @@ export default function AiAssistant() {
                                         color: m.type === 'bot' ? '#E2E8F0' : '#000',
                                         padding: '12px 18px',
                                         borderRadius: m.type === 'bot' ? '20px 20px 20px 4px' : '20px 20px 4px 20px',
-                                        fontSize: '0.9rem',
+                                        fontSize: '0.88rem',
                                         maxWidth: '88%',
                                         lineHeight: '1.6',
                                         fontWeight: '500',
@@ -282,8 +348,8 @@ export default function AiAssistant() {
                                     {m.dishes && m.dishes.length > 0 && (
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '10px' }}>
                                             {m.dishes.map((dish, dIdx) => {
-                                                const dishName = typeof dish.name === 'object' ? dish.name.en : dish.name;
-                                                const isVeg = Array.isArray(dish.tags) ? dish.tags.includes('veg') : true;
+                                                const dishName = typeof dish.name === 'object' ? (dish.name.en || dish.name.hi || 'Gourmet Dish') : dish.name;
+                                                const isVeg = Array.isArray(dish.tags) ? dish.tags.includes('veg') : !String(dish.tags || '').includes('non-veg');
                                                 return (
                                                     <div key={dIdx} style={{ 
                                                         display: 'flex', 
@@ -295,22 +361,22 @@ export default function AiAssistant() {
                                                         padding: '10px 12px' 
                                                     }}>
                                                         {dish.image ? (
-                                                            <img src={dish.image} alt={dishName} style={{ width: '50px', height: '50px', borderRadius: '10px', objectFit: 'cover' }} />
+                                                            <img src={dish.image} alt={dishName} style={{ width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover' }} />
                                                         ) : (
-                                                            <div style={{ width: '50px', height: '50px', borderRadius: '10px', background: 'rgba(212, 175, 55, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D4AF37' }}>
+                                                            <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(212, 175, 55, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D4AF37' }}>
                                                                 <i className="fas fa-utensils"></i>
                                                             </div>
                                                         )}
                                                         <div style={{ flex: 1, minWidth: 0 }}>
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: '4px', background: isVeg ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: isVeg ? '#4ADE80' : '#F87171', border: `1px solid ${isVeg ? '#22C55E' : '#EF4444'}` }}>
+                                                                <span style={{ fontSize: '0.62rem', padding: '1px 5px', borderRadius: '4px', background: isVeg ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: isVeg ? '#4ADE80' : '#F87171', border: `1px solid ${isVeg ? '#22C55E' : '#EF4444'}` }}>
                                                                     {isVeg ? 'VEG' : 'NON-VEG'}
                                                                 </span>
-                                                                <div style={{ fontWeight: '700', color: '#FFF', fontSize: '0.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                                <div style={{ fontWeight: '700', color: '#FFF', fontSize: '0.86rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                                     {dishName}
                                                                 </div>
                                                             </div>
-                                                            <div style={{ color: '#FFD700', fontWeight: '800', fontSize: '0.85rem', marginTop: '2px' }}>
+                                                            <div style={{ color: '#FFD700', fontWeight: '800', fontSize: '0.82rem', marginTop: '2px' }}>
                                                                 ₹{dish.price}
                                                             </div>
                                                         </div>
@@ -374,7 +440,7 @@ export default function AiAssistant() {
                         </div>
 
                         {/* Quick Suggestion Chips */}
-                        <div className="khali-suggestions" style={{ display: 'flex', gap: '8px', padding: '12px 18px', overflowX: 'auto', whiteSpace: 'nowrap', background: '#0E121B', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div className="khali-suggestions" style={{ display: 'flex', gap: '8px', padding: '10px 18px', overflowX: 'auto', whiteSpace: 'nowrap', background: '#0E121B', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                             {suggestions.map((s, i) => (
                                 <button 
                                     key={i} 
@@ -403,8 +469,8 @@ export default function AiAssistant() {
                                 onClick={toggleListen}
                                 title={isListening ? "Listening..." : "Speak via Microphone"}
                                 style={{ 
-                                    width: '40px', 
-                                    height: '40px', 
+                                    width: '38px', 
+                                    height: '38px', 
                                     borderRadius: '50%', 
                                     background: isListening ? '#E53E3E' : 'rgba(255,255,255,0.06)', 
                                     color: isListening ? '#FFF' : '#D4AF37', 
@@ -430,18 +496,18 @@ export default function AiAssistant() {
                                     background: 'rgba(255, 255, 255, 0.05)', 
                                     border: '1px solid rgba(212, 175, 55, 0.25)', 
                                     borderRadius: '25px', 
-                                    padding: '10px 18px', 
+                                    padding: '9px 16px', 
                                     color: '#FFF', 
                                     outline: 'none', 
                                     fontWeight: '500',
-                                    fontSize: '0.88rem'
+                                    fontSize: '0.86rem'
                                 }}
                             />
                             <button 
                                 onClick={() => handleSend()} 
                                 style={{ 
-                                    width: '40px', 
-                                    height: '40px', 
+                                    width: '38px', 
+                                    height: '38px', 
                                     borderRadius: '50%', 
                                     background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)', 
                                     color: '#000', 
@@ -453,7 +519,7 @@ export default function AiAssistant() {
                                     flexShrink: 0
                                 }}
                             >
-                                <i className="fas fa-paper-plane" style={{ fontSize: '0.9rem' }}></i>
+                                <i className="fas fa-paper-plane" style={{ fontSize: '0.85rem' }}></i>
                             </button>
                         </div>
                     </motion.div>
@@ -467,16 +533,16 @@ export default function AiAssistant() {
                   title="Speak with Luxury Concierge"
                   style={{
                     position: 'fixed',
-                    bottom: 'calc(30px + var(--pwa-offset, 0px))',
-                    right: '30px',
-                    width: '68px',
-                    height: '68px',
+                    bottom: 'calc(25px + var(--pwa-offset, 0px))',
+                    right: '25px',
+                    width: '64px',
+                    height: '64px',
                     borderRadius: '50%',
                     background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
                     boxShadow: '0 10px 30px rgba(212, 175, 55, 0.4)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     color: '#000',
-                    fontSize: '1.7rem',
+                    fontSize: '1.6rem',
                     cursor: 'pointer',
                     zIndex: 9999,
                     display: 'flex',
@@ -488,14 +554,21 @@ export default function AiAssistant() {
                     <style>{`
                         @media (max-width: 768px) {
                             .khali-trigger { 
-                                --pwa-offset: 85px; 
+                                --pwa-offset: 75px; 
                                 width: 55px !important; 
                                 height: 55px !important; 
                                 font-size: 1.3rem !important;
                                 right: 15px !important;
                                 bottom: calc(15px + var(--pwa-offset)) !important;
                             }
-                            .khali-window { bottom: 150px !important; width: 92% !important; left: 4% !important; right: 4% !important; height: 520px !important; }
+                            .khali-window { 
+                                bottom: 90px !important; 
+                                width: calc(100vw - 30px) !important; 
+                                left: 15px !important; 
+                                right: 15px !important; 
+                                height: 480px !important; 
+                                max-height: calc(100vh - 110px) !important;
+                            }
                         }
                     `}</style>
                 </button>
