@@ -219,7 +219,7 @@ export default function Navbar() {
                         {/* Language Switcher (Desktop Header Only) */}
                         {isDesktop && <LanguageSwitcher mode="dropdown" />}
 
-                        {/* Mobile Menu Toggle Button (Visible on screens < 992px) */}
+                        {/* Mobile Menu Toggle Button (Icon Only) */}
                         {!isDesktop && (
                             <button 
                                 onClick={toggleMenu}
@@ -229,19 +229,17 @@ export default function Navbar() {
                                     border: '1.5px solid #D4AF37',
                                     color: '#FFD700',
                                     borderRadius: '10px',
-                                    padding: '8px 12px',
+                                    width: '38px',
+                                    height: '38px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '6px',
+                                    justifyContent: 'center',
                                     cursor: 'pointer',
-                                    fontWeight: '800',
-                                    fontSize: '0.85rem',
-                                    letterSpacing: '1px',
-                                    boxShadow: '0 0 15px rgba(212, 175, 55, 0.2)'
+                                    boxShadow: '0 0 15px rgba(212, 175, 55, 0.2)',
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
-                                <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`} style={{ fontSize: '1rem' }}></i>
-                                <span style={{ textTransform: 'uppercase', fontSize: '0.75rem' }}>{isMenuOpen ? 'Close' : 'Menu'}</span>
+                                <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`} style={{ fontSize: '1.1rem' }}></i>
                             </button>
                         )}
                     </div>
