@@ -604,28 +604,38 @@ app.post('/api/ai/chat', async (req, res) => {
         const lowerMsg = userMsg.toLowerCase();
         const menu = await readData('menu') || [];
 
-        let reply = '';
+        let reply = 'Here are our recommendations for your request:';
         let dishes = [];
         let action = null;
         let suggestions = ['🔥 Signature Specials', '🌱 Pure Veg', '🍖 Non-Veg Delights', '📅 Book Table', '🕒 Operating Hours'];
 
-        if (lowerMsg.includes('appetizer') || lowerMsg.includes('starter')) {
+        if (lowerMsg.includes('special') || lowerMsg.includes('today') || lowerMsg.includes('chef') || lowerMsg.includes('featured')) {
+            dishes = menu.filter(m => {
+                const tags = Array.isArray(m.tags) ? m.tags : [];
+                return tags.includes('special') || tags.includes('featured') || tags.includes('chef');
+            });
+            if (dishes.length === 0) dishes = menu.slice(0, 4);
+            reply = "Here are our Master Chef's signature specialities for today:";
+        } else if (lowerMsg.includes('appetizer') || lowerMsg.includes('starter')) {
             dishes = menu.filter(m => {
                 const cat = (m.category || '').toLowerCase();
                 return cat.includes('starter') || cat.includes('appetizer');
             }).slice(0, 4);
+            if (dishes.length === 0) dishes = menu.slice(0, 4);
             reply = "Here are our finest royal starters and appetizers to kick off your dining experience:";
         } else if (lowerMsg.includes('main course') || lowerMsg.includes('curry') || lowerMsg.includes('gravy')) {
             dishes = menu.filter(m => {
                 const cat = (m.category || '').toLowerCase();
                 return cat.includes('main') || cat.includes('curry') || cat.includes('gravy');
             }).slice(0, 4);
+            if (dishes.length === 0) dishes = menu.slice(0, 4);
             reply = "Here are our master chef's handcrafted main courses:";
         } else if (lowerMsg.includes('dessert') || lowerMsg.includes('sweet') || lowerMsg.includes('mithai')) {
             dishes = menu.filter(m => {
                 const cat = (m.category || '').toLowerCase();
                 return cat.includes('dessert') || cat.includes('sweet');
             }).slice(0, 4);
+            if (dishes.length === 0) dishes = menu.slice(0, 4);
             reply = "Treat yourself to our exquisite traditional Indian desserts:";
         } else if (lowerMsg.includes('bread') || lowerMsg.includes('naan') || lowerMsg.includes('roti')) {
             dishes = menu.filter(m => {
@@ -633,24 +643,32 @@ app.post('/api/ai/chat', async (req, res) => {
                 const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
                 return cat.includes('bread') || nameStr.includes('naan') || nameStr.includes('roti') || nameStr.includes('paratha');
             }).slice(0, 4);
+            if (dishes.length === 0) dishes = menu.slice(0, 4);
             reply = "Here are our tandoori breads baked fresh in clay ovens:";
         } else if (lowerMsg.includes('veg') && !lowerMsg.includes('non-veg') && !lowerMsg.includes('non veg')) {
             dishes = menu.filter(m => {
                 const tags = Array.isArray(m.tags) ? m.tags : [];
-                return tags.includes('veg') || !tags.includes('non-veg');
+                const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
+                const isExplicitVeg = tags.includes('veg') && !tags.includes('non-veg');
+                const isVegName = nameStr.includes('paneer') || nameStr.includes('dal') || nameStr.includes('subzi') || nameStr.includes('chana') || nameStr.includes('aloo') || nameStr.includes('veggie') || nameStr.includes('vegetable');
+                return isExplicitVeg || isVegName || (!tags.includes('non-veg') && !nameStr.includes('chicken') && !nameStr.includes('mutton') && !nameStr.includes('fish') && !nameStr.includes('prawn'));
             }).slice(0, 4);
+            if (dishes.length === 0) dishes = menu.slice(0, 4);
             reply = "Here are our signature 100% Pure Vegetarian gourmet creations:";
         } else if (lowerMsg.includes('non-veg') || lowerMsg.includes('non veg') || lowerMsg.includes('chicken') || lowerMsg.includes('mutton') || lowerMsg.includes('kebab')) {
             dishes = menu.filter(m => {
                 const tags = Array.isArray(m.tags) ? m.tags : [];
-                return tags.includes('non-veg');
+                const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
+                return tags.includes('non-veg') || nameStr.includes('chicken') || nameStr.includes('mutton') || nameStr.includes('kebab') || nameStr.includes('fish');
             }).slice(0, 4);
+            if (dishes.length === 0) dishes = menu.slice(0, 4);
             reply = "Here are our succulent non-vegetarian specialties:";
         } else if (lowerMsg.includes('biryani')) {
             dishes = menu.filter(m => {
                 const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
                 return nameStr.includes('biryani');
             });
+            if (dishes.length === 0) dishes = menu.slice(0, 3);
             reply = "Our aromatic Royal Biryanis are slow-cooked in traditional Dum style. I highly recommend pairing with cool Cucumber Raita!";
         } else if (lowerMsg.includes('butter chicken')) {
             reply = "Our Velvet Butter Chicken is legendary — cooked in rich tomato gravy, butter, and fenugreek. Best enjoyed with Butter Naan or Roomali Roti!";
@@ -658,6 +676,7 @@ app.post('/api/ai/chat', async (req, res) => {
                 const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
                 return nameStr.includes('butter chicken') || nameStr.includes('naan');
             }).slice(0, 3);
+            if (dishes.length === 0) dishes = menu.slice(0, 3);
         } else if (lowerMsg.includes('book') || lowerMsg.includes('reserve') || lowerMsg.includes('table')) {
             reply = "We would love to host you! You can reserve your luxury dining space using our online reservation tool.";
             action = 'RESERVE_TABLE';
@@ -665,18 +684,22 @@ app.post('/api/ai/chat', async (req, res) => {
             reply = "Khaliya Sanctuary Hours:\n• Monday–Friday: 11:00 AM – 10:00 PM\n• Saturday–Sunday: 10:00 AM – 11:00 PM";
         } else if (lowerMsg.includes('location') || lowerMsg.includes('where') || lowerMsg.includes('address')) {
             reply = "We are located at 123 Spice Garden, Luxury Culinary Haven, Food City (110001). Free valet parking available!";
+        } else if (lowerMsg.includes('hi') || lowerMsg.includes('hello') || lowerMsg.includes('hey')) {
+            reply = "Hello & Welcome to Khaliya Sanctuary! How may I assist your dining experience today?";
+            dishes = menu.slice(0, 3);
         } else {
             const matchedDishes = menu.filter(m => {
                 const nameStr = (typeof m.name === 'object' ? m.name.en : m.name || '').toLowerCase();
                 const descStr = (typeof m.description === 'object' ? m.description.en : m.description || '').toLowerCase();
                 return nameStr.includes(lowerMsg) || descStr.includes(lowerMsg);
-            }).slice(0, 3);
+            }).slice(0, 4);
 
             if (matchedDishes.length > 0) {
                 dishes = matchedDishes;
                 reply = `I found these items on our menu matching "${userMsg}":`;
             } else {
-                reply = "Welcome to Khaliya Sanctuary! I am your personal Sommelier & Culinary Concierge. Ask me about dish recommendations, pure veg options, or table bookings!";
+                dishes = menu.slice(0, 3);
+                reply = "Welcome to Khaliya Sanctuary! Here are some of our popular recommendations to get you started:";
             }
         }
 

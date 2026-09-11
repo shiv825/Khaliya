@@ -40,11 +40,12 @@
 
 .khali-window {
     position: fixed;
-    bottom: 95px;
-    right: 30px;
+    bottom: 90px;
+    right: 25px;
     left: auto;
-    width: 400px;
-    height: 600px;
+    width: 380px;
+    height: 520px;
+    max-height: calc(100vh - 110px);
     background: #121722;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);

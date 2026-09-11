@@ -98,7 +98,10 @@ export default function AiAssistant() {
             const res = await axios.post(`${API_URL}/ai/chat`, { message: userMsg }, { timeout: 8000 });
             setIsTyping(false);
             
-            const botReply = res.data?.reply || "I am at your service. How else may I assist you?";
+            const rawReply = res.data?.reply;
+            const botReply = (rawReply && typeof rawReply === 'string' && rawReply.trim().length > 0)
+                ? rawReply.trim()
+                : "Here are our recommendations based on your request:";
             const dishes = res.data?.dishes || [];
             const action = res.data?.action;
             const newSuggestions = res.data?.suggestions || suggestions;
@@ -123,17 +126,25 @@ export default function AiAssistant() {
             console.warn('AI API fallback to local engine:', err.message);
             setIsTyping(false);
             
-            // Fallback response generator
-            let fallbackText = "I'm your luxury culinary guide at Khaliya Sanctuary. Ask me about our signature biryanis, pure veg specialties, or table reservations!";
+            // Intelligent local fallback response generator
+            let fallbackText = "Here are our recommendations based on your request:";
             let fallbackDishes = [];
 
             const lower = userMsg.toLowerCase();
-            if (lower.includes('menu') || lower.includes('food')) {
+            if (lower.includes('special') || lower.includes('today') || lower.includes('chef')) {
+                fallbackText = "Here are today's featured chef specialities:";
+            } else if (lower.includes('veg') && !lower.includes('non-veg')) {
+                fallbackText = "Here are our signature 100% Pure Vegetarian gourmet creations:";
+            } else if (lower.includes('non-veg') || lower.includes('chicken') || lower.includes('mutton') || lower.includes('biryani')) {
+                fallbackText = "Here are our succulent non-vegetarian specialties:";
+            } else if (lower.includes('menu') || lower.includes('food')) {
                 fallbackText = "Our menu features royal North Indian delicacies, rich gravies, tandoori starters, and saffron biryanis.";
             } else if (lower.includes('book') || lower.includes('table') || lower.includes('reserve')) {
                 fallbackText = "You can easily reserve a table by clicking 'Reserve Table' in our navigation menu!";
             } else if (lower.includes('hour') || lower.includes('time') || lower.includes('open')) {
                 fallbackText = "Khaliya Sanctuary Hours: Mon-Fri: 11 AM - 10 PM | Sat-Sun: 10 AM - 11 PM.";
+            } else if (lower.includes('location') || lower.includes('where') || lower.includes('address')) {
+                fallbackText = "We are located at 123 Spice Garden, Luxury Culinary Haven, Food City (110001).";
             }
 
             setMessages(prev => [...prev, { type: 'bot', text: fallbackText, dishes: fallbackDishes }]);
