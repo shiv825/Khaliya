@@ -174,6 +174,8 @@ export default function AiAssistant() {
                             position: 'fixed',
                             bottom: '100px',
                             right: '30px',
+                            left: 'auto',
+                            transformOrigin: 'bottom right',
                             width: '400px',
                             height: '600px',
                             display: 'flex',

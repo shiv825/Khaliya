@@ -39,22 +39,23 @@
 }
 
 .khali-window {
-    position: absolute;
-    bottom: 80px;
-    left: 0;
-    width: 330px;
-    height: 450px;
-    background: var(--bg-surface);
+    position: fixed;
+    bottom: 95px;
+    right: 30px;
+    left: auto;
+    width: 400px;
+    height: 600px;
+    background: #121722;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transform-origin: bottom left;
+    transform-origin: bottom right;
     transform: scale(0);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid var(--border-light);
+    border: 1px solid rgba(212, 175, 55, 0.35);
 }
 
 .khali-window.active {
