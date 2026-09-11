@@ -1,11 +1,13 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
 export default function CartDrawer({ isOpen, onClose }) {
+    const navigate = useNavigate();
     const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
     const { t, language } = useLanguage();
     const [tableNumber, setTableNumber] = React.useState('');
@@ -285,23 +287,49 @@ export default function CartDrawer({ isOpen, onClose }) {
                                         Ordering closed temporarily
                                     </div>
                                 )}
-                                <button 
-                                    onClick={handleCheckout}
-                                    className="btn btn-primary" 
-                                    disabled={storeSettings.isOpen === false}
-                                    style={{ 
-                                        width: '100%', 
-                                        padding: '20px', 
-                                        borderRadius: '40px', 
-                                        fontWeight: '800', 
-                                        letterSpacing: '1.5px', 
-                                        fontSize: '1.1rem',
-                                        opacity: storeSettings.isOpen === false ? 0.5 : 1,
-                                        cursor: storeSettings.isOpen === false ? 'not-allowed' : 'pointer'
-                                    }}
-                                >
-                                    {storeSettings.isOpen === false ? 'Ordering Closed' : t('cart.checkout')}
-                                </button>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <button 
+                                        onClick={handleCheckout}
+                                        className="btn btn-primary" 
+                                        disabled={storeSettings.isOpen === false}
+                                        style={{ 
+                                            width: '100%', 
+                                            padding: '16px', 
+                                            borderRadius: '40px', 
+                                            fontWeight: '800', 
+                                            letterSpacing: '1.5px', 
+                                            fontSize: '1rem',
+                                            opacity: storeSettings.isOpen === false ? 0.5 : 1,
+                                            cursor: storeSettings.isOpen === false ? 'not-allowed' : 'pointer'
+                                        }}
+                                    >
+                                        {storeSettings.isOpen === false ? 'Ordering Closed' : 'Quick Order'}
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            onClose();
+                                            navigate('/cart');
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            padding: '14px',
+                                            borderRadius: '40px',
+                                            background: 'rgba(212, 175, 55, 0.12)',
+                                            border: '1.5px solid #D4AF37',
+                                            color: '#FFD700',
+                                            fontWeight: '800',
+                                            fontSize: '0.92rem',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px'
+                                        }}
+                                    >
+                                        Full Cart &amp; Checkout Page <i className="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </motion.div>

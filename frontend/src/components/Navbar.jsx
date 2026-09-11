@@ -66,6 +66,7 @@ export default function Navbar() {
     const mainNavLinks = [
         { path: '/', label: t('nav.home', 'Home'), icon: 'fa-home' },
         { path: '/menu', label: t('nav.menu', 'Menu'), icon: 'fa-utensils' },
+        { path: '/cart', label: 'Cart & Checkout', icon: 'fa-shopping-bag' },
         { path: '/reserve', label: t('nav.reservations', 'Reserve Table'), icon: 'fa-chair' },
         { path: '/tables', label: 'Dining Spaces', icon: 'fa-gem' }
     ];
