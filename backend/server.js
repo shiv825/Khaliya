@@ -505,13 +505,13 @@ app.get('/api/menu', async (req, res) => {
 app.post('/api/menu', verifyAdminToken, async (req, res) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     const menu = await readData('menu');
-    const reqId = req.body.id || req.body._id;
+    const reqId = (req.body.id !== undefined && req.body.id !== null && req.body.id !== '') ? req.body.id : req.body._id;
     const reqNameEn = typeof req.body.name === 'object' ? req.body.name?.en : req.body.name;
     const normName = reqNameEn ? String(reqNameEn).trim().toLowerCase() : '';
 
     // Check if dish already exists in menu by ID or Dish Name
     const existingIndex = menu.findIndex(m => {
-        if (reqId && String(m.id || m._id) === String(reqId)) return true;
+        if (reqId !== undefined && reqId !== null && reqId !== '' && String(m.id || m._id) === String(reqId)) return true;
         if (normName) {
             const mNameEn = typeof m.name === 'object' ? m.name?.en : m.name;
             if (mNameEn && String(mNameEn).trim().toLowerCase() === normName) return true;
@@ -531,7 +531,7 @@ app.post('/api/menu', verifyAdminToken, async (req, res) => {
         console.log(`📝 [MENU API] POST /api/menu - Updated existing product #${targetId} (${reqNameEn})`);
         return res.json(menu[existingIndex]);
     } else {
-        const productId = reqId || Date.now();
+        const productId = (reqId !== undefined && reqId !== null && reqId !== '') ? reqId : Date.now();
         if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
             imageUrl = await processOnlineImageUrl(imageUrl, productId);
         }
@@ -852,15 +852,62 @@ app.post('/api/bookings', async (req, res) => {
     bookings.push(newBooking);
     await writeData('bookings', bookings);
     console.log(`📅 [BOOKING API] New Reservation ${newBooking.bookingNo} created for ${newBooking.name}`);
+
+    // Trigger Luxury Email Notification asynchronously
+    sendBookingConfirmationEmail(newBooking).catch(err => {
+        console.error('❌ [BOOKING EMAIL] Async error:', err.message);
+    });
+
     res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
 });
+
+// Helper function to dispatch table reservation confirmation emails
+const sendBookingConfirmationEmail = async (booking) => {
+    if (!booking || !booking.email) return false;
+    const recipientEmail = String(booking.email).trim().toLowerCase();
+    if (!recipientEmail.includes('@')) return false;
+
+    console.log(`✉️ [BOOKING EMAIL] Preparing reservation confirmation email for ${recipientEmail} (${booking.bookingNo || booking.id})`);
+
+    const emailContent = getBookingEmailTemplate({ booking });
+
+    if (emailTransporter) {
+        try {
+            await emailTransporter.sendMail({
+                from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
+                to: recipientEmail,
+                subject: emailContent.subject,
+                text: emailContent.text,
+                html: emailContent.html
+            });
+            console.log(`✅ [BOOKING EMAIL] Luxury confirmation email sent successfully to ${recipientEmail}`);
+            return true;
+        } catch (err) {
+            console.error(`❌ [BOOKING EMAIL] Failed to send email to ${recipientEmail}:`, err.message);
+            return false;
+        }
+    } else {
+        console.log(`ℹ️ [BOOKING EMAIL SIMULATED MODE] Confirmation email generated for ${recipientEmail}:`);
+        console.log(`   Subject: ${emailContent.subject}`);
+        return false;
+    }
+};
 
 app.put('/api/bookings/:id', async (req, res) => {
     const bookings = await readData('bookings');
     const index = bookings.findIndex(b => b.id == req.params.id);
     if (index !== -1) {
+        const oldStatus = bookings[index].status;
         bookings[index] = { ...bookings[index], ...req.body };
         await writeData('bookings', bookings);
+
+        // Send email if status is updated to confirmed
+        if (req.body.status && req.body.status !== oldStatus && (req.body.status.toLowerCase() === 'confirmed' || req.body.status.toLowerCase() === 'approved')) {
+            sendBookingConfirmationEmail(bookings[index]).catch(err => {
+                console.error('❌ [BOOKING EMAIL] Async status update error:', err.message);
+            });
+        }
+
         res.json({ message: 'Booking updated', booking: bookings[index] });
     } else {
         res.status(404).json({ message: 'Booking not found' });

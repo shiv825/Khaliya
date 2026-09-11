@@ -326,7 +326,8 @@ export default function AdminDashboard({ onLogout }) {
         setIsUploading(true);
         const formData = new FormData();
         formData.append('image', file);
-        if (editingItem?.id) formData.append('productId', editingItem.id);
+        const itemId = (editingItem?.id !== undefined && editingItem?.id !== null && editingItem?.id !== '') ? editingItem.id : editingItem?._id;
+        if (itemId) formData.append('productId', itemId);
         try {
             const res = await axios.post(`${API_URL}/upload`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
@@ -334,7 +335,7 @@ export default function AdminDashboard({ onLogout }) {
             const rawUrl = res.data.imageUrl;
             const baseUrl = API_URL.replace(/\/api$/, '');
             const fullUrl = (rawUrl && rawUrl.startsWith('/uploads')) ? `${baseUrl}${rawUrl}` : rawUrl;
-            setEditingItem({ ...editingItem, image: fullUrl });
+            setEditingItem(prev => ({ ...prev, image: fullUrl }));
             Swal.fire({ title: 'Image Saved!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
         } catch (err) {
             console.error('Upload failed', err);
@@ -351,16 +352,17 @@ export default function AdminDashboard({ onLogout }) {
             return;
         }
         setIsUploading(true);
+        const itemId = (editingItem?.id !== undefined && editingItem?.id !== null && editingItem?.id !== '') ? editingItem.id : editingItem?._id;
         try {
             const res = await axios.post(`${API_URL}/upload-url`, {
                 url: editingItem.image,
-                productId: editingItem.id || Date.now()
+                productId: itemId || Date.now()
             });
             if (res.data?.imageUrl) {
                 const rawUrl = res.data.imageUrl;
                 const baseUrl = API_URL.replace(/\/api$/, '');
                 const fullUrl = (rawUrl && rawUrl.startsWith('/uploads')) ? `${baseUrl}${rawUrl}` : rawUrl;
-                setEditingItem({ ...editingItem, image: fullUrl });
+                setEditingItem(prev => ({ ...prev, image: fullUrl }));
                 Swal.fire({ title: 'Online Image Downloaded & Saved!', icon: 'success', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false });
             }
         } catch (err) {
@@ -375,6 +377,8 @@ export default function AdminDashboard({ onLogout }) {
         e.preventDefault();
         try {
             let savedItem = { ...editingItem };
+            const itemId = (savedItem.id !== undefined && savedItem.id !== null && savedItem.id !== '') ? savedItem.id : savedItem._id;
+
             if (savedItem.price && !String(savedItem.price).startsWith('₹')) {
                 savedItem.price = `₹${savedItem.price}`;
             }
@@ -384,7 +388,7 @@ export default function AdminDashboard({ onLogout }) {
                 try {
                     const urlRes = await axios.post(`${API_URL}/upload-url`, {
                         url: savedItem.image,
-                        productId: savedItem.id || Date.now()
+                        productId: itemId || Date.now()
                     });
                     if (urlRes.data?.imageUrl) {
                         const rawUrl = urlRes.data.imageUrl;
@@ -399,16 +403,22 @@ export default function AdminDashboard({ onLogout }) {
             // Close modal immediately for smooth transitions
             setIsModalOpen(false);
 
-            if (savedItem.id) {
-                // Optimistically update frontend state for existing item
-                setMenu(prev => prev.map(m => m.id === savedItem.id ? savedItem : m));
-                await axios.put(`${API_URL}/menu/${savedItem.id}`, savedItem);
+            if (itemId !== undefined && itemId !== null && itemId !== '') {
+                const res = await axios.put(`${API_URL}/menu/${itemId}`, savedItem);
+                const updatedItem = res.data || savedItem;
+                setMenu(prev => prev.map(m => String(m.id || m._id) === String(itemId) ? { ...m, ...updatedItem } : m));
                 Swal.fire({ title: 'Updated!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             } else {
-                // Make the call and push the response item once it resolves
                 const res = await axios.post(`${API_URL}/menu`, savedItem);
                 if (res.data) {
-                    setMenu(prev => [...prev, res.data]);
+                    const newItem = res.data;
+                    setMenu(prev => {
+                        const exists = prev.some(m => String(m.id || m._id) === String(newItem.id || newItem._id));
+                        if (exists) {
+                            return prev.map(m => String(m.id || m._id) === String(newItem.id || newItem._id) ? newItem : m);
+                        }
+                        return [newItem, ...prev];
+                    });
                 }
                 Swal.fire({ title: 'Added!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             }
