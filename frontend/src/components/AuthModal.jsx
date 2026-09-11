@@ -287,33 +287,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                             >
                                 {isLoading ? 'Sending OTP...' : (mode === 'register' ? '✉️ REGISTER & SEND OTP' : '✉️ SEND SIGN IN CODE')}
                             </button>
-
-                            {/* Mode Toggle Footer Link */}
-                            <div style={{ textAlign: 'center', marginTop: '6px', paddingTop: '10px', borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
-                                {mode === 'login' ? (
-                                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#94A3B8' }}>
-                                        Don't have an account?{' '}
-                                        <button
-                                            type="button"
-                                            onClick={() => setMode('register')}
-                                            style={{ background: 'none', border: 'none', color: '#FFD700', fontWeight: '700', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-                                        >
-                                            Create an Account / Register
-                                        </button>
-                                    </p>
-                                ) : (
-                                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#94A3B8' }}>
-                                        Already have an account?{' '}
-                                        <button
-                                            type="button"
-                                            onClick={() => setMode('login')}
-                                            style={{ background: 'none', border: 'none', color: '#FFD700', fontWeight: '700', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-                                        >
-                                            Sign In Here
-                                        </button>
-                                    </p>
-                                )}
-                            </div>
                         </form>
                     ) : (
                         <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
