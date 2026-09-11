@@ -436,7 +436,28 @@ export default function CheckoutPage() {
                 padding: '45px 20px 30px 20px',
                 textAlign: 'center'
             }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/cart')}
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'rgba(212, 175, 55, 0.12)',
+                            border: '1px solid rgba(212, 175, 55, 0.4)',
+                            color: '#FFD700',
+                            padding: '7px 18px',
+                            borderRadius: '50px',
+                            fontSize: '0.82rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            marginBottom: '14px',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        <i className="fas fa-arrow-left"></i> Back to Cart
+                    </button>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 18px', borderRadius: '50px', background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.35)', marginBottom: '12px' }}>
                         <span style={{ color: '#FFD700', fontSize: '0.8rem' }}>💳</span>
                         <span style={{ color: '#D4AF37', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '2px', textTransform: 'uppercase' }}>
