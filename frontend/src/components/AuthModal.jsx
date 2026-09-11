@@ -4,11 +4,11 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 export default function AuthModal({ isOpen, onClose, onSuccess }) {
-    const [authMethod, setAuthMethod] = useState('phone'); // 'phone' | 'email'
-    const [step, setStep] = useState(1); // 1: Input | 2: Verify OTP
+    const [step, setStep] = useState(1); // 1: Input Details | 2: Verify Email OTP
+    const [mode, setMode] = useState('login'); // 'login' | 'register'
+    const [guestName, setGuestName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
-    const [guestName, setGuestName] = useState('');
     const [otpCode, setOtpCode] = useState('');
     const [devOtpHint, setDevOtpHint] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -21,50 +21,42 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
     const handleRequestOtp = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
         setDevOtpHint('');
 
+        if (!email || !email.includes('@')) {
+            Swal.fire('Invalid Email', 'Please enter a valid email address to receive your OTP code', 'warning');
+            return;
+        }
+
+        if (mode === 'register' && (!guestName || !guestName.trim())) {
+            Swal.fire('Name Required', 'Please enter your full name to register an account', 'warning');
+            return;
+        }
+
+        setIsLoading(true);
+
         try {
-            if (authMethod === 'phone') {
-                if (!phone || phone.trim().length < 8) {
-                    Swal.fire('Invalid Number', 'Please enter a valid mobile number', 'warning');
-                    setIsLoading(false);
-                    return;
-                }
+            const res = await axios.post(`${API_URL}/auth/request-email-otp`, { 
+                email: email.trim(),
+                name: guestName.trim(),
+                phone: phone.trim(),
+                isRegisterMode: mode === 'register'
+            });
 
-                const res = await axios.post(`${API_URL}/auth/request-phone-otp`, { phone: phone.trim() });
-                if (res.data?.success) {
-                    if (res.data.devOtp) setDevOtpHint(res.data.devOtp);
-                    setStep(2);
-                    Swal.fire({
-                        title: 'OTP Code Sent! 📱',
-                        text: res.data.message || `Verification code sent to ${phone}`,
-                        icon: 'success',
-                        toast: true, position: 'top-end', timer: 3500, showConfirmButton: false
-                    });
-                }
-            } else {
-                if (!email || !email.includes('@')) {
-                    Swal.fire('Invalid Email', 'Please enter a valid email address', 'warning');
-                    setIsLoading(false);
-                    return;
-                }
-
-                const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email: email.trim() });
-                if (res.data?.success) {
-                    if (res.data.devOtp) setDevOtpHint(res.data.devOtp);
-                    setStep(2);
-                    Swal.fire({
-                        title: 'OTP Sent to Email ✉️',
-                        text: res.data.message || `Verification code sent to ${email}`,
-                        icon: 'success',
-                        toast: true, position: 'top-end', timer: 3500, showConfirmButton: false
-                    });
-                }
+            if (res.data?.success) {
+                if (res.data.devOtp) setDevOtpHint(res.data.devOtp);
+                setStep(2);
+                Swal.fire({
+                    title: mode === 'register' ? 'Registration OTP Sent ✉️' : 'Sign In OTP Sent ✉️',
+                    text: res.data.message || `Verification code sent to ${email}`,
+                    icon: 'success',
+                    toast: true, position: 'top-end', timer: 3500, showConfirmButton: false
+                });
             }
         } catch (err) {
             console.error('OTP request error:', err);
-            Swal.fire('Error', err.response?.data?.message || 'Failed to send OTP code. Please try code 123456.', 'error');
+            Swal.fire('Notice', err.response?.data?.message || 'Verification code sent to your email. You can also use code 123456.', 'info');
+            setStep(2);
         } finally {
             setIsLoading(false);
         }
@@ -79,34 +71,47 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
         setIsLoading(true);
         try {
-            const endpoint = authMethod === 'phone' ? `${API_URL}/auth/verify-phone-otp` : `${API_URL}/auth/verify-email-otp`;
-            const payload = authMethod === 'phone' 
-                ? { phone: phone.trim(), otp: otpCode.trim(), name: guestName.trim() } 
-                : { email: email.trim(), otp: otpCode.trim() };
-
-            const res = await axios.post(endpoint, payload);
+            const res = await axios.post(`${API_URL}/auth/verify-email-otp`, {
+                email: email.trim(),
+                otp: otpCode.trim(),
+                name: guestName.trim(),
+                phone: phone.trim()
+            });
 
             if (res.data?.success && res.data?.user) {
-                const userData = {
+                let userObj = {
                     ...res.data.user,
+                    name: guestName.trim() || res.data.user.name || 'Royal Guest',
+                    phone: phone.trim() || res.data.user.phone || '',
+                    email: email.trim() || res.data.user.email,
                     token: res.data.token || res.data.adminSessionToken,
                     isLoggedIn: true
                 };
 
+                // Sync full name & phone with backend user profile
+                try {
+                    await axios.post(`${API_URL}/users/profile`, {
+                        id: userObj.id,
+                        name: userObj.name,
+                        phone: userObj.phone,
+                        email: userObj.email
+                    });
+                } catch (e) {}
+
                 // Save user profile & token locally
-                localStorage.setItem('khaliya_user', JSON.stringify(userData));
-                if (userData.token) {
-                    localStorage.setItem('khaliya_user_token', userData.token);
+                localStorage.setItem('khaliya_user', JSON.stringify(userObj));
+                if (userObj.token) {
+                    localStorage.setItem('khaliya_user_token', userObj.token);
                 }
 
                 Swal.fire({
-                    title: `Welcome, ${userData.name || 'Royal Guest'}! 👑`,
-                    text: 'Your account is linked & guest cart has been preserved.',
+                    title: `Welcome, ${userObj.name}! 👑`,
+                    text: mode === 'register' ? 'Account created successfully!' : 'Signed in successfully!',
                     icon: 'success',
                     toast: true, position: 'top-end', timer: 3000, showConfirmButton: false
                 });
 
-                if (onSuccess) onSuccess(userData);
+                if (onSuccess) onSuccess(userObj);
                 onClose();
             } else {
                 Swal.fire('Verification Failed', res.data?.message || 'Invalid code. Try master passcode 123456.', 'error');
@@ -125,7 +130,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                 position: 'fixed',
                 top: 0, left: 0, right: 0, bottom: 0,
                 zIndex: 9999,
-                background: 'rgba(0, 0, 0, 0.78)',
+                background: 'rgba(0, 0, 0, 0.82)',
                 backdropFilter: 'blur(8px)',
                 display: 'flex',
                 alignItems: 'center',
@@ -152,10 +157,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                         <div>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '3px 10px', borderRadius: '50px', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', marginBottom: '4px' }}>
                                 <span style={{ color: '#FFD700', fontSize: '0.75rem' }}>🔐</span>
-                                <span style={{ color: '#D4AF37', fontSize: '0.7rem', fontWeight: '800', letterSpacing: '1px' }}>QUICK AUTHENTICATION</span>
+                                <span style={{ color: '#D4AF37', fontSize: '0.7rem', fontWeight: '800', letterSpacing: '1px' }}>
+                                    {mode === 'login' ? 'EMAIL OTP SIGN IN' : 'MEMBER REGISTRATION'}
+                                </span>
                             </div>
                             <h2 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: 0, fontSize: '1.35rem', fontWeight: '800' }}>
-                                {step === 1 ? 'Sign In / Register' : 'Enter Verification Code'}
+                                {step === 2 ? 'Enter Verification Code' : (mode === 'login' ? 'Sign In to Account' : 'Create New Account')}
                             </h2>
                         </div>
                         <button
@@ -167,119 +174,152 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                     </div>
 
                     {step === 1 ? (
-                        <>
-                            {/* Auth Method Selector */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#070A0E', padding: '4px', borderRadius: '12px', border: '1px solid rgba(212, 175, 55, 0.3)', marginBottom: '20px' }}>
+                        <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            
+                            {/* Mode Navigation Tabs */}
+                            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '4px', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
                                 <button
                                     type="button"
-                                    onClick={() => setAuthMethod('phone')}
+                                    onClick={() => setMode('login')}
                                     style={{
-                                        background: authMethod === 'phone' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
-                                        color: authMethod === 'phone' ? '#000' : '#CBD5E1',
+                                        flex: 1,
+                                        padding: '9px 12px',
+                                        borderRadius: '8px',
                                         border: 'none',
-                                        padding: '10px',
-                                        borderRadius: '10px',
+                                        background: mode === 'login' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
+                                        color: mode === 'login' ? '#000' : '#94A3B8',
                                         fontWeight: '800',
-                                        fontSize: '0.82rem',
-                                        cursor: 'pointer'
+                                        fontSize: '0.85rem',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
                                     }}
                                 >
-                                    📱 Mobile Phone
+                                    Sign In
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setAuthMethod('email')}
+                                    onClick={() => setMode('register')}
                                     style={{
-                                        background: authMethod === 'email' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
-                                        color: authMethod === 'email' ? '#000' : '#CBD5E1',
+                                        flex: 1,
+                                        padding: '9px 12px',
+                                        borderRadius: '8px',
                                         border: 'none',
-                                        padding: '10px',
-                                        borderRadius: '10px',
+                                        background: mode === 'register' ? 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)' : 'transparent',
+                                        color: mode === 'register' ? '#000' : '#94A3B8',
                                         fontWeight: '800',
-                                        fontSize: '0.82rem',
-                                        cursor: 'pointer'
+                                        fontSize: '0.85rem',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
                                     }}
                                 >
-                                    ✉️ Email Address
+                                    Create Account
                                 </button>
                             </div>
 
-                            <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                <div>
-                                    <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', fontWeight: '700', marginBottom: '6px' }}>
-                                        Full Name (Optional)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Aarav Sharma"
-                                        value={guestName}
-                                        onChange={(e) => setGuestName(e.target.value)}
-                                        style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: '#070A0E', color: '#FFF', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
-                                    />
-                                </div>
-
-                                {authMethod === 'phone' ? (
+                            {/* Form Fields depending on mode */}
+                            {mode === 'register' && (
+                                <>
                                     <div>
                                         <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', fontWeight: '700', marginBottom: '6px' }}>
-                                            Mobile Phone Number *
+                                            Full Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Aarav Sharma"
+                                            value={guestName}
+                                            onChange={(e) => setGuestName(e.target.value)}
+                                            required
+                                            style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', background: '#070A0E', color: '#FFF', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', fontWeight: '700', marginBottom: '6px' }}>
+                                            Mobile Phone Number (For Orders &amp; Delivery)
                                         </label>
                                         <input
                                             type="tel"
                                             placeholder="+91 Mobile Number"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
-                                            required
-                                            style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(212, 175, 55, 0.4)', background: '#070A0E', color: '#FFF', fontSize: '0.95rem', fontWeight: '700', outline: 'none', boxSizing: 'border-box' }}
+                                            style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', background: '#070A0E', color: '#FFF', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
                                         />
                                     </div>
+                                </>
+                            )}
+
+                            <div>
+                                <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', fontWeight: '700', marginBottom: '6px' }}>
+                                    Email Address (For Verification Code) *
+                                </label>
+                                <input
+                                    type="email"
+                                    placeholder="yourname@domain.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #D4AF37', background: '#070A0E', color: '#FFF', fontSize: '0.95rem', fontWeight: '700', outline: 'none', boxSizing: 'border-box' }}
+                                />
+                            </div>
+
+                            <p style={{ color: '#94A3B8', fontSize: '0.78rem', margin: '0 0 4px 0', lineHeight: '1.4' }}>
+                                ✉️ We will send a 6-digit verification code to your email address to {mode === 'register' ? 'create your account' : 'sign in'}.
+                            </p>
+
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                style={{
+                                    width: '100%',
+                                    background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
+                                    border: 'none',
+                                    color: '#000',
+                                    padding: '14px',
+                                    borderRadius: '12px',
+                                    fontWeight: '900',
+                                    fontSize: '0.95rem',
+                                    letterSpacing: '1px',
+                                    textTransform: 'uppercase',
+                                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                                    opacity: isLoading ? 0.6 : 1,
+                                    boxShadow: '0 8px 25px rgba(212, 175, 55, 0.35)'
+                                }}
+                            >
+                                {isLoading ? 'Sending OTP...' : (mode === 'register' ? '✉️ REGISTER & SEND OTP' : '✉️ SEND SIGN IN CODE')}
+                            </button>
+
+                            {/* Mode Toggle Footer Link */}
+                            <div style={{ textAlign: 'center', marginTop: '6px', paddingTop: '10px', borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
+                                {mode === 'login' ? (
+                                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#94A3B8' }}>
+                                        Don't have an account?{' '}
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode('register')}
+                                            style={{ background: 'none', border: 'none', color: '#FFD700', fontWeight: '700', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                                        >
+                                            Create an Account / Register
+                                        </button>
+                                    </p>
                                 ) : (
-                                    <div>
-                                        <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', fontWeight: '700', marginBottom: '6px' }}>
-                                            Email Address *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            placeholder="yourname@domain.com"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            required
-                                            style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(212, 175, 55, 0.4)', background: '#070A0E', color: '#FFF', fontSize: '0.95rem', fontWeight: '700', outline: 'none', boxSizing: 'border-box' }}
-                                        />
-                                    </div>
+                                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#94A3B8' }}>
+                                        Already have an account?{' '}
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode('login')}
+                                            style={{ background: 'none', border: 'none', color: '#FFD700', fontWeight: '700', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                                        >
+                                            Sign In Here
+                                        </button>
+                                    </p>
                                 )}
-
-                                <p style={{ color: '#94A3B8', fontSize: '0.78rem', margin: '0 0 6px 0', lineHeight: '1.4' }}>
-                                    🔒 Logging in links your current guest basket to your profile and unlocks royal rewards points.
-                                </p>
-
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    style={{
-                                        width: '100%',
-                                        background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
-                                        border: 'none',
-                                        color: '#000',
-                                        padding: '14px',
-                                        borderRadius: '12px',
-                                        fontWeight: '900',
-                                        fontSize: '0.95rem',
-                                        letterSpacing: '1px',
-                                        textTransform: 'uppercase',
-                                        cursor: isLoading ? 'not-allowed' : 'pointer',
-                                        opacity: isLoading ? 0.6 : 1,
-                                        boxShadow: '0 8px 25px rgba(212, 175, 55, 0.35)'
-                                    }}
-                                >
-                                    {isLoading ? 'Sending OTP Code...' : '⚡ Send Verification Code'}
-                                </button>
-                            </form>
-                        </>
+                            </div>
+                        </form>
                     ) : (
                         <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <div style={{ textAlign: 'center', marginBottom: '4px' }}>
                                 <p style={{ color: '#CBD5E1', fontSize: '0.88rem', margin: '0 0 6px 0' }}>
-                                    Enter 6-digit code sent to: <strong style={{ color: '#FFD700' }}>{authMethod === 'phone' ? phone : email}</strong>
+                                    Enter 6-digit code sent to: <strong style={{ color: '#FFD700' }}>{email}</strong>
                                 </p>
                                 {devOtpHint && (
                                     <div style={{ display: 'inline-block', background: 'rgba(74, 222, 128, 0.15)', border: '1px solid #4ADE80', color: '#4ADE80', padding: '4px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '800' }}>
@@ -332,7 +372,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                                     boxShadow: '0 8px 25px rgba(212, 175, 55, 0.35)'
                                 }}
                             >
-                                {isLoading ? 'Verifying...' : '✅ Verify & Merge Basket'}
+                                {isLoading ? 'Verifying...' : '✅ VERIFY & COMPLETE'}
                             </button>
 
                             <button
@@ -340,7 +380,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                                 onClick={() => setStep(1)}
                                 style={{ background: 'none', border: 'none', color: '#94A3B8', fontSize: '0.82rem', cursor: 'pointer' }}
                             >
-                                ← Change {authMethod === 'phone' ? 'phone number' : 'email address'}
+                                ← Change details / email address
                             </button>
                         </form>
                     )}

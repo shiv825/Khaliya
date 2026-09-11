@@ -1170,6 +1170,7 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
         }
         
         // Handle User Persistence
+        const { name, phone } = req.body || {};
         const users = await readData('users');
         let user = users.find(u => u.email === cleanEmail);
         
@@ -1177,20 +1178,23 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
             user = {
                 id: `USR-${Date.now()}`,
                 email: cleanEmail,
-                name: 'Khaliya Member',
+                name: name ? name.trim() : 'Khaliya Member',
+                phone: phone ? phone.trim() : '',
                 joinedAt: new Date().toISOString(),
-                spicePoints: 750,
-                role: 'admin'
+                spicePoints: 500,
+                role: 'customer'
             };
             users.push(user);
-            console.log(`👤 [AUTH] New account created: ${cleanEmail}`);
+            console.log(`👤 [AUTH] New account created for ${cleanEmail}`);
         } else {
             console.log(`👤 [AUTH] Returning member logged in: ${cleanEmail}`);
+            if (name && name.trim()) user.name = name.trim();
+            if (phone && phone.trim()) user.phone = phone.trim();
+            if (!user.role) user.role = 'customer';
         }
 
-        // Generate stateless HMAC-signed token for admin dashboard access
+        // Generate stateless HMAC-signed token
         const token = signAdminToken(cleanEmail);
-        user.role = 'admin';
         user.currentSessionId = token;
 
         const userIndex = users.findIndex(u => u.email === cleanEmail);
