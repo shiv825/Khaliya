@@ -90,7 +90,7 @@ const PROMO_CODES = {
 };
 
 export default function CartPage() {
-    const { cart, addToCart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
+    const { cart, addToCart, removeFromCart, updateQuantity, updateItemNotes, getCartTotal, clearCart } = useCart();
     const { t, language } = useLanguage();
     const navigate = useNavigate();
 
@@ -201,6 +201,7 @@ export default function CartPage() {
 
     const handleItemNoteChange = (cartKey, note) => {
         setItemNotes(prev => ({ ...prev, [cartKey]: note }));
+        updateItemNotes(cartKey, note);
     };
 
     const handleProceedToCheckout = () => {
@@ -475,7 +476,7 @@ export default function CartPage() {
                                                     <input
                                                         type="text"
                                                         placeholder="Custom instructions (e.g. extra spicy, no onion)..."
-                                                        value={itemNotes[cartKey] || ''}
+                                                        value={itemNotes[cartKey] !== undefined ? itemNotes[cartKey] : (item.notes || item.specialInstructions || '')}
                                                         onChange={(e) => handleItemNoteChange(cartKey, e.target.value)}
                                                         style={{
                                                             width: '100%',

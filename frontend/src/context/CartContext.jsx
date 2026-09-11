@@ -88,6 +88,12 @@ export const CartProvider = ({ children }) => {
         );
     };
 
+    const updateItemNotes = (productId, notes) => {
+        setCart(prevCart =>
+            prevCart.map(item => getProductId(item) === String(productId) ? { ...item, notes, specialInstructions: notes } : item)
+        );
+    };
+
     const clearCart = () => {
         setCart([]);
     };
@@ -114,6 +120,7 @@ export const CartProvider = ({ children }) => {
             addToCart,
             removeFromCart,
             updateQuantity,
+            updateItemNotes,
             clearCart,
             getCartTotal,
             getCartCount

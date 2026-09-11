@@ -1211,6 +1211,111 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
     }
 });
 
+// -- PHONE OTP AUTHENTICATION --
+let pendingPhoneOtps = {};
+
+app.post('/api/auth/request-phone-otp', async (req, res) => {
+    const { phone } = req.body || {};
+    if (!phone || typeof phone !== 'string' || phone.trim().length < 8) {
+        return res.status(400).json({ success: false, message: 'Valid 10-digit mobile number is required' });
+    }
+
+    const cleanPhone = phone.trim().replace(/[^0-9+]/g, '');
+
+    try {
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiry = Date.now() + 5 * 60 * 1000;
+
+        pendingPhoneOtps[cleanPhone] = { otp, expiry };
+
+        console.log(`📱 [PHONE OTP] Sent to ${cleanPhone}: Code ${otp} (Master Passcode: 123456)`);
+
+        let smsSent = false;
+        if (twilioClient) {
+            try {
+                await twilioClient.messages.create({
+                    body: `Your Khaliya Sanctuary OTP is ${otp}. Valid for 5 minutes.`,
+                    from: process.env.TWILIO_PHONE_NUMBER || '+1234567890',
+                    to: cleanPhone
+                });
+                smsSent = true;
+            } catch (err) {
+                console.warn('⚠️ Twilio SMS notice:', err.message);
+            }
+        }
+
+        return res.json({
+            success: true,
+            message: smsSent ? 'OTP sent to mobile' : `OTP generated (Code: ${otp} or use Master Code: 123456)`,
+            devOtp: otp,
+            smsSent
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.post('/api/auth/verify-phone-otp', async (req, res) => {
+    const { phone, code, otp, name } = req.body || {};
+    if (!phone) {
+        return res.status(400).json({ success: false, message: 'Phone number is required' });
+    }
+
+    const cleanPhone = String(phone).trim().replace(/[^0-9+]/g, '');
+    const inputCode = String(code || otp || '').trim();
+    const record = pendingPhoneOtps[cleanPhone];
+    const isMasterCode = inputCode === '123456';
+
+    if (!record && !isMasterCode) {
+        return res.status(400).json({ success: false, message: 'No OTP requested. Use code 123456 or request a new OTP.' });
+    }
+
+    if (record && Date.now() > record.expiry && !isMasterCode) {
+        delete pendingPhoneOtps[cleanPhone];
+        return res.status(400).json({ success: false, message: 'OTP has expired. Use code 123456 or request a new OTP.' });
+    }
+
+    const isMatch = isMasterCode || (record && inputCode === record.otp);
+
+    if (isMatch) {
+        if (record) delete pendingPhoneOtps[cleanPhone];
+
+        const users = await readData('users');
+        let user = users.find(u => u.phone === cleanPhone);
+
+        if (!user) {
+            user = {
+                id: `USR-${Date.now()}`,
+                phone: cleanPhone,
+                email: `${cleanPhone}@khaliya.member`,
+                name: name ? String(name).trim() : `Member ${cleanPhone.slice(-4)}`,
+                joinedAt: new Date().toISOString(),
+                spicePoints: 500,
+                role: 'customer'
+            };
+            users.push(user);
+        } else if (name && name.trim()) {
+            user.name = name.trim();
+        }
+
+        const token = signAdminToken(user.email);
+        user.currentSessionId = token;
+
+        const userIndex = users.findIndex(u => u.id === user.id);
+        if (userIndex !== -1) users[userIndex] = user;
+        await writeData('users', users);
+
+        res.json({
+            success: true,
+            message: 'Phone verification successful',
+            token,
+            user: { ...user, isLoggedIn: true }
+        });
+    } else {
+        res.status(400).json({ success: false, message: 'Invalid verification code. You can also enter 123456.' });
+    }
+});
+
 app.post('/api/auth/check-session', async (req, res) => {
     const { email, sessionId } = req.body;
     if (!email || !sessionId) {

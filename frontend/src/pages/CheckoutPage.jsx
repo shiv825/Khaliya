@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import AuthModal from '../components/AuthModal';
 
 const PROMO_CODES = {
     'KHALIYA20': { type: 'percent', value: 20, desc: '20% OFF on Royal Orders' },
@@ -31,6 +32,16 @@ export default function CheckoutPage() {
     const { cart, getCartTotal, clearCart } = useCart();
     const { t, language } = useLanguage();
     const navigate = useNavigate();
+
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState(() => {
+        try {
+            const stored = localStorage.getItem('khaliya_user');
+            return stored ? JSON.parse(stored) : null;
+        } catch (e) {
+            return null;
+        }
+    });
 
     const [diningMode, setDiningMode] = useState('dine-in'); // 'dine-in' | 'takeaway'
     const [tableNumber, setTableNumber] = useState('');
@@ -81,6 +92,7 @@ export default function CheckoutPage() {
             const storedUser = localStorage.getItem('khaliya_user');
             if (storedUser) {
                 const parsed = JSON.parse(storedUser);
+                setCurrentUser(parsed);
                 if (parsed.name) setGuestName(parsed.name);
                 if (parsed.phone) setGuestPhone(parsed.phone);
                 if (parsed.email) setGuestEmail(parsed.email);
@@ -194,7 +206,8 @@ export default function CheckoutPage() {
             id: item.cartItemId || item.id || item.slug || (typeof item.name === 'object' ? item.name.en : item.name),
             name: getLocalized(item.name),
             quantity: item.quantity,
-            price: item.price
+            price: item.price,
+            specialInstructions: item.notes || item.specialInstructions || item.note || ''
         }));
 
         let formattedAddress = `Dine-In Table: ${tableNumber}`;
@@ -595,12 +608,53 @@ export default function CheckoutPage() {
                                 boxShadow: '0 15px 40px rgba(0,0,0,0.7)'
                             }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                                <span style={{ background: '#D4AF37', color: '#000', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '0.85rem' }}>2</span>
-                                <h3 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: 0, fontSize: '1.25rem', fontWeight: '800' }}>
-                                    Guest Details
-                                </h3>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <span style={{ background: '#D4AF37', color: '#000', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '0.85rem' }}>2</span>
+                                    <h3 style={{ fontFamily: "'Cinzel', serif", color: '#FFD700', margin: 0, fontSize: '1.25rem', fontWeight: '800' }}>
+                                        Guest &amp; Account Details
+                                    </h3>
+                                </div>
                             </div>
+
+                            {/* Guest vs Logged-In User Account Banner */}
+                            {currentUser && currentUser.isLoggedIn ? (
+                                <div style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid rgba(74, 222, 128, 0.4)', borderRadius: '12px', padding: '12px 14px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                                    <div>
+                                        <div style={{ color: '#4ADE80', fontWeight: '800', fontSize: '0.86rem' }}>
+                                            ✅ Logged in as: <strong>{currentUser.name || currentUser.phone || currentUser.email || 'Royal Guest'}</strong>
+                                        </div>
+                                        <div style={{ color: '#CBD5E1', fontSize: '0.75rem', marginTop: '2px' }}>
+                                            Your cart is linked to your account &amp; rewards will be accumulated!
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsAuthModalOpen(true)}
+                                        style={{ background: 'rgba(212, 175, 55, 0.2)', border: '1px solid #D4AF37', color: '#FFD700', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer' }}
+                                    >
+                                        🔐 Switch Account
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{ background: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.35)', borderRadius: '12px', padding: '12px 14px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                                    <div>
+                                        <div style={{ color: '#FFD700', fontWeight: '800', fontSize: '0.86rem' }}>
+                                            💡 Ordering as Guest
+                                        </div>
+                                        <div style={{ color: '#CBD5E1', fontSize: '0.75rem', marginTop: '2px' }}>
+                                            Sign in via OTP to merge your cart into your profile &amp; earn rewards.
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsAuthModalOpen(true)}
+                                        style={{ background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)', color: '#000', border: 'none', padding: '8px 14px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '900', cursor: 'pointer', boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)' }}
+                                    >
+                                        🔐 Sign In / Merge Cart
+                                    </button>
+                                </div>
+                            )}
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                                 <div>
@@ -752,6 +806,11 @@ export default function CheckoutPage() {
                                         <div>
                                             <div style={{ color: '#FFF', fontWeight: '700', fontSize: '0.88rem' }}>{getLocalized(item.name)}</div>
                                             <div style={{ color: '#94A3B8', fontSize: '0.75rem' }}>Qty: {item.quantity} × {item.price}</div>
+                                            {(item.notes || item.specialInstructions) && (
+                                                <div style={{ color: '#FFD700', fontSize: '0.73rem', marginTop: '3px', fontStyle: 'italic' }}>
+                                                    📝 Note: {item.notes || item.specialInstructions}
+                                                </div>
+                                            )}
                                         </div>
                                         <div style={{ color: '#FFD700', fontWeight: '800', fontSize: '0.92rem' }}>₹{unitPrice * item.quantity}</div>
                                     </div>
@@ -854,6 +913,18 @@ export default function CheckoutPage() {
                     </motion.div>
                 </form>
             </div>
+
+            {/* Auth Modal for Guest Login & Cart Preservation */}
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                onSuccess={(userData) => {
+                    setCurrentUser(userData);
+                    if (userData.name) setGuestName(userData.name);
+                    if (userData.phone) setGuestPhone(userData.phone);
+                    if (userData.email) setGuestEmail(userData.email);
+                }}
+            />
         </div>
     );
 }
