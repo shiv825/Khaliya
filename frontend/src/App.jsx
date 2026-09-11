@@ -13,6 +13,7 @@ import BillVerificationPage from './pages/BillVerificationPage';
 import PolicyPage from './pages/PolicyPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import ProfilePage from './pages/ProfilePage';
 
 // Mobile PWA App Shell
 import NativeAppShell from './components/native/NativeAppShell';
@@ -101,6 +102,7 @@ function App() {
                       <Route path="menu" element={<MenuPage />} />
                       <Route path="cart" element={<CartPage />} />
                       <Route path="checkout" element={<CheckoutPage />} />
+                      <Route path="profile" element={<ProfilePage />} />
                       <Route path="reserve" element={<ReservePage />} />
                       <Route path="tables" element={<TablesExplorePage />} />
                       <Route path="reviews" element={<ReviewsPublicPage />} />

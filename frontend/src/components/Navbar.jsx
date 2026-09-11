@@ -4,6 +4,7 @@ import { NavLink, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import AuthModal from './AuthModal';
 
 export default function Navbar() {
     const { language, setLanguage, t } = useLanguage();
@@ -12,6 +13,27 @@ export default function Navbar() {
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
     const [isInstallable, setIsInstallable] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+    const [user, setUser] = useState(() => {
+        try {
+            const saved = localStorage.getItem('khaliya_user');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            return null;
+        }
+    });
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            try {
+                const saved = localStorage.getItem('khaliya_user');
+                setUser(saved ? JSON.parse(saved) : null);
+            } catch (e) {}
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
     const toggleMenu = () => {
         setIsMenuOpen(prev => !prev);
@@ -216,6 +238,56 @@ export default function Navbar() {
                             )}
                         </Link>
 
+                        {/* User Account / Profile Button */}
+                        {user && user.isLoggedIn ? (
+                            <Link 
+                                to="/profile"
+                                style={{ 
+                                    display: 'inline-flex', 
+                                    alignItems: 'center', 
+                                    gap: '6px', 
+                                    background: 'rgba(212, 175, 55, 0.15)', 
+                                    border: '1.5px solid #D4AF37', 
+                                    color: '#FFD700', 
+                                    padding: '6px 14px', 
+                                    borderRadius: '50px', 
+                                    fontSize: '0.8rem', 
+                                    fontWeight: '800', 
+                                    textDecoration: 'none',
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: '0 2px 10px rgba(212, 175, 55, 0.2)'
+                                }}
+                            >
+                                <span>👑</span>
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                    {user.name || 'Profile'}
+                                </span>
+                            </Link>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => setIsAuthModalOpen(true)}
+                                style={{ 
+                                    display: 'inline-flex', 
+                                    alignItems: 'center', 
+                                    gap: '6px', 
+                                    background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)', 
+                                    color: '#000', 
+                                    border: 'none', 
+                                    padding: '7px 16px', 
+                                    borderRadius: '50px', 
+                                    fontSize: '0.8rem', 
+                                    fontWeight: '900', 
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 15px rgba(212, 175, 55, 0.35)',
+                                    transition: 'all 0.2s ease'
+                                }}
+                            >
+                                <i className="fas fa-lock" style={{ fontSize: '0.75rem' }}></i>
+                                <span>Sign In</span>
+                            </button>
+                        )}
+
                         {/* Language Switcher (Desktop Header Only) */}
                         {isDesktop && <LanguageSwitcher mode="dropdown" />}
 
@@ -298,6 +370,44 @@ export default function Navbar() {
                             >
                                 <i className="fas fa-times"></i>
                             </button>
+                        </div>
+
+                        {/* User Profile Card Inside Drawer */}
+                        <div style={{ marginBottom: '1.2rem', background: 'rgba(15, 20, 30, 0.75)', padding: '14px 16px', borderRadius: '16px', border: '1.5px solid #D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                            {user && user.isLoggedIn ? (
+                                <>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #FFD700, #D4AF37)', color: '#000', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>
+                                            {user.name ? user.name.charAt(0).toUpperCase() : '👑'}
+                                        </div>
+                                        <div>
+                                            <div style={{ color: '#FFF', fontWeight: '800', fontSize: '0.9rem' }}>{user.name || 'Royal Member'}</div>
+                                            <div style={{ color: '#FFD700', fontSize: '0.72rem', fontWeight: '700' }}>⭐️ {user.spicePoints || 750} Spice Points</div>
+                                        </div>
+                                    </div>
+                                    <Link
+                                        to="/profile"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        style={{ background: 'rgba(212, 175, 55, 0.2)', border: '1px solid #D4AF37', color: '#FFD700', padding: '6px 12px', borderRadius: '10px', fontSize: '0.78rem', fontWeight: '800', textDecoration: 'none' }}
+                                    >
+                                        Profile
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <div style={{ color: '#FFD700', fontWeight: '800', fontSize: '0.88rem' }}>Guest Account</div>
+                                        <div style={{ color: '#CBD5E1', fontSize: '0.72rem' }}>Sign in to save orders &amp; earn rewards</div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setIsMenuOpen(false); setIsAuthModalOpen(true); }}
+                                        style={{ background: 'linear-gradient(135deg, #FFD700, #D4AF37)', color: '#000', border: 'none', padding: '7px 14px', borderRadius: '10px', fontSize: '0.78rem', fontWeight: '900', cursor: 'pointer' }}
+                                    >
+                                        🔐 Sign In
+                                    </button>
+                                </>
+                            )}
                         </div>
 
                         {/* Language Selector Inside Drawer (Segmented Theme) */}
@@ -447,6 +557,13 @@ export default function Navbar() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Global Quick Auth Modal */}
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                onSuccess={(userData) => setUser(userData)}
+            />
         </>
     );
 }

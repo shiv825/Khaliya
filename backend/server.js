@@ -1350,20 +1350,42 @@ app.post('/api/auth/check-session', async (req, res) => {
 });
 
 app.post('/api/users/profile', async (req, res) => {
-    const { email, name, phone } = req.body;
-    if (!email) {
-        return res.status(400).json({ success: false, message: 'Email is required' });
+    const { id, email, name, phone } = req.body || {};
+    if (!id && !email && !phone) {
+        return res.status(400).json({ success: false, message: 'User identifier (ID, email, or phone) is required' });
     }
     try {
         const users = await readData('users');
-        const userIndex = users.findIndex(u => u.email === email.toLowerCase());
+        const cleanEmail = email ? String(email).trim().toLowerCase() : '';
+        const cleanPhone = phone ? String(phone).trim().replace(/[^0-9+]/g, '') : '';
+        
+        let userIndex = users.findIndex(u => {
+            if (id && String(u.id) === String(id)) return true;
+            if (cleanEmail && u.email && u.email.toLowerCase() === cleanEmail) return true;
+            if (cleanPhone && u.phone && u.phone === cleanPhone) return true;
+            return false;
+        });
+
         if (userIndex !== -1) {
-            users[userIndex].name = name || users[userIndex].name;
-            users[userIndex].phone = phone || users[userIndex].phone;
+            users[userIndex].name = name ? name.trim() : users[userIndex].name;
+            if (cleanPhone) users[userIndex].phone = cleanPhone;
+            if (cleanEmail) users[userIndex].email = cleanEmail;
             await writeData('users', users);
-            return res.json({ success: true, user: users[userIndex] });
+            return res.json({ success: true, user: { ...users[userIndex], isLoggedIn: true } });
         } else {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            // Create user profile if not found
+            const newUser = {
+                id: id || `USR-${Date.now()}`,
+                name: name ? name.trim() : 'Royal Guest',
+                phone: cleanPhone || '',
+                email: cleanEmail || '',
+                joinedAt: new Date().toISOString(),
+                spicePoints: 500,
+                role: 'customer'
+            };
+            users.push(newUser);
+            await writeData('users', users);
+            return res.json({ success: true, user: { ...newUser, isLoggedIn: true } });
         }
     } catch (err) {
         console.error('❌ Error updating user profile:', err);
@@ -1547,7 +1569,25 @@ app.post('/api/verify-razorpay-payment', async (req, res) => {
 
 // -- API: ORDERS (PWA NATIVE ORDERS) --
 app.get('/api/orders', async (req, res) => {
-    res.json(await readData('orders'));
+    const orders = await readData('orders') || [];
+    const { phone, email, userId } = req.query || {};
+
+    if (!phone && !email && !userId) {
+        return res.json(orders);
+    }
+
+    const cleanPhone = phone ? String(phone).trim().replace(/[^0-9+]/g, '') : '';
+    const cleanEmail = email ? String(email).trim().toLowerCase() : '';
+
+    const filtered = orders.filter(o => {
+        const u = o.user || {};
+        if (cleanPhone && (u.phone === cleanPhone || String(o.guestPhone) === cleanPhone)) return true;
+        if (cleanEmail && (u.email && u.email.toLowerCase() === cleanEmail)) return true;
+        if (userId && (u.id === userId || o.userId === userId)) return true;
+        return false;
+    });
+
+    res.json(filtered);
 });
 
 app.post('/api/orders', async (req, res) => {
