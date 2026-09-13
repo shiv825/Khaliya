@@ -48,6 +48,44 @@ const resolveSmtpHostIp = async (hostname) => {
 };
 
 const sendEmailSecure = async ({ to, subject, text, html }) => {
+    // 1. HTTPS API Gateway (Port 443 - 100% immune to ISP & Firewall socket blocks)
+    if (process.env.RESEND_API_KEY || process.env.BREVO_API_KEY) {
+        try {
+            if (process.env.RESEND_API_KEY) {
+                const res = await axios.post('https://api.resend.com/emails', {
+                    from: process.env.EMAIL_FROM || 'Khaliya Sanctuary <onboarding@resend.dev>',
+                    to: [to],
+                    subject,
+                    html: html || `<p>${text}</p>`
+                }, {
+                    headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+                    timeout: 8000
+                });
+                if (res.status === 200 || res.status === 201) {
+                    console.log(`✅ [AUTH] Email sent via HTTPS Port 443 (Resend) to ${to}`);
+                    return true;
+                }
+            } else if (process.env.BREVO_API_KEY) {
+                const res = await axios.post('https://api.brevo.com/v3/smtp/email', {
+                    sender: { name: 'Khaliya Sanctuary', email: process.env.SMTP_USER || 'shivkumarrdn7@gmail.com' },
+                    to: [{ email: to }],
+                    subject,
+                    htmlContent: html || `<p>${text}</p>`
+                }, {
+                    headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
+                    timeout: 8000
+                });
+                if (res.status === 201 || res.status === 200) {
+                    console.log(`✅ [AUTH] Email sent via HTTPS Port 443 (Brevo) to ${to}`);
+                    return true;
+                }
+            }
+        } catch (httpsErr) {
+            console.warn('⚠️ HTTPS API notice, attempting fallback TCP socket transport:', httpsErr.message);
+        }
+    }
+
+    // 2. Direct Nodemailer Socket Transport (Ports 465 / 587)
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
@@ -60,7 +98,7 @@ const sendEmailSecure = async ({ to, subject, text, html }) => {
             port: 465,
             secure: true,
             servername: smtpHost,
-            connectionTimeout: 10000,
+            connectionTimeout: 8000,
             auth: { user: smtpUser, pass: smtpPass },
             tls: { rejectUnauthorized: false }
         });
@@ -78,7 +116,7 @@ const sendEmailSecure = async ({ to, subject, text, html }) => {
                 port: 587,
                 secure: false,
                 servername: smtpHost,
-                connectionTimeout: 10000,
+                connectionTimeout: 8000,
                 auth: { user: smtpUser, pass: smtpPass },
                 tls: { rejectUnauthorized: false }
             });
