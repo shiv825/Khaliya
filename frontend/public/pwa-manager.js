@@ -3,7 +3,7 @@ const PWAManager = {
     lastLang: localStorage.getItem('lang') || 'en',
 
     init: () => {
-        console.log('🚀 [PWA] Manager v2.3 Initialized');
+        console.log('🚀 [PWA] Manager v2.4 Initialized');
         
         // Handle debug force mode
         const urlParams = new URLSearchParams(window.location.search);
@@ -14,8 +14,6 @@ const PWAManager = {
 
         PWAManager.registerServiceWorker();
         PWAManager.setupInstallPrompt();
-        PWAManager.setupLaterButton();
-        PWAManager.listenForLanguageChanges();
     },
     registerServiceWorker: () => {
         if ('serviceWorker' in navigator) {
@@ -58,22 +56,11 @@ const PWAManager = {
             
             // Dispatch custom event for React components
             window.dispatchEvent(new CustomEvent('khaliya-pwa-ready', { detail: true }));
-
-            // Show banner immediately when prompt is ready, if not dismissed
-            const isDismissed = sessionStorage.getItem('pwa_dismissed');
-            console.log('🔍 [PWA] Checking dismissal state:', isDismissed);
-            
-            if (!isDismissed) {
-                PWAManager.showInstallBanner();
-            } else {
-                console.log('ℹ️ [PWA] Banner suppressed: Already dismissed in this session.');
-            }
         });
 
         window.addEventListener('appinstalled', (evt) => {
             console.log('🎉 [PWA] App successfully installed');
             window.dispatchEvent(new CustomEvent('khaliya-pwa-ready', { detail: false }));
-            PWAManager.closeInstallBanner();
         });
 
         // Check if already in standalone mode
@@ -84,115 +71,41 @@ const PWAManager = {
 
     promptInstall: () => {
         if (!PWAManager.deferredPrompt) {
-            console.error('❌ [PWA] Install prompt not available. User clicked Install too early or browser blocked it.');
-            alert("To install the app, please look for the install icon in your browser's address bar, or use the 'Add to Home Screen' option in your browser menu.");
+            console.warn('⚠️ [PWA] Native install prompt not directly available. Opening instruction modal.');
+            window.dispatchEvent(new CustomEvent('khaliya-show-pwa-modal'));
+            if (typeof window.forceShowPwaBanner === 'function') {
+                window.forceShowPwaBanner();
+            }
             return false;
         }
 
-        PWAManager.deferredPrompt.prompt();
-        PWAManager.deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('✅ [PWA] User accepted the installation');
-            } else {
-                console.log('❌ [PWA] User dismissed the installation');
+        try {
+            PWAManager.deferredPrompt.prompt();
+            PWAManager.deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('✅ [PWA] User accepted the installation');
+                } else {
+                    console.log('❌ [PWA] User dismissed the installation');
+                    window.dispatchEvent(new CustomEvent('khaliya-show-pwa-modal'));
+                }
+                PWAManager.deferredPrompt = null;
+            });
+            return true;
+        } catch (err) {
+            console.error('❌ [PWA] Error triggering install prompt:', err);
+            window.dispatchEvent(new CustomEvent('khaliya-show-pwa-modal'));
+            if (typeof window.forceShowPwaBanner === 'function') {
+                window.forceShowPwaBanner();
             }
-            PWAManager.deferredPrompt = null;
-            PWAManager.closeInstallBanner();
-        });
-        return true;
+            return false;
+        }
     },
 
     showInstallBanner: () => {
-        console.log('✨ [PWA] Attempting to show banner...');
-        const banner = document.getElementById('pwaInstallBanner');
-        if (banner) {
-            PWAManager.updateBannerContent();
-            banner.classList.add('active');
-            console.log('🎬 [PWA] Banner is now ACTIVE');
-            
-            // Haptic feedback if available
-            if ("vibrate" in navigator) {
-                try {
-                    navigator.vibrate(50);
-                } catch(e) { /* Ignore vibration errors if blocked */ }
-            }
-        } else {
-            console.error('❌ [PWA] Banner element #pwaInstallBanner not found in DOM');
+        window.dispatchEvent(new CustomEvent('khaliya-show-pwa-modal'));
+        if (typeof window.forceShowPwaBanner === 'function') {
+            window.forceShowPwaBanner();
         }
-    },
-
-    closeInstallBanner: () => {
-        const banner = document.getElementById('pwaInstallBanner');
-        if (banner) {
-            console.log('🙈 [PWA] Closing banner');
-            banner.classList.remove('active');
-        }
-    },
-
-    setupLaterButton: () => {
-        const attachLater = () => {
-            const laterBtn = document.getElementById('pwaLaterBtn');
-            if (laterBtn) {
-                // Clear any existing onclick to avoid duplicates
-                laterBtn.onclick = null;
-                
-                laterBtn.addEventListener('click', (e) => {
-                    if (!e.isTrusted) {
-                        console.warn('⚠️ [PWA] Untrusted click detected on Later button! Preventing automatic dismissal.');
-                        // If it's not a real user click, we might want to ignore it
-                        // but for now let's just log and continue to see the trace.
-                        console.trace('Programmatic Click Trace');
-                        return; 
-                    }
-                    
-                    console.log('⏳ [PWA] User clicked "Later"');
-                    sessionStorage.setItem('pwa_dismissed', 'true');
-                    PWAManager.closeInstallBanner();
-                });
-            }
-        };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', attachLater);
-        } else {
-            attachLater();
-        }
-    },
-
-    updateBannerContent: () => {
-        const lang = localStorage.getItem('lang') || 'en';
-        const i18n = window.KHALIYA_i18n ? window.KHALIYA_i18n[lang] : null;
-
-        if (!i18n) {
-            console.warn('⚠️ [PWA] No i18n data found for language:', lang);
-            return;
-        }
-
-        const title = document.getElementById('pwaInstallTitle');
-        const desc = document.getElementById('pwaInstallDesc');
-        const installBtn = document.getElementById('pwaInstallBtn');
-        const laterBtn = document.getElementById('pwaLaterBtn');
-
-        if (title) title.innerText = i18n.pwa?.installTitle || 'Install Khaliya App';
-        if (desc) desc.innerText = i18n.pwa?.installDesc || 'Fast access to our menu.';
-        if (installBtn) installBtn.innerText = i18n.pwa?.installBtn || 'Install';
-        if (laterBtn) laterBtn.innerText = i18n.pwa?.cancelBtn || 'Later';
-    },
-
-    listenForLanguageChanges: () => {
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'lang') {
-                PWAManager.updateBannerContent();
-            }
-        });
-
-        setInterval(() => {
-            const currentLang = localStorage.getItem('lang') || 'en';
-            if (PWAManager.lastLang !== currentLang) {
-                PWAManager.lastLang = currentLang;
-                PWAManager.updateBannerContent();
-            }
-        }, 1000);
     }
 };
 
@@ -200,8 +113,8 @@ const PWAManager = {
 window.promptInstall = PWAManager.promptInstall;
 window.forceShowPwaBanner = PWAManager.showInstallBanner;
 
-// Initialize with slight delay to ensure translations are available
+// Initialize with slight delay
 setTimeout(() => {
     PWAManager.init();
-}, 800);
+}, 500);
 

@@ -24,9 +24,9 @@ export default async function handler(req, res) {
 
     // Use fallback credentials or environment variables from Vercel
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-    const smtpUser = process.env.SMTP_USER || 'khaliyarestaurant@gmail.com';
-    const smtpPass = process.env.SMTP_PASS || 'ojusvrcpwdshdxoi';
-    const smtpPort = process.env.SMTP_PORT || 465;
+    const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
+    const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
+    const smtpPort = process.env.SMTP_PORT || 587;
 
     try {
         const emailTransporter = nodemailer.createTransport({

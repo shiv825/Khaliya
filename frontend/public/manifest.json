@@ -64,22 +64,18 @@
   ],
   "screenshots": [
     {
-      "src": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1080&h=1920&fit=crop",
-      "sizes": "1080x1920",
-      "type": "image/jpeg",
-      "form_factor": "narrow"
+      "src": "pwa-preview.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Khaliya Sanctuary Desktop Experience"
     },
     {
-      "src": "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1080&h=1920&fit=crop",
+      "src": "pwa-preview-mobile.png",
       "sizes": "1080x1920",
-      "type": "image/jpeg",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&h=1080&fit=crop",
-      "sizes": "1920x1080",
-      "type": "image/jpeg",
-      "form_factor": "wide"
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Khaliya Sanctuary Mobile Experience"
     }
   ]
 }

@@ -50,11 +50,10 @@ export default function NativeAuth({ onLoginSuccess }) {
                             console.log('✅ OTP sent successfully via Vercel Serverless Function');
                         }).catch((emailErr) => {
                             console.error('❌ Vercel Email Delivery Failed:', emailErr);
-                            // Fallback popup if Vercel function fails (displayed asynchronously)
                             Swal.fire({
-                                title: 'Local Testing Mode',
-                                html: `Could not send email. Your OTP is: <strong style="font-size: 1.5rem; color: var(--primary-color);">${res.data.simulatedOtp}</strong>`,
-                                icon: 'info',
+                                title: 'Email Notice',
+                                text: 'Could not send verification email. Please check your internet connection and try again.',
+                                icon: 'warning',
                                 confirmButtonColor: 'var(--primary-color)'
                             });
                         });

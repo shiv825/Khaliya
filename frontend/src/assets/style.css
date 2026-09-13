@@ -219,7 +219,6 @@ a {
     background: var(--bg-glass);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    padding: 1.2rem 2rem;
     position: fixed;
     top: 0;
     left: 0;
@@ -228,6 +227,7 @@ a {
     transition: var(--transition);
     border-bottom: 1px solid var(--border-light);
     box-shadow: var(--glass-shadow);
+    box-sizing: border-box;
 }
 
 .nav-container {
@@ -237,6 +237,29 @@ a {
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .main-nav {
+        padding: 0.6rem 0.85rem !important;
+    }
+    .brand-subtitle {
+        display: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-nav {
+        padding: 0.5rem 0.6rem !important;
+    }
+    .nav-brand-title {
+        font-size: 1.2rem !important;
+        letter-spacing: 0.8px !important;
+    }
+    .nav-controls {
+        gap: 6px !important;
+    }
 }
 
 .main-nav a {

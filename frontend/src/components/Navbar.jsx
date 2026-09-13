@@ -110,25 +110,26 @@ export default function Navbar() {
                     left: 0,
                     width: '100%',
                     zIndex: 1000,
-                    padding: scrolled ? '0.7rem 1.2rem' : '1rem 1.5rem',
+                    padding: scrolled ? (isDesktop ? '0.6rem 1.2rem' : '0.4rem 0.6rem') : (isDesktop ? '0.9rem 1.5rem' : '0.5rem 0.6rem'),
                     background: scrolled ? 'rgba(7, 10, 14, 0.95)' : 'rgba(7, 10, 14, 0.78)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
                     borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
                     boxShadow: scrolled ? '0 10px 40px rgba(0,0,0,0.85)' : 'none',
-                    transition: 'var(--transition)'
+                    transition: 'var(--transition)',
+                    boxSizing: 'border-box'
                 }}
             >
-                <div className="nav-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
+                <div className="nav-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', width: '100%', margin: '0 auto', gap: '6px' }}>
                     {/* Brand Logo & Title */}
-                    <Link to="/" className="nav-brand" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+                    <Link to="/" className="nav-brand" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: isDesktop ? '10px' : '6px', textDecoration: 'none', minWidth: 0, flexShrink: 1 }}>
                         <div style={{
-                            width: '42px',
-                            height: '42px',
-                            borderRadius: '10px',
+                            width: isDesktop ? '40px' : '32px',
+                            height: isDesktop ? '40px' : '32px',
+                            borderRadius: '8px',
                             overflow: 'hidden',
                             border: '1.5px solid rgba(212, 175, 55, 0.7)',
-                            boxShadow: '0 0 15px rgba(212, 175, 55, 0.35)',
+                            boxShadow: '0 0 12px rgba(212, 175, 55, 0.35)',
                             background: '#000',
                             display: 'flex',
                             alignItems: 'center',
@@ -141,37 +142,41 @@ export default function Navbar() {
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                         </div>
-                        <div>
-                            <div style={{ 
+                        <div style={{ minWidth: 0 }}>
+                            <div className="nav-brand-title" style={{ 
                                 margin: 0, 
                                 fontFamily: "'Cinzel', 'Playfair Display', serif",
                                 background: 'linear-gradient(135deg, #FFF5C0 0%, #FFD700 40%, #D4AF37 80%, #AA7C11 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
-                                fontSize: '1.55rem',
+                                fontSize: isDesktop ? '1.5rem' : '1.15rem',
                                 fontWeight: '800',
-                                letterSpacing: '1.5px',
-                                lineHeight: '1'
+                                letterSpacing: '0.8px',
+                                lineHeight: '1',
+                                whiteSpace: 'nowrap'
                             }}>
                                 KHALIYA
                             </div>
-                            <div className="brand-subtitle" style={{
-                                fontSize: '0.58rem',
-                                fontWeight: '800',
-                                color: '#D4AF37',
-                                letterSpacing: '2px',
-                                textTransform: 'uppercase',
-                                marginTop: '2px',
-                                opacity: 0.9
-                            }}>
-                                ROYAL INDIAN CUISINE
-                            </div>
+                            {isDesktop && (
+                                <div className="brand-subtitle" style={{
+                                    fontSize: '0.55rem',
+                                    fontWeight: '800',
+                                    color: '#D4AF37',
+                                    letterSpacing: '2px',
+                                    textTransform: 'uppercase',
+                                    marginTop: '2px',
+                                    opacity: 0.9,
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    ROYAL INDIAN CUISINE
+                                </div>
+                            )}
                         </div>
                     </Link>
 
                     {/* Desktop Navigation Links */}
                     {isDesktop && (
-                        <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '1.8rem' }}>
+                        <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '1.6rem' }}>
                             {mainNavLinks.map((link) => (
                                 <NavLink 
                                     key={link.path}
@@ -180,7 +185,7 @@ export default function Navbar() {
                                     style={({ isActive }) => ({
                                         color: isActive ? '#FFD700' : '#F8FAFC',
                                         fontWeight: '800',
-                                        fontSize: '0.86rem',
+                                        fontSize: '0.85rem',
                                         borderBottom: isActive ? '2px solid #FFD700' : '2px solid transparent',
                                         paddingBottom: '4px',
                                         textDecoration: 'none',
@@ -194,7 +199,7 @@ export default function Navbar() {
                     )}
 
                     {/* Right Side Header Controls */}
-                    <div className="nav-controls" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div className="nav-controls" style={{ display: 'flex', alignItems: 'center', gap: isDesktop ? '10px' : '5px', flexShrink: 0 }}>
                         {/* Cart Icon - Direct Link to /cart Page */}
                         <Link 
                             to="/cart"
@@ -203,18 +208,19 @@ export default function Navbar() {
                             style={{ 
                                 position: 'relative', 
                                 cursor: 'pointer', 
-                                fontSize: '1.1rem', 
+                                fontSize: isDesktop ? '1.05rem' : '0.88rem', 
                                 color: '#FFD700',
                                 transition: 'var(--transition)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                width: '38px',
-                                height: '38px',
-                                borderRadius: '10px',
+                                width: isDesktop ? '36px' : '32px',
+                                height: isDesktop ? '36px' : '32px',
+                                borderRadius: '8px',
                                 background: 'rgba(212, 175, 55, 0.1)',
                                 border: '1px solid rgba(212, 175, 55, 0.3)',
-                                textDecoration: 'none'
+                                textDecoration: 'none',
+                                flexShrink: 0
                             }}
                         >
                             <i className="fas fa-shopping-cart"></i>
@@ -226,9 +232,9 @@ export default function Navbar() {
                                     background: '#E53E3E',
                                     color: '#FFF',
                                     borderRadius: '50%',
-                                    width: '18px',
-                                    height: '18px',
-                                    fontSize: '0.68rem',
+                                    width: '16px',
+                                    height: '16px',
+                                    fontSize: '0.6rem',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -242,48 +248,62 @@ export default function Navbar() {
                         {user && user.isLoggedIn ? (
                             <Link 
                                 to="/profile"
+                                className="nav-auth-btn"
                                 style={{ 
                                     display: 'inline-flex', 
+                                    flexDirection: 'row',
                                     alignItems: 'center', 
-                                    gap: '6px', 
+                                    justifyContent: 'center',
+                                    gap: '4px', 
                                     background: 'rgba(212, 175, 55, 0.15)', 
                                     border: '1.5px solid #D4AF37', 
                                     color: '#FFD700', 
-                                    padding: '6px 14px', 
+                                    padding: isDesktop ? '6px 14px' : '0 8px', 
+                                    height: isDesktop ? '36px' : '32px',
                                     borderRadius: '50px', 
-                                    fontSize: '0.8rem', 
+                                    fontSize: isDesktop ? '0.8rem' : '0.72rem', 
                                     fontWeight: '800', 
                                     textDecoration: 'none',
                                     transition: 'all 0.2s ease',
-                                    boxShadow: '0 2px 10px rgba(212, 175, 55, 0.2)'
+                                    boxShadow: '0 2px 10px rgba(212, 175, 55, 0.2)',
+                                    whiteSpace: 'nowrap',
+                                    lineHeight: '1',
+                                    flexShrink: 0
                                 }}
                             >
-                                <span>👑</span>
-                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                <span style={{ fontSize: '0.85rem' }}>👑</span>
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: isDesktop ? '100px' : '55px' }}>
                                     {user.name || 'Profile'}
                                 </span>
                             </Link>
                         ) : (
                             <button
                                 type="button"
+                                className="nav-auth-btn"
                                 onClick={() => setIsAuthModalOpen(true)}
                                 style={{ 
                                     display: 'inline-flex', 
+                                    flexDirection: 'row',
                                     alignItems: 'center', 
-                                    gap: '6px', 
+                                    justifyContent: 'center',
+                                    gap: '5px', 
                                     background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)', 
                                     color: '#000', 
                                     border: 'none', 
-                                    padding: '7px 16px', 
+                                    padding: isDesktop ? '6px 16px' : '0 10px', 
+                                    height: isDesktop ? '36px' : '32px',
                                     borderRadius: '50px', 
-                                    fontSize: '0.8rem', 
+                                    fontSize: isDesktop ? '0.8rem' : '0.72rem', 
                                     fontWeight: '900', 
                                     cursor: 'pointer',
                                     boxShadow: '0 4px 15px rgba(212, 175, 55, 0.35)',
-                                    transition: 'all 0.2s ease'
+                                    transition: 'all 0.2s ease',
+                                    whiteSpace: 'nowrap',
+                                    lineHeight: '1',
+                                    flexShrink: 0
                                 }}
                             >
-                                <i className="fas fa-lock" style={{ fontSize: '0.75rem' }}></i>
+                                <i className="fas fa-lock" style={{ fontSize: '0.68rem' }}></i>
                                 <span>Sign In</span>
                             </button>
                         )}
@@ -296,22 +316,25 @@ export default function Navbar() {
                             <button 
                                 onClick={toggleMenu}
                                 aria-label="Toggle mobile menu"
+                                className="nav-menu-toggle"
                                 style={{
                                     background: isMenuOpen ? 'rgba(212, 175, 55, 0.25)' : 'rgba(212, 175, 55, 0.12)',
                                     border: '1.5px solid #D4AF37',
                                     color: '#FFD700',
-                                    borderRadius: '10px',
-                                    width: '38px',
-                                    height: '38px',
+                                    borderRadius: '8px',
+                                    width: '32px',
+                                    height: '32px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     cursor: 'pointer',
-                                    boxShadow: '0 0 15px rgba(212, 175, 55, 0.2)',
-                                    transition: 'all 0.2s ease'
+                                    boxShadow: '0 0 12px rgba(212, 175, 55, 0.2)',
+                                    transition: 'all 0.2s ease',
+                                    flexShrink: 0,
+                                    padding: 0
                                 }}
                             >
-                                <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`} style={{ fontSize: '1.1rem' }}></i>
+                                <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`} style={{ fontSize: '0.95rem' }}></i>
                             </button>
                         )}
                     </div>
@@ -487,10 +510,17 @@ export default function Navbar() {
                                 </div>
                                 <button
                                     onClick={() => {
-                                        let prompted = false;
-                                        if (window.promptInstall) prompted = window.promptInstall();
-                                        if (!prompted && window.forceShowPwaBanner) window.forceShowPwaBanner();
                                         setIsMenuOpen(false);
+                                        let prompted = false;
+                                        if (window.promptInstall) {
+                                            prompted = window.promptInstall();
+                                        }
+                                        if (!prompted) {
+                                            window.dispatchEvent(new CustomEvent('khaliya-show-pwa-modal'));
+                                            if (typeof window.forceShowPwaBanner === 'function') {
+                                                window.forceShowPwaBanner();
+                                            }
+                                        }
                                     }}
                                     style={{
                                         background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',

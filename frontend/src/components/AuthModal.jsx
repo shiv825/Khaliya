@@ -44,19 +44,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             });
 
             if (res.data?.success) {
-                if (res.data.devOtp) setDevOtpHint(res.data.devOtp);
                 setStep(2);
                 Swal.fire({
                     title: mode === 'register' ? 'Registration OTP Sent ✉️' : 'Sign In OTP Sent ✉️',
-                    text: res.data.message || `Verification code sent to ${email}`,
+                    text: `Verification code sent to ${email}. Please check your Inbox and Spam/Junk folder.`,
                     icon: 'success',
-                    toast: true, position: 'top-end', timer: 3500, showConfirmButton: false
+                    toast: true, position: 'top-end', timer: 4500, showConfirmButton: false
                 });
+            } else {
+                Swal.fire('OTP Request Failed', res.data?.message || 'Failed to send verification code. Please try again.', 'error');
             }
         } catch (err) {
             console.error('OTP request error:', err);
-            Swal.fire('Notice', err.response?.data?.message || 'Verification code sent to your email. You can also use code 123456.', 'info');
-            setStep(2);
+            Swal.fire('Error', err.response?.data?.message || 'Could not send verification code. Please check your internet connection and try again.', 'error');
         } finally {
             setIsLoading(false);
         }
@@ -114,11 +114,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                 if (onSuccess) onSuccess(userObj);
                 onClose();
             } else {
-                Swal.fire('Verification Failed', res.data?.message || 'Invalid code. Try master passcode 123456.', 'error');
+                Swal.fire('Verification Failed', res.data?.message || 'Invalid verification code. Please check your email and try again.', 'error');
             }
         } catch (err) {
             console.error('OTP verify error:', err);
-            Swal.fire('Error', err.response?.data?.message || 'Invalid code. Try master passcode 123456.', 'error');
+            Swal.fire('Error', err.response?.data?.message || 'Invalid verification code. Please check your email and try again.', 'error');
         } finally {
             setIsLoading(false);
         }
@@ -292,20 +292,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                         <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <div style={{ textAlign: 'center', marginBottom: '4px' }}>
                                 <p style={{ color: '#CBD5E1', fontSize: '0.88rem', margin: '0 0 6px 0' }}>
-                                    Enter 6-digit code sent to: <strong style={{ color: '#FFD700' }}>{email}</strong>
+                                    Enter 6-digit verification code sent to: <strong style={{ color: '#FFD700' }}>{email}</strong>
                                 </p>
-                                {devOtpHint && (
-                                    <div style={{ display: 'inline-block', background: 'rgba(74, 222, 128, 0.15)', border: '1px solid #4ADE80', color: '#4ADE80', padding: '4px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '800' }}>
-                                        🔑 Code: {devOtpHint} (Or Master: 123456)
-                                    </div>
-                                )}
                             </div>
 
                             <div>
                                 <input
                                     type="text"
                                     maxLength="6"
-                                    placeholder="Enter 6-Digit OTP (or 123456)"
+                                    placeholder="Enter 6-Digit OTP"
                                     value={otpCode}
                                     onChange={(e) => setOtpCode(e.target.value)}
                                     required
@@ -348,13 +343,23 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                                 {isLoading ? 'Verifying...' : '✅ VERIFY & COMPLETE'}
                             </button>
 
-                            <button
-                                type="button"
-                                onClick={() => setStep(1)}
-                                style={{ background: 'none', border: 'none', color: '#94A3B8', fontSize: '0.82rem', cursor: 'pointer' }}
-                            >
-                                ← Change details / email address
-                            </button>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                                <button
+                                    type="button"
+                                    disabled={isLoading}
+                                    onClick={handleRequestOtp}
+                                    style={{ background: 'none', border: 'none', color: '#FFD700', fontSize: '0.82rem', cursor: 'pointer', fontWeight: '700' }}
+                                >
+                                    🔄 Resend Code
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(1)}
+                                    style={{ background: 'none', border: 'none', color: '#94A3B8', fontSize: '0.82rem', cursor: 'pointer' }}
+                                >
+                                    ← Change email
+                                </button>
+                            </div>
                         </form>
                     )}
                 </motion.div>

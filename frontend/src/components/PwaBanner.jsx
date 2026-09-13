@@ -18,10 +18,9 @@ export default function PwaBanner() {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             
             if (!isDismissed && !isStandalone) {
-                // Show banner after brief delay
                 const timer = setTimeout(() => {
                     setIsVisible(true);
-                }, 2000);
+                }, 1500);
                 return () => clearTimeout(timer);
             }
         };
@@ -34,22 +33,45 @@ export default function PwaBanner() {
             }
         };
 
+        const handleShowModal = () => {
+            setShowInstructions(true);
+        };
+
         window.addEventListener('khaliya-pwa-ready', handlePwaReady);
-        return () => window.removeEventListener('khaliya-pwa-ready', handlePwaReady);
+        window.addEventListener('khaliya-show-pwa-modal', handleShowModal);
+
+        window.forceShowPwaBanner = () => {
+            setShowInstructions(true);
+            setIsVisible(true);
+        };
+
+        return () => {
+            window.removeEventListener('khaliya-pwa-ready', handlePwaReady);
+            window.removeEventListener('khaliya-show-pwa-modal', handleShowModal);
+            try { delete window.forceShowPwaBanner; } catch(e) {}
+        };
     }, []);
 
-    const handleInstallClick = () => {
+    const handleInstallClick = (e) => {
+        e && e.preventDefault();
+        e && e.stopPropagation();
+        
+        let prompted = false;
         if (window.promptInstall) {
-            const prompted = window.promptInstall();
-            if (!prompted) {
-                setShowInstructions(true);
+            try {
+                prompted = window.promptInstall();
+            } catch (err) {
+                console.warn('PWA prompt error:', err);
             }
-        } else {
+        }
+        if (!prompted) {
             setShowInstructions(true);
         }
     };
 
-    const handleDismiss = () => {
+    const handleDismiss = (e) => {
+        e && e.preventDefault();
+        e && e.stopPropagation();
         sessionStorage.setItem('pwa_dismissed', 'true');
         setIsVisible(false);
     };
@@ -59,127 +81,139 @@ export default function PwaBanner() {
     return (
         <>
             {/* Main PWA Install Floating Banner */}
-            <div 
-                id="pwaInstallBanner" 
-                className={`pwa-install-banner ${isVisible ? 'active' : ''}`}
-                style={{
-                    position: 'fixed',
-                    bottom: '20px',
-                    left: '50%',
-                    transform: isVisible ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(120%)',
-                    width: 'calc(100% - 32px)',
-                    maxWidth: '540px',
-                    zIndex: 9990,
-                    background: 'linear-gradient(135deg, rgba(15, 20, 30, 0.98) 0%, rgba(7, 10, 14, 0.98) 100%)',
-                    border: '1.5px solid rgba(212, 175, 55, 0.6)',
-                    borderRadius: '20px',
-                    padding: '16px 20px',
-                    boxShadow: '0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                    display: isVisible ? 'flex' : 'none',
-                    alignItems: 'center',
-                    gap: '16px'
-                }}
-            >
-                {/* Logo Badge */}
-                <div style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '14px',
-                    overflow: 'hidden',
-                    border: '1.5px solid #D4AF37',
-                    boxShadow: '0 4px 15px rgba(212, 175, 55, 0.35)',
-                    flexShrink: 0,
-                    background: '#000',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <img 
-                        src="/khaliya-logo.jpg" 
-                        alt="Khaliya Sanctuary Logo" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                </div>
-
-                {/* Content */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    <div 
-                        id="pwaInstallTitle"
-                        style={{
-                            fontFamily: "'Cinzel', 'Playfair Display', serif",
-                            color: '#FFD700',
-                            fontWeight: '800',
-                            fontSize: '1rem',
-                            letterSpacing: '0.5px',
-                            lineHeight: '1.2',
-                            marginBottom: '3px'
-                        }}
-                    >
-                        {t('pwa.installTitle', 'Install Khaliya Sanctuary')}
-                    </div>
-                    <div 
-                        id="pwaInstallDesc"
-                        style={{
-                            color: '#CBD5E1',
-                            fontSize: '0.78rem',
-                            lineHeight: '1.3',
-                            fontWeight: '500',
+            {isVisible && (
+                <div 
+                    id="pwaInstallBanner" 
+                    className="pwa-install-banner active"
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: 'calc(100% - 32px)',
+                        maxWidth: '680px',
+                        zIndex: 9998,
+                        background: 'linear-gradient(135deg, rgba(14, 18, 27, 0.96) 0%, rgba(7, 10, 14, 0.98) 100%)',
+                        border: '1.5px solid #D4AF37',
+                        borderRadius: '24px',
+                        padding: '12px 18px',
+                        boxShadow: '0 15px 45px rgba(0, 0, 0, 0.9), 0 0 25px rgba(212, 175, 55, 0.25)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '16px',
+                        flexWrap: 'wrap'
+                    }}
+                >
+                    {/* Left: App Logo & Info */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '1 1 260px', minWidth: 0 }}>
+                        <div style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '14px',
                             overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        {t('pwa.installDesc', 'Experience royal dining with instant table bookings & mobile orders.')}
+                            border: '1.5px solid #D4AF37',
+                            boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+                            flexShrink: 0,
+                            background: '#000',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <img 
+                                src="/khaliya-logo.jpg" 
+                                alt="Khaliya Logo" 
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                        </div>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                            <div 
+                                id="pwaInstallTitle"
+                                style={{
+                                    fontFamily: "'Cinzel', 'Playfair Display', serif",
+                                    color: '#FFD700',
+                                    fontWeight: '800',
+                                    fontSize: '0.95rem',
+                                    letterSpacing: '0.5px',
+                                    lineHeight: '1.25',
+                                    textTransform: 'uppercase'
+                                }}
+                            >
+                                {t('pwa.installTitle', 'INSTALL KHALIYA SANCTUARY')}
+                            </div>
+                            <div 
+                                id="pwaInstallDesc"
+                                style={{
+                                    color: '#CBD5E1',
+                                    fontSize: '0.78rem',
+                                    lineHeight: '1.25',
+                                    fontWeight: '500',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    marginTop: '3px'
+                                }}
+                            >
+                                {t('pwa.installDesc', 'Experience royal dining with instant table bookings & mobile ord...')}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right: Install & Later Buttons */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, msFlexNegative: 0 }}>
+                        <button
+                            type="button"
+                            id="pwaInstallBtn"
+                            onClick={handleInstallClick}
+                            style={{
+                                background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
+                                color: '#000',
+                                border: 'none',
+                                padding: '10px 18px',
+                                borderRadius: '12px',
+                                fontWeight: '900',
+                                fontSize: '0.86rem',
+                                cursor: 'pointer',
+                                letterSpacing: '0.3px',
+                                boxShadow: '0 4px 18px rgba(212, 175, 55, 0.4)',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                whiteSpace: 'nowrap',
+                                transition: 'transform 0.15s ease'
+                            }}
+                        >
+                            <i className="fas fa-download"></i>
+                            <span>{t('pwa.installBtn', 'Install App')}</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            id="pwaLaterBtn"
+                            onClick={handleDismiss}
+                            style={{
+                                background: 'rgba(255, 255, 255, 0.08)',
+                                color: '#CBD5E1',
+                                border: '1px solid rgba(255, 255, 255, 0.15)',
+                                padding: '10px 18px',
+                                borderRadius: '12px',
+                                fontWeight: '700',
+                                fontSize: '0.84rem',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                                transition: 'background 0.15s ease'
+                            }}
+                        >
+                            {t('pwa.cancelBtn', 'Later')}
+                        </button>
                     </div>
                 </div>
+            )}
 
-                {/* Action Buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                    <button
-                        id="pwaInstallBtn"
-                        onClick={handleInstallClick}
-                        style={{
-                            background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #AA7C11 100%)',
-                            color: '#000',
-                            border: 'none',
-                            padding: '9px 16px',
-                            borderRadius: '10px',
-                            fontWeight: '900',
-                            fontSize: '0.82rem',
-                            cursor: 'pointer',
-                            letterSpacing: '0.5px',
-                            boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
-                            transition: 'all 0.2s ease',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        <i className="fas fa-download" style={{ marginRight: '6px' }}></i>
-                        {t('pwa.installBtn', 'Install')}
-                    </button>
-                    <button
-                        id="pwaLaterBtn"
-                        onClick={handleDismiss}
-                        style={{
-                            background: 'rgba(255, 255, 255, 0.08)',
-                            color: '#94A3B8',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            padding: '9px 12px',
-                            borderRadius: '10px',
-                            fontWeight: '700',
-                            fontSize: '0.8rem',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                        }}
-                    >
-                        {t('pwa.cancelBtn', 'Later')}
-                    </button>
-                </div>
-            </div>
-
-            {/* Manual Installation Steps Modal (For iOS or standard browsers without automated prompt) */}
+            {/* Manual Installation Steps Modal */}
             {showInstructions && (
                 <div 
                     style={{
@@ -222,6 +256,7 @@ export default function PwaBanner() {
                                 </div>
                             </div>
                             <button 
+                                type="button"
                                 onClick={() => setShowInstructions(false)}
                                 style={{ background: 'none', border: 'none', color: '#FFD700', fontSize: '1.2rem', cursor: 'pointer' }}
                             >
@@ -260,6 +295,7 @@ export default function PwaBanner() {
                         </div>
 
                         <button
+                            type="button"
                             onClick={() => setShowInstructions(false)}
                             style={{
                                 width: '100%',

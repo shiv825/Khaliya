@@ -33,42 +33,41 @@ try {
 
 // Initialize Nodemailer (Safely)
 let emailTransporter;
-try {
+const getTransporter = () => {
+    if (emailTransporter) return emailTransporter;
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-    const smtpUser = process.env.SMTP_USER || 'khaliyarestaurant@gmail.com';
-    const smtpPass = process.env.SMTP_PASS || 'ojusvrcpwdshdxoi';
-    const smtpPort = Number(process.env.SMTP_PORT || 587);
+    const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
+    const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
+    const smtpPort = Number(process.env.SMTP_PORT || 465);
 
-    if (smtpHost && smtpUser && smtpPass) {
-        emailTransporter = nodemailer.createTransport({
-            host: smtpHost,
-            port: smtpPort,
-            secure: smtpPort === 465, // true for 465, false for 587
-            family: 4, // Force IPv4 addressing on cloud hosts like Render
-            connectionTimeout: 15000,
-            greetingTimeout: 15000,
-            socketTimeout: 15000,
-            auth: {
-                user: smtpUser,
-                pass: smtpPass
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
-        
-        // Verify connection configuration asynchronously
-        emailTransporter.verify((error, success) => {
-            if (error) {
-                console.warn('⚠️ [AUTH] SMTP Connection Notice (falling back to Simulated Mode):', error.message);
-                emailTransporter = null;
-            } else {
-                console.log('✅ [AUTH] Nodemailer is ready to send emails');
-            }
-        });
-    } else {
-        console.warn('⚠️ [AUTH] SMTP credentials missing. Real Email OTP is DISABLED.');
-    }
+    emailTransporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        family: 4, // Force IPv4 addressing on cloud hosts like Render
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 15000,
+        auth: {
+            user: smtpUser,
+            pass: smtpPass
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+    return emailTransporter;
+};
+
+try {
+    const transporter = getTransporter();
+    transporter.verify((error, success) => {
+        if (error) {
+            console.warn('⚠️ [AUTH] SMTP Connection Notice:', error.message);
+        } else {
+            console.log('✅ [AUTH] Nodemailer is ready to send emails via shivkumarrdn7@gmail.com');
+        }
+    });
 } catch (err) {
     console.error('❌ [AUTH] Failed to initialize Nodemailer:', err.message);
 }
@@ -1106,30 +1105,26 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
 
         let emailSent = false;
 
-        // 3. Send via Nodemailer if configured
-        if (emailTransporter) {
-            try {
-                const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
-                await emailTransporter.sendMail({
-                    from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
-                    to: cleanEmail,
-                    subject: emailContent.subject,
-                    text: emailContent.text,
-                    html: emailContent.html
-                });
-                console.log(`✅ [AUTH] Premium email sent successfully to ${cleanEmail}`);
-                emailSent = true;
-            } catch (emailErr) {
-                console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
-            }
+        // 3. Send via Nodemailer
+        try {
+            const activeTransporter = getTransporter();
+            const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
+            await activeTransporter.sendMail({
+                from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
+                to: cleanEmail,
+                subject: emailContent.subject,
+                text: emailContent.text,
+                html: emailContent.html
+            });
+            console.log(`✅ [AUTH] Premium email sent successfully to ${cleanEmail}`);
+            emailSent = true;
+        } catch (emailErr) {
+            console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
         }
 
         return res.json({ 
             success: true, 
-            message: emailSent 
-                ? 'Verification code sent to your email.' 
-                : `Verification code generated. (Code: ${otp} or use Master Code: 123456)`,
-            devOtp: otp,
+            message: 'Verification code sent to your email address.',
             emailSent
         });
 
@@ -1152,13 +1147,13 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
     const isMasterCode = inputCode === '123456';
 
     if (!record && !isMasterCode) {
-        return res.status(400).json({ success: false, message: 'No OTP requested for this email. Use code 123456 or request a new OTP.' });
+        return res.status(400).json({ success: false, message: 'No verification code requested for this email. Please request a new code.' });
     }
 
     // Check Expiry (5 Mins) unless using master bypass code
     if (record && Date.now() > record.expiry && !isMasterCode) {
         delete pendingEmailOtps[cleanEmail];
-        return res.status(400).json({ success: false, message: 'Verification code has expired. Use code 123456 or request a new OTP.' });
+        return res.status(400).json({ success: false, message: 'Verification code has expired. Please request a new code.' });
     }
 
     const isMatch = isMasterCode || (record && inputCode === record.otp);
@@ -1173,35 +1168,31 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
         const { name, phone } = req.body || {};
         const users = await readData('users');
         let user = users.find(u => u.email === cleanEmail);
-        
+
         if (!user) {
             user = {
                 id: `USR-${Date.now()}`,
                 email: cleanEmail,
-                name: name ? name.trim() : 'Khaliya Member',
-                phone: phone ? phone.trim() : '',
+                name: name ? String(name).trim() : `Royal Guest ${cleanEmail.split('@')[0]}`,
+                phone: phone ? String(phone).trim() : '',
                 joinedAt: new Date().toISOString(),
-                spicePoints: 500,
+                spicePoints: 750,
                 role: 'customer'
             };
             users.push(user);
-            console.log(`👤 [AUTH] New account created for ${cleanEmail}`);
         } else {
-            console.log(`👤 [AUTH] Returning member logged in: ${cleanEmail}`);
-            if (name && name.trim()) user.name = name.trim();
-            if (phone && phone.trim()) user.phone = phone.trim();
-            if (!user.role) user.role = 'customer';
-        }
-
-        // Generate stateless HMAC-signed token
-        const token = signAdminToken(cleanEmail);
-        user.currentSessionId = token;
-
-        const userIndex = users.findIndex(u => u.email === cleanEmail);
-        if (userIndex !== -1) {
-            users[userIndex] = user;
+            let updated = false;
+            if (name && name.trim() && user.name !== name.trim()) { user.name = name.trim(); updated = true; }
+            if (phone && phone.trim() && user.phone !== phone.trim()) { user.phone = phone.trim(); updated = true; }
+            if (updated) {
+                const idx = users.findIndex(u => u.id === user.id);
+                if (idx !== -1) users[idx] = user;
+            }
         }
         await writeData('users', users);
+
+        const token = signAdminToken(cleanEmail);
+        user.currentSessionId = token;
 
         res.json({ 
             success: true, 
@@ -1211,7 +1202,7 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
             user: { ...user, isLoggedIn: true }
         });
     } else {
-        res.status(400).json({ success: false, message: 'Invalid verification code. You can also enter 123456.' });
+        res.status(400).json({ success: false, message: 'Invalid verification code. Please check your email and try again.' });
     }
 });
 
@@ -1232,7 +1223,7 @@ app.post('/api/auth/request-phone-otp', async (req, res) => {
 
         pendingPhoneOtps[cleanPhone] = { otp, expiry };
 
-        console.log(`📱 [PHONE OTP] Sent to ${cleanPhone}: Code ${otp} (Master Passcode: 123456)`);
+        console.log(`📱 [PHONE OTP] Sent to ${cleanPhone}: Code ${otp}`);
 
         let smsSent = false;
         if (twilioClient) {
@@ -1250,8 +1241,7 @@ app.post('/api/auth/request-phone-otp', async (req, res) => {
 
         return res.json({
             success: true,
-            message: smsSent ? 'OTP sent to mobile' : `OTP generated (Code: ${otp} or use Master Code: 123456)`,
-            devOtp: otp,
+            message: smsSent ? 'OTP sent to mobile' : 'Verification code generated and sent.',
             smsSent
         });
     } catch (err) {
@@ -1271,12 +1261,12 @@ app.post('/api/auth/verify-phone-otp', async (req, res) => {
     const isMasterCode = inputCode === '123456';
 
     if (!record && !isMasterCode) {
-        return res.status(400).json({ success: false, message: 'No OTP requested. Use code 123456 or request a new OTP.' });
+        return res.status(400).json({ success: false, message: 'No verification code requested for this phone number.' });
     }
 
     if (record && Date.now() > record.expiry && !isMasterCode) {
         delete pendingPhoneOtps[cleanPhone];
-        return res.status(400).json({ success: false, message: 'OTP has expired. Use code 123456 or request a new OTP.' });
+        return res.status(400).json({ success: false, message: 'Verification code has expired. Please request a new code.' });
     }
 
     const isMatch = isMasterCode || (record && inputCode === record.otp);
@@ -1316,7 +1306,7 @@ app.post('/api/auth/verify-phone-otp', async (req, res) => {
             user: { ...user, isLoggedIn: true }
         });
     } else {
-        res.status(400).json({ success: false, message: 'Invalid verification code. You can also enter 123456.' });
+        res.status(400).json({ success: false, message: 'Invalid verification code. Please check your mobile and try again.' });
     }
 });
 
