@@ -1,3 +1,8 @@
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first');
+}
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -41,10 +46,11 @@ const getTransporter = () => {
     const smtpPort = Number(process.env.SMTP_PORT || 465);
 
     emailTransporter = nodemailer.createTransport({
+        service: 'gmail',
         host: smtpHost,
         port: smtpPort,
         secure: smtpPort === 465,
-        family: 4, // Force IPv4 addressing on cloud hosts like Render
+        family: 4, // Force IPv4 addressing to prevent ENETUNREACH on IPv6
         connectionTimeout: 15000,
         greetingTimeout: 15000,
         socketTimeout: 15000,

@@ -1,5 +1,10 @@
 import nodemailer from 'nodemailer';
+import dns from 'dns';
 import { getOtpEmailTemplate } from '../src/utils/emailTemplates.js';
+
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first');
+}
 
 export default async function handler(req, res) {
     // CORS Headers
@@ -26,13 +31,15 @@ export default async function handler(req, res) {
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
-    const smtpPort = process.env.SMTP_PORT || 587;
+    const smtpPort = process.env.SMTP_PORT || 465;
 
     try {
         const emailTransporter = nodemailer.createTransport({
+            service: 'gmail',
             host: smtpHost,
             port: smtpPort,
-            secure: Number(smtpPort) === 465, // true for 465, false for 587
+            secure: Number(smtpPort) === 465, // true for 465
+            family: 4,
             auth: {
                 user: smtpUser,
                 pass: smtpPass
