@@ -36,47 +36,64 @@ try {
     console.error('❌ [AUTH] Failed to initialize Twilio:', err.message);
 }
 
-// Initialize Nodemailer (Safely)
-let emailTransporter;
-const getTransporter = () => {
-    if (emailTransporter) return emailTransporter;
+// Resilient IPv4 Nodemailer Transporter Resolution
+const resolveSmtpHostIp = async (hostname) => {
+    try {
+        const ips = await dns.promises.resolve4(hostname);
+        if (ips && ips.length > 0) return ips[0];
+    } catch (e) {
+        console.warn('⚠️ IPv4 lookup warning:', e.message);
+    }
+    return hostname;
+};
+
+const sendEmailSecure = async ({ to, subject, text, html }) => {
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
-    const smtpPort = Number(process.env.SMTP_PORT || 465);
+    const targetIp = await resolveSmtpHostIp(smtpHost);
 
-    emailTransporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465,
-        family: 4, // Force IPv4 addressing to prevent ENETUNREACH on IPv6
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 15000,
-        auth: {
-            user: smtpUser,
-            pass: smtpPass
-        },
-        tls: {
-            rejectUnauthorized: false
+    // Try Port 465 SSL first with resolved IPv4 IP address
+    try {
+        const t465 = nodemailer.createTransport({
+            host: targetIp,
+            port: 465,
+            secure: true,
+            servername: smtpHost,
+            connectionTimeout: 10000,
+            auth: { user: smtpUser, pass: smtpPass },
+            tls: { rejectUnauthorized: false }
+        });
+        await t465.sendMail({
+            from: `"Khaliya Sanctuary" <${smtpUser}>`,
+            to, subject, text, html
+        });
+        console.log(`✅ [AUTH] Email sent successfully to ${to} via IPv4 (${targetIp}:465)`);
+        return true;
+    } catch (err465) {
+        console.warn(`⚠️ Port 465 failed (${err465.message}), attempting fallback Port 587...`);
+        try {
+            const t587 = nodemailer.createTransport({
+                host: targetIp,
+                port: 587,
+                secure: false,
+                servername: smtpHost,
+                connectionTimeout: 10000,
+                auth: { user: smtpUser, pass: smtpPass },
+                tls: { rejectUnauthorized: false }
+            });
+            await t587.sendMail({
+                from: `"Khaliya Sanctuary" <${smtpUser}>`,
+                to, subject, text, html
+            });
+            console.log(`✅ [AUTH] Email sent successfully to ${to} via fallback Port 587`);
+            return true;
+        } catch (err587) {
+            console.error('❌ [AUTH] Email delivery failed on both ports:', err587.message);
+            throw err587;
         }
-    });
-    return emailTransporter;
+    }
 };
-
-try {
-    const transporter = getTransporter();
-    transporter.verify((error, success) => {
-        if (error) {
-            console.warn('⚠️ [AUTH] SMTP Connection Notice:', error.message);
-        } else {
-            console.log('✅ [AUTH] Nodemailer is ready to send emails via shivkumarrdn7@gmail.com');
-        }
-    });
-} catch (err) {
-    console.error('❌ [AUTH] Failed to initialize Nodemailer:', err.message);
-}
 
 const app = express();
 const PORT = process.env.PORT || 5005;
@@ -1108,48 +1125,19 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
 
         let emailSent = false;
 
-        // 3. Send via Nodemailer with automatic fallback ports (465 SSL -> 587 STARTTLS)
+        // 3. Send via IPv4 Nodemailer Transporter
         const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
         
         try {
-            const activeTransporter = getTransporter();
-            await activeTransporter.sendMail({
-                from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
+            await sendEmailSecure({
                 to: cleanEmail,
                 subject: emailContent.subject,
                 text: emailContent.text,
                 html: emailContent.html
             });
-            console.log(`✅ [AUTH] Verification email sent successfully to ${cleanEmail}`);
             emailSent = true;
         } catch (emailErr) {
-            console.error('⚠️ [AUTH] Primary port 465 failed, attempting fallback port 587...', emailErr.message);
-            try {
-                const fallbackTransporter = nodemailer.createTransport({
-                    service: 'gmail',
-                    host: 'smtp.gmail.com',
-                    port: 587,
-                    secure: false,
-                    family: 4,
-                    connectionTimeout: 10000,
-                    auth: {
-                        user: process.env.SMTP_USER || 'shivkumarrdn7@gmail.com',
-                        pass: process.env.SMTP_PASS || 'nasyuwmtzsuarioo'
-                    },
-                    tls: { rejectUnauthorized: false }
-                });
-                await fallbackTransporter.sendMail({
-                    from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
-                    to: cleanEmail,
-                    subject: emailContent.subject,
-                    text: emailContent.text,
-                    html: emailContent.html
-                });
-                console.log(`✅ [AUTH] Verification email sent via fallback port 587 to ${cleanEmail}`);
-                emailSent = true;
-            } catch (fallbackErr) {
-                console.error('❌ [AUTH] Email delivery failed on both ports:', fallbackErr.message);
-            }
+            console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
         }
 
         return res.json({ 

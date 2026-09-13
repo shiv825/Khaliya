@@ -33,17 +33,23 @@ export default async function handler(req, res) {
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
     const smtpPort = process.env.SMTP_PORT || 465;
 
+    let targetIp = smtpHost;
+    try {
+        const ips = await dns.promises.resolve4(smtpHost);
+        if (ips && ips.length > 0) targetIp = ips[0];
+    } catch (e) {}
+
     try {
         const emailTransporter = nodemailer.createTransport({
-            service: 'gmail',
-            host: smtpHost,
-            port: smtpPort,
-            secure: Number(smtpPort) === 465, // true for 465
-            family: 4,
+            host: targetIp,
+            port: Number(smtpPort),
+            secure: Number(smtpPort) === 465,
+            servername: smtpHost,
             auth: {
                 user: smtpUser,
                 pass: smtpPass
-            }
+            },
+            tls: { rejectUnauthorized: false }
         });
 
         const emailContent = getOtpEmailTemplate({ otp, email });
