@@ -1104,17 +1104,15 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
         // 2. Store the OTP in memory
         pendingEmailOtps[cleanEmail] = { otp, expiry };
 
-        console.log(`🔑 ==========================================`);
-        console.log(`🔑 [AUTH OTP GENERATED] Email: ${cleanEmail}`);
-        console.log(`🔑 [SECURITY CODE / OTP]: ${otp} (Master Passcode: 123456)`);
-        console.log(`🔑 ==========================================`);
+        console.log(`✉️ [AUTH OTP] Request received for email: ${cleanEmail}`);
 
         let emailSent = false;
 
-        // 3. Send via Nodemailer
+        // 3. Send via Nodemailer with automatic fallback ports (465 SSL -> 587 STARTTLS)
+        const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
+        
         try {
             const activeTransporter = getTransporter();
-            const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
             await activeTransporter.sendMail({
                 from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
                 to: cleanEmail,
@@ -1122,15 +1120,41 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
                 text: emailContent.text,
                 html: emailContent.html
             });
-            console.log(`✅ [AUTH] Premium email sent successfully to ${cleanEmail}`);
+            console.log(`✅ [AUTH] Verification email sent successfully to ${cleanEmail}`);
             emailSent = true;
         } catch (emailErr) {
-            console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
+            console.error('⚠️ [AUTH] Primary port 465 failed, attempting fallback port 587...', emailErr.message);
+            try {
+                const fallbackTransporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
+                    family: 4,
+                    connectionTimeout: 10000,
+                    auth: {
+                        user: process.env.SMTP_USER || 'shivkumarrdn7@gmail.com',
+                        pass: process.env.SMTP_PASS || 'nasyuwmtzsuarioo'
+                    },
+                    tls: { rejectUnauthorized: false }
+                });
+                await fallbackTransporter.sendMail({
+                    from: `"Khaliya Sanctuary" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
+                    to: cleanEmail,
+                    subject: emailContent.subject,
+                    text: emailContent.text,
+                    html: emailContent.html
+                });
+                console.log(`✅ [AUTH] Verification email sent via fallback port 587 to ${cleanEmail}`);
+                emailSent = true;
+            } catch (fallbackErr) {
+                console.error('❌ [AUTH] Email delivery failed on both ports:', fallbackErr.message);
+            }
         }
 
         return res.json({ 
             success: true, 
-            message: 'Verification code sent to your email address.',
+            message: emailSent ? 'Verification code sent to your email address.' : 'Failed to send verification email. Please check your address.',
             emailSent
         });
 
@@ -1150,25 +1174,21 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
     const inputCode = String(code || otp || '').trim();
     const record = pendingEmailOtps[cleanEmail];
 
-    const isMasterCode = inputCode === '123456';
-
-    if (!record && !isMasterCode) {
+    if (!record) {
         return res.status(400).json({ success: false, message: 'No verification code requested for this email. Please request a new code.' });
     }
 
-    // Check Expiry (5 Mins) unless using master bypass code
-    if (record && Date.now() > record.expiry && !isMasterCode) {
+    // Check Expiry (5 Mins)
+    if (Date.now() > record.expiry) {
         delete pendingEmailOtps[cleanEmail];
         return res.status(400).json({ success: false, message: 'Verification code has expired. Please request a new code.' });
     }
 
-    const isMatch = isMasterCode || (record && inputCode === record.otp);
+    const isMatch = (inputCode === record.otp);
 
-    if (isMatch || (record && record.verified)) {
-        if (record) {
-            record.verified = true;
-            setTimeout(() => { delete pendingEmailOtps[cleanEmail]; }, 30000);
-        }
+    if (isMatch || record.verified) {
+        record.verified = true;
+        setTimeout(() => { delete pendingEmailOtps[cleanEmail]; }, 30000);
         
         // Handle User Persistence
         const { name, phone } = req.body || {};
@@ -1229,14 +1249,12 @@ app.post('/api/auth/request-phone-otp', async (req, res) => {
 
         pendingPhoneOtps[cleanPhone] = { otp, expiry };
 
-        console.log(`📱 [PHONE OTP] Sent to ${cleanPhone}: Code ${otp}`);
-
         let smsSent = false;
         if (twilioClient) {
             try {
                 await twilioClient.messages.create({
                     body: `Your Khaliya Sanctuary OTP is ${otp}. Valid for 5 minutes.`,
-                    from: process.env.TWILIO_PHONE_NUMBER || '+1234567890',
+                    from: process.env.TWILIO_PHONE_NUMBER,
                     to: cleanPhone
                 });
                 smsSent = true;
@@ -1256,7 +1274,7 @@ app.post('/api/auth/request-phone-otp', async (req, res) => {
 });
 
 app.post('/api/auth/verify-phone-otp', async (req, res) => {
-    const { phone, code, otp, name } = req.body || {};
+    const { phone, code, otp } = req.body || {};
     if (!phone) {
         return res.status(400).json({ success: false, message: 'Phone number is required' });
     }
@@ -1264,21 +1282,20 @@ app.post('/api/auth/verify-phone-otp', async (req, res) => {
     const cleanPhone = String(phone).trim().replace(/[^0-9+]/g, '');
     const inputCode = String(code || otp || '').trim();
     const record = pendingPhoneOtps[cleanPhone];
-    const isMasterCode = inputCode === '123456';
 
-    if (!record && !isMasterCode) {
+    if (!record) {
         return res.status(400).json({ success: false, message: 'No verification code requested for this phone number.' });
     }
 
-    if (record && Date.now() > record.expiry && !isMasterCode) {
+    if (Date.now() > record.expiry) {
         delete pendingPhoneOtps[cleanPhone];
         return res.status(400).json({ success: false, message: 'Verification code has expired. Please request a new code.' });
     }
 
-    const isMatch = isMasterCode || (record && inputCode === record.otp);
+    const isMatch = (inputCode === record.otp);
 
     if (isMatch) {
-        if (record) delete pendingPhoneOtps[cleanPhone];
+        delete pendingPhoneOtps[cleanPhone];
 
         const users = await readData('users');
         let user = users.find(u => u.phone === cleanPhone);
