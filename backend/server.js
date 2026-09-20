@@ -13,6 +13,7 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const axios = require('axios');
 require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET || process.env.APP_SECRET || 'khaliya_sanctuary_secure_jwt_secret_2026';
 const { getOtpEmailTemplate, getBookingEmailTemplate, getBillReceiptEmailTemplate } = require('./templates/emailTemplates');
 
 
