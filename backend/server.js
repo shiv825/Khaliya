@@ -89,6 +89,7 @@ const sendEmailSecure = async ({ to, subject, text, html }) => {
                 const errData = await res.json().catch(() => ({}));
                 console.warn(`⚠️ Resend HTTPS API error (${res.status}):`, JSON.stringify(errData));
             } else if (process.env.BREVO_API_KEY) {
+                const senderEmail = process.env.EMAIL_FROM || 'khaliyarestaurant@gmail.com';
                 const res = await fetch('https://api.brevo.com/v3/smtp/email', {
                     method: 'POST',
                     headers: { 
@@ -96,7 +97,7 @@ const sendEmailSecure = async ({ to, subject, text, html }) => {
                         'Content-Type': 'application/json' 
                     },
                     body: JSON.stringify({
-                        sender: { name: 'Khaliya Sanctuary', email: process.env.SMTP_USER || 'shivkumarrdn7@gmail.com' },
+                        sender: { name: 'Khaliya Sanctuary', email: senderEmail },
                         to: [{ email: to }],
                         subject,
                         htmlContent: html || `<p>${text}</p>`
