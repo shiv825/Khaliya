@@ -1186,27 +1186,31 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
 
         console.log(`✉️ [AUTH OTP] Request received for email: ${cleanEmail}`);
 
-        // 3. Dispatch Email Delivery Asynchronously (Non-blocking for instant sub-100ms response!)
+        // 3. Dispatch Email Delivery synchronously & handle failures cleanly
         const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
         
-        sendEmailSecure({
-            to: cleanEmail,
-            subject: emailContent.subject,
-            text: emailContent.text,
-            html: emailContent.html
-        }).then(() => {
+        try {
+            await sendEmailSecure({
+                to: cleanEmail,
+                subject: emailContent.subject,
+                text: emailContent.text,
+                html: emailContent.html
+            });
             console.log(`✅ [AUTH] OTP Email delivered to ${cleanEmail}`);
-        }).catch((emailErr) => {
-            console.error('❌ [AUTH] Async Nodemailer Send Error:', emailErr.message);
-        });
 
-        // Respond IMMEDIATELY to client so frontend advances to OTP entry without hanging
-        return res.json({ 
-            success: true, 
-            message: 'Verification code sent to your email address.',
-            emailSent: true,
-            ...(process.env.SHOW_DEV_OTP === 'true' ? { simulatedOtp: otp } : {})
-        });
+            return res.json({ 
+                success: true, 
+                message: 'Verification code sent to your email address.',
+                emailSent: true,
+                ...(process.env.SHOW_DEV_OTP === 'true' ? { simulatedOtp: otp } : {})
+            });
+        } catch (emailErr) {
+            console.error('❌ [AUTH] Nodemailer Send Error:', emailErr.message);
+            return res.status(500).json({ 
+                success: false, 
+                message: `Failed to deliver OTP email (${emailErr.message}). Please check SMTP configuration.` 
+            });
+        }
 
     } catch (err) {
         console.error('❌ [AUTH] Server Error during OTP generation:', err.message);
