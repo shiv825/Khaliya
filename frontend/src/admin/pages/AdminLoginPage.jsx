@@ -24,7 +24,8 @@ export default function AdminLoginPage({ onLoginSuccess }) {
         try {
             const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email });
             if (res.data.success) {
-                setInfoMsg(res.data.message || 'OTP Sent to Email.');
+                const hintText = res.data.simulatedOtp ? ` (Code Hint: ${res.data.simulatedOtp})` : '';
+                setInfoMsg((res.data.message || 'OTP Sent to Email.') + hintText);
                 setStep(2);
             }
         } catch (err) {

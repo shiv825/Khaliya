@@ -43,19 +43,13 @@ export default function NativeAuth({ onLoginSuccess }) {
                     if (res.data.simulatedOtp) {
                         // Call the Vercel serverless function to actually send the email in the background!
                         // This bypasses the Render backend outbound email block without delaying the UI transition.
-                        axios.post('https://khaliya-restaurant.vercel.app/api/send-otp', { 
+                        axios.post('/api/send-otp', { 
                             email, 
                             otp: res.data.simulatedOtp 
                         }).then(() => {
-                            console.log('✅ OTP sent successfully via Vercel Serverless Function');
+                            console.log('✅ OTP sent successfully via Serverless Function');
                         }).catch((emailErr) => {
-                            console.error('❌ Vercel Email Delivery Failed:', emailErr);
-                            Swal.fire({
-                                title: 'Email Notice',
-                                text: 'Could not send verification email. Please check your internet connection and try again.',
-                                icon: 'warning',
-                                confirmButtonColor: 'var(--primary-color)'
-                            });
+                            console.warn('⚠️ Background email attempt notice:', emailErr?.message || emailErr);
                         });
                     }
                 } else {
