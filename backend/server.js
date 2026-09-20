@@ -1180,7 +1180,7 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
         // 2. Store the OTP in memory
         pendingEmailOtps[cleanEmail] = { otp, expiry };
 
-        console.log(`✉️ [AUTH OTP] Request received for email: ${cleanEmail} | Active OTP: ${otp}`);
+        console.log(`✉️ [AUTH OTP] Request received for email: ${cleanEmail}`);
 
         // 3. Dispatch Email Delivery Asynchronously (Non-blocking for instant sub-100ms response!)
         const emailContent = getOtpEmailTemplate({ otp, email: cleanEmail });
