@@ -35,10 +35,20 @@ export default async function handler(req, res) {
 
     const emailContent = getOtpEmailTemplate({ otp, email });
 
+    const customIpv4Lookup = (hostname, options, callback) => {
+        if (typeof options === 'function') {
+            callback = options;
+            options = {};
+        }
+        dns.lookup(hostname, { family: 4 }, callback);
+    };
+
     // Primary Transporter (Port 587 STARTTLS / Port 465 SSL)
     const primaryTransporter = nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
+        family: 4,
+        lookup: customIpv4Lookup,
         secure: smtpPort === 465,
         requireTLS: smtpPort === 587,
         connectionTimeout: 15000,

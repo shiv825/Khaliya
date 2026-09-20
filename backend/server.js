@@ -38,6 +38,14 @@ try {
 }
 
 // Resilient IPv4 Nodemailer Transporter Resolution
+const customIpv4Lookup = (hostname, options, callback) => {
+    if (typeof options === 'function') {
+        callback = options;
+        options = {};
+    }
+    dns.lookup(hostname, { family: 4 }, callback);
+};
+
 const getSmtpTransporters = () => {
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
@@ -47,7 +55,8 @@ const getSmtpTransporters = () => {
     const smtpPooledTransporter = nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
-        family: 4, // Force IPv4 resolution
+        family: 4,
+        lookup: customIpv4Lookup,
         secure: smtpPort === 465,
         requireTLS: smtpPort === 587,
         auth: { user: smtpUser, pass: smtpPass },
@@ -60,7 +69,8 @@ const getSmtpTransporters = () => {
     const smtpFallbackTransporter = nodemailer.createTransport({
         host: smtpHost,
         port: 465,
-        family: 4, // Force IPv4 fallback
+        family: 4,
+        lookup: customIpv4Lookup,
         secure: true,
         auth: { user: smtpUser, pass: smtpPass },
         tls: { rejectUnauthorized: false },
