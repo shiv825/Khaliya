@@ -37,20 +37,28 @@ try {
     console.error('❌ [AUTH] Failed to initialize Twilio:', err.message);
 }
 
-// Resilient Nodemailer Gmail Service Transporter
+// Resilient Nodemailer Gmail SMTP Transporter (Port 587 STARTTLS)
 const getSmtpTransporters = () => {
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
+    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const smtpPort = Number(process.env.SMTP_PORT) || 587;
 
     const gmailTransporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        requireTLS: smtpPort === 587,
         auth: {
             user: smtpUser,
             pass: smtpPass
         },
         tls: {
             rejectUnauthorized: false
-        }
+        },
+        connectionTimeout: 8000,
+        greetingTimeout: 8000,
+        socketTimeout: 10000
     });
 
     return { gmailTransporter, smtpUser };
