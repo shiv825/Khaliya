@@ -37,53 +37,27 @@ try {
     console.error('❌ [AUTH] Failed to initialize Twilio:', err.message);
 }
 
-// Resilient IPv4 Nodemailer Transporter Resolution
-const customIpv4Lookup = (hostname, options, callback) => {
-    if (typeof options === 'function') {
-        callback = options;
-        options = {};
-    }
-    dns.lookup(hostname, { family: 4 }, callback);
-};
-
+// Resilient Nodemailer Gmail Service Transporter
 const getSmtpTransporters = () => {
-    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
-    const smtpPort = Number(process.env.SMTP_PORT) || 587;
 
-    const smtpPooledTransporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        family: 4,
-        lookup: customIpv4Lookup,
-        secure: smtpPort === 465,
-        requireTLS: smtpPort === 587,
-        auth: { user: smtpUser, pass: smtpPass },
-        tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000
+    const gmailTransporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: smtpUser,
+            pass: smtpPass
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
     });
 
-    const smtpFallbackTransporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: 465,
-        family: 4,
-        lookup: customIpv4Lookup,
-        secure: true,
-        auth: { user: smtpUser, pass: smtpPass },
-        tls: { rejectUnauthorized: false },
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000
-    });
-
-    return { smtpPooledTransporter, smtpFallbackTransporter, smtpUser, smtpHost, smtpPort };
+    return { gmailTransporter, smtpUser };
 };
 
 const sendEmailSecure = async ({ to, subject, text, html }) => {
-    // 1. HTTPS API Gateway (Port 443 - 100% immune to Render ISP & Firewall socket blocks)
+    // 1. HTTPS API Gateway (Port 443 - Resend / Brevo)
     if (process.env.RESEND_API_KEY || process.env.BREVO_API_KEY) {
         try {
             if (process.env.RESEND_API_KEY) {
@@ -128,34 +102,19 @@ const sendEmailSecure = async ({ to, subject, text, html }) => {
                 console.warn(`⚠️ Brevo HTTPS API error (${res.status}):`, JSON.stringify(errData));
             }
         } catch (httpsErr) {
-            console.warn('⚠️ HTTPS API notice, attempting fallback TCP socket transport:', httpsErr.message);
+            console.warn('⚠️ HTTPS API notice, attempting fallback Gmail service:', httpsErr.message);
         }
     }
 
-    // 2. Gmail Nodemailer Transport (Port 587 STARTTLS / Service Fallback)
-    const { smtpPooledTransporter, smtpFallbackTransporter, smtpUser, smtpPort } = getSmtpTransporters();
+    // 2. Standard Gmail Service Transport
+    const { gmailTransporter, smtpUser } = getSmtpTransporters();
 
-    try {
-        await smtpPooledTransporter.sendMail({
-            from: `"Khaliya Sanctuary" <${smtpUser}>`,
-            to, subject, text, html
-        });
-        console.log(`✅ [AUTH] Email delivered successfully to ${to} via Gmail SMTP (Port ${smtpPort})`);
-        return true;
-    } catch (primaryErr) {
-        console.warn(`⚠️ Primary SMTP delivery warning (${primaryErr.message}), trying Gmail service fallback...`);
-        try {
-            await smtpFallbackTransporter.sendMail({
-                from: `"Khaliya Sanctuary" <${smtpUser}>`,
-                to, subject, text, html
-            });
-            console.log(`✅ [AUTH] Email delivered successfully to ${to} via Gmail Service Fallback`);
-            return true;
-        } catch (fallbackErr) {
-            console.error('❌ [AUTH] Email delivery failed on both primary and fallback transports:', fallbackErr.message);
-            throw fallbackErr;
-        }
-    }
+    await gmailTransporter.sendMail({
+        from: `"Khaliya Sanctuary" <${smtpUser}>`,
+        to, subject, text, html
+    });
+    console.log(`✅ [AUTH] Email delivered successfully to ${to} via Gmail Service`);
+    return true;
 };
 
 const app = express();

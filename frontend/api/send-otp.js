@@ -27,39 +27,19 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Email and OTP are required' });
     }
 
-    // Use environment variables or resilient defaults
-    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
-    const smtpPort = Number(process.env.SMTP_PORT) || 587; // Default to 587 STARTTLS for serverless/cloud platforms
 
     const emailContent = getOtpEmailTemplate({ otp, email });
 
-    const customIpv4Lookup = (hostname, options, callback) => {
-        if (typeof options === 'function') {
-            callback = options;
-            options = {};
-        }
-        dns.lookup(hostname, { family: 4 }, callback);
-    };
-
-    // Primary Transporter (Port 587 STARTTLS / Port 465 SSL)
-    const primaryTransporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        family: 4,
-        lookup: customIpv4Lookup,
-        secure: smtpPort === 465,
-        requireTLS: smtpPort === 587,
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000,
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
         auth: { user: smtpUser, pass: smtpPass },
-        tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' }
+        tls: { rejectUnauthorized: false }
     });
 
     try {
-        await primaryTransporter.sendMail({
+        await transporter.sendMail({
             from: `"Khaliya Sanctuary" <${smtpUser}>`,
             to: email,
             subject: emailContent.subject,
@@ -67,32 +47,9 @@ export default async function handler(req, res) {
             html: emailContent.html
         });
 
-        return res.status(200).json({ success: true, message: 'Email sent successfully via primary SMTP' });
+        return res.status(200).json({ success: true, message: 'Email sent successfully via Gmail service' });
     } catch (error) {
-        console.warn('⚠️ Primary SMTP failed in send-otp handler:', error.message);
-        
-        // Fallback Transporter using Nodemailer Gmail service
-        try {
-            const fallbackTransporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: { user: smtpUser, pass: smtpPass },
-                tls: { rejectUnauthorized: false },
-                connectionTimeout: 15000,
-                greetingTimeout: 15000
-            });
-
-            await fallbackTransporter.sendMail({
-                from: `"Khaliya Sanctuary" <${smtpUser}>`,
-                to: email,
-                subject: emailContent.subject,
-                text: emailContent.text,
-                html: emailContent.html
-            });
-
-            return res.status(200).json({ success: true, message: 'Email sent successfully via Gmail service fallback' });
-        } catch (fbErr) {
-            console.error('❌ Both SMTP transports failed in send-otp handler:', fbErr.message);
-            return res.status(500).json({ success: false, message: 'Failed to send email', error: fbErr.message });
-        }
+        console.error('❌ Nodemailer Send Error:', error.message);
+        return res.status(500).json({ success: false, message: 'Failed to send email', error: error.message });
     }
 }
