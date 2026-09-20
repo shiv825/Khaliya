@@ -37,43 +37,36 @@ try {
 }
 
 // Resilient IPv4 Nodemailer Transporter Resolution
-let smtpPooledTransporter = null;
-let smtpFallbackTransporter = null;
-
 const getSmtpTransporters = () => {
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
     const smtpPort = Number(process.env.SMTP_PORT) || 587;
 
-    if (!smtpPooledTransporter) {
-        smtpPooledTransporter = nodemailer.createTransport({
-            host: smtpHost,
-            port: smtpPort,
-            family: 4, // Force IPv4 to eliminate ENETUNREACH IPv6 routing errors
-            secure: smtpPort === 465,
-            requireTLS: smtpPort === 587,
-            auth: { user: smtpUser, pass: smtpPass },
-            tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
-            connectionTimeout: 15000,
-            greetingTimeout: 15000,
-            socketTimeout: 20000
-        });
-    }
+    const smtpPooledTransporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        family: 4, // Force IPv4 resolution
+        secure: smtpPort === 465,
+        requireTLS: smtpPort === 587,
+        auth: { user: smtpUser, pass: smtpPass },
+        tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000
+    });
 
-    if (!smtpFallbackTransporter) {
-        smtpFallbackTransporter = nodemailer.createTransport({
-            host: smtpHost,
-            port: 465,
-            family: 4, // Force IPv4 fallback
-            secure: true,
-            auth: { user: smtpUser, pass: smtpPass },
-            tls: { rejectUnauthorized: false },
-            connectionTimeout: 15000,
-            greetingTimeout: 15000,
-            socketTimeout: 20000
-        });
-    }
+    const smtpFallbackTransporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: 465,
+        family: 4, // Force IPv4 fallback
+        secure: true,
+        auth: { user: smtpUser, pass: smtpPass },
+        tls: { rejectUnauthorized: false },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000
+    });
 
     return { smtpPooledTransporter, smtpFallbackTransporter, smtpUser, smtpHost, smtpPort };
 };

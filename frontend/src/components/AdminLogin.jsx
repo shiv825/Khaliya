@@ -36,9 +36,8 @@ export default function AdminLogin({ onLogin }) {
         try {
             const res = await axios.post(`${API_URL}/auth/request-email-otp`, { email: email.trim().toLowerCase() }, { timeout: 15000 });
             if (res.data.success) {
-                const hintText = res.data.simulatedOtp ? ` (Code Hint: ${res.data.simulatedOtp})` : '';
                 setStep('otp');
-                setInfoMsg(`Verification code sent to ${email}${hintText}`);
+                setInfoMsg(`Verification code sent to ${email}`);
             } else {
                 throw new Error(res.data.message || 'Failed to send OTP.');
             }

@@ -246,14 +246,48 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        {/* Spice Rewards Badge */}
-                        <div style={{ background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.35)', borderRadius: '16px', padding: '12px 18px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.72rem', color: '#D4AF37', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                                SPICE REWARDS
+                        {/* Right Actions: Spice Rewards & Logout Button */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                            <div style={{ background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.35)', borderRadius: '16px', padding: '10px 16px', textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.68rem', color: '#D4AF37', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                                    SPICE REWARDS
+                                </div>
+                                <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#FFD700' }}>
+                                    ⭐️ {spicePoints} <span style={{ fontSize: '0.78rem', color: '#CBD5E1', fontWeight: '600' }}>Pts</span>
+                                </div>
                             </div>
-                            <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#FFD700' }}>
-                                ⭐️ {spicePoints} <span style={{ fontSize: '0.8rem', color: '#CBD5E1', fontWeight: '600' }}>Pts</span>
-                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                style={{
+                                    background: 'rgba(239, 68, 68, 0.15)',
+                                    border: '1.5px solid rgba(239, 68, 68, 0.45)',
+                                    color: '#F87171',
+                                    padding: '10px 16px',
+                                    borderRadius: '16px',
+                                    fontWeight: '800',
+                                    fontSize: '0.85rem',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: '0 4px 15px rgba(239, 68, 68, 0.15)'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.3)';
+                                    e.currentTarget.style.borderColor = '#EF4444';
+                                    e.currentTarget.style.color = '#FFF';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+                                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.45)';
+                                    e.currentTarget.style.color = '#F87171';
+                                }}
+                            >
+                                <i className="fas fa-sign-out-alt"></i> Log Out
+                            </button>
                         </div>
                     </div>
                 </div>

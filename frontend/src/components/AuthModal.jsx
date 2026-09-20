@@ -10,7 +10,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [otpCode, setOtpCode] = useState('');
-    const [devOtpHint, setDevOtpHint] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const rawApiUrl = window.KHALIYA_API_URL || import.meta.env.VITE_API_URL || '';
@@ -21,7 +20,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
     const handleRequestOtp = async (e) => {
         e.preventDefault();
-        setDevOtpHint('');
 
         if (!email || !email.includes('@')) {
             Swal.fire('Invalid Email', 'Please enter a valid email address to receive your OTP code', 'warning');
@@ -45,9 +43,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
             if (res.data?.success) {
                 setStep(2);
-                if (res.data?.simulatedOtp) {
-                    setDevOtpHint(res.data.simulatedOtp);
-                }
                 Swal.fire({
                     title: mode === 'register' ? 'Registration OTP Sent ✉️' : 'Sign In OTP Sent ✉️',
                     text: `Verification code sent to ${email}. Please check your Inbox and Spam/Junk folder.`,
@@ -297,11 +292,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                                 <p style={{ color: '#CBD5E1', fontSize: '0.88rem', margin: '0 0 6px 0' }}>
                                     Enter 6-digit verification code sent to: <strong style={{ color: '#FFD700' }}>{email}</strong>
                                 </p>
-                                {devOtpHint && (
-                                    <div style={{ marginTop: '6px', background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.4)', padding: '6px 12px', borderRadius: '8px', color: '#FFD700', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                                        🔑 Code Hint: {devOtpHint}
-                                    </div>
-                                )}
                             </div>
 
                             <div>
