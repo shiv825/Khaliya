@@ -44,13 +44,14 @@ const getSmtpTransporters = () => {
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
-    const smtpPort = Number(process.env.SMTP_PORT) || 587; // Port 587 (STARTTLS) works best on Render
+    const smtpPort = Number(process.env.SMTP_PORT) || 587;
 
     if (!smtpPooledTransporter) {
         smtpPooledTransporter = nodemailer.createTransport({
             host: smtpHost,
             port: smtpPort,
-            secure: smtpPort === 465, // true for 465, false for 587
+            family: 4, // Force IPv4 to eliminate ENETUNREACH IPv6 routing errors
+            secure: smtpPort === 465,
             requireTLS: smtpPort === 587,
             auth: { user: smtpUser, pass: smtpPass },
             tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
@@ -62,7 +63,10 @@ const getSmtpTransporters = () => {
 
     if (!smtpFallbackTransporter) {
         smtpFallbackTransporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: smtpHost,
+            port: 465,
+            family: 4, // Force IPv4 fallback
+            secure: true,
             auth: { user: smtpUser, pass: smtpPass },
             tls: { rejectUnauthorized: false },
             connectionTimeout: 15000,
@@ -1197,7 +1201,7 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
             success: true, 
             message: 'Verification code sent to your email address.',
             emailSent: true,
-            simulatedOtp: otp // Always provide simulatedOtp for instant developer/offline hint fallback
+            ...(process.env.SHOW_DEV_OTP === 'true' ? { simulatedOtp: otp } : {})
         });
 
     } catch (err) {
