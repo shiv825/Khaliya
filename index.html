@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <script type="text/javascript">
+    // Single Page Apps for GitHub Pages - Path Decoder
+    (function(l) {
+      if (l.search[1] === '/' ) {
+        var decoded = l.search.slice(1).split('&').map(function(s) { 
+          return s.replace(/~and~/g, '&') 
+        }).join('?');
+        window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+        );
+      }
+    }(window.location));
+  </script>
+  <link rel="icon" type="image/png" sizes="192x192" href="./pwa-icon-192.png" />
+  <link rel="apple-touch-icon" href="./pwa-icon-192.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#070A0E" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Experience the royal heritage of authentic Indian fine dining with Khaliya Sanctuary. Order online, reserve dining spaces, and explore signature delicacies." />
+  <meta name="keywords" content="Khaliya, Khaliya Sanctuary, Indian cuisine, royal Indian dining, authentic Indian food, online food order, restaurant reservations" />
+  <meta property="og:title" content="Khaliya Sanctuary - Royal Indian Fine Dining" />
+  <meta property="og:description" content="Experience the royal heritage of authentic Indian fine dining with Khaliya Sanctuary. Order online, reserve dining spaces, and explore signature delicacies." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./khaliya-logo.jpg" />
+  <title>Khaliya Sanctuary - Royal Indian Fine Dining</title>
+  
+  <script>
+    // 1. ADVANCED DIAGNOSTIC GUARD: Catch EVERYTHING
+    (function() {
+      window.khaliyaNuclearReset = function() {
+        if (confirm("Factory Reset will clear your cart and session to fix loading issues. Continue?")) {
+          try {
+            localStorage.clear();
+            sessionStorage.clear();
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(rs) {
+                for(let r of rs) r.unregister();
+              });
+            }
+            if ('caches' in window) {
+              caches.keys().then(function(ns) {
+                for(let n of ns) caches.delete(n);
+              });
+            }
+          } catch(e) {}
+          window.location.href = window.location.pathname + "?reset=" + Date.now();
+        }
+      };
+
+      window.showKhaliyaDiag = function(msg, detail) {
+        if (document.getElementById('khaliya-diag')) {
+          var d = document.getElementById('khaliya-diag-detail');
+          if (d) d.innerText += "\n" + (detail || "");
+          return;
+        }
+        var div = document.createElement('div');
+        div.id = 'khaliya-diag';
+        div.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(142,28,28,0.98);color:#fff;padding:40px 20px;z-index:999999;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;backdrop-filter:blur(10px)";
+        div.innerHTML = "<div style='font-size:60px;margin-bottom:20px;color:#DAA520'>⚠</div>" + 
+                        "<div style='font-size:24px;margin-bottom:15px;font-weight:900;letter-spacing:1px'>SYSTEM INTERRUPTION</div>" + 
+                        "<div style='font-size:14px;max-width:500px;line-height:1.6;margin-bottom:30px;opacity:0.9'>" + msg + "<br><br><span id='khaliya-diag-detail' style='font-family:monospace;font-size:11px;opacity:0.7;display:block;max-height:150px;overflow:auto'>" + (detail || "") + "</span></div>" +
+                        "<div style='display:flex;gap:15px;flex-wrap:wrap;justify-content:center'>" +
+                          "<button onclick='window.location.reload(true)' style='background:#DAA520;color:#000;border:none;padding:15px 30px;border-radius:50px;font-weight:900;cursor:pointer;text-transform:uppercase'>Retry Load</button>" +
+                          "<button onclick='window.khaliyaNuclearReset()' style='background:transparent;color:#FFF;border:2px solid #FFF;padding:15px 30px;border-radius:50px;font-weight:900;cursor:pointer;text-transform:uppercase'>Factory Reset</button>" +
+                        "</div>";
+        document.body ? document.body.appendChild(div) : document.documentElement.appendChild(div);
+      };
+
+      // Capture runtime errors
+      window.onerror = function(m, u, l) { window.showKhaliyaDiag("JS Error: " + m, u + ":" + l); return false; };
+      
+      // Capture resource (404) errors
+      window.addEventListener('error', function(e) {
+        if (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK') {
+          window.showKhaliyaDiag("Resource Loading Error", e.target.src || e.target.href);
+        }
+      }, true);
+
+      // 2. WATCHDOG: If #root is empty after 6 seconds, show "App Hung"
+      window.addEventListener('load', function() {
+        console.log('🏁 [Watchdog] Page load complete. Waiting for React mount...');
+        setTimeout(function() {
+          var root = document.getElementById('root');
+          if (root && root.innerHTML === "") {
+            window.showKhaliyaDiag("Application Hang detected", "The app failed to render the main interface within 6 seconds. This usually means a critical dependency (like Framer Motion or AOS) failed to initialize, or a JavaScript error occurred during the early boot phase.");
+          } else {
+            console.log('✅ [Watchdog] React mount detected. Watchdog disarmed.');
+          }
+        }, 6000);
+      });
+
+      window.KHALIYA_API_URL = ""; 
+    })();
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Outfit:wght@300;400;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap"
+    rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- GSAP for Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script type="module" crossorigin src="./assets/index-DM9uA4WG.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-6pGA34DO.css">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="./pwa-manager.js"></script>
+</body>
+
+</html>
