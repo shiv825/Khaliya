@@ -1,0 +1,112 @@
+[
+  {
+    "id": "T01",
+    "name": "Table 01",
+    "capacity": 2,
+    "tableType": "window",
+    "section": "Glass Frontage (Window View)",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T02",
+    "name": "Table 02",
+    "capacity": 4,
+    "tableType": "window",
+    "section": "Glass Frontage (Window View)",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T03",
+    "name": "Table 03",
+    "capacity": 2,
+    "tableType": "intimate",
+    "section": "VIP Lounge & Booths",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T04",
+    "name": "Table 04",
+    "capacity": 4,
+    "tableType": "family",
+    "section": "Main Dining Hall",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T05",
+    "name": "Table 05",
+    "capacity": 6,
+    "tableType": "family",
+    "section": "Main Dining Hall",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T06",
+    "name": "Table 06",
+    "capacity": 6,
+    "tableType": "family",
+    "section": "Main Dining Hall",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T07",
+    "name": "Table 07",
+    "capacity": 8,
+    "tableType": "group",
+    "section": "Royal Court Banquet",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T08",
+    "name": "Table 08",
+    "capacity": 4,
+    "tableType": "intimate",
+    "section": "VIP Lounge & Booths",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T09",
+    "name": "Table 09",
+    "capacity": 10,
+    "tableType": "group",
+    "section": "Royal Court Banquet",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T10",
+    "name": "Table 10",
+    "capacity": 12,
+    "tableType": "party",
+    "section": "Grand Terrace & Al Fresco",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  },
+  {
+    "id": "T11",
+    "name": "Table 11",
+    "capacity": 16,
+    "tableType": "party",
+    "section": "Grand Terrace & Al Fresco",
+    "status": "AVAILABLE",
+    "session": null,
+    "mergedTables": []
+  }
+]

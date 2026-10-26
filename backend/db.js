@@ -32,8 +32,16 @@ const BookingSchema = new mongoose.Schema({
 
 const OrderSchema = new mongoose.Schema({
     id: String,
+    invoiceNo: String,
+    orderNo: String,
+    kotNo: String,
     timestamp: String,
+    createdAt: String,
     status: String,
+    paymentStatus: String,
+    paymentMethod: String,
+    razorpayPaymentId: String,
+    razorpayOrderId: String,
     items: mongoose.Schema.Types.Mixed,
     total: mongoose.Schema.Types.Mixed,
     name: String,
@@ -42,8 +50,9 @@ const OrderSchema = new mongoose.Schema({
     source: String,
     pointsUsed: Number,
     pointsEarned: Number,
-    email: String
-}, { collection: 'orders', minimize: false });
+    email: String,
+    paymentDetails: mongoose.Schema.Types.Mixed
+}, { collection: 'orders', strict: false, minimize: false });
 
 const ReviewSchema = new mongoose.Schema({
     id: Number,
@@ -243,36 +252,94 @@ const readDataAsync = async (key) => {
 };
 
 /**
- * Writes 100% directly to MongoDB Atlas collection without JSON disk operations.
+ * Writes directly to MongoDB Atlas collection using atomic operations without data loss.
+ * Prevents race conditions and lost updates.
  */
 const writeDataAsync = async (key, data) => {
-    await ensureDbConnected();
+    const isConnected = await ensureDbConnected();
+    if (!isConnected || mongoose.connection.readyState !== 1) {
+        throw new Error(`[DB Error] Database connection inactive: cannot write to '${key}'`);
+    }
 
-    if (isMongoEnabled && mongoose.connection.readyState === 1) {
-        try {
-            const collectionKey = cleanKey(key);
-            const Model = models[collectionKey];
-            if (Model) {
-                if (collectionKey === 'settings') {
-                    await Model.replaceOne({}, data, { upsert: true });
-                } else if (Array.isArray(data)) {
-                    await Model.deleteMany({});
-                    if (data.length > 0) {
-                        await Model.insertMany(data);
-                    }
+    const collectionKey = cleanKey(key);
+    const Model = models[collectionKey];
+    if (!Model) {
+        throw new Error(`[DB Error] Unknown collection key: '${collectionKey}'`);
+    }
+
+    try {
+        if (collectionKey === 'settings') {
+            await Model.replaceOne({}, data, { upsert: true });
+        } else if (Array.isArray(data)) {
+            if (data.length === 0) {
+                await Model.deleteMany({});
+            } else {
+                // Perform atomic upserts for each item to prevent lost updates
+                const bulkOps = data.map(item => {
+                    const identifier = item.id !== undefined ? { id: item.id } : { _id: item._id };
+                    const cleanItem = { ...item };
+                    delete cleanItem._id;
+                    delete cleanItem.__v;
+                    return {
+                        updateOne: {
+                            filter: identifier,
+                            update: { $set: cleanItem },
+                            upsert: true
+                        }
+                    };
+                });
+
+                await Model.bulkWrite(bulkOps, { ordered: false });
+
+                // Clean up only items that were explicitly removed, after new data is secured
+                const activeIds = data.map(d => d.id).filter(id => id !== undefined && id !== null);
+                if (activeIds.length > 0) {
+                    await Model.deleteMany({ id: { $nin: activeIds } });
                 }
             }
-        } catch (err) {
-            console.error(`❌ [DB] Direct MongoDB Write Error on '${key}':`, err.message);
+        } else if (data && typeof data === 'object') {
+            const identifier = data.id !== undefined ? { id: data.id } : {};
+            await Model.updateOne(identifier, { $set: data }, { upsert: true });
         }
-    } else {
-        console.error(`❌ [DB] Cannot write '${key}': MongoDB Atlas connection inactive.`);
+    } catch (err) {
+        console.error(`❌ [DB] Direct MongoDB Write Error on '${key}':`, err.message);
+        throw err; // Propagate persistence failure to caller
     }
+};
+
+/**
+ * Atomic single-document operations
+ */
+const saveDoc = async (collectionKey, doc) => {
+    await ensureDbConnected();
+    const Model = models[cleanKey(collectionKey)];
+    if (!Model) throw new Error(`[DB Error] Unknown collection: ${collectionKey}`);
+    const identifier = doc.id !== undefined ? { id: doc.id } : { _id: doc._id };
+    return await Model.findOneAndUpdate(identifier, { $set: doc }, { upsert: true, new: true }).lean();
+};
+
+const updateDoc = async (collectionKey, filter, update) => {
+    await ensureDbConnected();
+    const Model = models[cleanKey(collectionKey)];
+    if (!Model) throw new Error(`[DB Error] Unknown collection: ${collectionKey}`);
+    return await Model.updateOne(filter, update);
+};
+
+const deleteDoc = async (collectionKey, filter) => {
+    await ensureDbConnected();
+    const Model = models[cleanKey(collectionKey)];
+    if (!Model) throw new Error(`[DB Error] Unknown collection: ${collectionKey}`);
+    return await Model.deleteOne(filter);
 };
 
 module.exports = {
     isMongoEnabled,
+    ensureDbConnected,
     readDataAsync,
     writeDataAsync,
+    saveDoc,
+    updateDoc,
+    deleteDoc,
     models
 };
+

@@ -3,6 +3,19 @@
 
 <head>
   <meta charset="UTF-8" />
+  <script type="text/javascript">
+    // Single Page Apps for GitHub Pages - Path Decoder
+    (function(l) {
+      if (l.search[1] === '/' ) {
+        var decoded = l.search.slice(1).split('&').map(function(s) { 
+          return s.replace(/~and~/g, '&') 
+        }).join('?');
+        window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+        );
+      }
+    }(window.location));
+  </script>
   <link rel="icon" type="image/png" sizes="192x192" href="/pwa-icon-192.png" />
   <link rel="apple-touch-icon" href="/pwa-icon-192.png" />
   <link rel="manifest" href="/manifest.json" />
@@ -81,12 +94,6 @@
         }, 6000);
       });
 
-      // 3. DEV SERVICE WORKER CLEANUP: Unregister SWs on localhost to prevent infinite reload loops
-      if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && 'serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(rs) {
-          for (let r of rs) r.unregister();
-        });
-      }
       window.KHALIYA_API_URL = ""; 
     })();
   </script>

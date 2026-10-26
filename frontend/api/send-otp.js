@@ -27,10 +27,14 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Email and OTP are required' });
     }
 
-    const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
-    const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpPort = Number(process.env.SMTP_PORT) || 587;
+
+    if (!smtpUser || !smtpPass) {
+        return res.status(500).json({ success: false, message: 'SMTP credentials not configured in environment' });
+    }
 
     const emailContent = getOtpEmailTemplate({ otp, email });
 

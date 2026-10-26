@@ -18,6 +18,8 @@ dist/
 dist-ssr/
 build/
 *.local
+*.zip
+
 
 # Logs
 logs

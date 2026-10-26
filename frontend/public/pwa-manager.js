@@ -17,14 +17,6 @@ const PWAManager = {
     },
     registerServiceWorker: () => {
         if ('serviceWorker' in navigator) {
-            // Disable Service Worker on local development server to prevent HMR infinite reload loops
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                navigator.serviceWorker.getRegistrations().then(regs => {
-                    for (let r of regs) r.unregister();
-                });
-                return;
-            }
-
             const register = () => {
                 const isGithubPages = window.location.pathname.startsWith('/Khaliya-Restaurant');
                 const swPath = isGithubPages ? '/Khaliya-Restaurant/service-worker.js' : '/service-worker.js';

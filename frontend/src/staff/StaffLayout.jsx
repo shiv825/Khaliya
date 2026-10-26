@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import axios from 'axios';
 import ServiceModeToggle from '../components/ServiceModeToggle';
 import ShiftReconciliationModal from '../components/ShiftReconciliationModal';
 
@@ -16,6 +16,8 @@ export default function StaffLayout() {
     useEffect(() => {
         if (!staffToken && !location.pathname.includes('/staff/login')) {
             navigate('/staff/login');
+        } else if (staffToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${staffToken}`;
         }
     }, [staffToken, location.pathname, navigate]);
 
@@ -34,6 +36,7 @@ export default function StaffLayout() {
             if (result.isConfirmed) {
                 localStorage.removeItem('staffSessionToken');
                 localStorage.removeItem('staffUser');
+                delete axios.defaults.headers.common['Authorization'];
                 navigate('/staff/login');
             }
         });

@@ -44,6 +44,11 @@ self.addEventListener('fetch', event => {
     // Only handle GET requests and skip API calls entirely
     if (event.request.method !== 'GET') return;
     if (event.request.url.includes('/api/')) return;
+    // Skip Vite dev server internals to prevent HMR issues on localhost
+    if (event.request.url.includes('/@vite') || 
+        event.request.url.includes('/@fs') || 
+        event.request.url.includes('hot-update') || 
+        event.request.url.includes('node_modules')) return;
     if (!event.request.url.startsWith(self.location.origin)) return;
 
     if (event.request.mode === 'navigate') {

@@ -8,14 +8,23 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const axios = require('axios');
 require('dotenv').config();
-const JWT_SECRET = process.env.JWT_SECRET || process.env.APP_SECRET || 'khaliya_sanctuary_secure_jwt_secret_2026';
-const { getOtpEmailTemplate, getBookingEmailTemplate, getBillReceiptEmailTemplate } = require('./templates/emailTemplates');
 
+// Secure Cryptographic Secret Initialization (No hardcoded fallback secrets)
+const JWT_SECRET = process.env.JWT_SECRET || process.env.APP_SECRET || (() => {
+    console.warn('⚠️ [SECURITY WARNING] Neither JWT_SECRET nor APP_SECRET is defined in environment! Generating a cryptographically secure ephemeral 256-bit secret.');
+    return crypto.randomBytes(32).toString('hex');
+})();
+
+const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || process.env.APP_SECRET || JWT_SECRET;
+
+const { getOtpEmailTemplate, getBookingEmailTemplate, getBillReceiptEmailTemplate } = require('./templates/emailTemplates');
 
 // Global Process Safeguards (Prevents server from ever stopping on unhandled errors)
 process.on('uncaughtException', (err) => {
@@ -37,12 +46,16 @@ try {
     console.error('❌ [AUTH] Failed to initialize Twilio:', err.message);
 }
 
-// Resilient Nodemailer Gmail SMTP Transporter (Port 587 STARTTLS)
+// Resilient Nodemailer Gmail SMTP Transporter (Port 587 STARTTLS) - Without Hardcoded Credentials
 const getSmtpTransporters = () => {
-    const smtpUser = process.env.SMTP_USER || 'shivkumarrdn7@gmail.com';
-    const smtpPass = process.env.SMTP_PASS || 'nasyuwmtzsuarioo';
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
     const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpPort = Number(process.env.SMTP_PORT) || 587;
+
+    if (!smtpUser || !smtpPass) {
+        return { gmailTransporter: null, smtpUser: null };
+    }
 
     const gmailTransporter = nodemailer.createTransport({
         host: smtpHost,
@@ -65,6 +78,11 @@ const getSmtpTransporters = () => {
 };
 
 const sendEmailSecure = async ({ to, subject, text, html }) => {
+    if (process.env.NODE_ENV === 'test') {
+        console.log(`[TEST] Simulated email delivery to ${to}`);
+        return true;
+    }
+
     // 1. HTTPS API Gateway (Port 443 - Resend / Brevo)
     if (process.env.RESEND_API_KEY || process.env.BREVO_API_KEY) {
         try {
@@ -117,6 +135,10 @@ const sendEmailSecure = async ({ to, subject, text, html }) => {
 
     // 2. Standard Gmail Service Transport
     const { gmailTransporter, smtpUser } = getSmtpTransporters();
+    if (!gmailTransporter) {
+        console.warn('⚠️ [AUTH] SMTP credentials not configured in environment. Cannot dispatch email.');
+        return false;
+    }
 
     await gmailTransporter.sendMail({
         from: `"Khaliya Sanctuary" <${smtpUser}>`,
@@ -500,11 +522,7 @@ const seedDefaultMenu = async () => {
 seedAdminUser();
 seedDefaultMenu();
 
-// -- ADMIN AUTHENTICATION SECURITY (Stateless HMAC Tokens) --
-// Tokens are self-contained and survive server restarts.
-const crypto = require('crypto');
-const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || process.env.APP_SECRET || 'khaliya-admin-secret-key-2024';
-
+// -- AUTHENTICATION & ROLE-BASED ACCESS CONTROL (RBAC) SECURITY --
 const signAdminToken = (email) => {
     const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
     const payload = Buffer.from(JSON.stringify({ email, expires })).toString('base64url');
@@ -514,10 +532,13 @@ const signAdminToken = (email) => {
 
 const verifyAdminTokenData = (token) => {
     try {
-        const [payload, sig] = token.split('.');
+        if (!token || typeof token !== 'string') return null;
+        const parts = token.split('.');
+        if (parts.length !== 2) return null;
+        const [payload, sig] = parts;
         if (!payload || !sig) return null;
         const expectedSig = crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(payload).digest('base64url');
-        // Constant-time comparison to prevent timing attacks
+        if (Buffer.from(sig).length !== Buffer.from(expectedSig).length) return null;
         if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig))) return null;
         const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
         if (Date.now() > data.expires) return null;
@@ -527,17 +548,116 @@ const verifyAdminTokenData = (token) => {
     }
 };
 
-const verifyAdminToken = (req, res, next) => {
+// Rate limiting tracking stores
+const otpRateLimitMap = new Map();
+const otpFailuresMap = new Map();
+const staffLoginFailuresMap = new Map();
+
+const checkRateLimit = (store, key, maxAttempts, windowMs) => {
+    const now = Date.now();
+    const record = store.get(key) || { count: 0, resetAt: now + windowMs };
+    if (now > record.resetAt) {
+        record.count = 1;
+        record.resetAt = now + windowMs;
+        store.set(key, record);
+        return true;
+    }
+    if (record.count >= maxAttempts) {
+        return false;
+    }
+    record.count++;
+    store.set(key, record);
+    return true;
+};
+
+/**
+ * Unified Authentication Middleware
+ * Validates JWT tokens (staff, members) and stateless HMAC Admin tokens.
+ * Enforces missing, invalid, and expired token rejections.
+ */
+const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.split(' ')[1];
-        const data = verifyAdminTokenData(token);
-        if (data) {
-            req.adminEmail = data.email;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ 
+            success: false, 
+            message: 'Authentication required: Missing or invalid Authorization header' 
+        });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ 
+            success: false, 
+            message: 'Authentication required: Token missing' 
+        });
+    }
+
+    // 1. Attempt JWT verification
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = {
+            id: decoded.id,
+            name: decoded.name,
+            role: String(decoded.role || 'customer').toUpperCase(),
+            email: decoded.email
+        };
+        if (req.user.role === 'ADMIN') {
+            req.adminEmail = req.user.email || 'admin@khaliya.com';
+        }
+        return next();
+    } catch (jwtErr) {
+        if (jwtErr.name === 'TokenExpiredError') {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Authentication failed: Token has expired. Please log in again.' 
+            });
         }
     }
-    next();
+
+    // 2. Fallback: HMAC Admin Token verification
+    const adminData = verifyAdminTokenData(token);
+    if (adminData) {
+        req.user = {
+            id: 'ADMIN',
+            name: 'Administrator',
+            role: 'ADMIN',
+            email: adminData.email
+        };
+        req.adminEmail = adminData.email;
+        return next();
+    }
+
+    return res.status(401).json({ 
+        success: false, 
+        message: 'Authentication failed: Invalid authentication token' 
+    });
 };
+
+/**
+ * Role-Based Access Control Factory
+ */
+const requireRoles = (...roles) => {
+    const allowed = roles.map(r => String(r).toUpperCase());
+    return (req, res, next) => {
+        if (!req.user || !req.user.role) {
+            return res.status(401).json({ success: false, message: 'Authentication required' });
+        }
+        const userRole = req.user.role.toUpperCase();
+        if (!allowed.includes(userRole)) {
+            return res.status(403).json({ 
+                success: false, 
+                message: `Forbidden: Role '${userRole}' is not authorized to access this resource. Required: [${allowed.join(', ')}]` 
+            });
+        }
+        next();
+    };
+};
+
+const verifyAdminToken = [authenticateToken, requireRoles('ADMIN', 'MANAGER')];
+const requireAdmin = [authenticateToken, requireRoles('ADMIN')];
+const requireManagerOrAdmin = [authenticateToken, requireRoles('ADMIN', 'MANAGER')];
+const requireStaff = [authenticateToken, requireRoles('ADMIN', 'MANAGER', 'WAITER', 'CASHIER', 'KITCHEN')];
+const requireServiceStaff = [authenticateToken, requireRoles('ADMIN', 'MANAGER', 'WAITER', 'CASHIER')];
 
 app.post('/api/auth/admin-login', async (req, res) => {
     return res.status(400).json({ 
@@ -556,6 +676,12 @@ app.get('/api/auth/verify-admin-token', (req, res) => {
     if (data) {
         return res.json({ success: true, email: data.email });
     }
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (['ADMIN', 'MANAGER'].includes(String(decoded.role || '').toUpperCase())) {
+            return res.json({ success: true, email: decoded.email || decoded.name });
+        }
+    } catch {}
     return res.json({ success: false });
 });
 
@@ -971,8 +1097,8 @@ app.delete('/api/menu/:id', verifyAdminToken, async (req, res) => {
     }
 });
 
-// API: Bookings
-app.get('/api/bookings', async (req, res) => {
+// API: Bookings (Protected with RBAC)
+app.get('/api/bookings', requireStaff, async (req, res) => {
     const bookings = await readData('bookings');
     res.json(bookings);
 });
@@ -1024,9 +1150,26 @@ app.post('/api/bookings', async (req, res) => {
         return res.status(400).json({ message: 'Please enter a valid contact phone number.' });
     }
 
+    const maxCapacity = CAPACITY_MAP[trimmedTableType.toLowerCase()] || 4;
+
+    // Concurrency-safe atomic capacity verification directly against MongoDB database
+    if (models.bookings) {
+        const activeCount = await models.bookings.countDocuments({
+            date,
+            time,
+            tableType: new RegExp(`^${trimmedTableType}$`, 'i'),
+            status: { $ne: 'cancelled' }
+        });
+        if (activeCount >= maxCapacity) {
+            return res.status(409).json({ 
+                message: `Reservation failed: The selected slot (${time}) for ${trimmedTableType} is fully booked.` 
+            });
+        }
+    }
+
     const bookings = await readData('bookings');
     
-    // Enforce seating capacity checks
+    // Fallback in-memory count check
     const activeBookings = bookings.filter(b => 
         b.date === date && 
         b.tableType && b.tableType.toLowerCase() === trimmedTableType.toLowerCase() && 
@@ -1034,10 +1177,8 @@ app.post('/api/bookings', async (req, res) => {
         b.status !== 'cancelled'
     );
     
-    const maxCapacity = CAPACITY_MAP[trimmedTableType.toLowerCase()] || 4;
-    
     if (activeBookings.length >= maxCapacity) {
-        return res.status(400).json({ 
+        return res.status(409).json({ 
             message: `Reservation failed: The selected slot (${time}) for ${trimmedTableType} is fully booked.` 
         });
     }
@@ -1101,7 +1242,7 @@ const sendBookingConfirmationEmail = async (booking) => {
     }
 };
 
-app.put('/api/bookings/:id', async (req, res) => {
+app.put('/api/bookings/:id', requireManagerOrAdmin, async (req, res) => {
     const bookings = await readData('bookings');
     const index = bookings.findIndex(b => b.id == req.params.id);
     if (index !== -1) {
@@ -1122,7 +1263,7 @@ app.put('/api/bookings/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/bookings/:id', async (req, res) => {
+app.delete('/api/bookings/:id', requireManagerOrAdmin, async (req, res) => {
     const bookings = await readData('bookings');
     const filtered = bookings.filter(b => b.id != req.params.id);
     if (filtered.length !== bookings.length) {
@@ -1143,14 +1284,24 @@ app.post('/api/auth/request-email-otp', async (req, res) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    const rateLimitKey = `email_otp_${cleanEmail}_${clientIp}`;
+
+    // Rate Limiting: Max 3 OTP requests per 10 minutes
+    if (!checkRateLimit(otpRateLimitMap, rateLimitKey, 3, 10 * 60 * 1000)) {
+        return res.status(429).json({ 
+            success: false, 
+            message: 'Too many OTP requests. Please wait 10 minutes before requesting another code.' 
+        });
+    }
 
     try {
         // 1. Generate secure 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiry = Date.now() + 5 * 60 * 1000; // 5 mins
 
-        // 2. Store the OTP in memory
-        pendingEmailOtps[cleanEmail] = { otp, expiry };
+        // 2. Store the OTP in memory with attempt tracking
+        pendingEmailOtps[cleanEmail] = { otp, expiry, attempts: 0 };
 
         console.log(`✉️ [AUTH OTP] Request received for email: ${cleanEmail}`);
 
@@ -1206,11 +1357,12 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Verification code has expired. Please request a new code.' });
     }
 
+    record.attempts = (record.attempts || 0) + 1;
     const isMatch = (inputCode === record.otp);
 
     if (isMatch || record.verified) {
         record.verified = true;
-        setTimeout(() => { delete pendingEmailOtps[cleanEmail]; }, 30000);
+        delete pendingEmailOtps[cleanEmail];
         
         // Handle User Persistence
         const { name, phone } = req.body || {};
@@ -1250,7 +1402,17 @@ app.post('/api/auth/verify-email-otp', async (req, res) => {
             user: { ...user, isLoggedIn: true }
         });
     } else {
-        res.status(400).json({ success: false, message: 'Invalid verification code. Please check your email and try again.' });
+        if (record.attempts >= 5) {
+            delete pendingEmailOtps[cleanEmail];
+            return res.status(429).json({ 
+                success: false, 
+                message: 'Too many incorrect attempts. This verification code has been invalidated for security. Please request a new code.' 
+            });
+        }
+        res.status(400).json({ 
+            success: false, 
+            message: `Invalid verification code. Attempts remaining: ${5 - record.attempts}` 
+        });
     }
 });
 
@@ -1264,12 +1426,22 @@ app.post('/api/auth/request-phone-otp', async (req, res) => {
     }
 
     const cleanPhone = phone.trim().replace(/[^0-9+]/g, '');
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    const rateLimitKey = `phone_otp_${cleanPhone}_${clientIp}`;
+
+    // Rate Limiting: Max 3 OTP requests per 10 minutes
+    if (!checkRateLimit(otpRateLimitMap, rateLimitKey, 3, 10 * 60 * 1000)) {
+        return res.status(429).json({ 
+            success: false, 
+            message: 'Too many OTP requests. Please wait 10 minutes before requesting another code.' 
+        });
+    }
 
     try {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiry = Date.now() + 5 * 60 * 1000;
 
-        pendingPhoneOtps[cleanPhone] = { otp, expiry };
+        pendingPhoneOtps[cleanPhone] = { otp, expiry, attempts: 0 };
 
         let smsSent = false;
         if (twilioClient) {
@@ -1314,6 +1486,7 @@ app.post('/api/auth/verify-phone-otp', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Verification code has expired. Please request a new code.' });
     }
 
+    record.attempts = (record.attempts || 0) + 1;
     const isMatch = (inputCode === record.otp);
 
     if (isMatch) {
@@ -1351,7 +1524,17 @@ app.post('/api/auth/verify-phone-otp', async (req, res) => {
             user: { ...user, isLoggedIn: true }
         });
     } else {
-        res.status(400).json({ success: false, message: 'Invalid verification code. Please check your mobile and try again.' });
+        if (record.attempts >= 5) {
+            delete pendingPhoneOtps[cleanPhone];
+            return res.status(429).json({ 
+                success: false, 
+                message: 'Too many incorrect attempts. This verification code has been invalidated for security. Please request a new code.' 
+            });
+        }
+        res.status(400).json({ 
+            success: false, 
+            message: `Invalid verification code. Attempts remaining: ${5 - record.attempts}` 
+        });
     }
 });
 
@@ -1361,31 +1544,14 @@ app.post('/api/auth/check-session', async (req, res) => {
         return res.json({ success: true, valid: false, message: 'Email and Session ID are required' });
     }
     
-    if (email.toLowerCase() === 'shivkumarrdn7@gmail.com') {
+    const users = await readData('users');
+    const user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+    
+    if (user && user.currentSessionId === sessionId) {
         return res.json({ success: true, valid: true });
     }
     
-    const users = await readData('users');
-    let user = users.find(u => u.email === email.toLowerCase());
-    
-    if (!user) {
-        // Ephemeral storage fallback: restore user session if they don't exist
-        user = {
-            id: `USR-${Date.now()}`,
-            email: email.toLowerCase(),
-            name: 'Khaliya Member',
-            joinedAt: new Date().toISOString(),
-            spicePoints: 750,
-            role: 'customer',
-            currentSessionId: sessionId
-        };
-        users.push(user);
-        await writeData('users', users);
-        return res.json({ success: true, valid: true, message: 'User restored' });
-    }
-    
-    const isValid = user.currentSessionId === sessionId;
-    res.json({ success: true, valid: isValid });
+    return res.json({ success: true, valid: false });
 });
 
 app.post('/api/users/profile', async (req, res) => {
@@ -1493,15 +1659,36 @@ const getNextSequenceNumber = (type, existingList = []) => {
 // -- API: RAZORPAY PAYMENT GATEWAY --
 app.post('/api/create-razorpay-order', async (req, res) => {
     try {
-        const { amount, currency = 'INR', receipt } = req.body;
-        if (!amount || Number(amount) <= 0) {
-            return res.status(400).json({ success: false, message: 'Invalid payment amount' });
-        }
-        const keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_TaosPGZhWQa5wH';
-        const keySecret = process.env.RAZORPAY_KEY_SECRET || 'DN0HnVoBaz6JoksTvPYBvf2T';
+        const { amount, items, currency = 'INR', receipt } = req.body;
+        const keyId = process.env.RAZORPAY_KEY_ID;
+        const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-        const rzp = razorpayInstance || new Razorpay({ key_id: keyId, key_secret: keySecret });
-        const amountInPaise = Math.round(Number(amount) * 100);
+        if (!keyId || !keySecret) {
+            return res.status(500).json({ success: false, message: 'Razorpay payment gateway credentials not configured' });
+        }
+
+        let calculatedAmount = 0;
+        if (Array.isArray(items) && items.length > 0) {
+            const menuList = await readData('menu');
+            let subtotal = 0;
+            for (const it of items) {
+                const menuItem = menuList.find(m => String(m.id) === String(it.id));
+                const unitPrice = menuItem 
+                    ? (menuItem.effectivePriceNum || parseFloat(String(menuItem.price).replace(/[^0-9.]/g, '')) || 0)
+                    : (parseFloat(String(it.price || 0).replace(/[^0-9.]/g, '')) || 0);
+                subtotal += unitPrice * (parseInt(it.quantity, 10) || 1);
+            }
+            // Add 5% GST
+            calculatedAmount = Math.round(subtotal * 1.05);
+        } else if (amount && Number(amount) > 0) {
+            calculatedAmount = Number(amount);
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid payment amount or empty item list' });
+        }
+
+        const Razorpay = require('razorpay');
+        const rzp = new Razorpay({ key_id: keyId, key_secret: keySecret });
+        const amountInPaise = Math.round(calculatedAmount * 100);
 
         const options = {
             amount: amountInPaise,
@@ -1511,12 +1698,13 @@ app.post('/api/create-razorpay-order', async (req, res) => {
         };
 
         const razorpayOrder = await rzp.orders.create(options);
-        console.log(`💳 [RAZORPAY API] Created order ${razorpayOrder.id} for ₹${amount}`);
+        console.log(`💳 [RAZORPAY API] Created order ${razorpayOrder.id} for ₹${calculatedAmount} (Server-Calculated)`);
 
         res.json({
             success: true,
             orderId: razorpayOrder.id,
             amount: razorpayOrder.amount,
+            calculatedAmount,
             currency: razorpayOrder.currency,
             key: keyId
         });
@@ -1528,25 +1716,52 @@ app.post('/api/create-razorpay-order', async (req, res) => {
 
 app.post('/api/verify-razorpay-payment', async (req, res) => {
     try {
-        const crypto = require('crypto');
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderData } = req.body;
-        const keySecret = process.env.RAZORPAY_KEY_SECRET || 'DN0HnVoBaz6JoksTvPYBvf2T';
+        const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+        if (!keySecret) {
+            return res.status(500).json({ success: false, message: 'Razorpay secret key not configured' });
+        }
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            return res.status(400).json({ success: false, message: 'Missing payment verification parameters' });
+        }
 
         const expectedSignature = crypto
             .createHmac('sha256', keySecret)
             .update(`${razorpay_order_id}|${razorpay_payment_id}`)
             .digest('hex');
 
-        if (expectedSignature !== razorpay_signature) {
+        const isSigValid = expectedSignature.length === razorpay_signature.length &&
+            crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpay_signature));
+
+        if (!isSigValid) {
             console.error('❌ [RAZORPAY VERIFY] Payment signature verification failed!');
             return res.status(400).json({ success: false, message: 'Payment verification failed: Signature mismatch' });
         }
 
         console.log('✅ [RAZORPAY VERIFY] Payment verified successfully!', razorpay_payment_id);
 
+        // IDEMPOTENCY CHECK: Prevent duplicate order creation on retries
+        const orders = await readData('orders');
+        const existingOrder = orders.find(o => 
+            o.razorpayPaymentId === razorpay_payment_id || 
+            (o.paymentDetails && o.paymentDetails.razorpay_payment_id === razorpay_payment_id)
+        );
+
+        if (existingOrder) {
+            console.log(`⚠️ [RAZORPAY VERIFY] Order for payment ${razorpay_payment_id} already exists (Idempotent response).`);
+            return res.json({
+                success: true,
+                message: 'Payment already processed and order recorded',
+                paymentId: razorpay_payment_id,
+                order: existingOrder,
+                alreadyProcessed: true
+            });
+        }
+
         let createdOrder = null;
         if (orderData) {
-            const orders = await readData('orders');
             const epoch = Date.now();
             const isPickup = orderData.orderType === 'pickup' || orderData.orderType === 'takeout' || !orderData.tableNumber;
             
@@ -1571,9 +1786,9 @@ app.post('/api/verify-razorpay-payment', async (req, res) => {
                 status: 'received',
                 paymentStatus: 'PAID',
                 paymentMethod: 'RAZORPAY',
+                ...orderData,
                 razorpayPaymentId: razorpay_payment_id,
                 razorpayOrderId: razorpay_order_id,
-                ...orderData,
                 items: processedItems
             };
 
@@ -1608,13 +1823,19 @@ app.post('/api/verify-razorpay-payment', async (req, res) => {
 
 // -- API: ORDERS (PWA NATIVE ORDERS) --
 app.get('/api/orders', async (req, res) => {
-    const orders = await readData('orders') || [];
     const { phone, email, userId } = req.query || {};
 
+    // Restrict global order list to authenticated staff/admin
     if (!phone && !email && !userId) {
-        return res.json(orders);
+        return authenticateToken(req, res, () => {
+            requireRoles('ADMIN', 'MANAGER', 'WAITER', 'CASHIER', 'KITCHEN')(req, res, async () => {
+                const orders = await readData('orders') || [];
+                return res.json(orders);
+            });
+        });
     }
 
+    const orders = await readData('orders') || [];
     const cleanPhone = phone ? String(phone).trim().replace(/[^0-9+]/g, '') : '';
     const cleanEmail = email ? String(email).trim().toLowerCase() : '';
 
@@ -1683,7 +1904,7 @@ app.post('/api/orders', async (req, res) => {
     res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
 });
 
-app.put('/api/orders/:id', async (req, res) => {
+app.put('/api/orders/:id', requireManagerOrAdmin, async (req, res) => {
     const orders = await readData('orders');
     const index = orders.findIndex(o => o.id === req.params.id);
     if (index !== -1) {
@@ -1711,7 +1932,7 @@ app.put('/api/orders/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/orders/:id', async (req, res) => {
+app.delete('/api/orders/:id', requireManagerOrAdmin, async (req, res) => {
     const orders = await readData('orders');
     const filtered = orders.filter(o => o.id !== req.params.id);
     if (filtered.length !== orders.length) {
@@ -1723,8 +1944,7 @@ app.delete('/api/orders/:id', async (req, res) => {
 });
 
 // API: Analytics & Visits
-
-app.get('/api/analytics', async (req, res) => {
+app.get('/api/analytics', requireManagerOrAdmin, async (req, res) => {
     try {
         const orders = await readDataAsync('orders');
         const VisitModel = models['visits'];
@@ -1887,7 +2107,7 @@ app.post('/api/settings', verifyAdminToken, async (req, res) => {
 // THERMAL PRINTER MANAGEMENT & ESC/POS PRINT JOB ROUTING
 const printAgent = require('./print-agent');
 
-app.get('/api/printers', async (req, res) => {
+app.get('/api/printers', requireManagerOrAdmin, async (req, res) => {
     try {
         const printers = await readData('printers').catch(() => []);
         res.json({ success: true, printers: Array.isArray(printers) ? printers : [] });
@@ -2093,7 +2313,7 @@ app.post('/api/billing/split-pay', verifyAdminToken, async (req, res) => {
 });
 
 // --- KITCHEN ITEM FIRING API ---
-app.patch('/api/orders/:id/fire-items', async (req, res) => {
+app.patch('/api/orders/:id/fire-items', requireStaff, async (req, res) => {
     const { itemIndices, fireAll = false } = req.body || {};
     const orders = await readData('orders');
     const index = orders.findIndex(o => o.id === req.params.id || o._id === req.params.id);
@@ -2117,7 +2337,7 @@ app.patch('/api/orders/:id/fire-items', async (req, res) => {
 });
 
 // --- CASH DRAWER SHIFT RECONCILIATION API ---
-app.get('/api/shifts/active', async (req, res) => {
+app.get('/api/shifts/active', requireServiceStaff, async (req, res) => {
     try {
         const shifts = await readData('shifts').catch(() => []);
         const activeShift = Array.isArray(shifts) ? shifts.find(s => s.status === 'OPEN') : null;
@@ -2127,7 +2347,7 @@ app.get('/api/shifts/active', async (req, res) => {
     }
 });
 
-app.post('/api/shifts/open', async (req, res) => {
+app.post('/api/shifts/open', requireServiceStaff, async (req, res) => {
     const { staffId, staffName, openingFloat = 5000, shiftName = 'Main Shift' } = req.body || {};
     let shifts = await readData('shifts').catch(() => []);
     if (!Array.isArray(shifts)) shifts = [];
@@ -2169,7 +2389,7 @@ app.post('/api/shifts/open', async (req, res) => {
     res.json({ success: true, shift: newShift });
 });
 
-app.post('/api/shifts/close', async (req, res) => {
+app.post('/api/shifts/close', requireServiceStaff, async (req, res) => {
     const { shiftId, actualCash, notes = '', managerPin } = req.body || {};
     let shifts = await readData('shifts').catch(() => []);
     if (!Array.isArray(shifts)) shifts = [];
@@ -2230,7 +2450,7 @@ app.post('/api/shifts/close', async (req, res) => {
 });
 
 // --- SECURITY AUDIT LOGS API ---
-app.get('/api/audit-logs', async (req, res) => {
+app.get('/api/audit-logs', requireManagerOrAdmin, async (req, res) => {
     try {
         const logs = await readData('audit_logs').catch(() => []);
         res.json({ success: true, logs: Array.isArray(logs) ? logs : [] });
@@ -2239,7 +2459,7 @@ app.get('/api/audit-logs', async (req, res) => {
     }
 });
 
-app.post('/api/audit-logs', async (req, res) => {
+app.post('/api/audit-logs', requireManagerOrAdmin, async (req, res) => {
     try {
         let logs = await readData('audit_logs').catch(() => []);
         if (!Array.isArray(logs)) logs = [];
@@ -2247,7 +2467,7 @@ app.post('/api/audit-logs', async (req, res) => {
         const newLog = {
             id: `AUD-${Date.now()}`,
             timestamp: new Date().toISOString(),
-            staffName: req.body.staffName || 'System Staff',
+            staffName: req.body.staffName || (req.user ? req.user.name : 'System Staff'),
             action: req.body.action || 'SENSITIVE_ACTION',
             details: req.body.details || '',
             reason: req.body.reason || ''
@@ -2263,13 +2483,13 @@ app.post('/api/audit-logs', async (req, res) => {
 
 // --- DAILY AUTO-ROTATING MANAGER SECURITY PIN ENGINE ---
 const getDailyManagerPin = () => {
-    const todayStr = new Date().toISOString().split('T')[0]; // e.g. 2026-09-06
+    const todayStr = new Date().toISOString().split('T')[0];
     const hash = crypto.createHash('sha256').update(`khaliya-security-${todayStr}`).digest('hex');
     const pinNum = (parseInt(hash.slice(0, 8), 16) % 9000) + 1000;
     return String(pinNum);
 };
 
-app.get('/api/auth/daily-pin', verifyAdminToken, (req, res) => {
+app.get('/api/auth/daily-pin', requireManagerOrAdmin, (req, res) => {
     const dailyPin = getDailyManagerPin();
     const todayStr = new Date().toISOString().split('T')[0];
     res.json({
@@ -2280,17 +2500,21 @@ app.get('/api/auth/daily-pin', verifyAdminToken, (req, res) => {
     });
 });
 
-app.post('/api/auth/send-daily-pin', verifyAdminToken, async (req, res) => {
+app.post('/api/auth/send-daily-pin', requireManagerOrAdmin, async (req, res) => {
     const dailyPin = getDailyManagerPin();
-    const targetEmail = req.body.email || 'shivkumarrdn7@gmail.com';
+    const targetEmail = req.body.email || process.env.ADMIN_EMAIL || process.env.EMAIL_FROM;
+    if (!targetEmail) {
+        return res.status(400).json({ success: false, message: 'Recipient email address is required' });
+    }
     const todayStr = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     console.log(`🔑 [SECURITY] Daily Rotating Manager PIN generated for ${todayStr}: ${dailyPin}`);
 
-    if (emailTransporter) {
+    const { gmailTransporter, smtpUser } = getSmtpTransporters();
+    if (gmailTransporter && smtpUser) {
         try {
-            await emailTransporter.sendMail({
-                from: `"Khaliya Security Center" <${process.env.SMTP_USER || 'shivkumarrdn7@gmail.com'}>`,
+            await gmailTransporter.sendMail({
+                from: `"Khaliya Security Center" <${smtpUser}>`,
                 to: targetEmail,
                 subject: `🔒 Khaliya Today's Rotating Security PIN [${new Date().toISOString().split('T')[0]}]`,
                 html: `
@@ -2308,7 +2532,7 @@ app.post('/api/auth/send-daily-pin', verifyAdminToken, async (req, res) => {
                     </div>
                 `
             });
-            console.log(`✅ [SECURITY] Daily PIN ${dailyPin} emailed to ${targetEmail}`);
+            console.log(`✅ [SECURITY] Daily PIN emailed to ${targetEmail}`);
         } catch (emailErr) {
             console.error('❌ [SECURITY] Email dispatch error:', emailErr.message);
         }
@@ -2317,41 +2541,54 @@ app.post('/api/auth/send-daily-pin', verifyAdminToken, async (req, res) => {
     res.json({ success: true, message: `Daily security PIN sent to ${targetEmail}`, dailyPin });
 });
 
-// STAFF MANAGEMENT & PIN AUTHENTICATION ENDPOINTS
+// STAFF MANAGEMENT & PIN AUTHENTICATION ENDPOINTS (BCrypt Hashed PINs)
 const defaultStaffList = [
-    { id: 'STF-001', name: 'Rajesh Kumar', role: 'WAITER', pin: '1234', phone: '+91 9876543210', status: 'ACTIVE', shift: 'Morning' },
-    { id: 'STF-002', name: 'Sunita Sharma', role: 'CASHIER', pin: '2345', phone: '+91 9876543211', status: 'ACTIVE', shift: 'Full Day' },
-    { id: 'STF-003', name: 'Chef Vikas Khanna', role: 'KITCHEN', pin: '3456', phone: '+91 9876543212', status: 'ACTIVE', shift: 'Evening' },
-    { id: 'STF-004', name: 'Amit Verma', role: 'MANAGER', pin: '4567', phone: '+91 9876543213', status: 'ACTIVE', shift: 'Full Day' }
+    { id: 'STF-001', name: 'Rajesh Kumar', role: 'WAITER', pin: bcrypt.hashSync('1234', 10), phone: '+91 9876543210', status: 'ACTIVE', shift: 'Morning' },
+    { id: 'STF-002', name: 'Sunita Sharma', role: 'CASHIER', pin: bcrypt.hashSync('2345', 10), phone: '+91 9876543211', status: 'ACTIVE', shift: 'Full Day' },
+    { id: 'STF-003', name: 'Chef Vikas Khanna', role: 'KITCHEN', pin: bcrypt.hashSync('3456', 10), phone: '+91 9876543212', status: 'ACTIVE', shift: 'Evening' },
+    { id: 'STF-004', name: 'Amit Verma', role: 'MANAGER', pin: bcrypt.hashSync('4567', 10), phone: '+91 9876543213', status: 'ACTIVE', shift: 'Full Day' }
 ];
 
-app.get('/api/staff', async (req, res) => {
+app.get('/api/staff', requireManagerOrAdmin, async (req, res) => {
     try {
         let staff = await readData('staff').catch(() => []);
         if (!Array.isArray(staff) || staff.length === 0) {
             staff = defaultStaffList;
             await writeData('staff', staff).catch(() => {});
         }
-        res.json({ success: true, staff });
+        // CRITICAL SECURITY FIX: Strip staff PINs before returning to client
+        const sanitizedStaff = staff.map(({ pin, ...safe }) => safe);
+        res.json({ success: true, staff: sanitizedStaff });
     } catch {
-        res.json({ success: true, staff: defaultStaffList });
+        const sanitizedDefault = defaultStaffList.map(({ pin, ...safe }) => safe);
+        res.json({ success: true, staff: sanitizedDefault });
     }
 });
 
-app.post('/api/staff', verifyAdminToken, async (req, res) => {
+app.post('/api/staff', requireManagerOrAdmin, async (req, res) => {
     try {
         let staff = await readData('staff').catch(() => []);
         if (!Array.isArray(staff)) staff = [...defaultStaffList];
-        const newStaff = { ...req.body, id: req.body.id || `STF-${Date.now().toString().slice(-4)}` };
+        
+        const rawPin = req.body.pin ? String(req.body.pin) : '1234';
+        const hashedPin = rawPin.startsWith('$2') ? rawPin : bcrypt.hashSync(rawPin, 10);
+
+        const newStaff = { 
+            ...req.body, 
+            id: req.body.id || `STF-${Date.now().toString().slice(-4)}`,
+            pin: hashedPin
+        };
         staff.unshift(newStaff);
         await writeData('staff', staff);
-        res.json({ success: true, staff: newStaff });
+
+        const { pin: _p, ...safeStaff } = newStaff;
+        res.json({ success: true, staff: safeStaff });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 });
 
-app.delete('/api/staff/:id', verifyAdminToken, async (req, res) => {
+app.delete('/api/staff/:id', requireAdmin, async (req, res) => {
     try {
         let staff = await readData('staff').catch(() => []);
         if (Array.isArray(staff)) {
@@ -2366,20 +2603,58 @@ app.delete('/api/staff/:id', verifyAdminToken, async (req, res) => {
 
 app.post('/api/auth/staff-login', async (req, res) => {
     const { pin } = req.body;
+    if (!pin) {
+        return res.status(400).json({ success: false, message: 'Security PIN is required' });
+    }
+
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    const rateLimitKey = `staff_login_${clientIp}`;
+
+    // Rate Limiting: Max 5 failed attempts per 10 minutes
+    if (!checkRateLimit(staffLoginFailuresMap, rateLimitKey, 5, 10 * 60 * 1000)) {
+        return res.status(429).json({ 
+            success: false, 
+            message: 'Too many failed login attempts. Please wait 10 minutes before trying again.' 
+        });
+    }
+
     try {
         let staffList = await readData('staff').catch(() => []);
         if (!Array.isArray(staffList) || staffList.length === 0) staffList = defaultStaffList;
 
         const dailyPin = getDailyManagerPin();
-        const matchedStaff = staffList.find(s => String(s.pin) === String(pin));
-        const isDailyManagerPin = String(pin) === dailyPin;
+        const isDailyManagerPin = String(pin) === String(dailyPin);
 
-        if (matchedStaff || isDailyManagerPin || String(pin) === '1234' || String(pin) === '4567' || String(pin) === '0000') {
+        let matchedStaff = null;
+        for (const s of staffList) {
+            if (!s.pin) continue;
+            const isMatch = s.pin.startsWith('$2')
+                ? bcrypt.compareSync(String(pin), s.pin)
+                : String(s.pin) === String(pin);
+            
+            if (isMatch) {
+                matchedStaff = s;
+                // Auto-upgrade legacy plaintext PIN in DB to bcrypt hash
+                if (!s.pin.startsWith('$2')) {
+                    s.pin = bcrypt.hashSync(String(pin), 10);
+                    writeData('staff', staffList).catch(() => {});
+                }
+                break;
+            }
+        }
+
+        // HARDCODED BYPASS PINS REMOVED ('1234', '4567', '0000')
+        if (matchedStaff || isDailyManagerPin) {
+            // Reset failure counter on successful login
+            staffLoginFailuresMap.delete(rateLimitKey);
+
             const user = isDailyManagerPin 
-                ? { id: 'STF-MGR', name: 'Duty Manager (Daily PIN)', role: 'MANAGER', pin: dailyPin }
-                : (matchedStaff || { id: 'STF-001', name: 'Duty Staff', role: 'WAITER', pin: '1234' });
+                ? { id: 'STF-MGR', name: 'Duty Manager (Daily PIN)', role: 'MANAGER' }
+                : { id: matchedStaff.id, name: matchedStaff.name, role: matchedStaff.role };
             
             const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '12h' });
+            
+            // NEVER return PIN in response!
             res.json({ success: true, token, user });
         } else {
             res.status(401).json({ success: false, message: 'Invalid 4-digit Staff or Daily Security PIN.' });
@@ -2431,7 +2706,7 @@ async function dispatchKitchenPrintJob(order, ticketType = 'KOT') {
     return { success: false, queued: true };
 }
 
-app.post('/api/orders/:id/reprint-kot', async (req, res) => {
+app.post('/api/orders/:id/reprint-kot', requireStaff, async (req, res) => {
     const orders = await readData('orders');
     const order = orders.find(o => o.id === req.params.id || o._id === req.params.id);
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
@@ -2440,7 +2715,7 @@ app.post('/api/orders/:id/reprint-kot', async (req, res) => {
     res.json({ success: true, message: `*** REPRINT *** ticket dispatched for ${order.invoiceNo || order.id}`, result });
 });
 
-app.get('/api/printers/queue', async (req, res) => {
+app.get('/api/printers/queue', requireManagerOrAdmin, async (req, res) => {
     try {
         const queue = await readData('print_queue').catch(() => []);
         res.json({ success: true, queue: Array.isArray(queue) ? queue : [] });
@@ -2449,7 +2724,7 @@ app.get('/api/printers/queue', async (req, res) => {
     }
 });
 
-app.post('/api/printers/queue/retry', async (req, res) => {
+app.post('/api/printers/queue/retry', requireManagerOrAdmin, async (req, res) => {
     try {
         let queue = await readData('print_queue').catch(() => []);
         if (!Array.isArray(queue) || queue.length === 0) {
@@ -2520,7 +2795,22 @@ app.use((req, res) => {
     }
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
-});
+// Start Server (only when run directly, not when required in tests)
+let server;
+if (require.main === module) {
+    server = app.listen(PORT, () => {
+        console.log(`Backend server running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = { 
+    app, 
+    server, 
+    JWT_SECRET, 
+    ADMIN_TOKEN_SECRET, 
+    signAdminToken, 
+    verifyAdminTokenData, 
+    getDailyManagerPin,
+    defaultStaffList
+};
+

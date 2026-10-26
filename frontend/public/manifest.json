@@ -1,9 +1,10 @@
 {
+  "id": "khaliya-sanctuary-app",
   "name": "Khaliya Sanctuary - Royal Indian Cuisine",
   "short_name": "Khaliya",
   "description": "Experience the royal heritage of authentic Indian fine dining with Khaliya Sanctuary. Order online, reserve dining spaces, and explore signature delicacies.",
-  "start_url": "./?mode=pwa",
-  "scope": "./",
+  "start_url": "/?mode=pwa",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#070A0E",
